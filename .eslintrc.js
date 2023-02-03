@@ -132,7 +132,7 @@ module.exports = {
                 'react/react-in-jsx-scope': 'off',
 
                 /* mobx */
-                'mobx/missing-observer': isFixMode ? 'off' : 'warn'
+                'mobx/missing-observer': isFixMode ? 'off' : 'off' // : 'warn'
             },
             settings: {
                 react: {
@@ -145,6 +145,13 @@ module.exports = {
             rules: {
                 '@typescript-eslint/explicit-function-return-type': 'off',
                 'import/no-extraneous-dependencies': ['error', { devDependencies: true }]
+            }
+        },
+        {
+            files: ['src/**/*.stories.ts', 'src/**/*.stories.tsx'],
+            rules: {
+                '@typescript-eslint/explicit-function-return-type': 'off',
+                'import/no-extraneous-dependencies': 'off'
             }
         },
         {
