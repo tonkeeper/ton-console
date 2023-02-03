@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": false,
+    "isolatedModules": false,
+    "types": ["vitest/globals"],
+    "paths": {
+      "tests/*": ["./tests/*"],
+      "src/*": ["./src/*"]
+    }
+  },
+  "include": ["tests"],
+  "exclude": ["src"]
+}

@@ -22,5 +22,6 @@
     }
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "exclude": ["tests"],
+  "references": [{ "path": "./tsconfig.vite.json" }, { "path": "./tsconfig.test.json" }]
 }

@@ -33,16 +33,35 @@ module.exports = {
     },
     overrides: [
         {
-            files: ['src/**/*.ts', 'src/**/*.tsx'],
-            parser: '@typescript-eslint/parser',
+            files: ['**/*.ts'],
             parserOptions: {
-                project: './tsconfig.json',
+                parser: '@typescript-eslint/parser',
                 sourceType: 'module',
-                ecmaVersion: 'latest',
+                ecmaVersion: 'latest'
+            }
+        },
+        {
+            files: ['src/**/*.tsx', 'tests/**/*.tsx'],
+            parserOptions: {
                 ecmaFeatures: {
                     jsx: true
                 }
-            },
+            }
+        },
+        {
+            files: ['src/**/*.ts', 'src/**/*.tsx'],
+            parserOptions: {
+                project: './tsconfig.json'
+            }
+        },
+        {
+            files: ['tests/**/*.ts', 'tests/**/*.tsx'],
+            parserOptions: {
+                project: './tsconfig.test.json'
+            }
+        },
+        {
+            files: ['src/**/*.ts', 'src/**/*.tsx', 'tests/**/*.ts', 'tests/**/*.tsx'],
             plugins: [
                 'react',
                 'react-hooks',
@@ -122,11 +141,15 @@ module.exports = {
             }
         },
         {
+            files: ['tests/**/*.ts', 'tests/**/*.tsx'],
+            rules: {
+                '@typescript-eslint/explicit-function-return-type': 'off',
+                'import/no-extraneous-dependencies': ['error', { devDependencies: true }]
+            }
+        },
+        {
             files: ['vite.config.ts'],
             parserOptions: {
-                parser: '@typescript-eslint/parser',
-                sourceType: 'module',
-                ecmaVersion: 'latest',
                 project: './tsconfig.config.json'
             },
             rules: {
