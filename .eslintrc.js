@@ -1,3 +1,5 @@
+var isFixMode = process.argv.includes('--fix');
+
 module.exports = {
     root: true,
     ignorePatterns: ['node_modules'],
@@ -108,7 +110,10 @@ module.exports = {
                 '@typescript-eslint/indent': 'off',
 
                 /* react */
-                'react/react-in-jsx-scope': 'off'
+                'react/react-in-jsx-scope': 'off',
+
+                /* mobx */
+                'mobx/missing-observer': isFixMode ? 'off' : 'warn'
             },
             settings: {
                 react: {
