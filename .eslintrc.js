@@ -68,13 +68,17 @@ module.exports = {
                 '@typescript-eslint',
                 'import',
                 'unused-imports',
-                'mobx'
+                'mobx',
+                'chakra-ui',
+                'i18next'
             ],
             extends: [
                 'airbnb-typescript/base',
                 'plugin:react/recommended',
+                'plugin:react-hooks/recommended',
                 'plugin:mobx/recommended',
-                'plugin:@typescript-eslint/recommended'
+                'plugin:@typescript-eslint/recommended',
+                'plugin:i18next/recommended'
             ],
             rules: {
                 /* imports */
@@ -130,6 +134,11 @@ module.exports = {
 
                 /* react */
                 'react/react-in-jsx-scope': 'off',
+
+                /* Chakra UI */
+                'chakra-ui/props-order': 'error',
+                'chakra-ui/props-shorthand': 'error',
+                'chakra-ui/require-specific-component': 'error',
 
                 /* mobx */
                 'mobx/missing-observer': isFixMode ? 'off' : 'off' // : 'warn'
