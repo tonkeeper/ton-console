@@ -2,7 +2,7 @@ var isFixMode = process.argv.includes('--fix');
 
 module.exports = {
     root: true,
-    ignorePatterns: ['node_modules'],
+    ignorePatterns: ['node_modules', '.storybook'],
     extends: ['plugin:prettier/recommended', 'prettier'],
     rules: {
         /* common */
@@ -131,6 +131,7 @@ module.exports = {
                 '@typescript-eslint/no-shadow': 'error',
                 '@typescript-eslint/return-await': 'error',
                 '@typescript-eslint/indent': 'off',
+                '@typescript-eslint/no-non-null-assertion': 'off',
 
                 /* react */
                 'react/react-in-jsx-scope': 'off',

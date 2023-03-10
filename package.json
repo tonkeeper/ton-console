@@ -1,5 +1,5 @@
 {
-  "name": "tonkeeper-pro",
+  "name": "ton-console",
   "private": true,
   "version": "0.0.1",
   "scripts": {
@@ -33,7 +33,8 @@
     "@storybook/addon-essentials": "^6.5.16",
     "@storybook/addon-interactions": "^6.5.16",
     "@storybook/addon-links": "^6.5.16",
-    "@storybook/builder-vite": "^0.4.0",
+    "@storybook/builder-webpack5": "^6.5.16",
+    "@storybook/manager-webpack5": "^6.5.16",
     "@storybook/react": "^6.5.16",
     "@storybook/testing-library": "^0.0.13",
     "@testing-library/jest-dom": "^5.16.5",
@@ -63,6 +64,7 @@
     "typescript": "^4.9.3",
     "vite": "^4.1.1",
     "vite-tsconfig-paths": "^4.0.5",
-    "vitest": "^0.28.4"
+    "vitest": "^0.28.4",
+    "webpack": "^5.76.0"
   }
 }
