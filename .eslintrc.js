@@ -135,6 +135,12 @@ module.exports = {
 
                 /* react */
                 'react/react-in-jsx-scope': 'off',
+                'i18next/no-literal-string': [
+                    'warn',
+                    {
+                        exclude: ['Ton Console']
+                    }
+                ],
 
                 /* Chakra UI */
                 'chakra-ui/props-order': 'error',

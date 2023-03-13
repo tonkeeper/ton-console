@@ -1,6 +1,6 @@
 export default {
     borderRadius: 'lg',
-    borderColor: 'transparent',
+    border: 0,
     boxShadow: 'none',
     cursor: 'pointer',
     display: 'inline-flex',
