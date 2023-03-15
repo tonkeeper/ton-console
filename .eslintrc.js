@@ -141,6 +141,8 @@ module.exports = {
                         exclude: ['Ton Console']
                     }
                 ],
+                'react-hooks/rules-of-hooks': 'error',
+                'react-hooks/exhaustive-deps': 'error',
 
                 /* Chakra UI */
                 'chakra-ui/props-order': 'error',

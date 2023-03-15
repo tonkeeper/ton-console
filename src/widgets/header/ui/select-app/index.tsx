@@ -12,7 +12,7 @@ export const SelectApp: FunctionComponent<ComponentProps<typeof Box>> = props =>
             <Menu placement="bottom">
                 <MenuButton as={MenuButtonStyled} w="240px" rightIcon={<ArrowIcon />}>
                     <HStack spacing="2">
-                        <Image w="7" h="7" borderRadius="sm" src="assets/images/getgems.png" />
+                        <Image w="7" h="7" borderRadius="sm" src="/assets/images/getgems.png" />
                         <Text textStyle="label2" noOfLines={1}>
                             {selectedProjectName}
                         </Text>

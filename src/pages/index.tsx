@@ -1,16 +1,19 @@
 import { FunctionComponent, lazy, Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { LayoutWithAside } from 'src/pages/layouts';
+import TonapiRouting from 'src/pages/tonapi';
 
 const SubscriptionsPage = lazy(() => import('./subscriptions'));
 const DashboardPage = lazy(() => import('./dashboard'));
+const SettingsPage = lazy(() => import('./settings'));
+const SupportPage = lazy(() => import('./support'));
 
 export const Routing: FunctionComponent = () => {
     return (
         <Routes>
             <Route path="/" element={<LayoutWithAside />}>
                 <Route
-                    index
+                    path="dashboard"
                     element={
                         <Suspense fallback={<>...</>}>
                             <DashboardPage />
@@ -25,6 +28,25 @@ export const Routing: FunctionComponent = () => {
                         </Suspense>
                     }
                 />
+                <Route path="tonapi">{TonapiRouting}</Route>
+                <Route
+                    path="settings"
+                    element={
+                        <Suspense fallback={<>...</>}>
+                            <SettingsPage />
+                        </Suspense>
+                    }
+                />
+                <Route
+                    path="support"
+                    element={
+                        <Suspense fallback={<>...</>}>
+                            <SupportPage />
+                        </Suspense>
+                    }
+                />
+                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route path="*" element={<Navigate to="dashboard" replace />} />
             </Route>
         </Routes>
     );

@@ -17,9 +17,14 @@ export interface DropDownMenuItemExpandableProps extends PropsWithChildren {
     leftIcon?: ReactNode;
 
     layer?: number;
+
+    linkTo?: string;
+
+    path?: string;
 }
 
-const _hover = { backgroundColor: 'background.contentTint' };
+const _hover = { backgroundColor: 'transparent', transform: 'scale(1.03)' };
+const _active = { backgroundColor: 'transparent', transform: 'scale(0.97)' };
 export const DropDownMenuItemExpandable: FunctionComponent<
     DropDownMenuItemExpandableProps
 > = props => {
@@ -29,11 +34,18 @@ export const DropDownMenuItemExpandable: FunctionComponent<
                 return child;
             }
 
-            return cloneElement(child as ReactElement<{ layer?: number }>, {
-                layer: (props.layer || 0) + 1
+            let path = props.path;
+            if (path && props.linkTo) {
+                path += `/${props.linkTo}`;
+            }
+            path ||= props.linkTo;
+
+            return cloneElement(child as ReactElement<{ layer?: number; path?: string }>, {
+                layer: (props.layer || 0) + 1,
+                path
             });
         });
-    }, [props.children, props.layer]);
+    }, [props.children, props.layer, props.path, props.linkTo]);
 
     return (
         <Accordion allowToggle>
@@ -52,6 +64,8 @@ export const DropDownMenuItemExpandable: FunctionComponent<
                             fontSize="14px"
                             borderRadius="md"
                             _hover={_hover}
+                            _active={_active}
+                            transition=""
                         >
                             {props.leftIcon}
                             <Box textAlign="left" wordBreak="break-all" noOfLines={1}>

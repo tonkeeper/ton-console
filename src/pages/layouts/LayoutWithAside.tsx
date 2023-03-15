@@ -1,7 +1,7 @@
 import { Box, Flex } from '@chakra-ui/react';
 import { Aside, Footer, Header } from 'src/widgets';
 import { Overlay } from 'src/shared';
-import { Outlet } from 'react-router';
+import { Outlet } from 'react-router-dom';
 import { FunctionComponent } from 'react';
 
 export const LayoutWithAside: FunctionComponent = () => {
