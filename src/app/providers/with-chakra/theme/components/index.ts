@@ -4,6 +4,9 @@ import Menu from './menu';
 import Text from './text';
 import Link from './link';
 import Modal from './modal';
+import Form from './form';
+import Input from './input';
+import FormError from './form-error';
 
 export default {
     Button,
@@ -11,5 +14,8 @@ export default {
     Menu,
     Text,
     Link,
-    Modal
+    Modal,
+    Form,
+    Input,
+    FormError
 };

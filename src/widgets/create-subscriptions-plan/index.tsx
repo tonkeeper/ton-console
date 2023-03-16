@@ -1,4 +1,5 @@
 import {
+    Box,
     Button,
     Modal,
     ModalBody,
@@ -10,90 +11,34 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 import { FunctionComponent } from 'react';
+import { CreateSubscriptionsPlanForm } from './create-subscriptions-plan-form';
 
 export const CreateSubscriptionsPlan: FunctionComponent = () => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen, onClose } = useDisclosure();
 
     return (
         <>
-            <Button onClick={onOpen}>Open Modal</Button>
+            <Box w="560px" px="24px">
+                <CreateSubscriptionsPlanForm />
+            </Box>
+
+            {/* <Button onClick={onOpen}>Open Modal</Button>*/}
 
             <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Modal Title</ModalHeader>
+                    <ModalHeader>Subscription plan</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        Lorem count
-                        <br />
-                        Lorem count Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
-                        Lorem count
-                        <br />
+                        <CreateSubscriptionsPlanForm />
                     </ModalBody>
 
                     <ModalFooter gap="3">
-                        <Button flex={1} mr={3} colorScheme="blue" onClick={onClose}>
-                            Close
+                        <Button flex={1} onClick={onClose} variant="secondary">
+                            Cancel
                         </Button>
-                        <Button flex={1} variant="ghost">
-                            Secondary Action
+                        <Button flex={1} variant="primary">
+                            Deploy
                         </Button>
                     </ModalFooter>
                 </ModalContent>
