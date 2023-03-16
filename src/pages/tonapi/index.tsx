@@ -1,4 +1,5 @@
-import { lazy, Suspense } from 'react';
+import { lazy } from '@loadable/component';
+import { Suspense } from 'react';
 import { Navigate, Route } from 'react-router-dom';
 
 const BillingPage = lazy(() => import('./billing'));

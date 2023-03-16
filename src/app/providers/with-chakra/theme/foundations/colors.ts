@@ -14,7 +14,8 @@ const colors = {
     icon: {
         primary: '#000000',
         secondary: '#7E868F',
-        tertiary: '#A0A6AD'
+        tertiary: '#A0A6AD',
+        contrast: '#FFFFFF'
     },
     accent: {
         blue: '#2E84E5',
@@ -29,6 +30,10 @@ const colors = {
     constant: {
         black: '#000000',
         white: '#FFFFFF'
+    },
+    scrollbar: {
+        primary: '#C1C1C1',
+        hover: '#7C7D7C'
     }
 } as const;
 

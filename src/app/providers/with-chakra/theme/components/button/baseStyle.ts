@@ -1,5 +1,5 @@
 export default {
-    borderRadius: 'lg',
+    borderRadius: 'md',
     border: 0,
     boxShadow: 'none',
     cursor: 'pointer',

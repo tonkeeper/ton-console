@@ -7,10 +7,10 @@ import styles from './global-styles';
 
 const theme = extendTheme(
     {
-        components,
         ...typography,
         ...foundations,
-        styles
+        styles,
+        components
     },
     {
         config: defaultTheme.config,

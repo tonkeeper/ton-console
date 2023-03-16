@@ -1,8 +1,10 @@
 import { defineStyle } from '@chakra-ui/react';
 import type { SystemStyleInterpolation } from '@chakra-ui/styled-system';
+import textStyles from '../../foundations/textStyles';
 
 function variant(backgroundColor: string, color: string): SystemStyleInterpolation {
     return defineStyle({
+        ...textStyles.label2,
         backgroundColor,
         borderRadius: 'md',
         color,
