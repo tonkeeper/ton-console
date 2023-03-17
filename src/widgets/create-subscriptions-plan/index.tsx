@@ -14,7 +14,7 @@ import { FunctionComponent } from 'react';
 import { CreateSubscriptionsPlanForm } from './create-subscriptions-plan-form';
 
 export const CreateSubscriptionsPlan: FunctionComponent = () => {
-    const { isOpen, onClose } = useDisclosure();
+    const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (
         <>
@@ -22,7 +22,7 @@ export const CreateSubscriptionsPlan: FunctionComponent = () => {
                 <CreateSubscriptionsPlanForm />
             </Box>
 
-            {/* <Button onClick={onOpen}>Open Modal</Button>*/}
+            <Button onClick={onOpen}>Open Modal</Button>
 
             <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
                 <ModalOverlay />

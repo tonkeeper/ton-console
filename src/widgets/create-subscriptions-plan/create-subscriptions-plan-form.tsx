@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { FunctionComponent } from 'react';
 import { Button, FormControl, FormErrorMessage, FormLabel, Input } from '@chakra-ui/react';
+import { ImageInput } from 'src/shared';
 
 export const CreateSubscriptionsPlanForm: FunctionComponent = () => {
     const {
@@ -9,10 +10,8 @@ export const CreateSubscriptionsPlanForm: FunctionComponent = () => {
         formState: { errors }
     } = useForm();
 
-    console.log(errors);
-
     const onSubmit = (values: unknown): void => {
-        alert(values);
+        console.debug(values);
     };
 
     return (
@@ -32,6 +31,24 @@ export const CreateSubscriptionsPlanForm: FunctionComponent = () => {
                     {!!errors.name && (errors.name.message as string)}
                 </FormErrorMessage>
             </FormControl>
+
+            <FormControl>
+                <FormLabel htmlFor="description">Description</FormLabel>
+                <Input
+                    autoComplete="off"
+                    id="description"
+                    placeholder="Description"
+                    {...register('description')}
+                />
+            </FormControl>
+            <FormControl isInvalid={!!errors.image} isRequired>
+                <FormLabel htmlFor="image">Image</FormLabel>
+                <ImageInput {...register('image', { required: 'This is required' })} />
+                <FormErrorMessage>
+                    {!!errors.image && (errors.image.message as string)}
+                </FormErrorMessage>
+            </FormControl>
+
             <Button mt={4} type="submit">
                 Submit
             </Button>

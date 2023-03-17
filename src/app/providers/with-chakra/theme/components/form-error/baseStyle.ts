@@ -3,7 +3,7 @@ import { definePartsStyle } from './parts';
 
 export default definePartsStyle({
     text: {
-        mt: '1',
+        mt: 0,
         position: 'absolute',
         color: 'accent.red',
         ...textStyles.label3
