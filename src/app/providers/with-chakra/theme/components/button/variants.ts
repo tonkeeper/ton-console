@@ -20,6 +20,11 @@ function variant(backgroundColor: string, color: string): SystemStyleInterpolati
         },
         _disabled: {
             opacity: 0.48
+        },
+        _loading: {
+            _hover: {
+                bg: backgroundColor
+            }
         }
     });
 }
