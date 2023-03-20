@@ -1,0 +1,623 @@
+openapi: 3.0.0
+info:
+  title: "REST API to TON Console"
+  version: 0.0.1
+  contact:
+    name: "Support"
+    email: "contact@tonaps.org"
+
+servers:
+  - url: "http://localhost:8888"
+
+paths:
+  /v1/auth/tg:
+    post:
+      description: "Auth via telegram"
+      operationId: authViaTG
+      tags:
+        - auth
+      requestBody:
+        $ref: "#/components/requestBodies/TgAuthInput"
+      responses:
+        '200':
+          $ref: '#/components/responses/TgAuthOk'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /v1/auth/ton-proof/generate_payload:
+    post:
+      description: "Generate payload for TON Connect"
+      operationId: authGeneratePayload
+      tags:
+        - auth
+      responses:
+        '200':
+          $ref: '#/components/responses/GeneratePayload'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /v1/auth/ton-proof/check_proof:
+    post:
+      description: "Auth via TON Connect"
+      operationId: authViaTonConnect
+      tags:
+        - auth
+      requestBody:
+        $ref: "#/components/requestBodies/TonProofInput"
+      responses:
+        '200':
+          $ref: '#/components/responses/AuthToken'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
+  /v1/account/logout:
+    post:
+      description: "Logout from the system"
+      operationId: accountLogout
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - account
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
+  /v1/apps:
+    get:
+      description: "Get apps by user account"
+      operationId: getApps
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - app
+      responses:
+        '200':
+          $ref: '#/components/responses/Apps'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /v1/app:
+    post:
+      description: "Create app"
+      operationId: createApp
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - app
+      requestBody:
+        $ref: "#/components/requestBodies/AppInputCreate"
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /v1/app/{id}:
+    delete:
+      description: "Delete app"
+      operationId: deleteApp
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - app
+      parameters:
+        - $ref: '#/components/parameters/appID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      description: "Update app"
+      operationId: updateApp
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - app
+      parameters:
+        - $ref: '#/components/parameters/appID'
+      requestBody:
+        $ref: "#/components/requestBodies/AppInputUpdate"
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /app/{id}/generate:
+    post:
+      description: "Generate app token"
+      operationId: generateAppToken
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - app
+      parameters:
+        - $ref: '#/components/parameters/appID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /app/token/{id}:
+    delete:
+      description: "Delete app token"
+      operationId: deleteAppToken
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - app
+      parameters:
+        - $ref: '#/components/parameters/tokenID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  parameters:
+    appID:
+      description: App ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+        format: int64
+    tokenID:
+      description: Token ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+        format: int64
+  
+  requestBodies:
+    TgAuthInput:
+      description: "Data that is expected from Telegram"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - id
+              - hash
+              - auth_date
+            properties:
+              id:
+                type: integer
+                format: int64
+                example: "1261871881"
+              first_name:
+                type: string
+                example: "Test"
+              photo_url:
+                type: string
+                example: "Testov"
+              username:
+                type: string
+                example: "testov"
+              hash:
+                type: string
+              auth_date:
+                type: integer
+                format: int64
+                example: "1678275313"
+    TonProofInput:
+      description: "Data that is expected from TON Connect"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - address
+              - network
+              - proof
+            properties:
+              address:
+                type: string
+                example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+              network:
+                type: string
+                example: "-3"
+                enum:
+                  - "-3"
+                  - "-239"
+                description: "-3 is testnet network, -239 is mainnet network"
+              proof:
+                type: object
+                properties:
+                  timestamp:
+                    type: integer
+                    format: int64
+                    example: "1678275313"
+                  domain:
+                    type: object
+                    properties:
+                      length_bytes:
+                        type: integer
+                        format: uint32
+                      value:
+                        type: string
+                  signature:
+                    type: string
+                  payload:
+                    type: string
+                  state_init:
+                    type: string
+    AppInputCreate:
+      description: "Data that is expected"
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required:
+              - address
+              - network
+              - proof
+            properties:
+              name:
+                type: string
+                example: "Test App"
+              oauth_url:
+                type: string
+                example: "https://tonapi.io"
+              image:
+                type: string
+                format: binary
+    AppInputUpdate:
+      description: "Data that is expected"
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Test App"
+              enable_notifications:
+                type: boolean
+                example: true
+              remove_push_credentials:
+                type: boolean
+                example: true
+              oauth_url:
+                type: string
+                example: "https://tonapi.io"
+              image:
+                type: string
+                format: binary
+              firebase_credentials:
+                type: string
+                format: binary
+
+  schemas:
+    Ok:
+      type: object
+      required:
+        - ok
+      properties:
+        ok:
+          type: boolean
+          example: true
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: "Error message"
+    User:
+      type: object
+      required:
+        - id
+        - is_ban
+        - date_create
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: "1464363297"
+        tg_id:
+          type: integer
+          format: int64
+          example: "1260831881"
+          description: "ID from the Telegram service"
+        wallet_address:
+          type: string
+          example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+          description: "TON wallet address"
+        first_name:
+          type: string
+          example: "Test"
+        last_name:
+          type: string
+          example: "Testov"
+        avatar:
+          type: string
+          example: "https://test.io/my_face.png"
+        is_ban:
+          type: boolean
+          default: false
+          example: false
+        token:
+          type: string
+          description: "Authorization token"
+        date_create:
+          type: integer
+          format: int64
+          example: 1678275313
+    Webhook:
+      type: object
+      required:
+        - id
+        - user_id
+        - app_id
+        - payload_url
+        - secret
+        - active
+        - type_actions
+        - date_create
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        user_id:
+          type: integer
+          format: int64
+          example: 1464363297
+        app_id:
+          type: integer
+          format: int64
+          example: 2465363097
+        payload_url:
+          type: string
+          example: "http://tonapi.io/callback"
+        secret:
+          type: string
+          example: "it's my secret"
+        addresses:
+          type: array
+          items:
+            type: string
+          example: [
+            "0:15d570f9c0c67e8e6d40f5c69be049a247dd6c0e841d31ac8dcc3edf4a57d057",
+            "0:85d570f9c0c67e8e6v40f2c69be049a217dd6c0f841d31ac8dcc3edf4a57d057"
+          ]
+        active:
+          type: boolean
+          example: true
+        type_actions:
+          type: array
+          items:
+            type: string
+            example: "account_event"
+          enum:
+            - "account_event"
+        date_create:
+          type: integer
+          format: int64
+          example: 1678275313
+    App:
+      type: object
+      required:
+        - id
+        - name
+        - user_id
+        - is_ban
+        - date_create
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 2465363097
+        user_id:
+          type: integer
+          format: int64
+          example: 1464363297
+        name:
+          type: string
+          example: "Test App"
+        avatar:
+          type: string
+          example: "https://tonapi.io/static/test.png"
+        app_tokens:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppToken'
+        webhooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Webhook'
+        oauth_url:
+          type: string
+          example: "https://tonapi.io/login?app=2465363097"
+        is_ban:
+          type: boolean
+          example: false
+        firebase_filename:
+          type: string
+          example: "firebase_creds.json"
+        enable_notifications:
+          type: boolean
+          example: true
+        date_create:
+          type: integer
+          format: int64
+          example: 1678275313
+    AppToken:
+      type: object
+      required:
+        - id
+        - user_id
+        - app_id
+        - tire
+        - token
+        - is_ban
+        - active
+        - date_create
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          format: int64
+          example: 1464363297
+        app_id:
+          type: integer
+          format: int64
+          example: 2465363097
+        tire:
+          $ref: '#/components/schemas/AppTokenTire'
+        token:
+          type: string
+          example: "AFWRUVK5QHVRFFAAAAACNAS5QU22SHA2D4SMH3SFJOOQB5PCBU7Z7KDDWKQT5KI2YNABHBI"
+        is_ban:
+          type: boolean
+          example: false
+        active:
+          type: boolean
+          example: true
+        date_create: 
+          type: integer
+          format: int64
+          example: 1678275313
+    AppTokenTire:
+      type: object
+      required:
+        - name
+        - rpc
+        - burst
+      properties:
+        id:
+          type: string
+          example: "Test tire"
+        burst:
+          type: number
+          example: 1
+        rpc:
+          type: number
+          example: 5
+
+  responses:
+    NotFound:
+      description: "The specified resource was not found"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: "Something went wrong on server side"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: "Something went wrong on client side"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnauthorizedError:
+      description: "Access token is missing or invalid"
+    Ok:
+      description: "Ok"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Ok'
+    TgAuthOk:
+      description: "Successful authorization"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user
+            properties:
+              user:
+                $ref: '#/components/schemas/User'
+    GeneratePayload:
+      description: "Payload for TON Connect"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - payload
+            properties:
+              payload:
+                type: string
+    AuthToken:
+      description: "Authorization token for work TON Console"
+      content:
+        application/json:
+          schema:
+            required:
+              - token
+            type: object
+            properties:
+              token:
+                type: string
+    Apps:
+      description: "Apps by user account"
+      content:
+        application/json:
+          schema:
+            required:
+              - items
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/App'
+  
+  securitySchemes:
+    JWTAuth:
+      description: "JWT token authorization"
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

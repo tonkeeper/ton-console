@@ -2,12 +2,15 @@
 /// <reference types="vite/client" />
 
 import { defineConfig } from 'vite';
+import mkcert from 'vite-plugin-mkcert';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
-    plugins: [tsconfigPaths(), react()],
+    plugins: [tsconfigPaths(), react(), mkcert()],
     server: {
+        port: 5173,
+        https: true,
         watch: {
             usePolling: true
         }
