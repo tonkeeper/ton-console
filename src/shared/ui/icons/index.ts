@@ -6,3 +6,5 @@ export { TonapiIcon } from './TonapiIcon';
 export { SubscriptionsIcon } from './SubscriptionsIcon';
 export { SettingsIcon } from './SettingsIcon';
 export { SupportIcon } from './SupportIcon';
+export { TgIcon } from './TgIcon';
+export { DisconnectIcon } from './DisconnectIcon';

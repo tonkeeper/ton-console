@@ -4,4 +4,6 @@ export interface TgUser {
     firstName?: string;
 
     lastName?: string;
+
+    imageUrl?: string;
 }

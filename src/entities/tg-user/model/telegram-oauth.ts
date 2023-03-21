@@ -13,6 +13,8 @@ export interface TGLoginData {
     id: number;
     last_name: string;
     username: string;
+
+    photo_url: string;
 }
 
 type Callback = (dataOrFalse: TGLoginData | false) => void;

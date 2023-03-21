@@ -1,4 +1,4 @@
-/* eslint-disable react/display-name */
+/*
 
 import { ReactNode } from 'react';
 import { TonConnectUIProvider, THEME } from '@tonconnect/ui-react';
@@ -15,3 +15,6 @@ export const withTonConnectUI = (component: () => ReactNode) => () =>
             {component()}
         </TonConnectUIProvider>
     );
+*/
+
+export {};
