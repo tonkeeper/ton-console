@@ -8,7 +8,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import { createHtmlPlugin } from 'vite-plugin-html';
 
 export default ({ mode }) => {
-    const { VITE_TG_OAUTH_BOT_NAME } = loadEnv(mode, process.cwd());
+    const { VITE_TG_OAUTH_BOT_NAME, VITE_BASE_PROXY_URL } = loadEnv(mode, process.cwd());
 
     return defineConfig({
         plugins: [
@@ -38,6 +38,14 @@ export default ({ mode }) => {
             https: true,
             watch: {
                 usePolling: true
+            },
+            proxy: {
+                '/v1': {
+                    target: VITE_BASE_PROXY_URL,
+                    changeOrigin: true,
+                    secure: true,
+                    cookiePathRewrite: '/'
+                }
             }
         },
         test: {

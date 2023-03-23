@@ -8,3 +8,4 @@ export { SettingsIcon } from './SettingsIcon';
 export { SupportIcon } from './SupportIcon';
 export { TgIcon } from './TgIcon';
 export { DisconnectIcon } from './DisconnectIcon';
+export { CreateIcon96 } from './CreateIcon96';

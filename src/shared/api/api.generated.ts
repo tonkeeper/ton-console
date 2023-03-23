@@ -88,38 +88,6 @@ export interface DTOWebhook {
     date_create: number;
 }
 
-export interface DTOApp {
-    /**
-     * @format int64
-     * @example 2465363097
-     */
-    id: number;
-    /**
-     * @format int64
-     * @example 1464363297
-     */
-    user_id: number;
-    /** @example "Test App" */
-    name: string;
-    /** @example "https://tonapi.io/static/test.png" */
-    avatar?: string;
-    app_tokens?: DTOAppToken[];
-    webhooks?: DTOWebhook[];
-    /** @example "https://tonapi.io/login?app=2465363097" */
-    oauth_url?: string;
-    /** @example false */
-    is_ban: boolean;
-    /** @example "firebase_creds.json" */
-    firebase_filename?: string;
-    /** @example true */
-    enable_notifications?: boolean;
-    /**
-     * @format int64
-     * @example 1678275313
-     */
-    date_create: number;
-}
-
 export interface DTOAppToken {
     /** @example 1 */
     id: number;
@@ -133,7 +101,7 @@ export interface DTOAppToken {
      * @example 2465363097
      */
     app_id: number;
-    tire: DTOAppTokenTire;
+    tire: DTOTire;
     /** @example "AFWRUVK5QHVRFFAAAAACNAS5QU22SHA2D4SMH3SFJOOQB5PCBU7Z7KDDWKQT5KI2YNABHBI" */
     token: string;
     /** @example false */
@@ -147,13 +115,32 @@ export interface DTOAppToken {
     date_create: number;
 }
 
-export interface DTOAppTokenTire {
+export interface DTOTire {
+    /**
+     * @format int64
+     * @example 1
+     */
+    id: number;
     /** @example "Test tire" */
-    id?: string;
+    name: string;
     /** @example 1 */
     burst: number;
     /** @example 5 */
     rpc: number;
+}
+
+export interface DTOProject {
+    /**
+     * @format int64
+     * @example 1
+     */
+    id: number;
+    /** @example "Test project" */
+    name: string;
+    /** @example "https://tonapi.io/static/test.png" */
+    avatar: string;
+    /** @example "2023-03-23" */
+    date_create: string;
 }
 
 import axios, {
@@ -346,12 +333,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             params: RequestParams = {}
         ) =>
-            this.request<
-                {
-                    user: DTOUser;
-                },
-                DTOError
-            >({
+            this.request<DTOOk, DTOError>({
                 path: `/v1/auth/tg`,
                 method: 'POST',
                 body: data,
@@ -388,11 +370,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             data: {
                 /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
                 address: string;
-                /**
-                 * -3 is testnet network, -239 is mainnet network
-                 * @example "-3"
-                 */
-                network: '-3' | '-239';
                 proof: {
                     /**
                      * @format int64
@@ -411,12 +388,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             params: RequestParams = {}
         ) =>
-            this.request<
-                {
-                    token: string;
-                },
-                DTOError
-            >({
+            this.request<DTOOk, DTOError>({
                 path: `/v1/auth/ton-proof/check_proof`,
                 method: 'POST',
                 body: data,
@@ -440,134 +412,74 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
-         * @description Get apps by user account
+         * @description Get active tires
          *
-         * @tags app
-         * @name GetApps
-         * @request GET:/v1/apps
+         * @tags tire
+         * @name GetTires
+         * @request GET:/v1/tires
          * @secure
          */
-        getApps: (params: RequestParams = {}) =>
+        getTires: (params: RequestParams = {}) =>
             this.request<
                 {
-                    items: DTOApp[];
+                    items: DTOTire[];
                 },
                 DTOError
             >({
-                path: `/v1/apps`,
+                path: `/v1/tires`,
                 method: 'GET',
                 secure: true,
                 ...params
             }),
 
         /**
-         * @description Create app
+         * @description Get user's project
          *
-         * @tags app
-         * @name CreateApp
-         * @request POST:/v1/app
+         * @tags project
+         * @name GetProjects
+         * @request GET:/v1/projects
          * @secure
          */
-        createApp: (
-            data: {
-                /** @example "Test App" */
-                name?: string;
-                /** @example "https://tonapi.io" */
-                oauth_url?: string;
-                /** @format binary */
-                image?: File;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<DTOOk, DTOError>({
-                path: `/v1/app`,
-                method: 'POST',
-                body: data,
-                secure: true,
-                type: ContentType.FormData,
-                ...params
-            }),
-
-        /**
-         * @description Delete app
-         *
-         * @tags app
-         * @name DeleteApp
-         * @request DELETE:/v1/app/{id}
-         * @secure
-         */
-        deleteApp: (id: number, params: RequestParams = {}) =>
-            this.request<DTOOk, DTOError>({
-                path: `/v1/app/${id}`,
-                method: 'DELETE',
+        getProjects: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    items: DTOProject[];
+                },
+                DTOError
+            >({
+                path: `/v1/projects`,
+                method: 'GET',
                 secure: true,
                 ...params
             }),
 
         /**
-         * @description Update app
+         * @description Get user's project
          *
-         * @tags app
-         * @name UpdateApp
-         * @request PATCH:/v1/app/{id}
+         * @tags project
+         * @name GetProjects2
+         * @request PATCH:/v1/project/{id}
+         * @originalName getProjects
+         * @duplicate
          * @secure
          */
-        updateApp: (
+        getProjects2: (
             id: number,
             data: {
-                /** @example "Test App" */
+                /** @example "Test Project" */
                 name?: string;
-                /** @example true */
-                enable_notifications?: boolean;
-                /** @example true */
-                remove_push_credentials?: boolean;
-                /** @example "https://tonapi.io" */
-                oauth_url?: string;
-                /** @format binary */
-                image?: File;
-                /** @format binary */
-                firebase_credentials?: File;
+                /**
+                 * @format int64
+                 * @example 1
+                 */
+                tire_id?: number;
             },
             params: RequestParams = {}
         ) =>
             this.request<DTOOk, DTOError>({
-                path: `/v1/app/${id}`,
+                path: `/v1/project/${id}`,
                 method: 'PATCH',
                 body: data,
-                secure: true,
-                type: ContentType.FormData,
-                ...params
-            })
-    };
-    app = {
-        /**
-         * @description Generate app token
-         *
-         * @tags app
-         * @name GenerateAppToken
-         * @request POST:/app/{id}/generate
-         * @secure
-         */
-        generateAppToken: (id: number, params: RequestParams = {}) =>
-            this.request<DTOOk, DTOError>({
-                path: `/app/${id}/generate`,
-                method: 'POST',
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * @description Delete app token
-         *
-         * @tags app
-         * @name DeleteAppToken
-         * @request DELETE:/app/token/{id}
-         * @secure
-         */
-        deleteAppToken: (id: number, params: RequestParams = {}) =>
-            this.request<DTOOk, DTOError>({
-                path: `/app/token/${id}`,
-                method: 'DELETE',
                 secure: true,
                 ...params
             })

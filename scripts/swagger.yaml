@@ -20,7 +20,7 @@ paths:
         $ref: "#/components/requestBodies/TgAuthInput"
       responses:
         '200':
-          $ref: '#/components/responses/TgAuthOk'
+          $ref: '#/components/responses/Ok'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -52,7 +52,7 @@ paths:
         $ref: "#/components/requestBodies/TonProofInput"
       responses:
         '200':
-          $ref: '#/components/responses/AuthToken'
+          $ref: '#/components/responses/Ok'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -78,110 +78,53 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
   
-  /v1/apps:
+  /v1/tires:
     get:
-      description: "Get apps by user account"
-      operationId: getApps
+      description: "Get active tires"
+      operationId: getTires
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - app
+        - tire
       responses:
         '200':
-          $ref: '#/components/responses/Apps'
+          $ref: '#/components/responses/Tires'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /v1/app:
-    post:
-      description: "Create app"
-      operationId: createApp
+  
+  /v1/projects:
+    get:
+      description: "Get user's project"
+      operationId: getProjects
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - app
-      requestBody:
-        $ref: "#/components/requestBodies/AppInputCreate"
+        - project
       responses:
         '200':
-          $ref: '#/components/responses/Ok'
+          $ref: '#/components/responses/Projects'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /v1/app/{id}:
-    delete:
-      description: "Delete app"
-      operationId: deleteApp
-      security:
-        - JWTAuth: [ "common" ]
-      tags:
-        - app
-      parameters:
-        - $ref: '#/components/parameters/appID'
-      responses:
-        '200':
-          $ref: '#/components/responses/Ok'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
+  /v1/project/{id}:
     patch:
-      description: "Update app"
-      operationId: updateApp
+      description: "Get user's project"
+      operationId: getProjects
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - app
+        - project
       parameters:
-        - $ref: '#/components/parameters/appID'
+        - $ref: '#/components/parameters/projectID'
       requestBody:
-        $ref: "#/components/requestBodies/AppInputUpdate"
-      responses:
-        '200':
-          $ref: '#/components/responses/Ok'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /app/{id}/generate:
-    post:
-      description: "Generate app token"
-      operationId: generateAppToken
-      security:
-        - JWTAuth: [ "common" ]
-      tags:
-        - app
-      parameters:
-        - $ref: '#/components/parameters/appID'
-      responses:
-        '200':
-          $ref: '#/components/responses/Ok'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /app/token/{id}:
-    delete:
-      description: "Delete app token"
-      operationId: deleteAppToken
-      security:
-        - JWTAuth: [ "common" ]
-      tags:
-        - app
-      parameters:
-        - $ref: '#/components/parameters/tokenID'
+        $ref: "#/components/requestBodies/ProjectInputUpdate"
       responses:
         '200':
           $ref: '#/components/responses/Ok'
@@ -192,18 +135,19 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+
 components:
   parameters:
-    appID:
-      description: App ID
+    tokenID:
+      description: Token ID
       in: path
       name: id
       required: true
       schema:
         type: integer
         format: int64
-    tokenID:
-      description: Token ID
+    projectID:
+      description: Project ID
       in: path
       name: id
       required: true
@@ -250,19 +194,11 @@ components:
             type: object
             required:
               - address
-              - network
               - proof
             properties:
               address:
                 type: string
                 example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-              network:
-                type: string
-                example: "-3"
-                enum:
-                  - "-3"
-                  - "-239"
-                description: "-3 is testnet network, -239 is mainnet network"
               proof:
                 type: object
                 properties:
@@ -284,27 +220,7 @@ components:
                     type: string
                   state_init:
                     type: string
-    AppInputCreate:
-      description: "Data that is expected"
-      content:
-        multipart/form-data:
-          schema:
-            type: object
-            required:
-              - address
-              - network
-              - proof
-            properties:
-              name:
-                type: string
-                example: "Test App"
-              oauth_url:
-                type: string
-                example: "https://tonapi.io"
-              image:
-                type: string
-                format: binary
-    AppInputUpdate:
+    ProjectInputUpdate:
       description: "Data that is expected"
       content:
         multipart/form-data:
@@ -313,22 +229,11 @@ components:
             properties:
               name:
                 type: string
-                example: "Test App"
-              enable_notifications:
-                type: boolean
-                example: true
-              remove_push_credentials:
-                type: boolean
-                example: true
-              oauth_url:
-                type: string
-                example: "https://tonapi.io"
-              image:
-                type: string
-                format: binary
-              firebase_credentials:
-                type: string
-                format: binary
+                example: "Test Project"
+              tire_id:
+                type: integer
+                format: int64
+                example: 1
 
   schemas:
     Ok:
@@ -439,53 +344,6 @@ components:
           type: integer
           format: int64
           example: 1678275313
-    App:
-      type: object
-      required:
-        - id
-        - name
-        - user_id
-        - is_ban
-        - date_create
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 2465363097
-        user_id:
-          type: integer
-          format: int64
-          example: 1464363297
-        name:
-          type: string
-          example: "Test App"
-        avatar:
-          type: string
-          example: "https://tonapi.io/static/test.png"
-        app_tokens:
-          type: array
-          items:
-            $ref: '#/components/schemas/AppToken'
-        webhooks:
-          type: array
-          items:
-            $ref: '#/components/schemas/Webhook'
-        oauth_url:
-          type: string
-          example: "https://tonapi.io/login?app=2465363097"
-        is_ban:
-          type: boolean
-          example: false
-        firebase_filename:
-          type: string
-          example: "firebase_creds.json"
-        enable_notifications:
-          type: boolean
-          example: true
-        date_create:
-          type: integer
-          format: int64
-          example: 1678275313
     AppToken:
       type: object
       required:
@@ -510,7 +368,7 @@ components:
           format: int64
           example: 2465363097
         tire:
-          $ref: '#/components/schemas/AppTokenTire'
+          $ref: '#/components/schemas/Tire'
         token:
           type: string
           example: "AFWRUVK5QHVRFFAAAAACNAS5QU22SHA2D4SMH3SFJOOQB5PCBU7Z7KDDWKQT5KI2YNABHBI"
@@ -520,18 +378,23 @@ components:
         active:
           type: boolean
           example: true
-        date_create: 
+        date_create:
           type: integer
           format: int64
           example: 1678275313
-    AppTokenTire:
+    Tire:
       type: object
       required:
+        - id
         - name
         - rpc
         - burst
       properties:
         id:
+          type: integer
+          format: int64
+          example: 1
+        name:
           type: string
           example: "Test tire"
         burst:
@@ -540,7 +403,29 @@ components:
         rpc:
           type: number
           example: 5
-
+    Project:
+      type: object
+      required:
+        - id
+        - name
+        - avatar
+        - active
+        - date_create
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: "Test project"
+        avatar:
+          type: string
+          example: "https://tonapi.io/static/test.png"
+        date_create:
+          type: string
+          example: "2023-03-23"
+  
   responses:
     NotFound:
       description: "The specified resource was not found"
@@ -568,17 +453,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Ok'
-    TgAuthOk:
-      description: "Successful authorization"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - user
-            properties:
-              user:
-                $ref: '#/components/schemas/User'
     GeneratePayload:
       description: "Payload for TON Connect"
       content:
@@ -590,19 +464,8 @@ components:
             properties:
               payload:
                 type: string
-    AuthToken:
-      description: "Authorization token for work TON Console"
-      content:
-        application/json:
-          schema:
-            required:
-              - token
-            type: object
-            properties:
-              token:
-                type: string
-    Apps:
-      description: "Apps by user account"
+    Tires:
+      description: "Active tires"
       content:
         application/json:
           schema:
@@ -613,7 +476,21 @@ components:
               items:
                 type: array
                 items:
-                  $ref: '#/components/schemas/App'
+                  $ref: '#/components/schemas/Tire'
+    Projects:
+      description: "User projects"
+      content:
+        application/json:
+          schema:
+            required:
+              - items
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+  
   
   securitySchemes:
     JWTAuth:
