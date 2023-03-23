@@ -40,8 +40,11 @@ export async function loginViaTG(): Promise<TGLoginData | null> {
         throw new Error('Telegram auth provider not found');
     }
     return new Promise(res => {
-        window.Telegram.Login.auth({ bot_id: '6287318376', request_access: true }, data => {
-            res(data || null);
-        });
+        window.Telegram.Login.auth(
+            { bot_id: import.meta.env.VITE_TG_OAUTH_BOT_ID, request_access: true },
+            data => {
+                res(data || null);
+            }
+        );
     });
 }
