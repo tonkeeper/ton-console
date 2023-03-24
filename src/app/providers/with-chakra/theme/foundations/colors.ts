@@ -9,7 +9,9 @@ const colors = {
         page: '#F1F3F5',
         content: '#FFFFFF',
         contentTint: '#F1F3F5',
-        overlay: 'rgba(0, 0, 0, 0.4)'
+        overlay: 'rgba(0, 0, 0, 0.4)',
+        placeholderDark: 'rgba(0, 0, 0, 0.08)',
+        placeholderLight: 'rgba(255, 255, 255, 0.08)'
     },
     icon: {
         primary: '#000000',

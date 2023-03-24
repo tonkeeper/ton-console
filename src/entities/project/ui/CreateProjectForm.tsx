@@ -2,11 +2,7 @@ import { FunctionComponent } from 'react';
 import { chakra, FormControl, FormLabel, Input, StyleProps } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { ImageInput } from 'src/shared';
-
-export interface CreateProjectFormValues {
-    name: string;
-    icon?: File;
-}
+import { CreateProjectFormValues } from '../model/interfaces';
 
 type CreateProjectFormValuesInternal = Omit<CreateProjectFormValues, 'icon'> & { icon: FileList };
 

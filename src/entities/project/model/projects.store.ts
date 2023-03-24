@@ -1,7 +1,9 @@
 import { makeAutoObservable } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
-import { apiClient, DTOProject, getWindow, createReaction } from 'src/shared';
-import { tGUserStore, Project } from 'src/entities';
+import { apiClient, DTOProject, getWindow, createReaction, createAsyncAction } from 'src/shared';
+import { Project, CreateProjectFormValues } from './interfaces';
+import { tGUserStore } from 'src/entities';
+import { createStandaloneToast } from '@chakra-ui/react';
 
 class ProjectsStore {
     projects: Project[] = [];
@@ -55,6 +57,23 @@ class ProjectsStore {
         this.projects = [];
         this.selectedProject = null;
     };
+
+    createProject = createAsyncAction(async (form: CreateProjectFormValues): Promise<void> => {
+        const request: Parameters<typeof apiClient.api.createProject>[0] = {
+            name: form.name
+        };
+
+        if (form.icon) {
+            request.image = form.icon;
+        }
+
+        await apiClient.api.createProject(request);
+
+        await this.fetchProjects();
+
+        const { toast } = createStandaloneToast();
+        toast({ title: 'Project created successfully', status: 'success', isClosable: true });
+    });
 }
 
 function mapProjectDtoToProject(projectDTO: DTOProject): Project {

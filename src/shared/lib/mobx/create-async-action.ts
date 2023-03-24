@@ -1,6 +1,7 @@
-import { makeAutoObservable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
-export function createAsyncAction<T extends (...args: unknown[]) => Promise<void>>(
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export function createAsyncAction<T extends (...args: any[]) => Promise<void>>(
     action: T
 ): T & { isLoading: boolean; error: unknown } {
     const fn = (async (...args) => {
@@ -21,7 +22,10 @@ export function createAsyncAction<T extends (...args: unknown[]) => Promise<void
 
     fn.isLoading = false;
     fn.error = '';
-    makeAutoObservable(fn);
+    makeObservable(fn, {
+        isLoading: observable,
+        error: observable
+    });
 
     return fn;
 }

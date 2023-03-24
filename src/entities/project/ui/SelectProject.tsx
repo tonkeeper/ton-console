@@ -1,5 +1,5 @@
-import { Menu, MenuButton, MenuItem, MenuList, Image, Text, HStack, Box } from '@chakra-ui/react';
-import { ArrowIcon, MenuButtonStyled, TickIcon } from 'src/shared';
+import { Menu, MenuButton, MenuItem, MenuList, Text, HStack, Box } from '@chakra-ui/react';
+import { ArrowIcon, MenuButtonStyled, TickIcon, Image } from 'src/shared';
 import { ComponentProps, FunctionComponent } from 'react';
 import { observer } from 'mobx-react-lite';
 import { projectsStore } from 'src/entities/project';
@@ -28,13 +28,7 @@ const component: FunctionComponent<ComponentProps<typeof Box>> = props => {
                                 key={project.id}
                                 onClick={() => projectsStore.selectProject(project.id)}
                             >
-                                <Image
-                                    w="7"
-                                    h="7"
-                                    mr="2"
-                                    borderRadius="sm"
-                                    src={projectsStore.selectedProject!.imgUrl}
-                                />
+                                <Image w="7" h="7" mr="2" borderRadius="sm" src={project.imgUrl} />
                                 <Text textStyle="label2" noOfLines={1}>
                                     {project.name}
                                 </Text>
