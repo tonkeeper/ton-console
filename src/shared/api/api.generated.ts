@@ -459,6 +459,37 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
+         * @description Create project
+         *
+         * @tags project
+         * @name CreateProject
+         * @request POST:/api/v1/project
+         * @secure
+         */
+        createProject: (
+            data: {
+                /** @example "Test Project" */
+                name?: string;
+                /**
+                 * @format int64
+                 * @example 1
+                 */
+                tier_id?: number;
+                /** @format binary */
+                image?: File;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<DTOOk, DTOError>({
+                path: `/api/v1/project`,
+                method: 'POST',
+                body: data,
+                secure: true,
+                type: ContentType.FormData,
+                ...params
+            }),
+
+        /**
          * @description Get user's project
          *
          * @tags project
@@ -483,13 +514,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @description Get user's project
          *
          * @tags project
-         * @name GetProjects2
+         * @name UpdateProject
          * @request PATCH:/api/v1/project/{id}
-         * @originalName getProjects
-         * @duplicate
          * @secure
          */
-        getProjects2: (
+        updateProject: (
             id: number,
             data: {
                 /** @example "Test Project" */
@@ -499,6 +528,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @example 1
                  */
                 tier_id?: number;
+                /** @format binary */
+                image?: File;
             },
             params: RequestParams = {}
         ) =>
@@ -507,6 +538,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 method: 'PATCH',
                 body: data,
                 secure: true,
+                type: ContentType.FormData,
                 ...params
             })
     };

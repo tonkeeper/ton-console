@@ -96,6 +96,25 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
   
+  /api/v1/project:
+    post:
+      description: "Create project"
+      operationId: createProject
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - project
+      requestBody:
+        $ref: "#/components/requestBodies/ProjectInput"
+      responses:
+        '201':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /api/v1/projects:
     get:
       description: "Get user's project"
@@ -116,7 +135,7 @@ paths:
   /api/v1/project/{id}:
     patch:
       description: "Get user's project"
-      operationId: getProjects
+      operationId: updateProject
       security:
         - JWTAuth: [ "common" ]
       tags:
@@ -124,7 +143,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/projectID'
       requestBody:
-        $ref: "#/components/requestBodies/ProjectInputUpdate"
+        $ref: "#/components/requestBodies/ProjectInput"
       responses:
         '200':
           $ref: '#/components/responses/Ok'
@@ -222,7 +241,7 @@ components:
                     example: "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa"
                   state_init:
                     type: string
-    ProjectInputUpdate:
+    ProjectInput:
       description: "Data that is expected"
       content:
         multipart/form-data:
@@ -236,6 +255,9 @@ components:
                 type: integer
                 format: int64
                 example: 1
+              image:
+                type: string
+                format: binary
 
   schemas:
     Ok:

@@ -1,6 +1,6 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import React from 'react';
-import { H1 } from 'src/shared/ui/components/typography/h1/index';
+import { H1 } from 'src/shared';
 
 const meta = {
     title: 'components/H1',

@@ -2,7 +2,7 @@
 
 import React, { ComponentClass, FunctionComponent } from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import theme from 'src/app/theme';
+import theme from 'src/app/providers/with-chakra/theme';
 import { getThemingArgTypes } from '@chakra-ui/storybook-addon';
 import { defineStyleConfig } from '@chakra-ui/styled-system';
 

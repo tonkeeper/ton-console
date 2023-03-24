@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "strict": false,
+    "composite": true,
     "isolatedModules": false,
     "types": ["vitest/globals"],
     "paths": {
@@ -10,5 +11,6 @@
     }
   },
   "include": ["tests"],
-  "exclude": ["src"]
+  "exclude": ["src"],
+  "references": [{ "path": "./tsconfig.vite.json" }]
 }
