@@ -16,7 +16,7 @@ export default ({ mode }) => {
             react(),
             mkcert(),
             createHtmlPlugin({
-                entry: 'src/index.tsx',
+                entry: '/src/main.tsx',
                 inject: {
                     data: {
                         injectScript: `<script async src="https://telegram.org/js/telegram-widget.js?21" data-telegram-login="${VITE_TG_OAUTH_BOT_NAME}" data-userpic="false" data-request-access="write" onload="setTimeout(document.getElementById('telegram-login-${VITE_TG_OAUTH_BOT_NAME}').style.display = 'none')"></script>`
@@ -40,7 +40,7 @@ export default ({ mode }) => {
                 usePolling: true
             },
             proxy: {
-                '/v1': {
+                '/api': {
                     target: VITE_BASE_PROXY_URL,
                     changeOrigin: true,
                     secure: true,

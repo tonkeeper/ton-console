@@ -2,7 +2,8 @@ import { makeAutoObservable } from 'mobx';
 import { loginViaTG } from './telegram-oauth';
 import { TgUser } from './interfaces/tg-user';
 import { makePersistable } from 'mobx-persist-store';
-import { api, getWindow } from 'src/shared';
+import { apiClient, getWindow } from 'src/shared';
+import { projectsStore } from 'src/entities/project';
 
 class TGUserStore {
     user: TgUser | null = null;
@@ -27,10 +28,9 @@ class TGUserStore {
             return;
         }
 
-        await api.v1.authViaTg(tgOAuthResponse);
-        await new Promise(r => setTimeout(r, 2000));
-        const p = await api.v1.getProjects();
-        console.log(p);
+        await apiClient.api.authViaTg(tgOAuthResponse);
+
+        await projectsStore.fetchProjects();
 
         this.user = {
             id: tgOAuthResponse.id,
@@ -42,6 +42,7 @@ class TGUserStore {
     };
 
     logout = async (): Promise<void> => {
+        await apiClient.api.accountLogout();
         this.user = null;
     };
 }

@@ -2,6 +2,7 @@ import {
     ChangeEvent,
     ComponentProps,
     forwardRef,
+    ReactNode,
     useCallback,
     useEffect,
     useRef,
@@ -12,9 +13,20 @@ import { UseFormRegisterReturn } from 'react-hook-form/dist/types/form';
 
 const ImageInput = forwardRef<
     HTMLInputElement,
-    ComponentProps<typeof Box> & UseFormRegisterReturn & { accept?: string }
+    ComponentProps<typeof Box> &
+        UseFormRegisterReturn & { accept?: string; heading?: ReactNode; description?: ReactNode }
 >((props, ref) => {
-    const { onChange, onBlur, name, required, disabled, accept, ...boxProps } = props;
+    const {
+        onChange,
+        onBlur,
+        name,
+        required,
+        disabled,
+        accept,
+        heading,
+        description,
+        ...boxProps
+    } = props;
     const nameWithFallback = name || 'input-file';
     const acceptWithFallback = accept || 'image/*';
 
@@ -137,11 +149,10 @@ const ImageInput = forwardRef<
             ) : (
                 <Flex align="center" direction="column" maxW="400px" pt="4">
                     <Text textStyle="label2" mb="1" color="text.primary" textAlign="center">
-                        Upload image
+                        {heading || 'Upload icon'}
                     </Text>
                     <Text textStyle="body2" mb="4" color="text.tertiary" textAlign="center">
-                        To make your subscription plan more visually appealing, please upload image
-                        in JPG, GIF, or PNG format.
+                        {description || 'Upload image in JPG, GIF, or PNG format.'}
                     </Text>
                     <Button as="label" htmlFor={nameWithFallback}>
                         Upload

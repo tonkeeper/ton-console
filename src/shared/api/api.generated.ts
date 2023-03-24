@@ -101,7 +101,7 @@ export interface DTOAppToken {
      * @example 2465363097
      */
     app_id: number;
-    tire: DTOTire;
+    tier: DTOTier;
     /** @example "AFWRUVK5QHVRFFAAAAACNAS5QU22SHA2D4SMH3SFJOOQB5PCBU7Z7KDDWKQT5KI2YNABHBI" */
     token: string;
     /** @example false */
@@ -115,18 +115,40 @@ export interface DTOAppToken {
     date_create: number;
 }
 
-export interface DTOTire {
+export interface DTOTier {
     /**
      * @format int64
      * @example 1
      */
     id: number;
-    /** @example "Test tire" */
+    /** @example "Test tier" */
     name: string;
     /** @example 1 */
     burst: number;
     /** @example 5 */
     rpc: number;
+    /** @example 100 */
+    ton_price: number;
+}
+
+export interface DTOAppTier {
+    /**
+     * @format int64
+     * @example 1
+     */
+    id: number;
+    /** @example "Test tier" */
+    name: string;
+    /** @example 1 */
+    burst: number;
+    /** @example 5 */
+    rpc: number;
+    /** @example 100 */
+    ton_price: number;
+    /** @example true */
+    active: boolean;
+    /** @example "2023-03-23" */
+    date_create: string;
 }
 
 export interface DTOProject {
@@ -137,6 +159,7 @@ export interface DTOProject {
     id: number;
     /** @example "Test project" */
     name: string;
+    tier?: DTOAppTier;
     /** @example "https://tonapi.io/static/test.png" */
     avatar: string;
     /** @example "2023-03-23" */
@@ -303,13 +326,13 @@ export class HttpClient<SecurityDataType = unknown> {
  * @contact Support <contact@tonaps.org>
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
-    v1 = {
+    api = {
         /**
          * @description Auth via telegram
          *
          * @tags auth
          * @name AuthViaTg
-         * @request POST:/v1/auth/tg
+         * @request POST:/api/v1/auth/tg
          */
         authViaTg: (
             data: {
@@ -324,6 +347,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 photo_url?: string;
                 /** @example "testov" */
                 username?: string;
+                /** @example "cd0e201bf7328535343301f428e51f01084a3e2a3822f4843d86b540bbebfe15" */
                 hash: string;
                 /**
                  * @format int64
@@ -334,7 +358,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             params: RequestParams = {}
         ) =>
             this.request<DTOOk, DTOError>({
-                path: `/v1/auth/tg`,
+                path: `/api/v1/auth/tg`,
                 method: 'POST',
                 body: data,
                 ...params
@@ -345,16 +369,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          *
          * @tags auth
          * @name AuthGeneratePayload
-         * @request POST:/v1/auth/ton-proof/generate_payload
+         * @request POST:/api/v1/auth/ton-proof/generate_payload
          */
         authGeneratePayload: (params: RequestParams = {}) =>
             this.request<
                 {
+                    /** @example "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa" */
                     payload: string;
                 },
                 DTOError
             >({
-                path: `/v1/auth/ton-proof/generate_payload`,
+                path: `/api/v1/auth/ton-proof/generate_payload`,
                 method: 'POST',
                 ...params
             }),
@@ -364,7 +389,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          *
          * @tags auth
          * @name AuthViaTonConnect
-         * @request POST:/v1/auth/ton-proof/check_proof
+         * @request POST:/api/v1/auth/ton-proof/check_proof
          */
         authViaTonConnect: (
             data: {
@@ -382,6 +407,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                         value?: string;
                     };
                     signature?: string;
+                    /** @example "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa" */
                     payload?: string;
                     state_init?: string;
                 };
@@ -389,7 +415,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             params: RequestParams = {}
         ) =>
             this.request<DTOOk, DTOError>({
-                path: `/v1/auth/ton-proof/check_proof`,
+                path: `/api/v1/auth/ton-proof/check_proof`,
                 method: 'POST',
                 body: data,
                 ...params
@@ -400,33 +426,33 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          *
          * @tags account
          * @name AccountLogout
-         * @request POST:/v1/account/logout
+         * @request POST:/api/v1/account/logout
          * @secure
          */
         accountLogout: (params: RequestParams = {}) =>
             this.request<DTOOk, DTOError>({
-                path: `/v1/account/logout`,
+                path: `/api/v1/account/logout`,
                 method: 'POST',
                 secure: true,
                 ...params
             }),
 
         /**
-         * @description Get active tires
+         * @description Get active tiers
          *
-         * @tags tire
-         * @name GetTires
-         * @request GET:/v1/tires
+         * @tags tier
+         * @name GetTiers
+         * @request GET:/api/v1/tiers
          * @secure
          */
-        getTires: (params: RequestParams = {}) =>
+        getTiers: (params: RequestParams = {}) =>
             this.request<
                 {
-                    items: DTOTire[];
+                    items: DTOTier[];
                 },
                 DTOError
             >({
-                path: `/v1/tires`,
+                path: `/api/v1/tiers`,
                 method: 'GET',
                 secure: true,
                 ...params
@@ -437,7 +463,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          *
          * @tags project
          * @name GetProjects
-         * @request GET:/v1/projects
+         * @request GET:/api/v1/projects
          * @secure
          */
         getProjects: (params: RequestParams = {}) =>
@@ -447,7 +473,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 },
                 DTOError
             >({
-                path: `/v1/projects`,
+                path: `/api/v1/projects`,
                 method: 'GET',
                 secure: true,
                 ...params
@@ -458,7 +484,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          *
          * @tags project
          * @name GetProjects2
-         * @request PATCH:/v1/project/{id}
+         * @request PATCH:/api/v1/project/{id}
          * @originalName getProjects
          * @duplicate
          * @secure
@@ -472,12 +498,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @format int64
                  * @example 1
                  */
-                tire_id?: number;
+                tier_id?: number;
             },
             params: RequestParams = {}
         ) =>
             this.request<DTOOk, DTOError>({
-                path: `/v1/project/${id}`,
+                path: `/api/v1/project/${id}`,
                 method: 'PATCH',
                 body: data,
                 secure: true,

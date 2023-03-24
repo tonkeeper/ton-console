@@ -1,28 +1,31 @@
 import { FunctionComponent } from 'react';
-import {
-    chakra,
-    FormControl,
-    FormErrorMessage,
-    FormLabel,
-    Input,
-    StyleProps
-} from '@chakra-ui/react';
-import { useForm } from 'react-hook-form';
+import { chakra, FormControl, FormLabel, Input, StyleProps } from '@chakra-ui/react';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { ImageInput } from 'src/shared';
 
-export const CreateProjectForm: FunctionComponent<StyleProps> = props => {
+export interface CreateProjectFormValues {
+    name: string;
+    icon?: File;
+}
+
+type CreateProjectFormValuesInternal = Omit<CreateProjectFormValues, 'icon'> & { icon: FileList };
+
+export const CreateProjectForm: FunctionComponent<
+    StyleProps & { id?: string; onSubmit: SubmitHandler<CreateProjectFormValues> }
+> = props => {
+    const { onSubmit, ...rest } = props;
     const {
         handleSubmit,
         register,
         formState: { errors }
-    } = useForm();
+    } = useForm<CreateProjectFormValuesInternal>();
 
-    const onSubmit = (values: unknown): void => {
-        console.debug(values);
+    const submitMiddleware = (values: CreateProjectFormValuesInternal): void => {
+        onSubmit({ name: values.name, icon: values.icon.length ? values.icon[0] : undefined });
     };
 
     return (
-        <chakra.form onSubmit={handleSubmit(onSubmit)} noValidate {...props}>
+        <chakra.form w="100%" onSubmit={handleSubmit(submitMiddleware)} noValidate {...rest}>
             <FormControl isInvalid={!!errors.name} isRequired>
                 <FormLabel htmlFor="name">Name</FormLabel>
                 <Input
@@ -34,12 +37,9 @@ export const CreateProjectForm: FunctionComponent<StyleProps> = props => {
                         minLength: { value: 3, message: 'Minimum length should be 3' }
                     })}
                 />
-                <FormErrorMessage>
-                    {!!errors.name && (errors.name.message as string)}
-                </FormErrorMessage>
             </FormControl>
 
-            <FormControl>
+            <FormControl mb="0">
                 <FormLabel htmlFor="icon">Icon</FormLabel>
                 <ImageInput {...register('icon')} />
             </FormControl>

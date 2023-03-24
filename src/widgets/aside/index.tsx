@@ -1,10 +1,8 @@
 import {
-    DashboardIcon,
     DropDownMenu,
     DropDownMenuItem,
     DropDownMenuItemExpandable,
     SettingsIcon,
-    SubscriptionsIcon,
     SupportIcon,
     TonapiIcon
 } from 'src/shared';
@@ -13,9 +11,6 @@ import { FunctionComponent } from 'react';
 export const Aside: FunctionComponent = () => {
     return (
         <DropDownMenu>
-            <DropDownMenuItem leftIcon={<DashboardIcon />} linkTo="dashboard">
-                Dashboard
-            </DropDownMenuItem>
             <DropDownMenuItemExpandable leftIcon={<TonapiIcon />} content="TON API" linkTo="tonapi">
                 <DropDownMenuItem linkTo="oauth">Oauth</DropDownMenuItem>
                 <DropDownMenuItem linkTo="billing">Billing</DropDownMenuItem>
@@ -24,9 +19,6 @@ export const Aside: FunctionComponent = () => {
                     <DropDownMenuItem linkTo="dev">&quot;Dev&quot;</DropDownMenuItem>
                 </DropDownMenuItemExpandable>
             </DropDownMenuItemExpandable>
-            <DropDownMenuItem leftIcon={<SubscriptionsIcon />} linkTo="subscriptions">
-                Subscriptions
-            </DropDownMenuItem>
             <DropDownMenuItem leftIcon={<SettingsIcon />} linkTo="settings">
                 Settings
             </DropDownMenuItem>

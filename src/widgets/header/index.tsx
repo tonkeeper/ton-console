@@ -1,8 +1,7 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Logo } from 'src/widgets/header/ui/logo';
 import { Flex } from '@chakra-ui/react';
-import { SelectApp } from 'src/widgets/header/ui/select-app';
-import { TgUserButton } from 'src/entities';
+import { TgUserButton, SelectProject } from 'src/entities';
 
 export const Header: FunctionComponent<ComponentProps<typeof Flex>> = props => {
     return (
@@ -16,7 +15,7 @@ export const Header: FunctionComponent<ComponentProps<typeof Flex>> = props => {
             {...props}
         >
             <Logo w="252px" />
-            <SelectApp mr="auto" />
+            <SelectProject mr="auto" />
             <TgUserButton />
         </Flex>
     );

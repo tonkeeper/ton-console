@@ -10,7 +10,7 @@ servers:
   - url: "http://localhost:8888"
 
 paths:
-  /v1/auth/tg:
+  /api/v1/auth/tg:
     post:
       description: "Auth via telegram"
       operationId: authViaTG
@@ -27,7 +27,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /v1/auth/ton-proof/generate_payload:
+  /api/v1/auth/ton-proof/generate_payload:
     post:
       description: "Generate payload for TON Connect"
       operationId: authGeneratePayload
@@ -42,7 +42,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /v1/auth/ton-proof/check_proof:
+  /api/v1/auth/ton-proof/check_proof:
     post:
       description: "Auth via TON Connect"
       operationId: authViaTonConnect
@@ -60,7 +60,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
   
-  /v1/account/logout:
+  /api/v1/account/logout:
     post:
       description: "Logout from the system"
       operationId: accountLogout
@@ -78,17 +78,17 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
   
-  /v1/tires:
+  /api/v1/tiers:
     get:
-      description: "Get active tires"
-      operationId: getTires
+      description: "Get active tiers"
+      operationId: getTiers
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - tire
+        - tier
       responses:
         '200':
-          $ref: '#/components/responses/Tires'
+          $ref: '#/components/responses/Tiers'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -96,7 +96,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
   
-  /v1/projects:
+  /api/v1/projects:
     get:
       description: "Get user's project"
       operationId: getProjects
@@ -113,7 +113,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /v1/project/{id}:
+  /api/v1/project/{id}:
     patch:
       description: "Get user's project"
       operationId: getProjects
@@ -182,6 +182,7 @@ components:
                 example: "testov"
               hash:
                 type: string
+                example: "cd0e201bf7328535343301f428e51f01084a3e2a3822f4843d86b540bbebfe15"
               auth_date:
                 type: integer
                 format: int64
@@ -218,6 +219,7 @@ components:
                     type: string
                   payload:
                     type: string
+                    example: "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa"
                   state_init:
                     type: string
     ProjectInputUpdate:
@@ -230,7 +232,7 @@ components:
               name:
                 type: string
                 example: "Test Project"
-              tire_id:
+              tier_id:
                 type: integer
                 format: int64
                 example: 1
@@ -350,7 +352,7 @@ components:
         - id
         - user_id
         - app_id
-        - tire
+        - tier
         - token
         - is_ban
         - active
@@ -367,8 +369,8 @@ components:
           type: integer
           format: int64
           example: 2465363097
-        tire:
-          $ref: '#/components/schemas/Tire'
+        tier:
+          $ref: '#/components/schemas/Tier'
         token:
           type: string
           example: "AFWRUVK5QHVRFFAAAAACNAS5QU22SHA2D4SMH3SFJOOQB5PCBU7Z7KDDWKQT5KI2YNABHBI"
@@ -382,13 +384,14 @@ components:
           type: integer
           format: int64
           example: 1678275313
-    Tire:
+    Tier:
       type: object
       required:
         - id
         - name
         - rpc
         - burst
+        - ton_price
       properties:
         id:
           type: integer
@@ -396,13 +399,50 @@ components:
           example: 1
         name:
           type: string
-          example: "Test tire"
+          example: "Test tier"
         burst:
-          type: number
+          type: integer
           example: 1
         rpc:
           type: number
           example: 5
+        ton_price:
+          type: integer
+          example: 100
+    AppTier:
+      type: object
+      required:
+        - id
+        - name
+        - rpc
+        - burst
+        - ton_price
+        - active
+        - date_create
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: "Test tier"
+        burst:
+          type: integer
+          example: 1
+        rpc:
+          type: number
+          example: 5
+        ton_price:
+          type: integer
+          example: 100
+        active:
+          type: boolean
+          example: true
+        date_create:
+          type: string
+          example: "2023-03-23"
+    
     Project:
       type: object
       required:
@@ -419,6 +459,8 @@ components:
         name:
           type: string
           example: "Test project"
+        tier:
+          $ref: '#/components/schemas/AppTier'
         avatar:
           type: string
           example: "https://tonapi.io/static/test.png"
@@ -464,8 +506,9 @@ components:
             properties:
               payload:
                 type: string
-    Tires:
-      description: "Active tires"
+                example: "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa"
+    Tiers:
+      description: "Active tiers"
       content:
         application/json:
           schema:
@@ -476,7 +519,7 @@ components:
               items:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Tire'
+                  $ref: '#/components/schemas/Tier'
     Projects:
       description: "User projects"
       content:
