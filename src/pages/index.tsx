@@ -68,6 +68,14 @@ const Routing: FunctionComponent = () => {
                         </Suspense>
                     }
                 />
+                <Route
+                    path="settings"
+                    element={
+                        <Suspense fallback={<>...</>}>
+                            <SettingsPage />
+                        </Suspense>
+                    }
+                />
                 <Route index element={<Navigate to="tonapi" replace />} />
                 <Route path="*" element={<Navigate to="tonapi" replace />} />
             </Route>

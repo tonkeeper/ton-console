@@ -101,7 +101,7 @@ export interface DTOAppToken {
      * @example 2465363097
      */
     app_id: number;
-    tier: DTOTier;
+    tonapi_tier: DTOTier;
     /** @example "AFWRUVK5QHVRFFAAAAACNAS5QU22SHA2D4SMH3SFJOOQB5PCBU7Z7KDDWKQT5KI2YNABHBI" */
     token: string;
     /** @example false */
@@ -159,7 +159,7 @@ export interface DTOProject {
     id: number;
     /** @example "Test project" */
     name: string;
-    tier?: DTOAppTier;
+    tonapi_tier?: DTOAppTier;
     /** @example "https://tonapi.io/static/test.png" */
     avatar: string;
     /** @example "2023-03-23" */
@@ -470,17 +470,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             data: {
                 /** @example "Test Project" */
                 name?: string;
-                /**
-                 * @format int64
-                 * @example 1
-                 */
-                tier_id?: number;
                 /** @format binary */
                 image?: File;
             },
             params: RequestParams = {}
         ) =>
-            this.request<DTOOk, DTOError>({
+            this.request<
+                {
+                    project: DTOProject;
+                },
+                DTOError
+            >({
                 path: `/api/v1/project`,
                 method: 'POST',
                 body: data,
@@ -533,7 +533,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             params: RequestParams = {}
         ) =>
-            this.request<DTOOk, DTOError>({
+            this.request<
+                {
+                    project: DTOProject;
+                },
+                DTOError
+            >({
                 path: `/api/v1/project/${id}`,
                 method: 'PATCH',
                 body: data,

@@ -4,6 +4,7 @@ import { apiClient, DTOProject, getWindow, createReaction, createAsyncAction } f
 import { Project, CreateProjectFormValues } from './interfaces';
 import { tGUserStore } from 'src/entities';
 import { createStandaloneToast } from '@chakra-ui/react';
+import { UpdateProjectFormValues } from 'src/entities/project/model/interfaces/update-project-form-values';
 
 class ProjectsStore {
     projects: Project[] = [];
@@ -58,22 +59,80 @@ class ProjectsStore {
         this.selectedProject = null;
     };
 
-    createProject = createAsyncAction(async (form: CreateProjectFormValues): Promise<void> => {
-        const request: Parameters<typeof apiClient.api.createProject>[0] = {
-            name: form.name
-        };
+    createProject = createAsyncAction(
+        async (form: CreateProjectFormValues): Promise<void> => {
+            const request: Parameters<typeof apiClient.api.createProject>[0] = {
+                name: form.name
+            };
 
-        if (form.icon) {
-            request.image = form.icon;
+            if (form.icon) {
+                request.image = form.icon;
+            }
+
+            const response = await apiClient.api.createProject(request);
+
+            const project = mapProjectDtoToProject(response.data.project);
+            this.projects = this.projects.concat(project);
+            this.selectedProject = project;
+
+            const { toast } = createStandaloneToast();
+            toast({ title: 'Project created successfully', status: 'success', isClosable: true });
+        },
+        () => {
+            const { toast } = createStandaloneToast();
+            toast({
+                title: "Project wasn't created",
+                description: 'Unknown api error happened. Try again later',
+                status: 'error',
+                isClosable: true
+            });
         }
+    );
 
-        await apiClient.api.createProject(request);
+    updateProject = createAsyncAction(
+        async (form: UpdateProjectFormValues): Promise<void> => {
+            const request: Parameters<typeof apiClient.api.updateProject>[1] = {};
 
-        await this.fetchProjects();
+            if ('icon' in form) {
+                request.image = form.icon || undefined; // TODO value to delete
+            }
 
-        const { toast } = createStandaloneToast();
-        toast({ title: 'Project created successfully', status: 'success', isClosable: true });
-    });
+            if ('name' in form) {
+                request.name = form.name;
+            }
+
+            await apiClient.api.updateProject(form.projectId, request);
+
+            const { toast } = createStandaloneToast();
+            toast({ title: 'Project deleted successfully', status: 'success', isClosable: true });
+        },
+        () => {
+            const { toast } = createStandaloneToast();
+            toast({
+                title: "Project wasn't deleted",
+                description: 'Unknown api error happened. Try again later',
+                status: 'error',
+                isClosable: true
+            });
+        }
+    );
+
+    deleteProject = createAsyncAction(
+        async (projectId: number): Promise<void> => {
+            console.log(projectId);
+            const { toast } = createStandaloneToast();
+            toast({ title: 'Project deleted successfully', status: 'success', isClosable: true });
+        },
+        () => {
+            const { toast } = createStandaloneToast();
+            toast({
+                title: "Project wasn't deleted",
+                description: 'Unknown api error happened. Try again later',
+                status: 'error',
+                isClosable: true
+            });
+        }
+    );
 }
 
 function mapProjectDtoToProject(projectDTO: DTOProject): Project {

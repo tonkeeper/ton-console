@@ -1,24 +1,11 @@
-import { FunctionComponent, useEffect } from 'react';
-import { Button, Center, Flex, Text, useBoolean, useToast } from '@chakra-ui/react';
+import { FunctionComponent } from 'react';
+import { Button, Center, Flex, Text, useBoolean } from '@chakra-ui/react';
 import { CreateIcon96, H4 } from 'src/shared';
 import { CreateProjectForm, projectsStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 
 const CreateFirstProjectPage: FunctionComponent = () => {
     const [clicked, setClicked] = useBoolean();
-    const toast = useToast();
-
-    useEffect(() => {
-        if (projectsStore.createProject.error) {
-            toast({
-                title: "Project wasn't created",
-                description: 'Unknown api error happened. Try again later',
-                status: 'error',
-                isClosable: true
-            });
-        }
-    }, [toast, projectsStore.createProject.error]);
-
     const formId = 'create-first-project-form';
 
     return (

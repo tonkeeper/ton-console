@@ -14,7 +14,11 @@ import { UseFormRegisterReturn } from 'react-hook-form/dist/types/form';
 const ImageInput = forwardRef<
     HTMLInputElement,
     ComponentProps<typeof Box> &
-        UseFormRegisterReturn & { accept?: string; heading?: ReactNode; description?: ReactNode }
+        UseFormRegisterReturn & {
+            accept?: string;
+            heading?: ReactNode;
+            description?: ReactNode;
+        }
 >((props, ref) => {
     const {
         onChange,
@@ -37,10 +41,47 @@ const ImageInput = forwardRef<
 
     const refCallback = useCallback(
         (el: HTMLInputElement | null) => {
+            let proxy = null;
+
+            if (el) {
+                proxy = new Proxy(el, {
+                    get(target, key: keyof HTMLInputElement | 'target') {
+                        if (key === 'target') {
+                            return target;
+                        }
+
+                        const value = target[key];
+                        if (value instanceof Function) {
+                            return value.bind(target);
+                        }
+
+                        if (key === 'type') {
+                            // because input type file cannot be programmatically modified
+                            return 'text';
+                        }
+
+                        return value;
+                    },
+                    set(target, key: keyof HTMLInputElement, value) {
+                        if (key === 'value') {
+                            if (value instanceof FileList) {
+                                setFile(URL.createObjectURL(value[0]));
+                            }
+                            return true;
+                        }
+
+                        /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+                        //@ts-ignore
+                        target[key] = value;
+                        return true;
+                    }
+                });
+            }
+
             if (typeof ref === 'function') {
-                ref(el);
+                ref(proxy);
             } else if (ref) {
-                ref.current = el;
+                ref.current = proxy;
             }
 
             inputRef.current = el;

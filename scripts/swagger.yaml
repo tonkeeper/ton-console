@@ -105,10 +105,10 @@ paths:
       tags:
         - project
       requestBody:
-        $ref: "#/components/requestBodies/ProjectInput"
+        $ref: "#/components/requestBodies/ProjectInputCreate"
       responses:
         '201':
-          $ref: '#/components/responses/Ok'
+          $ref: '#/components/responses/ProjectCreated'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -143,10 +143,10 @@ paths:
       parameters:
         - $ref: '#/components/parameters/projectID'
       requestBody:
-        $ref: "#/components/requestBodies/ProjectInput"
+        $ref: "#/components/requestBodies/ProjectInputUpdate"
       responses:
         '200':
-          $ref: '#/components/responses/Ok'
+          $ref: '#/components/responses/ProjectUpdated'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -241,7 +241,20 @@ components:
                     example: "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa"
                   state_init:
                     type: string
-    ProjectInput:
+    ProjectInputCreate:
+      description: "Data that is expected"
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Test Project"
+              image:
+                type: string
+                format: binary
+    ProjectInputUpdate:
       description: "Data that is expected"
       content:
         multipart/form-data:
@@ -374,7 +387,7 @@ components:
         - id
         - user_id
         - app_id
-        - tier
+        - tonapi_tier
         - token
         - is_ban
         - active
@@ -391,7 +404,7 @@ components:
           type: integer
           format: int64
           example: 2465363097
-        tier:
+        tonapi_tier:
           $ref: '#/components/schemas/Tier'
         token:
           type: string
@@ -481,7 +494,7 @@ components:
         name:
           type: string
           example: "Test project"
-        tier:
+        tonapi_tier:
           $ref: '#/components/schemas/AppTier'
         avatar:
           type: string
@@ -517,6 +530,28 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Ok'
+    ProjectCreated:
+      description: "Project has been created"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - project
+            properties:
+              project:
+                $ref: '#/components/schemas/Project'
+    ProjectUpdated:
+      description: "Project has been updated"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - project
+            properties:
+              project:
+                $ref: '#/components/schemas/Project'
     GeneratePayload:
       description: "Payload for TON Connect"
       content:

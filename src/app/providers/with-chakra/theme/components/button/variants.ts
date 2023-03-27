@@ -12,6 +12,7 @@ function variant(backgroundColor: string, color: string): SystemStyleInterpolati
             backgroundColor,
             transform: 'scale(1.03)',
             _disabled: {
+                backgroundColor,
                 transform: 'scale(1)'
             }
         },
