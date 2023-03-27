@@ -4,9 +4,9 @@ import { H4, TonConsoleIcon } from 'src/shared';
 
 export const Logo: FunctionComponent<ComponentProps<typeof HStack>> = props => {
     return (
-        <HStack spacing="3" {...props}>
+        <HStack spacing="2" {...props}>
             <TonConsoleIcon />
-            <H4>Ton Console</H4>
+            <H4>Console</H4>
         </HStack>
     );
 };

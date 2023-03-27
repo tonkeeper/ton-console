@@ -4,18 +4,43 @@ import { ComponentProps, FunctionComponent } from 'react';
 export const TonConsoleIcon: FunctionComponent<ComponentProps<typeof Icon>> = props => {
     return (
         <Icon
-            w="28px"
-            h="28px"
+            w="32px"
+            h="32px"
             fill="none"
-            viewBox="0 0 28 28"
+            viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
             {...props}
         >
-            <rect width="28" height="28" rx="8" fill="black" />
-            <path opacity="0.76" d="M14 14V5L5 14H14Z" fill="white" />
-            <path opacity="0.48" d="M14 14V23L5 14H14Z" fill="white" />
-            <path d="M14 14V5L23 14H14Z" fill="white" />
-            <path opacity="0.64" d="M14 14V23L23 14H14Z" fill="white" />
+            <path
+                opacity="0.2"
+                d="M15.999 1.7002L28.999 9.06677L15.999 16L15.999 1.7002Z"
+                fill="black"
+            />
+            <path
+                opacity="0.3"
+                d="M28.999 9.06665V22.9332L15.999 15.9999L28.999 9.06665Z"
+                fill="black"
+            />
+            <path
+                opacity="0.4"
+                d="M28.999 22.9333L15.999 30.2998L15.999 16L28.999 22.9333Z"
+                fill="black"
+            />
+            <path
+                opacity="0.3"
+                d="M15.999 30.2998L2.99902 22.9333L15.999 16L15.999 30.2998Z"
+                fill="black"
+            />
+            <path
+                opacity="0.2"
+                d="M2.99902 22.9332V9.06665L15.999 15.9999L2.99902 22.9332Z"
+                fill="black"
+            />
+            <path
+                opacity="0.1"
+                d="M2.99902 9.06677L15.999 1.7002L15.999 16L2.99902 9.06677Z"
+                fill="black"
+            />
         </Icon>
     );
 };
