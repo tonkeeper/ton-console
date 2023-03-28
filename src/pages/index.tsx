@@ -8,6 +8,7 @@ import { observer } from 'mobx-react-lite';
 
 const NewUserPage = lazy(() => import('./new-user/NewUserPage'));
 const CreateFirstProjectPage = lazy(() => import('./new-user/CreateFirstProjectPage'));
+const BalancePage = lazy(() => import('./balance'));
 const SettingsPage = lazy(() => import('./settings'));
 const SupportPage = lazy(() => import('./support'));
 
@@ -52,6 +53,14 @@ const Routing: FunctionComponent = () => {
         <Routes>
             <Route path="/" element={<Layout />}>
                 <Route path="tonapi">{TonapiRouting}</Route>
+                <Route
+                    path="balance"
+                    element={
+                        <Suspense fallback={<>...</>}>
+                            <BalancePage />
+                        </Suspense>
+                    }
+                />
                 <Route
                     path="support"
                     element={

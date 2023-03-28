@@ -10,3 +10,4 @@ export { TgIcon } from './TgIcon';
 export { DisconnectIcon } from './DisconnectIcon';
 export { CreateIcon96 } from './CreateIcon96';
 export { PlusIcon16 } from './PlusIcon16';
+export { BalanceIcon24 } from './BalanceIcon24';

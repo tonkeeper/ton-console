@@ -3,16 +3,16 @@ import { Suspense } from 'react';
 import { Navigate, Route } from 'react-router-dom';
 
 const PricingPage = lazy(() => import('./pricing'));
-const OAuthPage = lazy(() => import('./oauth'));
+const DocumentationPage = lazy(() => import('./documentation'));
 const ApiKeysPage = lazy(() => import('./api-keys'));
 
 const TonapiRouting = (
     <>
         <Route
-            path="oauth"
+            path="documentation"
             element={
                 <Suspense fallback={<>...</>}>
-                    <OAuthPage />
+                    <DocumentationPage />
                 </Suspense>
             }
         />
@@ -25,7 +25,7 @@ const TonapiRouting = (
             }
         />
         <Route
-            path="api-keys/:keyId"
+            path="api-keys"
             element={
                 <Suspense fallback={<>...</>}>
                     <ApiKeysPage />

@@ -1,4 +1,5 @@
 import {
+    BalanceIcon24,
     DropDownMenu,
     DropDownMenuItem,
     DropDownMenuItemExpandable,
@@ -7,18 +8,26 @@ import {
     TonapiIcon
 } from 'src/shared';
 import { FunctionComponent } from 'react';
+import { Flex, Text } from '@chakra-ui/react';
 
 export const Aside: FunctionComponent = () => {
     return (
         <DropDownMenu>
             <DropDownMenuItemExpandable leftIcon={<TonapiIcon />} content="TON API" linkTo="tonapi">
-                <DropDownMenuItem linkTo="oauth">Oauth</DropDownMenuItem>
+                <DropDownMenuItem linkTo="api-keys">Api keys and calls</DropDownMenuItem>
+                <DropDownMenuItem linkTo="documentation">Documentation</DropDownMenuItem>
                 <DropDownMenuItem linkTo="pricing">Pricing</DropDownMenuItem>
-                <DropDownMenuItemExpandable content="API keys" linkTo="api-keys">
-                    <DropDownMenuItem linkTo="prod">&quot;Prod&quot;</DropDownMenuItem>
-                    <DropDownMenuItem linkTo="dev">&quot;Dev&quot;</DropDownMenuItem>
-                </DropDownMenuItemExpandable>
             </DropDownMenuItemExpandable>
+            <DropDownMenuItem leftIcon={<BalanceIcon24 />} linkTo="balance">
+                <Flex direction="column">
+                    <Text textStyle="label2" color="text.primary">
+                        Balance
+                    </Text>
+                    <Text textStyle="body3" color="text.secondary">
+                        180 TON
+                    </Text>
+                </Flex>
+            </DropDownMenuItem>
             <DropDownMenuItem leftIcon={<SettingsIcon />} linkTo="settings">
                 Settings
             </DropDownMenuItem>
