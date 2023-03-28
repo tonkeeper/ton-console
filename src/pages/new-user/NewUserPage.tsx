@@ -1,8 +1,8 @@
 import { FunctionComponent } from 'react';
-import { Box } from '@chakra-ui/react';
+import { Overlay } from 'src/shared';
 
 const NewUserPage: FunctionComponent = () => {
-    return <Box>Please authorize to continue</Box>;
+    return <Overlay>Please authorize to continue</Overlay>;
 };
 
 export default NewUserPage;

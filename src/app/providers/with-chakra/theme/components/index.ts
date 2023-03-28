@@ -7,6 +7,7 @@ import Modal from './modal';
 import Form from './form';
 import Input from './input';
 import FormError from './form-error';
+import Card from './card';
 
 export default {
     Button,
@@ -17,5 +18,6 @@ export default {
     Modal,
     Form,
     Input,
-    FormError
+    FormError,
+    Card
 };

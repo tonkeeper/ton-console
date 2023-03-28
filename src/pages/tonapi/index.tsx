@@ -2,7 +2,7 @@ import { lazy } from '@loadable/component';
 import { Suspense } from 'react';
 import { Navigate, Route } from 'react-router-dom';
 
-const BillingPage = lazy(() => import('./billing'));
+const PricingPage = lazy(() => import('./pricing'));
 const OAuthPage = lazy(() => import('./oauth'));
 const ApiKeysPage = lazy(() => import('./api-keys'));
 
@@ -17,10 +17,10 @@ const TonapiRouting = (
             }
         />
         <Route
-            path="billing"
+            path="pricing"
             element={
                 <Suspense fallback={<>...</>}>
-                    <BillingPage />
+                    <PricingPage />
                 </Suspense>
             }
         />
@@ -32,8 +32,8 @@ const TonapiRouting = (
                 </Suspense>
             }
         />
-        <Route index element={<Navigate to="oauth" replace />} />
-        <Route path="*" element={<Navigate to="oauth" replace />} />
+        <Route index element={<Navigate to="pricing" replace />} />
+        <Route path="*" element={<Navigate to="pricing" replace />} />
     </>
 );
 

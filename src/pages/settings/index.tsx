@@ -8,6 +8,7 @@ import {
 } from 'src/entities';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toJS } from 'mobx';
+import { Overlay } from 'src/shared';
 
 const SettingsPage: FunctionComponent = () => {
     const formId = 'edit-project-form';
@@ -50,7 +51,7 @@ const SettingsPage: FunctionComponent = () => {
     );
 
     return (
-        <>
+        <Overlay>
             <Center h="100%">
                 <Flex align="center" direction="column" w="100%" maxW="512px">
                     <FormProvider {...methods}>
@@ -86,7 +87,7 @@ const SettingsPage: FunctionComponent = () => {
                 isOpen={isOpen}
                 onClose={onDeleteModalClose}
             />
-        </>
+        </Overlay>
     );
 };
 

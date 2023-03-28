@@ -13,7 +13,7 @@ export const Aside: FunctionComponent = () => {
         <DropDownMenu>
             <DropDownMenuItemExpandable leftIcon={<TonapiIcon />} content="TON API" linkTo="tonapi">
                 <DropDownMenuItem linkTo="oauth">Oauth</DropDownMenuItem>
-                <DropDownMenuItem linkTo="billing">Billing</DropDownMenuItem>
+                <DropDownMenuItem linkTo="pricing">Pricing</DropDownMenuItem>
                 <DropDownMenuItemExpandable content="API keys" linkTo="api-keys">
                     <DropDownMenuItem linkTo="prod">&quot;Prod&quot;</DropDownMenuItem>
                     <DropDownMenuItem linkTo="dev">&quot;Dev&quot;</DropDownMenuItem>

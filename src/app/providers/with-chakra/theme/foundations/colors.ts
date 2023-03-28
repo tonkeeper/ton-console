@@ -26,7 +26,7 @@ const colors = {
         orange: '#F59931'
     },
     separator: {
-        common: 'rgba(0, 0, 0, 0.1)',
+        common: 'rgba(131, 137, 143, 0.16)',
         inverted: 'rgba(255, 255, 255, 0.12)'
     },
     field: {
