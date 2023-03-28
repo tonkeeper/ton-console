@@ -7,6 +7,8 @@ generateApi({
     input: path.resolve(process.cwd(), './scripts/swagger.yaml'),
     typePrefix: 'DTO',
     enumKeyPrefix: 'DTO',
+    extractEnums: true,
+    generateUnionEnums: false,
     httpClientType: 'axios',
     templates: undefined
 });

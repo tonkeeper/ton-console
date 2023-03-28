@@ -2,8 +2,7 @@ import { configure } from 'mobx';
 
 setTimeout(() => {
     configure({
-        reactionScheduler: f => {
-            setTimeout(f, 1);
-        }
+        enforceActions: 'never',
+        reactionScheduler: f => setTimeout(f)
     });
 }, 1);

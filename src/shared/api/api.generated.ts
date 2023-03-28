@@ -17,6 +17,8 @@ export interface DTOOk {
 export interface DTOError {
     /** Error message */
     error: string;
+    /** backend error code */
+    code: DTOErrorCode;
 }
 
 export interface DTOUser {
@@ -56,65 +58,6 @@ export interface DTOUser {
     date_create: number;
 }
 
-export interface DTOWebhook {
-    /**
-     * @format int64
-     * @example 1
-     */
-    id: number;
-    /**
-     * @format int64
-     * @example 1464363297
-     */
-    user_id: number;
-    /**
-     * @format int64
-     * @example 2465363097
-     */
-    app_id: number;
-    /** @example "http://tonapi.io/callback" */
-    payload_url: string;
-    /** @example "it's my secret" */
-    secret: string;
-    /** @example ["0:15d570f9c0c67e8e6d40f5c69be049a247dd6c0e841d31ac8dcc3edf4a57d057","0:85d570f9c0c67e8e6v40f2c69be049a217dd6c0f841d31ac8dcc3edf4a57d057"] */
-    addresses?: string[];
-    /** @example true */
-    active: boolean;
-    type_actions: 'account_event';
-    /**
-     * @format int64
-     * @example 1678275313
-     */
-    date_create: number;
-}
-
-export interface DTOAppToken {
-    /** @example 1 */
-    id: number;
-    /**
-     * @format int64
-     * @example 1464363297
-     */
-    user_id: number;
-    /**
-     * @format int64
-     * @example 2465363097
-     */
-    app_id: number;
-    tonapi_tier: DTOTier;
-    /** @example "AFWRUVK5QHVRFFAAAAACNAS5QU22SHA2D4SMH3SFJOOQB5PCBU7Z7KDDWKQT5KI2YNABHBI" */
-    token: string;
-    /** @example false */
-    is_ban: boolean;
-    /** @example true */
-    active: boolean;
-    /**
-     * @format int64
-     * @example 1678275313
-     */
-    date_create: number;
-}
-
 export interface DTOTier {
     /**
      * @format int64
@@ -127,7 +70,11 @@ export interface DTOTier {
     burst: number;
     /** @example 5 */
     rpc: number;
-    /** @example 100 */
+    /**
+     * The price is in nano tons
+     * @format int64
+     * @example 1000000000
+     */
     ton_price: number;
 }
 
@@ -160,10 +107,43 @@ export interface DTOProject {
     /** @example "Test project" */
     name: string;
     tonapi_tier?: DTOAppTier;
+    tonapi_tokens?: DTOToken[];
     /** @example "https://tonapi.io/static/test.png" */
     avatar: string;
     /** @example "2023-03-23" */
     date_create: string;
+}
+
+export interface DTOToken {
+    /**
+     * @format int64
+     * @example 1
+     */
+    id: number;
+    /** @example "AE5TZRWIIOR2O2YAAAAGFP2HEWFZJYBP222A567CBF6JIL7S4RIZSCOAZRZOEW7AKMRICGQ" */
+    token: string;
+    /** @example "2023-03-23" */
+    date_create: string;
+}
+
+/** backend error code */
+export enum DTOErrorCode {
+    DTOErrorUnknown = 1,
+    DTOErrorInternal = 2,
+    DTOErrorBadRequest = 3,
+    DTOErrorCheckPayload = 4,
+    DTOErrorVerificationProof = 5,
+    DTOErrorVerificationTg = 6,
+    DTOErrorAuthUser = 7,
+    DTOErrorBannedUser = 8,
+    DTOErrorLogoutUser = 9,
+    DTOErrorCreateProject = 10,
+    DTOErrorGetProject = 11,
+    DTOErrorUpdateProject = 12,
+    DTOErrorDeleteProject = 13,
+    DTOErrorProjectWithoutTier = 14,
+    DTOErrorGetTiers = 15,
+    DTOErrorInsufficientFunds = 16
 }
 
 import axios, {
@@ -328,17 +308,18 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
     api = {
         /**
-         * @description Auth via telegram
+         * @description The token is recorded in the database and in the user's cookies.  If the user logs in under different browsers, then each authorization will have its own token.
          *
          * @tags auth
          * @name AuthViaTg
+         * @summary Auth via telegram
          * @request POST:/api/v1/auth/tg
          */
         authViaTg: (
             data: {
                 /**
                  * @format int64
-                 * @example "1261871881"
+                 * @example 1261871881
                  */
                 id: number;
                 /** @example "Test" */
@@ -351,7 +332,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 hash: string;
                 /**
                  * @format int64
-                 * @example "1678275313"
+                 * @example 1678275313
                  */
                 auth_date: number;
             },
@@ -365,10 +346,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
-         * @description Generate payload for TON Connect
+         * No description
          *
          * @tags auth
          * @name AuthGeneratePayload
+         * @summary Generate payload for TON Connect
          * @request POST:/api/v1/auth/ton-proof/generate_payload
          */
         authGeneratePayload: (params: RequestParams = {}) =>
@@ -385,10 +367,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
-         * @description Auth via TON Connect
+         * @description The token is recorded in the database and in the user's cookies.  If the user logs in under different browsers, then each authorization will have its own token.
          *
          * @tags auth
          * @name AuthViaTonConnect
+         * @summary Auth via TON Connect
          * @request POST:/api/v1/auth/ton-proof/check_proof
          */
         authViaTonConnect: (
@@ -422,10 +405,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
-         * @description Logout from the system
+         * @description After logout, the user's token is deleted
          *
          * @tags account
          * @name AccountLogout
+         * @summary Logout from the system
          * @request POST:/api/v1/account/logout
          * @secure
          */
@@ -438,10 +422,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
-         * @description Get active tiers
+         * No description
          *
          * @tags tier
          * @name GetTiers
+         * @summary Get active tiers
          * @request GET:/api/v1/tiers
          * @secure
          */
@@ -459,17 +444,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
-         * @description Create project
+         * No description
          *
          * @tags project
          * @name CreateProject
+         * @summary Create project
          * @request POST:/api/v1/project
          * @secure
          */
         createProject: (
             data: {
                 /** @example "Test Project" */
-                name?: string;
+                name: string;
                 /** @format binary */
                 image?: File;
             },
@@ -490,10 +476,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
-         * @description Get user's project
+         * No description
          *
          * @tags project
          * @name GetProjects
+         * @summary Get user's project
          * @request GET:/api/v1/projects
          * @secure
          */
@@ -511,10 +498,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
-         * @description Get user's project
+         * @description You need to pass only those fields that need to be changed.
          *
          * @tags project
          * @name UpdateProject
+         * @summary Update user project
          * @request PATCH:/api/v1/project/{id}
          * @secure
          */
@@ -528,8 +516,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @example 1
                  */
                 tier_id?: number;
-                /** @format binary */
-                image?: File;
+                /**
+                 * If you want to delete a avatar, put null in the image field.
+                 * @format binary
+                 */
+                image?: File | null;
             },
             params: RequestParams = {}
         ) =>
@@ -544,6 +535,63 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 body: data,
                 secure: true,
                 type: ContentType.FormData,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags project
+         * @name DeleteProject
+         * @summary Delete user project
+         * @request DELETE:/api/v1/project/{id}
+         * @secure
+         */
+        deleteProject: (id: number, params: RequestParams = {}) =>
+            this.request<DTOOk, DTOError>({
+                path: `/api/v1/project/${id}`,
+                method: 'DELETE',
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags project
+         * @name GenerateProjectToken
+         * @summary Generate project token
+         * @request POST:/api/v1/project/{id}/generate/token
+         * @secure
+         */
+        generateProjectToken: (id: number, params: RequestParams = {}) =>
+            this.request<
+                {
+                    /** @example "AE5TZRWIAAAAAAAAAAADIABPI6PKEZ2W6TIKPNEIMNIZF6LMAXTXHWLTK3OXRIXC62AUWWQ" */
+                    token?: string;
+                },
+                DTOError
+            >({
+                path: `/api/v1/project/${id}/generate/token`,
+                method: 'POST',
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags project
+         * @name DeleteProjectToken
+         * @summary Delete project token
+         * @request DELETE:/api/v1/project/{id}/token/{token_id}
+         * @secure
+         */
+        deleteProjectToken: (id: number, tokenId: number, params: RequestParams = {}) =>
+            this.request<DTOOk, DTOError>({
+                path: `/api/v1/project/${id}/token/${tokenId}`,
+                method: 'DELETE',
+                secure: true,
                 ...params
             })
     };

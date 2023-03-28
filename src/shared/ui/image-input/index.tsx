@@ -37,6 +37,7 @@ const ImageInput = forwardRef<
     const inputRef = useRef<HTMLInputElement | null>(null);
     const dropContainerRef = useRef<HTMLDivElement | null>(null);
     const [file, setFile] = useState<string | null>(null);
+    const [fileList, setFileList] = useState<null | FileList>();
     const [hasError, setHasError] = useState<boolean>(false);
 
     const refCallback = useCallback(
@@ -44,6 +45,8 @@ const ImageInput = forwardRef<
             let proxy = null;
 
             if (el) {
+                // react hook form limitation workaround
+                // https://github.com/react-hook-form/react-hook-form/discussions/8612?sort=old
                 proxy = new Proxy(el, {
                     get(target, key: keyof HTMLInputElement | 'target') {
                         if (key === 'target') {
@@ -55,8 +58,13 @@ const ImageInput = forwardRef<
                             return value.bind(target);
                         }
 
+                        if (key === 'value') {
+                            return fileList;
+                        }
+
                         if (key === 'type') {
-                            // because input type file cannot be programmatically modified
+                            // react hook form limitation workaround
+                            // react hook form will not set the default value if input has type 'file'
                             return 'text';
                         }
 
@@ -66,6 +74,8 @@ const ImageInput = forwardRef<
                         if (key === 'value') {
                             if (value instanceof FileList) {
                                 setFile(URL.createObjectURL(value[0]));
+                            } else {
+                                setFile(null);
                             }
                             return true;
                         }
@@ -86,25 +96,35 @@ const ImageInput = forwardRef<
 
             inputRef.current = el;
         },
-        [ref]
+        [ref, fileList]
     );
 
     const handleChange = useCallback(
         (e: ChangeEvent<HTMLInputElement>): void => {
-            onChange(e);
             if (e.target.files?.[0]) {
+                setFileList(e.target.files);
+                onChange({
+                    ...e,
+                    target: { ...e.target, name: nameWithFallback, value: e.target.files }
+                });
                 setFile(URL.createObjectURL(e.target.files![0]));
             } else {
+                setFileList(null);
                 setFile(null);
+                onChange({
+                    ...e,
+                    target: { ...e.target, name: nameWithFallback, value: null }
+                });
             }
         },
-        [onChange]
+        [onChange, nameWithFallback]
     );
 
     const onReset = useCallback(() => {
         inputRef.current!.value = '';
-        onChange({ target: inputRef.current });
+        setFileList(null);
         setFile(null);
+        onChange({ target: { ...inputRef.current, name: nameWithFallback, value: null } });
     }, [onChange]);
 
     useEffect(() => {

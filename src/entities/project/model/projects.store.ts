@@ -94,14 +94,26 @@ class ProjectsStore {
             const request: Parameters<typeof apiClient.api.updateProject>[1] = {};
 
             if ('icon' in form) {
-                request.image = form.icon || undefined; // TODO value to delete
+                request.image = form.icon || null;
             }
 
             if ('name' in form) {
                 request.name = form.name;
             }
 
-            await apiClient.api.updateProject(form.projectId, request);
+            const response = await apiClient.api.updateProject(form.projectId, request);
+            const project = mapProjectDtoToProject(response.data.project);
+
+            const projectIndex = this.projects.findIndex(item => item.id === project.id);
+            if (projectIndex !== -1) {
+                this.projects.splice(projectIndex, 1, project);
+            } else {
+                this.projects.push(project);
+            }
+
+            if (this.selectedProject?.id === project.id) {
+                this.selectedProject = project;
+            }
 
             const { toast } = createStandaloneToast();
             toast({ title: 'Project deleted successfully', status: 'success', isClosable: true });
@@ -119,7 +131,13 @@ class ProjectsStore {
 
     deleteProject = createAsyncAction(
         async (projectId: number): Promise<void> => {
-            console.log(projectId);
+            await apiClient.api.deleteProject(projectId);
+
+            this.projects = this.projects.filter(item => item.id !== projectId);
+            if (this.selectedProject?.id === projectId) {
+                this.selectedProject = this.projects[0] || null;
+            }
+
             const { toast } = createStandaloneToast();
             toast({ title: 'Project deleted successfully', status: 'success', isClosable: true });
         },
