@@ -32,7 +32,7 @@ export const PaymentDetailsModal: FunctionComponent<{
                 </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody py="0">
-                    <Pad py="5" px="6" mb="4">
+                    <Pad mb="4">
                         <Flex justify="space-between" gap="10" mb="3">
                             <Text textStyle="body2" color="text.secondary">
                                 Plan

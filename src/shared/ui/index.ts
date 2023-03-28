@@ -6,3 +6,4 @@ export * from './dropdown-menu';
 export * from './image-input';
 export * from './image';
 export { Pad } from './Pad';
+export { CopyPad } from './CopyPad';
