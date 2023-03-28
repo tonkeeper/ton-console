@@ -6,10 +6,19 @@ import {
     PropsWithChildren,
     ReactElement,
     ReactNode,
+    useEffect,
     useMemo
 } from 'react';
-import { Accordion, AccordionButton, AccordionItem, AccordionPanel, Box } from '@chakra-ui/react';
+import {
+    Accordion,
+    AccordionButton,
+    AccordionItem,
+    AccordionPanel,
+    Box,
+    useDisclosure
+} from '@chakra-ui/react';
 import { ArrowIcon } from 'src/shared';
+import { useLocation } from 'react-router-dom';
 
 export interface DropDownMenuItemExpandableProps extends PropsWithChildren {
     content: ReactNode;
@@ -28,27 +37,46 @@ const _active = { backgroundColor: 'transparent', transform: 'scale(0.97)' };
 export const DropDownMenuItemExpandable: FunctionComponent<
     DropDownMenuItemExpandableProps
 > = props => {
+    const path = useMemo(() => {
+        let value = props.path;
+        if (value && props.linkTo) {
+            value += `/${props.linkTo}`;
+        }
+        value ||= props.linkTo;
+        return value;
+    }, [props.path, props.linkTo]);
+
     const children = useMemo(() => {
         return Children.map(props.children, child => {
             if (!isValidElement<FunctionComponent<{ layer?: number }>>(child)) {
                 return child;
             }
 
-            let path = props.path;
-            if (path && props.linkTo) {
-                path += `/${props.linkTo}`;
-            }
-            path ||= props.linkTo;
-
             return cloneElement(child as ReactElement<{ layer?: number; path?: string }>, {
                 layer: (props.layer || 0) + 1,
                 path
             });
         });
-    }, [props.children, props.layer, props.path, props.linkTo]);
+    }, [path, props.children, props.layer]);
+
+    const { isOpen, onOpen, onToggle } = useDisclosure();
+
+    const location = useLocation();
+
+    useEffect(() => {
+        const isMathLocation = location.pathname.startsWith('/' + path);
+
+        if (isMathLocation) {
+            onOpen();
+        }
+    }, [location.pathname, path]);
+
+    const index = useMemo(() => {
+        return isOpen ? [0] : [];
+    }, [isOpen]);
 
     return (
-        <Accordion allowToggle>
+        <Accordion allowToggle index={index}>
             <AccordionItem border="none">
                 {({ isExpanded }) => (
                     <>
@@ -66,6 +94,7 @@ export const DropDownMenuItemExpandable: FunctionComponent<
                             _hover={_hover}
                             _active={_active}
                             transition=""
+                            onClick={onToggle}
                         >
                             {props.leftIcon}
                             <Box textAlign="left" wordBreak="break-all" noOfLines={1}>

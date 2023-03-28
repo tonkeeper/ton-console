@@ -53,14 +53,6 @@ const Routing: FunctionComponent = () => {
             <Route path="/" element={<Layout />}>
                 <Route path="tonapi">{TonapiRouting}</Route>
                 <Route
-                    index
-                    element={
-                        <Suspense fallback={<>...</>}>
-                            <SettingsPage />
-                        </Suspense>
-                    }
-                />
-                <Route
                     path="support"
                     element={
                         <Suspense fallback={<>...</>}>
