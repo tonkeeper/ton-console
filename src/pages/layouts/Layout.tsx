@@ -10,7 +10,7 @@ export const Layout: FunctionComponent<{ aside?: boolean }> = ({ aside }) => {
             <Header />
             <Flex flex={1} m="4">
                 {aside !== false && (
-                    <Box w="240px" mr="4">
+                    <Box flexShrink="0" w="240px" mr="4">
                         <Overlay p="2" height="fit-content" mb="4.5">
                             <Aside />
                         </Overlay>

@@ -5,7 +5,7 @@ export default {
     simple: definePartsStyle({
         th: {
             ...textStyles.body2,
-            '&:first-child': {
+            '&:first-of-type': {
                 pl: '4'
             },
             '&:last-child': {
@@ -14,7 +14,7 @@ export default {
             py: '14px'
         },
         td: {
-            '&:first-child': {
+            '&:first-of-type': {
                 pl: '4'
             },
             '&:last-child': {

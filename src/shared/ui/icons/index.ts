@@ -14,3 +14,5 @@ export { BalanceIcon24 } from './BalanceIcon24';
 export { CopyIcon24 } from './CopyIcon24';
 export { VerticalDotsIcon16 } from './VerticalDotsIcon16';
 export { CancelIcon24 } from './CancelIcon24';
+export { EditIcon24 } from './EditIcon24';
+export { DeleteIcon24 } from './DeleteIcon24';

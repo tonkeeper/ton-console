@@ -20,7 +20,7 @@ const Routing: FunctionComponent = () => {
                     <Route
                         index
                         element={
-                            <Suspense fallback={<>...</>}>
+                            <Suspense>
                                 <NewUserPage />
                             </Suspense>
                         }
@@ -38,7 +38,7 @@ const Routing: FunctionComponent = () => {
                     <Route
                         index
                         element={
-                            <Suspense fallback={<>...</>}>
+                            <Suspense>
                                 <CreateFirstProjectPage />
                             </Suspense>
                         }
@@ -56,24 +56,24 @@ const Routing: FunctionComponent = () => {
                 <Route
                     path="balance"
                     element={
-                        <Suspense fallback={<>...</>}>
+                        <Suspense>
                             <BalancePage />
-                        </Suspense>
-                    }
-                />
-                <Route
-                    path="support"
-                    element={
-                        <Suspense fallback={<>...</>}>
-                            <SupportPage />
                         </Suspense>
                     }
                 />
                 <Route
                     path="settings"
                     element={
-                        <Suspense fallback={<>...</>}>
+                        <Suspense>
                             <SettingsPage />
+                        </Suspense>
+                    }
+                />
+                <Route
+                    path="support"
+                    element={
+                        <Suspense>
+                            <SupportPage />
                         </Suspense>
                     }
                 />

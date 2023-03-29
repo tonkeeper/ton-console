@@ -11,7 +11,7 @@ const TonapiRouting = (
         <Route
             path="documentation"
             element={
-                <Suspense fallback={<>...</>}>
+                <Suspense>
                     <DocumentationPage />
                 </Suspense>
             }
@@ -19,7 +19,7 @@ const TonapiRouting = (
         <Route
             path="pricing"
             element={
-                <Suspense fallback={<>...</>}>
+                <Suspense>
                     <PricingPage />
                 </Suspense>
             }
@@ -27,7 +27,7 @@ const TonapiRouting = (
         <Route
             path="api-keys"
             element={
-                <Suspense fallback={<>...</>}>
+                <Suspense>
                     <ApiKeysPage />
                 </Suspense>
             }
