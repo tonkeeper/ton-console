@@ -1,9 +1,10 @@
 import { Icon } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, forwardRef } from 'react';
 
-export const CopyIcon24: FunctionComponent<ComponentProps<typeof Icon>> = props => {
+export const CopyIcon24 = forwardRef<SVGSVGElement, ComponentProps<typeof Icon>>((props, ref) => {
     return (
         <Icon
+            ref={ref}
             w="24px"
             h="24px"
             fill="none"
@@ -19,4 +20,6 @@ export const CopyIcon24: FunctionComponent<ComponentProps<typeof Icon>> = props 
             />
         </Icon>
     );
-};
+});
+
+CopyIcon24.displayName = 'CopyIcon24';

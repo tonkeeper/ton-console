@@ -177,7 +177,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-
   /api/v1/project/{id}/generate/token:
     post:
       summary: "Generate project token"
@@ -211,6 +210,44 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /project/{id}/payments/deposit-address:
+    get:
+      summary: "Get project deposit address"
+      operationId: getDepositAddress
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - project
+      parameters:
+        - $ref: '#/components/parameters/projectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/DepositWallet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /project/{id}/payments/deposits:
+    get:
+      summary: "Get project deposits"
+      operationId: getPaymentsDeposits
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - project
+      parameters:
+        - $ref: '#/components/parameters/projectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/PaymentsDeposits'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -466,6 +503,22 @@ components:
         date_create:
           type: string
           example: "2023-03-23"
+    Deposit:
+      type: object
+      required:
+        - address
+        - balance
+        - currency
+      properties:
+        address:
+          type: string
+          example: "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR"
+        balance:
+          type: string
+          example: "1000000"
+        currency:
+          type: string
+          example: "TON"
     Project:
       type: object
       required:
@@ -540,6 +593,27 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Ok'
+    DepositWallet:
+      description: "Deposit wallet"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ton_deposit_wallet:
+                type: string
+                example: "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR"
+    PaymentsDeposits:
+      description: "Payments deposits"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              deposits:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Deposit'
     TokenCreated:
       description: "Token has been created"
       content:

@@ -98,6 +98,15 @@ export interface DTOAppTier {
     date_create: string;
 }
 
+export interface DTODeposit {
+    /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
+    address: string;
+    /** @example "1000000" */
+    balance: string;
+    /** @example "TON" */
+    currency: string;
+}
+
 export interface DTOProject {
     /**
      * @format int64
@@ -591,6 +600,52 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             this.request<DTOOk, DTOError>({
                 path: `/api/v1/project/${id}/token/${tokenId}`,
                 method: 'DELETE',
+                secure: true,
+                ...params
+            })
+    };
+    project = {
+        /**
+         * No description
+         *
+         * @tags project
+         * @name GetDepositAddress
+         * @summary Get project deposit address
+         * @request GET:/project/{id}/payments/deposit-address
+         * @secure
+         */
+        getDepositAddress: (id: number, params: RequestParams = {}) =>
+            this.request<
+                {
+                    /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
+                    ton_deposit_wallet?: string;
+                },
+                DTOError
+            >({
+                path: `/project/${id}/payments/deposit-address`,
+                method: 'GET',
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags project
+         * @name GetPaymentsDeposits
+         * @summary Get project deposits
+         * @request GET:/project/{id}/payments/deposits
+         * @secure
+         */
+        getPaymentsDeposits: (id: number, params: RequestParams = {}) =>
+            this.request<
+                {
+                    deposits?: DTODeposit[];
+                },
+                DTOError
+            >({
+                path: `/project/${id}/payments/deposits`,
+                method: 'GET',
                 secure: true,
                 ...params
             })

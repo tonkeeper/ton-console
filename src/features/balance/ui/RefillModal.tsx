@@ -29,14 +29,14 @@ export const RefillModal: FunctionComponent<{
                     </Text>
                 </ModalHeader>
                 <ModalCloseButton />
-                <ModalBody py="0">
+                <ModalBody pt="0" pb="4">
                     <Pad mb="4" display="flex" alignItems="center" justifyContent="center">
                         <QRCodeSVG bgColor="transparent" size={180} value="https://google.com" />
                     </Pad>
-                    <CopyPad>EQAwWyoeWTtAcXh_M4x8bRv2e4CaQ4wRnBPK9sQBfCdEY5ll</CopyPad>
+                    <CopyPad text="EQAwWyoeWTtAcXh_M4x8bRv2e4CaQ4wRnBPK9sQBfCdEY5ll" />
                 </ModalBody>
 
-                <ModalFooter gap="3">
+                <ModalFooter gap="3" pt="0">
                     <Button flex={1} onClick={props.onClose} variant="secondary">
                         Cancel
                     </Button>

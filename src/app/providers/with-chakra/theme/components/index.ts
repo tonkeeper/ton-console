@@ -8,6 +8,8 @@ import Form from './form';
 import Input from './input';
 import FormError from './form-error';
 import Card from './card';
+import Divider from './divider';
+import Table from './table';
 
 export default {
     Button,
@@ -19,5 +21,7 @@ export default {
     Form,
     Input,
     FormError,
-    Card
+    Card,
+    Divider,
+    Table
 };

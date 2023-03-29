@@ -6,7 +6,8 @@ export default defineStyle({
         borderRadius: 'lg',
         border: 'none',
         bg: 'background.content',
-        boxShadow: 'dropdown'
+        boxShadow: 'dropdown',
+        minWidth: 'unset'
     },
     item: {
         p: 2,
