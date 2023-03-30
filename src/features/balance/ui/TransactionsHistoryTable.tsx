@@ -1,8 +1,11 @@
 import { Link, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent } from 'react';
-import { explorer, shortAddress } from 'src/shared';
+import { explorer, shortAddress, toDateTime } from 'src/shared';
+import { balanceStore } from 'src/entities';
+import { PaymentDescription } from './PaymentDescription';
+import { observer } from 'mobx-react-lite';
 
-export const TransactionsHistoryTable: FunctionComponent<
+const TransactionsHistoryTable: FunctionComponent<
     ComponentProps<typeof TableContainer>
 > = props => {
     return (
@@ -23,50 +26,44 @@ export const TransactionsHistoryTable: FunctionComponent<
                     </Tr>
                 </Thead>
                 <Tbody>
-                    <Tr>
-                        <Td>17 Jun, 14:44</Td>
-                        <Td>Payment, TON API «Pro»</Td>
-                        <Td textAlign="right">-160 TON</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>17 Jun, 14:44</Td>
-                        <Td>
-                            Refill from{' '}
-                            <Link
-                                color="text.accent"
-                                href={explorer.generateLinkToAddress(
-                                    'EQDoBhI8JERdpXHytsrGxCSvJwlPTejMSxMB8y_syxr3XgYq'
-                                )}
-                                isExternal
-                            >
-                                {shortAddress('EQDoBhI8JERdpXHytsrGxCSvJwlPTejMSxMB8y_syxr3XgYq')}
-                            </Link>
-                        </Td>
-                        <Td textAlign="right">+330 TON</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>17 Jun, 14:44</Td>
-                        <Td>Payment, TON API «Pro»</Td>
-                        <Td textAlign="right">-160 TON</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>17 Jun, 14:44</Td>
-                        <Td>
-                            Refill from{' '}
-                            <Link
-                                color="text.accent"
-                                href={explorer.generateLinkToAddress(
-                                    'EQDoBhI8JERdpXHytsrGxCSvJwlPTejMSxMB8y_syxr3XgYq'
-                                )}
-                                isExternal
-                            >
-                                {shortAddress('EQDoBhI8JERdpXHytsrGxCSvJwlPTejMSxMB8y_syxr3XgYq')}
-                            </Link>
-                        </Td>
-                        <Td textAlign="right">+330 TON</Td>
-                    </Tr>
+                    {balanceStore.billingHistory.value.map(historyItem => (
+                        <Tr key={historyItem.id}>
+                            <Td>{toDateTime(historyItem.date)}</Td>
+
+                            {historyItem.action === 'payment' ? (
+                                <>
+                                    <Td>
+                                        <PaymentDescription description={historyItem.description} />
+                                    </Td>
+                                    <Td textAlign="right">
+                                        -{historyItem.amount.stringCurrencyAmount}
+                                    </Td>
+                                </>
+                            ) : (
+                                <>
+                                    <Td>
+                                        Refill from{' '}
+                                        <Link
+                                            color="text.accent"
+                                            href={explorer.generateLinkToAddress(
+                                                historyItem.fromAddress
+                                            )}
+                                            isExternal
+                                        >
+                                            {shortAddress(historyItem.fromAddress)}
+                                        </Link>
+                                    </Td>
+                                    <Td color="accent.green" textAlign="right">
+                                        +{historyItem.amount.stringCurrencyAmount}
+                                    </Td>
+                                </>
+                            )}
+                        </Tr>
+                    ))}
                 </Tbody>
             </Table>
         </TableContainer>
     );
 };
+
+export default observer(TransactionsHistoryTable);

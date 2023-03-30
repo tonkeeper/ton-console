@@ -1,4 +1,6 @@
-export interface Tier {
+import { CurrencyAmount } from 'src/shared';
+
+export interface TonApiTier {
     id: number;
     name: string;
     description: {
@@ -8,5 +10,5 @@ export interface Tier {
         };
         requestsPerSecondLimit: number;
     };
-    tonPrice: number;
+    price: CurrencyAmount;
 }

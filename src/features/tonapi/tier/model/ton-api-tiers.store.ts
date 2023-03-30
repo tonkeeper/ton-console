@@ -1,19 +1,21 @@
 import { makeAutoObservable } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
-import { apiClient, getWindow, DTOTier, createEffect } from 'src/shared';
-import { Tier } from './interfaces';
+import { apiClient, getWindow, DTOTier, createEffect, TonCurrencyAmount } from 'src/shared';
+import { TonApiTier } from './interfaces';
 import { tGUserStore } from 'src/entities';
 
-class TiersStore {
-    tiers: Tier[] = [];
+class TonApiTiersStore {
+    tiers: TonApiTier[] = [];
 
     isLoading = false;
+
+    error: unknown = null;
 
     constructor() {
         makeAutoObservable(this);
 
         makePersistable(this, {
-            name: 'TiersStore',
+            name: 'TonApiTiersStore',
             properties: ['tiers'],
             storage: getWindow()!.localStorage
         });
@@ -21,6 +23,8 @@ class TiersStore {
         createEffect(() => {
             if (tGUserStore.user) {
                 this.fetchTiers();
+            } else {
+                this.clearState();
             }
         });
     }
@@ -38,13 +42,19 @@ class TiersStore {
 
         this.isLoading = false;
     };
+
+    clearState(): void {
+        this.tiers = [];
+        this.isLoading = false;
+        this.error = null;
+    }
 }
 
-function mapTierDTOToTier(tierDTO: DTOTier): Tier {
+function mapTierDTOToTier(tierDTO: DTOTier): TonApiTier {
     return {
         id: tierDTO.id,
         name: tierDTO.name,
-        tonPrice: tierDTO.ton_price / 10 ** 9,
+        price: new TonCurrencyAmount(tierDTO.ton_price),
         description: {
             requestsPerSecondLimit: tierDTO.rpc,
             connections: {
@@ -55,4 +65,4 @@ function mapTierDTOToTier(tierDTO: DTOTier): Tier {
     };
 }
 
-export const tiersStore = new TiersStore();
+export const tonApiTiersStore = new TonApiTiersStore();

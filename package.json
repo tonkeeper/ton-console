@@ -20,6 +20,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@loadable/component": "^5.15.3",
+    "bignumber.js": "^9.1.1",
     "compose-function": "^3.0.3",
     "framer-motion": "^10.2.3",
     "i18next": "^22.4.11",
@@ -39,6 +40,7 @@
   "devDependencies": {
     "@babel/core": "^7.20.12",
     "@chakra-ui/storybook-addon": "^4.0.16",
+    "@chakra-ui/styled-system": "^2.7.0",
     "@storybook/addon-actions": "^6.5.16",
     "@storybook/addon-essentials": "^6.5.16",
     "@storybook/addon-interactions": "^6.5.16",

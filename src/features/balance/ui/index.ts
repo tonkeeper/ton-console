@@ -1,3 +1,2 @@
-export { RefillModal } from './RefillModal';
 export { SubscriptionsTable } from './SubscriptionsTable';
-export { TransactionsHistoryTable } from './TransactionsHistoryTable';
+export { default as TransactionsHistoryTable } from './TransactionsHistoryTable';

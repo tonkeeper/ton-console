@@ -1,5 +1,4 @@
 import { FunctionComponent } from 'react';
-import { Tier } from 'src/entities';
 import {
     Button,
     Modal,
@@ -14,11 +13,12 @@ import {
     Flex
 } from '@chakra-ui/react';
 import { H4, Pad } from 'src/shared';
+import { TonApiTier } from '../model';
 
-export const PaymentDetailsModal: FunctionComponent<{
+export const TonApiPaymentDetailsModal: FunctionComponent<{
     isOpen: boolean;
     onClose: (confirm?: boolean) => void;
-    tier: Tier;
+    tier?: TonApiTier;
 }> = ({ tier, ...rest }) => {
     return (
         <Modal scrollBehavior="inside" size="md" {...rest}>
@@ -38,7 +38,7 @@ export const PaymentDetailsModal: FunctionComponent<{
                                 Plan
                             </Text>
                             <Text textStyle="body2" color="text.secondary">
-                                {tier.name}
+                                {tier?.name}
                             </Text>
                         </Flex>
                         <Flex justify="space-between" gap="10" mb="3">
@@ -46,9 +46,9 @@ export const PaymentDetailsModal: FunctionComponent<{
                                 Included
                             </Text>
                             <Text textStyle="body2" color="text.secondary" textAlign="right">
-                                {tier.description.requestsPerSecondLimit} requests per second,{' '}
-                                {tier.description.connections.subscriptionsLimit} subscription
-                                connection up to {tier.description.connections.accountsLimit}
+                                {tier?.description.requestsPerSecondLimit} requests per second,{' '}
+                                {tier?.description.connections.subscriptionsLimit} subscription
+                                connection up to {tier?.description.connections.accountsLimit}
                                  accounts, webhooks
                             </Text>
                         </Flex>
@@ -65,7 +65,7 @@ export const PaymentDetailsModal: FunctionComponent<{
                                 Price
                             </Text>
                             <Text textStyle="body2" color="text.secondary">
-                                {tier.tonPrice}
+                                {tier?.price.stringAmount}
                             </Text>
                         </Flex>
                     </Pad>

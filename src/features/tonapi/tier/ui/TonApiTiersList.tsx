@@ -1,26 +1,27 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Tier, TierCard, tiersStore } from 'src/entities';
 import { Button, Flex } from '@chakra-ui/react';
-import { PaymentDetailsModal } from './PaymentDetailsModal';
+import { TonApiPaymentDetailsModal } from './TonApiPaymentDetailsModal';
+import { TonApiTier, tonApiTiersStore } from '../model';
+import { TonApiTierCard } from './TonApiTierCard';
 
-const TiersList_: FunctionComponent = () => {
-    const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
+const TonApiTiersList: FunctionComponent = () => {
+    const [selectedTier, setSelectedTier] = useState<TonApiTier | undefined>(undefined);
 
     const onClose = useCallback((confirm?: boolean) => {
-        setSelectedTier(null);
+        setSelectedTier(undefined);
         console.log(confirm);
     }, []);
 
-    if (tiersStore.isLoading) {
+    if (tonApiTiersStore.isLoading) {
         return null;
     }
 
     return (
         <>
             <Flex gap="4">
-                {tiersStore.tiers.map(tier => (
-                    <TierCard
+                {tonApiTiersStore.tiers.map(tier => (
+                    <TonApiTierCard
                         key={tier.id}
                         tier={tier}
                         flex="1"
@@ -36,15 +37,13 @@ const TiersList_: FunctionComponent = () => {
                     />
                 ))}
             </Flex>
-            {selectedTier && (
-                <PaymentDetailsModal
-                    isOpen={!!selectedTier}
-                    onClose={onClose}
-                    tier={selectedTier}
-                />
-            )}
+            <TonApiPaymentDetailsModal
+                isOpen={!!selectedTier}
+                onClose={onClose}
+                tier={selectedTier}
+            />
         </>
     );
 };
 
-export const TiersList = observer(TiersList_);
+export default observer(TonApiTiersList);

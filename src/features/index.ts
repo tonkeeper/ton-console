@@ -1,2 +1,2 @@
-export * from './tier';
+export * from './tonapi';
 export * from './balance';

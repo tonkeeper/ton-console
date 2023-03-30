@@ -1,7 +1,8 @@
 import { FunctionComponent } from 'react';
 import { H2, H4, Overlay } from 'src/shared';
 import { Box, Button, Divider, Text, useDisclosure } from '@chakra-ui/react';
-import { RefillModal, SubscriptionsTable, TransactionsHistoryTable } from 'src/features';
+import { SubscriptionsTable, TransactionsHistoryTable } from 'src/features';
+import { RefillModal } from 'src/entities';
 
 const BalancePage: FunctionComponent = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();

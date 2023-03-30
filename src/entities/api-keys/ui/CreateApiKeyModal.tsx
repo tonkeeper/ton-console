@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
-import { apiKeysStore } from 'src/entities/api-keys';
+import { apiKeysStore } from '../model/api-keys.store';
 
 const CreateApiKeyModal: FunctionComponent<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'create-api-key-form';

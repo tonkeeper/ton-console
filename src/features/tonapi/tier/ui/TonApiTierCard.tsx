@@ -10,10 +10,10 @@ import {
     Text
 } from '@chakra-ui/react';
 import { H2, TickIcon } from 'src/shared';
-import { Tier } from 'src/entities';
+import { TonApiTier } from '../model';
 
-export const TierCard: FunctionComponent<
-    ComponentProps<typeof Card> & { tier: Tier; button: ReactNode }
+export const TonApiTierCard: FunctionComponent<
+    ComponentProps<typeof Card> & { tier: TonApiTier; button: ReactNode }
 > = ({ tier, button, ...rest }) => {
     return (
         <Card {...rest}>
@@ -23,7 +23,7 @@ export const TierCard: FunctionComponent<
                 </Text>
             </CardHeader>
             <CardBody>
-                <H2>{tier.tonPrice} TON</H2>
+                <H2>{tier.price.stringCurrencyAmount}</H2>
                 <Text textStyle="body2" mb="4" color="text.secondary">
                     per month
                 </Text>
