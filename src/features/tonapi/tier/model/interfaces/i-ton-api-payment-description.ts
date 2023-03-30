@@ -1,6 +1,6 @@
-import { IPaymentDescription } from 'src/entities';
+import { IPaymentDescription, SERVICE } from 'src/entities';
 
 export interface ITonApiPaymentDescription extends IPaymentDescription {
-    service: 'tonapi';
+    service: SERVICE.TONAPI;
     tierId: number;
 }

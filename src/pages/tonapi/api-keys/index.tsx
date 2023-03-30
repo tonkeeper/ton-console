@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import { EmptyApiKeys } from './EmptyApiKeys';
 import { observer } from 'mobx-react-lite';
-import { apiKeysStore, ApiKeysTable, CreateApiKeyModal } from 'src/entities';
+import { apiKeysStore, ApiKeysTable, CreateApiKeyModal } from 'src/features';
 import { Overlay } from 'src/shared';
 import { Button, useDisclosure } from '@chakra-ui/react';
 

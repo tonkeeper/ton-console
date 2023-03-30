@@ -158,7 +158,8 @@ function mapProjectDtoToProject(projectDTO: DTOProject): Project {
         id: projectDTO.id,
         name: projectDTO.name,
         imgUrl: projectDTO.avatar,
-        creationDate: new Date(projectDTO.date_create)
+        creationDate: new Date(projectDTO.date_create),
+        subscriptions: []
     };
 }
 

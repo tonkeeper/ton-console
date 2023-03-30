@@ -1,15 +1,9 @@
 import { makeAutoObservable } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
-import {
-    apiClient,
-    createEffect,
-    CurrencyAmount,
-    getWindow,
-    Loadable,
-    TonCurrencyAmount
-} from 'src/shared';
+import { createEffect, CurrencyAmount, getWindow, Loadable, TonCurrencyAmount } from 'src/shared';
 import { projectsStore } from '../../project';
 import { BillingHistory } from './interfaces';
+import { SERVICE } from 'src/entities';
 
 class BalancesStore {
     balances = new Loadable<CurrencyAmount[]>([]);
@@ -61,11 +55,12 @@ class BalancesStore {
 
         try {
             this.depositAddress.isLoading = true;
-            const response = await apiClient.project.getDepositAddress(
+            /*const response = await apiClient.project.getDepositAddress(
                 projectsStore.selectedProject!.id
-            );
+            );*/
 
-            this.depositAddress.value = response.data.ton_deposit_wallet;
+            //this.depositAddress.value = response.data.ton_deposit_wallet;
+            this.depositAddress.value = 'EQDoBhI8JERdpXHytsrGxCSvJwlPTejMSxMB8y_syxr3XgYq';
         } catch (e) {
             console.error(e);
             this.depositAddress.error = e;
@@ -84,7 +79,7 @@ class BalancesStore {
                     amount: new TonCurrencyAmount(1000000000),
                     date: new Date(),
                     description: {
-                        service: 'tonapi',
+                        service: SERVICE.TONAPI,
                         tierId: 1
                     },
                     id: 0

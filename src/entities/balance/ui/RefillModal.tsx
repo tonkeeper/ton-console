@@ -10,13 +10,16 @@ import {
     ModalOverlay,
     Text
 } from '@chakra-ui/react';
-import { CopyPad, H4, Pad } from 'src/shared';
+import { CopyPad, createTransferLink, H4, Pad } from 'src/shared';
 import { QRCodeSVG } from 'qrcode.react';
+import { balanceStore } from '../model';
+import { observer } from 'mobx-react-lite';
 
-export const RefillModal: FunctionComponent<{
+const RefillModal: FunctionComponent<{
     isOpen: boolean;
     onClose: () => void;
 }> = props => {
+    const depositAddress = balanceStore.depositAddress.value;
     return (
         <Modal scrollBehavior="inside" size="md" {...props}>
             <ModalOverlay />
@@ -30,10 +33,18 @@ export const RefillModal: FunctionComponent<{
                 </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody pt="0" pb="4">
-                    <Pad mb="4" display="flex" alignItems="center" justifyContent="center">
-                        <QRCodeSVG bgColor="transparent" size={180} value="https://google.com" />
-                    </Pad>
-                    <CopyPad text="EQAwWyoeWTtAcXh_M4x8bRv2e4CaQ4wRnBPK9sQBfCdEY5ll" />
+                    {depositAddress && (
+                        <>
+                            <Pad mb="4" display="flex" alignItems="center" justifyContent="center">
+                                <QRCodeSVG
+                                    bgColor="transparent"
+                                    size={180}
+                                    value={createTransferLink(depositAddress)}
+                                />
+                            </Pad>
+                            <CopyPad text={depositAddress} />
+                        </>
+                    )}
                 </ModalBody>
 
                 <ModalFooter gap="3" pt="0">
@@ -45,3 +56,5 @@ export const RefillModal: FunctionComponent<{
         </Modal>
     );
 };
+
+export default observer(RefillModal);

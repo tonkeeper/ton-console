@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import { CreateIcon96, H4, Overlay } from 'src/shared';
 import { Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
-import { CreateApiKeyModal } from 'src/entities';
+import { CreateApiKeyModal } from 'src/features';
 
 export const EmptyApiKeys: FunctionComponent = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();

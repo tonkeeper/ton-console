@@ -11,7 +11,7 @@ import {
     ModalOverlay,
     Text
 } from '@chakra-ui/react';
-import { ApiKey, apiKeysStore } from 'src/entities';
+import { ApiKey, apiKeysStore } from '../model';
 import { observer } from 'mobx-react-lite';
 
 const DeleteApiKeyModal: FunctionComponent<{

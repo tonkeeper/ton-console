@@ -15,3 +15,7 @@ export function hasProperty<T extends string>(
 ): value is Record<T, unknown> {
     return hasProperties(value, [propertyKey]);
 }
+
+export function exhaustiveCheck(val: never): void {
+    console.error('Case', val, 'was not included to the switch-case');
+}

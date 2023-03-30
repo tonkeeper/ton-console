@@ -1,1 +1,1 @@
-export { RefillModal } from './RefillModal';
+export { default as RefillModal } from './RefillModal';
