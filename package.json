@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:staging": "tsc && vite build --mode staging",
     "preview": "vite preview",
     "test": "vitest",
     "lint": "eslint ./",

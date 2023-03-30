@@ -235,10 +235,10 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /project/{id}/payments/deposits:
+  /project/{id}/payments/history:
     get:
-      summary: "Get project deposits"
-      operationId: getPaymentsDeposits
+      summary: "Get payments/history"
+      operationId: getPaymentsHistory
       security:
         - JWTAuth: [ "common" ]
       tags:
@@ -247,7 +247,7 @@ paths:
         - $ref: '#/components/parameters/projectID'
       responses:
         '200':
-          $ref: '#/components/responses/PaymentsDeposits'
+          $ref: '#/components/responses/PaymentsHistory'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -397,12 +397,13 @@ components:
         code:
           type: integer
           description: "backend error code"
-          enum: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ]
+          enum: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ]
           x-enum-varnames: [ ErrorUnknown, ErrorInternal, ErrorBadRequest,
                              ErrorCheckPayload, ErrorVerificationProof, ErrorVerificationTg,
                              ErrorAuthUser, ErrorBannedUser, ErrorLogoutUser, ErrorCreateProject,
                              ErrorGetProject, ErrorUpdateProject, ErrorDeleteProject,
-                             ErrorProjectWithoutTier, ErrorGetTiers, ErrorInsufficientFunds ]
+                             ErrorProjectWithoutTier, ErrorUpdateTier, ErrorGetTiers, ErrorAlreadySelectedTier,
+                             ErrorDownGradeTier, ErrorInsufficientFunds ]
     User:
       type: object
       required:
@@ -519,6 +520,43 @@ components:
         currency:
           type: string
           example: "TON"
+    Charge:
+      type: object
+      required:
+        - id
+        - project_id
+        - type_of_charge
+        - amount
+        - date_create
+      properties:
+        project_id:
+          type: integer
+          format: int64
+          example: 1534355233
+        type_of_charge:
+          type: string
+          example: "payment_tier"
+        info:
+          type: string
+        amount:
+          type: integer
+          format: int64
+          example: 1000000000
+        date_create:
+          type: string
+          example: "2023-03-23"
+    Balance:
+      type: object
+      required:
+        - balance
+      properties:
+        currency:
+          type: string
+          example: "TON"
+        balance:
+          type: integer
+          format: int64
+          example: 1000000000
     Project:
       type: object
       required:
@@ -603,17 +641,26 @@ components:
               ton_deposit_wallet:
                 type: string
                 example: "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR"
-    PaymentsDeposits:
-      description: "Payments deposits"
+    PaymentsHistory:
+      description: "Payments history"
       content:
         application/json:
           schema:
             type: object
             properties:
-              deposits:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Deposit'
+              balance:
+                $ref: '#/components/schemas/Balance'
+              history:
+                type: object
+                properties:
+                  payments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Charge'
+                  deposits:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Deposit'
     TokenCreated:
       description: "Token has been created"
       content:

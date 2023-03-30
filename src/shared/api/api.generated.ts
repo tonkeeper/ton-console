@@ -107,6 +107,34 @@ export interface DTODeposit {
     currency: string;
 }
 
+export interface DTOCharge {
+    /**
+     * @format int64
+     * @example 1534355233
+     */
+    project_id: number;
+    /** @example "payment_tier" */
+    type_of_charge: string;
+    info?: string;
+    /**
+     * @format int64
+     * @example 1000000000
+     */
+    amount: number;
+    /** @example "2023-03-23" */
+    date_create: string;
+}
+
+export interface DTOBalance {
+    /** @example "TON" */
+    currency?: string;
+    /**
+     * @format int64
+     * @example 1000000000
+     */
+    balance: number;
+}
+
 export interface DTOProject {
     /**
      * @format int64
@@ -151,8 +179,11 @@ export enum DTOErrorCode {
     DTOErrorUpdateProject = 12,
     DTOErrorDeleteProject = 13,
     DTOErrorProjectWithoutTier = 14,
-    DTOErrorGetTiers = 15,
-    DTOErrorInsufficientFunds = 16
+    DTOErrorUpdateTier = 15,
+    DTOErrorGetTiers = 16,
+    DTOErrorAlreadySelectedTier = 17,
+    DTOErrorDownGradeTier = 18,
+    DTOErrorInsufficientFunds = 19
 }
 
 import axios, {
@@ -632,19 +663,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags project
-         * @name GetPaymentsDeposits
-         * @summary Get project deposits
-         * @request GET:/project/{id}/payments/deposits
+         * @name GetPaymentsHistory
+         * @summary Get payments/history
+         * @request GET:/project/{id}/payments/history
          * @secure
          */
-        getPaymentsDeposits: (id: number, params: RequestParams = {}) =>
+        getPaymentsHistory: (id: number, params: RequestParams = {}) =>
             this.request<
                 {
-                    deposits?: DTODeposit[];
+                    balance?: DTOBalance;
+                    history?: {
+                        payments?: DTOCharge[];
+                        deposits?: DTODeposit[];
+                    };
                 },
                 DTOError
             >({
-                path: `/project/${id}/payments/deposits`,
+                path: `/project/${id}/payments/history`,
                 method: 'GET',
                 secure: true,
                 ...params
