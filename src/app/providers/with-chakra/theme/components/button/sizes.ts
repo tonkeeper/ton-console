@@ -12,5 +12,10 @@ export default {
         py: 1.5,
         minW: 1,
         minH: 8
+    },
+    fit: {
+        p: 0,
+        h: 'fit-content',
+        w: 'fit-content'
     }
 };

@@ -1,5 +1,6 @@
-import { Table, TableContainer, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react';
+import { Link, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent } from 'react';
+import { explorer, shortAddress } from 'src/shared';
 
 export const TransactionsHistoryTable: FunctionComponent<
     ComponentProps<typeof TableContainer>
@@ -29,7 +30,18 @@ export const TransactionsHistoryTable: FunctionComponent<
                     </Tr>
                     <Tr>
                         <Td>17 Jun, 14:44</Td>
-                        <Td>Refill from EQA4ZI…7FT4AF </Td>
+                        <Td>
+                            Refill from{' '}
+                            <Link
+                                color="text.accent"
+                                href={explorer.generateLinkToAddress(
+                                    'EQDoBhI8JERdpXHytsrGxCSvJwlPTejMSxMB8y_syxr3XgYq'
+                                )}
+                                isExternal
+                            >
+                                {shortAddress('EQDoBhI8JERdpXHytsrGxCSvJwlPTejMSxMB8y_syxr3XgYq')}
+                            </Link>
+                        </Td>
                         <Td textAlign="right">+330 TON</Td>
                     </Tr>
                     <Tr>
@@ -39,7 +51,18 @@ export const TransactionsHistoryTable: FunctionComponent<
                     </Tr>
                     <Tr>
                         <Td>17 Jun, 14:44</Td>
-                        <Td>Refill from EQA4ZI…7FT4AF </Td>
+                        <Td>
+                            Refill from{' '}
+                            <Link
+                                color="text.accent"
+                                href={explorer.generateLinkToAddress(
+                                    'EQDoBhI8JERdpXHytsrGxCSvJwlPTejMSxMB8y_syxr3XgYq'
+                                )}
+                                isExternal
+                            >
+                                {shortAddress('EQDoBhI8JERdpXHytsrGxCSvJwlPTejMSxMB8y_syxr3XgYq')}
+                            </Link>
+                        </Td>
                         <Td textAlign="right">+330 TON</Td>
                     </Tr>
                 </Tbody>

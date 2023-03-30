@@ -33,7 +33,7 @@ class ApiKeysStore {
                 {
                     id: 1,
                     name: 'Second',
-                    value: '1234567890123456789012345678901234567890',
+                    value: '1234567890123456789012345678901234567891',
                     creationDate: new Date()
                 }
             ];
@@ -48,10 +48,12 @@ class ApiKeysStore {
         async ({ name }: CreateApiKeyForm) => {
             await new Promise(r => setTimeout(r, 1500));
 
+            // await apiClient.api.generateProjectToken(projectsStore.selectedProject!.id);
+
             this.apiKeys.push({
                 id: Math.random(),
                 name,
-                value: '1234567890123456789012345678901234567890',
+                value: Math.random().toString(),
                 creationDate: new Date()
             });
 

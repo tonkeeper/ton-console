@@ -38,9 +38,6 @@ export const RefillModal: FunctionComponent<{
 
                 <ModalFooter gap="3" pt="0">
                     <Button flex={1} onClick={props.onClose} variant="secondary">
-                        Cancel
-                    </Button>
-                    <Button flex={1} onClick={props.onClose} variant="primary">
                         Done
                     </Button>
                 </ModalFooter>

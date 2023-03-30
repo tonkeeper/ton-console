@@ -12,10 +12,18 @@ import {
     Text,
     MenuList,
     MenuItem,
-    Menu
+    Menu,
+    IconButton
 } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent, useCallback, useState } from 'react';
-import { DeleteIcon24, EditIcon24, VerticalDotsIcon16 } from 'src/shared';
+import { ComponentProps, FunctionComponent, useCallback, useEffect, useState } from 'react';
+import {
+    CopyIcon16,
+    copyToClipboard,
+    DeleteIcon24,
+    EditIcon24,
+    TickIcon,
+    VerticalDotsIcon16
+} from 'src/shared';
 import { ApiKey, apiKeysStore } from '../model';
 import { observer } from 'mobx-react-lite';
 import EditApiKeyModal from './EditApiKeyModal';
@@ -23,6 +31,14 @@ import DeleteApiKeyModal from './DeleteApiKeyModal';
 
 const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
     const [modal, setModal] = useState<{ key: ApiKey; action: 'edit' | 'delete' } | null>();
+    const [copiedKey, setCopiedKey] = useState<number | undefined>();
+
+    useEffect(() => {
+        if (copiedKey !== undefined) {
+            const timeout = setTimeout(() => setCopiedKey(undefined), 1500);
+            return () => clearTimeout(timeout);
+        }
+    }, [copiedKey]);
 
     const openEditModal = useCallback((key: ApiKey) => {
         setModal({ key, action: 'edit' });
@@ -35,6 +51,8 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
     const closeModal = useCallback(() => {
         setModal(null);
     }, []);
+
+    console.log(copiedKey);
 
     return (
         <>
@@ -58,7 +76,25 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                         {apiKeysStore.apiKeys.map(apiKey => (
                             <Tr key={apiKey.id}>
                                 <Td>{apiKey.name}</Td>
-                                <Td>{apiKey.value}</Td>
+                                <Td>
+                                    <Flex align="center" gap="1">
+                                        {apiKey.value}
+                                        {copiedKey !== undefined && copiedKey === apiKey.id ? (
+                                            <TickIcon />
+                                        ) : (
+                                            <IconButton
+                                                aria-label="copy"
+                                                icon={<CopyIcon16 />}
+                                                onClick={() => {
+                                                    setCopiedKey(apiKey.id);
+                                                    copyToClipboard(apiKey.value);
+                                                }}
+                                                size="fit"
+                                                variant="flat"
+                                            />
+                                        )}
+                                    </Flex>
+                                </Td>
                                 <Td>
                                     <Flex align="center" justify="flex-end" gap="4">
                                         <chakra.span color="text.secondary">
