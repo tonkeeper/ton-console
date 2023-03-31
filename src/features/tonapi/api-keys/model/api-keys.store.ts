@@ -1,7 +1,6 @@
-import { makeAutoObservable } from 'mobx';
 import { createAsyncAction, createEffect } from 'src/shared';
 import { EditApiKeyForm, ApiKey, CreateApiKeyForm } from './interfaces';
-import { tGUserStore } from 'src/entities';
+import { projectsStore } from 'src/entities';
 import { createStandaloneToast } from '@chakra-ui/react';
 
 class ApiKeysStore {
@@ -10,10 +9,8 @@ class ApiKeysStore {
     isLoading = false;
 
     constructor() {
-        makeAutoObservable(this);
-
         createEffect(() => {
-            if (tGUserStore.user) {
+            if (projectsStore.selectedProject) {
                 this.fetchApiKeys();
             }
         });
@@ -45,14 +42,17 @@ class ApiKeysStore {
     };
 
     createApiKey = createAsyncAction(
-        async ({ name }: CreateApiKeyForm) => {
+        async (form: CreateApiKeyForm) => {
             await new Promise(r => setTimeout(r, 1500));
 
-            // await apiClient.api.generateProjectToken(projectsStore.selectedProject!.id);
+            /* const response = await apiClient.api.generateProjectToken(
+                projectsStore.selectedProject!.id,
+                form
+            );*/
 
             this.apiKeys.push({
                 id: Math.random(),
-                name,
+                name: form.name,
                 value: Math.random().toString(),
                 creationDate: new Date()
             });

@@ -9,8 +9,10 @@ import {
 } from 'src/shared';
 import { FunctionComponent } from 'react';
 import { Flex, Text } from '@chakra-ui/react';
+import { balanceStore } from 'src/entities';
+import { observer } from 'mobx-react-lite';
 
-export const Aside: FunctionComponent = () => {
+const Aside: FunctionComponent = () => {
     return (
         <DropDownMenu>
             <DropDownMenuItemExpandable leftIcon={<TonapiIcon />} content="TON API" linkTo="tonapi">
@@ -23,9 +25,11 @@ export const Aside: FunctionComponent = () => {
                     <Text textStyle="label2" color="text.primary">
                         Balance
                     </Text>
-                    <Text textStyle="body3" color="text.secondary">
-                        180 TON
-                    </Text>
+                    {balanceStore.balances.value[0] && (
+                        <Text textStyle="body3" color="text.secondary">
+                            {balanceStore.balances.value[0].stringCurrencyAmount}
+                        </Text>
+                    )}
                 </Flex>
             </DropDownMenuItem>
             <DropDownMenuItem leftIcon={<SettingsIcon />} linkTo="settings">
@@ -37,3 +41,5 @@ export const Aside: FunctionComponent = () => {
         </DropDownMenu>
     );
 };
+
+export default observer(Aside);

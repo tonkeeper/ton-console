@@ -1,8 +1,17 @@
 import { makeAutoObservable } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
-import { apiClient, DTOProject, getWindow, createReaction, createAsyncAction } from 'src/shared';
+import {
+    apiClient,
+    DTOProject,
+    getWindow,
+    createReaction,
+    createAsyncAction,
+    TonCurrencyAmount,
+    serializeState,
+    deserializeState
+} from 'src/shared';
 import { Project, CreateProjectFormValues } from './interfaces';
-import { tGUserStore } from 'src/entities';
+import { SERVICE, tGUserStore } from 'src/entities';
 import { createStandaloneToast } from '@chakra-ui/react';
 import { UpdateProjectFormValues } from 'src/entities/project/model/interfaces/update-project-form-values';
 
@@ -18,9 +27,20 @@ class ProjectsStore {
 
         makePersistable(this, {
             name: 'ProjectsStore',
-            properties: ['projects', 'selectedProject'],
+            properties: [
+                {
+                    key: 'projects',
+                    serialize: serializeState,
+                    deserialize: deserializeState
+                },
+                {
+                    key: 'selectedProject',
+                    serialize: serializeState,
+                    deserialize: deserializeState
+                }
+            ],
             storage: getWindow()!.localStorage
-        });
+        }).then(() => console.log(this.projects));
 
         createReaction(
             () => tGUserStore.user,
@@ -159,7 +179,18 @@ function mapProjectDtoToProject(projectDTO: DTOProject): Project {
         name: projectDTO.name,
         imgUrl: projectDTO.avatar,
         creationDate: new Date(projectDTO.date_create),
-        subscriptions: []
+        subscriptions: [
+            {
+                id: 1,
+                renewsDate: new Date(),
+                details: {
+                    service: SERVICE.TONAPI,
+                    tierId: 1
+                },
+                price: new TonCurrencyAmount(1000000000),
+                interval: 'Monthly'
+            }
+        ]
     };
 }
 

@@ -7,7 +7,7 @@ export class TonCurrencyAmount extends TokenCurrencyAmount {
         super({
             currency: CURRENCY.TON,
             decimals: 9,
-            weiAmount: nanoAmount
+            weiAmount: new BigNumber(nanoAmount).toString()
         });
     }
 }

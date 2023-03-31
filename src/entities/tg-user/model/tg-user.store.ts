@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import { loginViaTG } from './telegram-oauth';
 import { TgUser } from './interfaces/tg-user';
 import { makePersistable } from 'mobx-persist-store';
-import { apiClient, getWindow } from 'src/shared';
+import { apiClient, deserializeState, getWindow, serializeState } from 'src/shared';
 import { projectsStore } from 'src/entities/project';
 
 class TGUserStore {
@@ -15,7 +15,13 @@ class TGUserStore {
 
         makePersistable(this, {
             name: 'TGUserStore',
-            properties: ['user'],
+            properties: [
+                {
+                    key: 'user',
+                    serialize: serializeState,
+                    deserialize: deserializeState
+                }
+            ],
             storage: getWindow()!.localStorage
         });
     }

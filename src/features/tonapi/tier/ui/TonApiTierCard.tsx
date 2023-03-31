@@ -9,12 +9,16 @@ import {
     ListItem,
     Text
 } from '@chakra-ui/react';
-import { H2, TickIcon } from 'src/shared';
-import { TonApiTier } from '../model';
+import { H2, TickIcon, toDate } from 'src/shared';
+import { ITonApiSubscription, TonApiTier } from '../model';
 
 export const TonApiTierCard: FunctionComponent<
-    ComponentProps<typeof Card> & { tier: TonApiTier; button: ReactNode }
-> = ({ tier, button, ...rest }) => {
+    ComponentProps<typeof Card> & {
+        tier: TonApiTier;
+        button: ReactNode;
+        subscription?: ITonApiSubscription;
+    }
+> = ({ tier, button, subscription, ...rest }) => {
     return (
         <Card {...rest}>
             <CardHeader>
@@ -22,12 +26,12 @@ export const TonApiTierCard: FunctionComponent<
                     {tier.name}
                 </Text>
             </CardHeader>
-            <CardBody>
+            <CardBody flexDir="column" display="flex">
                 <H2>{tier.price.stringCurrencyAmount}</H2>
                 <Text textStyle="body2" mb="4" color="text.secondary">
                     per month
                 </Text>
-                <List mb="6" spacing="2">
+                <List flex="1" mb="6" spacing="2">
                     <ListItem display="flex">
                         <ListIcon as={TickIcon} color="accent.green" />
                         <Text textStyle="body2" color="text.primary">
@@ -42,6 +46,11 @@ export const TonApiTierCard: FunctionComponent<
                         </Text>
                     </ListItem>
                 </List>
+                {subscription && (
+                    <Text textStyle="body2" color="text.secondary">
+                        Available until {toDate(subscription.renewsDate)}
+                    </Text>
+                )}
             </CardBody>
             <CardFooter>{button}</CardFooter>
         </Card>

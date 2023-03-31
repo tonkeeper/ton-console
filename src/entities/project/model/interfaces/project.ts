@@ -5,6 +5,5 @@ export interface Project {
     name: string;
     imgUrl: string;
     creationDate: Date;
-
     subscriptions: Subscription[];
 }

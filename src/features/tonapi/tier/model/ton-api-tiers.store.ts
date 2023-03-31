@@ -1,6 +1,14 @@
 import { makeAutoObservable } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
-import { apiClient, getWindow, DTOTier, createEffect, TonCurrencyAmount } from 'src/shared';
+import {
+    apiClient,
+    getWindow,
+    DTOTier,
+    createEffect,
+    TonCurrencyAmount,
+    serializeState,
+    deserializeState
+} from 'src/shared';
 import { TonApiTier } from './interfaces';
 import { tGUserStore } from 'src/entities';
 
@@ -16,7 +24,13 @@ class TonApiTiersStore {
 
         makePersistable(this, {
             name: 'TonApiTiersStore',
-            properties: ['tiers'],
+            properties: [
+                {
+                    key: 'tiers',
+                    serialize: serializeState,
+                    deserialize: deserializeState
+                }
+            ],
             storage: getWindow()!.localStorage
         });
 

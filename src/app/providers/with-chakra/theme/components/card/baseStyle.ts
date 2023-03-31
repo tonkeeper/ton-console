@@ -19,7 +19,7 @@ export default definePartsStyle({
     body: {
         pt: '0',
         px: '6',
-        pb: '3'
+        pb: '4'
     },
     footer: {
         pt: '0',

@@ -157,6 +157,8 @@ export interface DTOToken {
      * @example 1
      */
     id: number;
+    /** @example "My token" */
+    name: string;
     /** @example "AE5TZRWIIOR2O2YAAAAGFP2HEWFZJYBP222A567CBF6JIL7S4RIZSCOAZRZOEW7AKMRICGQ" */
     token: string;
     /** @example "2023-03-23" */
@@ -604,16 +606,49 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @request POST:/api/v1/project/{id}/generate/token
          * @secure
          */
-        generateProjectToken: (id: number, params: RequestParams = {}) =>
+        generateProjectToken: (
+            id: number,
+            data: {
+                /** @example "My token" */
+                name: string;
+            },
+            params: RequestParams = {}
+        ) =>
             this.request<
                 {
-                    /** @example "AE5TZRWIAAAAAAAAAAADIABPI6PKEZ2W6TIKPNEIMNIZF6LMAXTXHWLTK3OXRIXC62AUWWQ" */
-                    token?: string;
+                    token?: DTOToken;
                 },
                 DTOError
             >({
                 path: `/api/v1/project/${id}/generate/token`,
                 method: 'POST',
+                body: data,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags project
+         * @name UpdateProjectToken
+         * @summary Update project token
+         * @request PATCH:/api/v1/project/{id}/token/{token_id}
+         * @secure
+         */
+        updateProjectToken: (
+            id: number,
+            tokenId: number,
+            data: {
+                /** @example "My token" */
+                name: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<DTOOk, DTOError>({
+                path: `/api/v1/project/${id}/token/${tokenId}`,
+                method: 'PATCH',
+                body: data,
                 secure: true,
                 ...params
             }),

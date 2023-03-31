@@ -3,6 +3,12 @@ import BigNumber from 'bignumber.js';
 import { CURRENCY } from './CURRENCY';
 import { fromWei } from 'src/shared/lib/blockchain/wei';
 
+export type TokenCurrencyAmountStruct = {
+    weiAmount: string;
+    currency: CURRENCY;
+    decimals: number;
+};
+
 export class TokenCurrencyAmount implements CurrencyAmount {
     private readonly decimals: number;
 
@@ -35,15 +41,16 @@ export class TokenCurrencyAmount implements CurrencyAmount {
         return `${this.toStringAmount(precision)} ${this.stringCurrency}`;
     }
 
-    constructor({
-        weiAmount,
-        currency,
-        decimals
-    }: {
-        weiAmount: string | number | BigNumber;
-        currency: CURRENCY;
-        decimals: number;
-    }) {
+    toJSON(): TokenCurrencyAmountStruct & { $type: 'TokenCurrencyAmount' } {
+        return {
+            $type: 'TokenCurrencyAmount',
+            currency: this.currency,
+            weiAmount: this.amount.toString(),
+            decimals: this.decimals
+        };
+    }
+
+    constructor({ weiAmount, currency, decimals }: TokenCurrencyAmountStruct) {
         this.amount = new BigNumber(weiAmount);
         this.currency = currency;
         this.decimals = decimals;

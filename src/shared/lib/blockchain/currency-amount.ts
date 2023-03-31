@@ -15,4 +15,6 @@ export interface CurrencyAmount {
     toStringAmount(precision: number): string;
 
     toStringCurrencyAmount(precision: number): string;
+
+    toJSON(): unknown;
 }

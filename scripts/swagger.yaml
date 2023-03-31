@@ -185,6 +185,8 @@ paths:
         - JWTAuth: [ "common" ]
       tags:
         - project
+      requestBody:
+        $ref: "#/components/requestBodies/TokenInput"
       parameters:
         - $ref: '#/components/parameters/projectID'
       responses:
@@ -197,6 +199,27 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/project/{id}/token/{token_id}:
+    patch:
+      summary: "Update project token"
+      operationId: updateProjectToken
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - project
+      requestBody:
+        $ref: "#/components/requestBodies/TokenInput"
+      parameters:
+        - $ref: '#/components/parameters/projectID'
+        - $ref: '#/components/parameters/tokenID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
     delete:
       summary: "Delete project token"
       operationId: deleteProjectToken
@@ -306,6 +329,18 @@ components:
                 type: integer
                 format: int64
                 example: 1678275313
+    TokenInput:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+                example: "My token"
     TonProofInput:
       description: "Data that is expected from TON Connect"
       content:
@@ -589,7 +624,7 @@ components:
       type: object
       required:
         - id
-        - blocked
+        - name
         - token
         - date_create
       properties:
@@ -597,6 +632,9 @@ components:
           type: integer
           format: int64
           example: 1
+        name:
+          type: string
+          example: "My token"
         token:
           type: string
           example: "AE5TZRWIIOR2O2YAAAAGFP2HEWFZJYBP222A567CBF6JIL7S4RIZSCOAZRZOEW7AKMRICGQ"
@@ -667,12 +705,9 @@ components:
         application/json:
           schema:
             type: object
-            required:
-              - project
             properties:
               token:
-                type: string
-                example: "AE5TZRWIAAAAAAAAAAADIABPI6PKEZ2W6TIKPNEIMNIZF6LMAXTXHWLTK3OXRIXC62AUWWQ"
+                $ref: '#/components/schemas/Token'
     ProjectCreated:
       description: "Project has been created"
       content:

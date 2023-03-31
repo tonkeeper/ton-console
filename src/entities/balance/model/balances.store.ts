@@ -1,9 +1,17 @@
 import { makeAutoObservable } from 'mobx';
-import { makePersistable } from 'mobx-persist-store';
-import { createEffect, CurrencyAmount, getWindow, Loadable, TonCurrencyAmount } from 'src/shared';
+import {
+    createEffect,
+    CurrencyAmount,
+    deserializeLoadableState,
+    getWindow,
+    Loadable,
+    serializeLoadableState,
+    TonCurrencyAmount
+} from 'src/shared';
 import { projectsStore } from '../../project';
 import { BillingHistory } from './interfaces';
 import { SERVICE } from 'src/entities';
+import { makePersistable } from 'mobx-persist-store';
 
 class BalancesStore {
     balances = new Loadable<CurrencyAmount[]>([]);
@@ -17,9 +25,20 @@ class BalancesStore {
 
         makePersistable(this, {
             name: 'BalancesStore',
-            properties: ['balances'],
+            properties: [
+                {
+                    key: 'balances',
+                    serialize: serializeLoadableState,
+                    deserialize: deserializeLoadableState
+                },
+                {
+                    key: 'billingHistory',
+                    serialize: serializeLoadableState,
+                    deserialize: deserializeLoadableState
+                }
+            ],
             storage: getWindow()!.localStorage
-        }).then(() => {
+        }).then(() =>
             createEffect(() => {
                 if (projectsStore.selectedProject) {
                     this.fetchDepositAddress();
@@ -28,8 +47,8 @@ class BalancesStore {
                 } else {
                     this.clearState();
                 }
-            });
-        });
+            })
+        );
     }
 
     fetchBalancesAndHistory(): void {
@@ -42,7 +61,8 @@ class BalancesStore {
 
         try {
             this.balances.isLoading = true;
-            this.balances.value = [new TonCurrencyAmount(1000000000)];
+            await new Promise(r => setTimeout(r, 2000));
+            this.balances.value = [new TonCurrencyAmount(Math.random() * 1000000000)];
         } catch (e) {
             console.error(e);
             this.balances.error = e;
