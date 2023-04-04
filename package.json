@@ -10,8 +10,6 @@
     "test": "vitest",
     "lint": "eslint ./",
     "prepare": "husky install",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
     "generate-api": "node ./scripts/swagger"
   },
   "dependencies": {
@@ -38,17 +36,7 @@
     "vite-plugin-html": "^3.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.12",
-    "@chakra-ui/storybook-addon": "^4.0.16",
     "@chakra-ui/styled-system": "^2.7.0",
-    "@storybook/addon-actions": "^6.5.16",
-    "@storybook/addon-essentials": "^6.5.16",
-    "@storybook/addon-interactions": "^6.5.16",
-    "@storybook/addon-links": "^6.5.16",
-    "@storybook/builder-webpack5": "^6.5.16",
-    "@storybook/manager-webpack5": "^6.5.16",
-    "@storybook/react": "^6.5.16",
-    "@storybook/testing-library": "^0.0.13",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@types/compose-function": "^0.0.30",
@@ -58,7 +46,6 @@
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "@typescript-eslint/parser": "^5.50.0",
     "@vitejs/plugin-react": "^3.1.0",
-    "babel-loader": "^8.3.0",
     "csstype": "^3.1.1",
     "eslint": "^8.33.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
@@ -80,7 +67,6 @@
     "vite": "^4.2.1",
     "vite-plugin-mkcert": "^1.13.3",
     "vite-tsconfig-paths": "^4.0.5",
-    "vitest": "^0.28.4",
-    "webpack": "^5.76.0"
+    "vitest": "^0.28.4"
   }
 }

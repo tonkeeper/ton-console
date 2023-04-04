@@ -2,7 +2,7 @@ var isFixMode = process.argv.includes('--fix');
 
 module.exports = {
     root: true,
-    ignorePatterns: ['node_modules', '.storybook', 'dist'],
+    ignorePatterns: ['node_modules', 'dist'],
     extends: ['plugin:prettier/recommended', 'prettier'],
     rules: {
         /* common */
