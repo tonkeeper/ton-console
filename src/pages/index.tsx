@@ -5,12 +5,11 @@ import { lazy } from '@loadable/component';
 import { Layout } from './layouts';
 import { projectsStore, tGUserStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
+import SettingsRouting from 'src/pages/settings';
 
 const NewUserPage = lazy(() => import('./new-user/NewUserPage'));
 const CreateFirstProjectPage = lazy(() => import('./new-user/CreateFirstProjectPage'));
 const BalancePage = lazy(() => import('./balance'));
-const SettingsPage = lazy(() => import('./settings'));
-const SupportPage = lazy(() => import('./support'));
 
 const Routing: FunctionComponent = () => {
     if (!tGUserStore.user) {
@@ -61,22 +60,7 @@ const Routing: FunctionComponent = () => {
                         </Suspense>
                     }
                 />
-                <Route
-                    path="settings"
-                    element={
-                        <Suspense>
-                            <SettingsPage />
-                        </Suspense>
-                    }
-                />
-                <Route
-                    path="support"
-                    element={
-                        <Suspense>
-                            <SupportPage />
-                        </Suspense>
-                    }
-                />
+                <Route path="settings">{SettingsRouting}</Route>
                 <Route index element={<Navigate to="tonapi" replace />} />
                 <Route path="*" element={<Navigate to="tonapi" replace />} />
             </Route>

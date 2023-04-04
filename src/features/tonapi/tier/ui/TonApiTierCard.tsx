@@ -37,13 +37,6 @@ export const TonApiTierCard: FunctionComponent<
                             {tier.description.requestsPerSecondLimit} requests per second
                         </Text>
                     </ListItem>
-                    <ListItem display="flex">
-                        <ListIcon as={TickIcon} color="accent.green" />
-                        <Text textStyle="body2" color="text.primary">
-                            {tier.description.connections.subscriptionsLimit} subscription
-                            connection up to {tier.description.connections.accountsLimit} accounts
-                        </Text>
-                    </ListItem>
                 </List>
                 {isTonApiSelectedTier(tier) && (
                     <Text textStyle="body2" color="text.secondary">

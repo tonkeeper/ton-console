@@ -55,4 +55,37 @@ export class TokenCurrencyAmount implements CurrencyAmount {
         this.currency = currency;
         this.decimals = decimals;
     }
+
+    public isEQ(currencyAmount: CurrencyAmount): boolean {
+        this.checkIfCanCompareCurrencies(currencyAmount);
+        return this.amount.eq(currencyAmount.amount);
+    }
+
+    isGT(currencyAmount: CurrencyAmount): boolean {
+        this.checkIfCanCompareCurrencies(currencyAmount);
+        return this.amount.gt(currencyAmount.amount);
+    }
+
+    isGTE(currencyAmount: CurrencyAmount): boolean {
+        this.checkIfCanCompareCurrencies(currencyAmount);
+        return this.amount.gte(currencyAmount.amount);
+    }
+
+    isLT(currencyAmount: CurrencyAmount): boolean {
+        this.checkIfCanCompareCurrencies(currencyAmount);
+        return this.amount.lt(currencyAmount.amount);
+    }
+
+    isLTE(currencyAmount: CurrencyAmount): boolean {
+        this.checkIfCanCompareCurrencies(currencyAmount);
+        return this.amount.lte(currencyAmount.amount);
+    }
+
+    private checkIfCanCompareCurrencies(currencyAmount: CurrencyAmount): never | void {
+        if (currencyAmount.currency !== this.currency) {
+            throw new Error(
+                `Can't compare ${this.currency} and ${currencyAmount.currency} amounts because they have different currencies types.`
+            );
+        }
+    }
 }

@@ -17,4 +17,14 @@ export interface CurrencyAmount {
     toStringCurrencyAmount(precision: number): string;
 
     toJSON(): unknown;
+
+    isGTE(currencyAmount: CurrencyAmount): boolean;
+
+    isGT(currencyAmount: CurrencyAmount): boolean;
+
+    isEQ(currencyAmount: CurrencyAmount): boolean;
+
+    isLTE(currencyAmount: CurrencyAmount): boolean;
+
+    isLT(currencyAmount: CurrencyAmount): boolean;
 }

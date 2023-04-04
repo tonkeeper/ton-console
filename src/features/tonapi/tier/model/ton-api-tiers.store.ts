@@ -6,7 +6,8 @@ import {
     TonCurrencyAmount,
     Loadable,
     DTOAppTier,
-    DTOCharge
+    DTOCharge,
+    createAsyncAction
 } from 'src/shared';
 import { TonApiPayment, TonApiTier } from './interfaces';
 import { projectsStore, tGUserStore } from 'src/entities';
@@ -76,7 +77,7 @@ class TonApiTiersStore {
             this.selectedTier.error = e;
         }
 
-        this.selectedTier.isLoading = true;
+        this.selectedTier.isLoading = false;
     };
 
     fetchPaymentsHistory = async (): Promise<void> => {
@@ -98,6 +99,8 @@ class TonApiTiersStore {
         this.paymentsHistory.isLoading = false;
     };
 
+    selectTier = createAsyncAction(async () => {});
+
     clearState(): void {
         this.tiers.clear();
         this.selectedTier.clear();
@@ -110,11 +113,7 @@ function mapTierDTOToTier(tierDTO: DTOTier): TonApiTier {
         name: tierDTO.name,
         price: new TonCurrencyAmount(tierDTO.ton_price),
         description: {
-            requestsPerSecondLimit: tierDTO.rpc,
-            connections: {
-                accountsLimit: tierDTO.burst,
-                subscriptionsLimit: tierDTO.burst
-            }
+            requestsPerSecondLimit: tierDTO.rpc
         }
     };
 }
@@ -125,11 +124,7 @@ function mapAppTierDTOToSelectedTier(tierDTO: DTOAppTier): TonApiSelectedTier {
         name: tierDTO.name,
         price: new TonCurrencyAmount(tierDTO.ton_price),
         description: {
-            requestsPerSecondLimit: tierDTO.rpc,
-            connections: {
-                accountsLimit: tierDTO.burst,
-                subscriptionsLimit: tierDTO.burst
-            }
+            requestsPerSecondLimit: tierDTO.rpc
         },
         subscriptionDate: new Date(tierDTO.date_create),
         active: true

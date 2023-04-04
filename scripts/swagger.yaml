@@ -580,6 +580,7 @@ components:
         - burst
         - ton_price
         - active
+        - next_payment
         - date_create
       properties:
         id:
@@ -601,6 +602,9 @@ components:
         active:
           type: boolean
           example: true
+        next_payment:
+          type: string
+          example: "2023-04-23"        
         date_create:
           type: string
           example: "2023-03-23"
@@ -626,22 +630,18 @@ components:
     Charge:
       type: object
       required:
-        - project_id
-        - type_of_charge
+        - id
+        - tier_id
         - amount
         - date_create
       properties:
-        project_id:
+        id:
+          type: string
+          example: "742af494-e2cd-441f-98e8-ac6075280eff"
+        tier_id:
           type: integer
           format: int64
-          example: 1534355233
-        type_of_charge:
-          type: string
-          example: "payment_tier"
-          enum:
-            - "payment_tier"
-        info:
-          type: string
+          example: 1
         amount:
           type: integer
           format: int64

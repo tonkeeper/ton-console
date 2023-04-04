@@ -94,6 +94,8 @@ export interface DTOAppTier {
     ton_price: number;
     /** @example true */
     active: boolean;
+    /** @example "2023-04-23" */
+    next_payment: string;
     /** @example "2023-03-23" */
     date_create: string;
 }
@@ -110,14 +112,13 @@ export interface DTODeposit {
 }
 
 export interface DTOCharge {
+    /** @example "742af494-e2cd-441f-98e8-ac6075280eff" */
+    id: string;
     /**
      * @format int64
-     * @example 1534355233
+     * @example 1
      */
-    project_id: number;
-    /** @example "payment_tier" */
-    type_of_charge: DTOChargeTypeOfCharge;
-    info?: string;
+    tier_id: number;
     /**
      * @format int64
      * @example 1000000000
@@ -186,11 +187,6 @@ export enum DTOErrorCode {
     DTOErrorAlreadySelectedTier = 17,
     DTOErrorDownGradeTier = 18,
     DTOErrorInsufficientFunds = 19
-}
-
-/** @example "payment_tier" */
-export enum DTOChargeTypeOfCharge {
-    DTOPaymentTier = 'payment_tier'
 }
 
 import axios, {

@@ -4,7 +4,6 @@ import {
     DropDownMenuItem,
     DropDownMenuItemExpandable,
     SettingsIcon,
-    SupportIcon,
     TonapiIcon
 } from 'src/shared';
 import { FunctionComponent } from 'react';
@@ -32,12 +31,15 @@ const Aside: FunctionComponent = () => {
                     )}
                 </Flex>
             </DropDownMenuItem>
-            <DropDownMenuItem leftIcon={<SettingsIcon />} linkTo="settings">
-                Settings
-            </DropDownMenuItem>
-            <DropDownMenuItem leftIcon={<SupportIcon />} linkTo="support">
-                Support
-            </DropDownMenuItem>
+            <DropDownMenuItemExpandable
+                leftIcon={<SettingsIcon />}
+                content="Settings"
+                linkTo="settings"
+            >
+                <DropDownMenuItem linkTo="edit-project" pb="0">
+                    Edit project
+                </DropDownMenuItem>
+            </DropDownMenuItemExpandable>
         </DropDownMenu>
     );
 };

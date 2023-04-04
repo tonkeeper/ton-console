@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useCallback } from 'react';
 import {
     Button,
     Modal,
@@ -13,13 +13,18 @@ import {
     Flex
 } from '@chakra-ui/react';
 import { H4, Pad } from 'src/shared';
-import { TonApiTier } from '../model';
+import { TonApiTier, tonApiTiersStore } from '../model';
+import { observer } from 'mobx-react-lite';
 
-export const TonApiPaymentDetailsModal: FunctionComponent<{
+const TonApiPaymentDetailsModal: FunctionComponent<{
     isOpen: boolean;
-    onClose: (confirm?: boolean) => void;
+    onClose: () => void;
     tier?: TonApiTier;
 }> = ({ tier, ...rest }) => {
+    const onConfirm = useCallback(() => {
+        tonApiTiersStore.selectTier().then(rest.onClose);
+    }, [tonApiTiersStore.selectTier]);
+
     return (
         <Modal scrollBehavior="inside" size="md" {...rest}>
             <ModalOverlay />
@@ -46,10 +51,7 @@ export const TonApiPaymentDetailsModal: FunctionComponent<{
                                 Included
                             </Text>
                             <Text textStyle="body2" color="text.secondary" textAlign="right">
-                                {tier?.description.requestsPerSecondLimit} requests per second,{' '}
-                                {tier?.description.connections.subscriptionsLimit} subscription
-                                connection up to {tier?.description.connections.accountsLimit}
-                                 accounts, webhooks
+                                {tier?.description.requestsPerSecondLimit} requests per second
                             </Text>
                         </Flex>
                         <Flex justify="space-between" gap="10" mb="3">
@@ -65,7 +67,7 @@ export const TonApiPaymentDetailsModal: FunctionComponent<{
                                 Price
                             </Text>
                             <Text textStyle="body2" color="text.secondary">
-                                {tier?.price.stringAmount}
+                                {tier?.price.stringCurrencyAmount}
                             </Text>
                         </Flex>
                     </Pad>
@@ -84,7 +86,12 @@ export const TonApiPaymentDetailsModal: FunctionComponent<{
                     <Button flex={1} onClick={() => rest.onClose()} variant="secondary">
                         Cancel
                     </Button>
-                    <Button flex={1} onClick={() => rest.onClose(true)} variant="primary">
+                    <Button
+                        flex={1}
+                        isLoading={tonApiTiersStore.selectTier.isLoading}
+                        onClick={onConfirm}
+                        variant="primary"
+                    >
                         Confirm Purchase
                     </Button>
                 </ModalFooter>
@@ -92,3 +99,5 @@ export const TonApiPaymentDetailsModal: FunctionComponent<{
         </Modal>
     );
 };
+
+export default observer(TonApiPaymentDetailsModal);
