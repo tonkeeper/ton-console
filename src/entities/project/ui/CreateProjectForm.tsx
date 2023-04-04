@@ -13,15 +13,22 @@ export const CreateProjectForm: FunctionComponent<
         id?: string;
         onSubmit: SubmitHandler<CreateProjectFormValues>;
         defaultValues?: Partial<Omit<CreateProjectFormValues, 'icon'> & { imgUrl: string }>;
+        disableDefaultFocus?: boolean;
     }
-> = props => {
-    const { onSubmit, defaultValues, ...rest } = props;
+> = ({ onSubmit, defaultValues, disableDefaultFocus, ...rest }) => {
     const context = useFormContext<CreateProjectFormValuesInternal>();
-    let { handleSubmit, register, formState, reset } = useForm<CreateProjectFormValuesInternal>();
+    let { handleSubmit, register, formState, reset, setFocus } =
+        useForm<CreateProjectFormValuesInternal>();
 
     if (context) {
-        ({ handleSubmit, register, formState, reset } = context);
+        ({ handleSubmit, register, formState, reset, setFocus } = context);
     }
+
+    useEffect(() => {
+        if (!disableDefaultFocus) {
+            setFocus('name');
+        }
+    }, [disableDefaultFocus, setFocus]);
 
     const getDefaultValues = useCallback(async () => {
         let icon: FileList | null = null;

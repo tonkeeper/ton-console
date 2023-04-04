@@ -48,7 +48,11 @@ class TGUserStore {
     };
 
     logout = async (): Promise<void> => {
-        await apiClient.api.accountLogout();
+        try {
+            await apiClient.api.accountLogout();
+        } catch (e) {
+            console.log(e);
+        }
         this.user = null;
     };
 }

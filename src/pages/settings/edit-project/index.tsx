@@ -9,6 +9,7 @@ import {
 import { FormProvider, useForm } from 'react-hook-form';
 import { toJS } from 'mobx';
 import { H4, Overlay } from 'src/shared';
+import { observer } from 'mobx-react-lite';
 
 const EditProjectPage: FunctionComponent = () => {
     const formId = 'edit-project-form';
@@ -61,6 +62,7 @@ const EditProjectPage: FunctionComponent = () => {
                             id={formId}
                             mb="4"
                             onSubmit={onSubmit}
+                            disableDefaultFocus
                         />
                     </FormProvider>
                     <Button
@@ -92,4 +94,4 @@ const EditProjectPage: FunctionComponent = () => {
     );
 };
 
-export default EditProjectPage;
+export default observer(EditProjectPage);

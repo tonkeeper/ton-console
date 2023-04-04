@@ -2,6 +2,7 @@ import { apiClient, createAsyncAction, createEffect, DTOToken } from 'src/shared
 import { EditApiKeyForm, ApiKey, CreateApiKeyForm } from './interfaces';
 import { projectsStore } from 'src/entities';
 import { createStandaloneToast } from '@chakra-ui/react';
+import { makeAutoObservable } from 'mobx';
 
 class ApiKeysStore {
     apiKeys: ApiKey[] = [];
@@ -9,9 +10,13 @@ class ApiKeysStore {
     isLoading = false;
 
     constructor() {
+        makeAutoObservable(this);
+
         createEffect(() => {
             if (projectsStore.selectedProject) {
                 this.fetchApiKeys();
+            } else {
+                this.clearStore();
             }
         });
     }
@@ -19,15 +24,11 @@ class ApiKeysStore {
     fetchApiKeys = async (): Promise<void> => {
         this.isLoading = true;
         try {
-            const response = await apiClient.api.getProjects();
+            const response = await apiClient.api.getTonApiTokens({
+                project_id: projectsStore.selectedProject!.id
+            });
 
-            const currentProject = response.data.items.find(
-                project => project.id === projectsStore.selectedProject?.id
-            );
-
-            if (currentProject) {
-                this.apiKeys = currentProject.tonapi_tokens?.map(mapApiTokenDTOToApiKey) || [];
-            }
+            this.apiKeys = response.data.items.map(mapApiTokenDTOToApiKey);
         } catch (e) {
             console.error(e);
         }
@@ -66,8 +67,6 @@ class ApiKeysStore {
 
     editApiKey = createAsyncAction(
         async ({ id, name }: EditApiKeyForm) => {
-            await new Promise(r => setTimeout(r, 1500));
-
             await apiClient.api.updateProjectToken(projectsStore.selectedProject!.id, id, { name });
 
             const key = this.apiKeys.find(item => item.id === id);
@@ -119,6 +118,11 @@ class ApiKeysStore {
             });
         }
     );
+
+    clearStore(): void {
+        this.isLoading = false;
+        this.apiKeys = [];
+    }
 }
 
 function mapApiTokenDTOToApiKey(apiTokenDTO: DTOToken): ApiKey {

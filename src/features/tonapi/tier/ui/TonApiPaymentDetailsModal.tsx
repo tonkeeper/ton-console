@@ -22,8 +22,8 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
     tier?: TonApiTier;
 }> = ({ tier, ...rest }) => {
     const onConfirm = useCallback(() => {
-        tonApiTiersStore.selectTier().then(rest.onClose);
-    }, [tonApiTiersStore.selectTier]);
+        tonApiTiersStore.selectTier(tier!.id).then(rest.onClose);
+    }, [tonApiTiersStore.selectTier, tier]);
 
     return (
         <Modal scrollBehavior="inside" size="md" {...rest}>

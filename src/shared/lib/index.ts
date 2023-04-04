@@ -1,4 +1,4 @@
-export { getWindow } from './window';
+export { getWindow, openLink, openLinkBlank } from './window';
 export { hasProperty, hasProperties, exhaustiveCheck } from './types';
 export * from './mobx';
 export { imageUrlToFilesList } from './file';

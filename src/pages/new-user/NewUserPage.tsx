@@ -1,8 +1,12 @@
 import { FunctionComponent } from 'react';
-import { Overlay } from 'src/shared';
+import { H4, Overlay } from 'src/shared';
 
 const NewUserPage: FunctionComponent = () => {
-    return <Overlay>Please authorize to continue</Overlay>;
+    return (
+        <Overlay display="flex" alignItems="center" justifyContent="center">
+            <H4>Please authorize to continue</H4>
+        </Overlay>
+    );
 };
 
 export default NewUserPage;

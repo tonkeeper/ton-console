@@ -298,6 +298,26 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+    patch:
+      summary: "Update TonAPI tier for project"
+      operationId: updateTonApiTier
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - services
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/TonApiTierInputUpdate"
+      responses:
+        '200':
+          $ref: '#/components/responses/TonApiTier'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /api/v1/services/tonapi/tiers:
     get:
       summary: "Get active TonAPI tiers"
@@ -466,15 +486,22 @@ components:
               name:
                 type: string
                 example: "Test Project"
-              tier_id:
-                type: integer
-                format: int64
-                example: 1
               image:
                 description: "If you want to delete a avatar, put null in the image field."
                 type: string
                 nullable: true
                 format: binary
+    TonApiTierInputUpdate:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              tier_id:
+                type: integer
+                format: int64
+                example: 1
 
   schemas:
     Ok:
@@ -579,7 +606,6 @@ components:
         - rpc
         - burst
         - ton_price
-        - active
         - next_payment
         - date_create
       properties:
@@ -599,12 +625,9 @@ components:
         ton_price:
           type: integer
           example: 1000000000
-        active:
-          type: boolean
-          example: true
         next_payment:
           type: string
-          example: "2023-04-23"        
+          example: "2023-04-23"
         date_create:
           type: string
           example: "2023-03-23"

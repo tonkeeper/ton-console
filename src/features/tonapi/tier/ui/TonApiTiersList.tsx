@@ -5,6 +5,7 @@ import TonApiPaymentDetailsModal from './TonApiPaymentDetailsModal';
 import { TonApiTier, tonApiTiersStore } from '../model';
 import { TonApiTierCard } from './TonApiTierCard';
 import { balanceStore, RefillModal } from 'src/entities';
+import { ButtonLink, EXTERNAL_LINKS } from 'src/shared';
 
 const TonApiTiersList: FunctionComponent = () => {
     const [selectedTier, setSelectedTier] = useState<TonApiTier | undefined>(undefined);
@@ -53,9 +54,14 @@ const TonApiTiersList: FunctionComponent = () => {
                             flex="1"
                             button={
                                 isCurrentSubscription ? (
-                                    <Button w="100%" variant="secondary">
+                                    <ButtonLink
+                                        w="100%"
+                                        href={EXTERNAL_LINKS.SUPPORT}
+                                        isExternal
+                                        variant="secondary"
+                                    >
                                         Cancel
-                                    </Button>
+                                    </ButtonLink>
                                 ) : (
                                     <Button
                                         w="100%"

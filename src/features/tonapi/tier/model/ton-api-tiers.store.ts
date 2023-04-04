@@ -12,6 +12,7 @@ import {
 import { TonApiPayment, TonApiTier } from './interfaces';
 import { projectsStore, tGUserStore } from 'src/entities';
 import { TonApiSelectedTier } from './interfaces';
+import { createStandaloneToast } from '@chakra-ui/react';
 
 class TonApiTiersStore {
     tiers = new Loadable<TonApiTier[]>([]);
@@ -33,7 +34,7 @@ class TonApiTiersStore {
 
         createEffect(() => {
             if (projectsStore.selectedProject) {
-                this.fetchTiers();
+                this.fetchSelectedTier();
             } else {
                 this.selectedTier.clear();
             }
@@ -99,7 +100,35 @@ class TonApiTiersStore {
         this.paymentsHistory.isLoading = false;
     };
 
-    selectTier = createAsyncAction(async () => {});
+    selectTier = createAsyncAction(
+        async (tierId: number) => {
+            this.selectedTier.isLoading = true;
+            const result = await apiClient.api.updateTonApiTier(
+                { project_id: projectsStore.selectedProject!.id },
+                {
+                    tier_id: tierId
+                }
+            );
+
+            this.selectedTier.value = mapAppTierDTOToSelectedTier(result.data.tier);
+            this.selectedTier.isLoading = false;
+
+            const { toast } = createStandaloneToast();
+            toast({ title: 'Successful purchase', status: 'success', isClosable: true });
+        },
+        e => {
+            console.error(e);
+            this.selectedTier.isLoading = false;
+
+            const { toast } = createStandaloneToast();
+            toast({
+                title: 'Unsuccessful purchase',
+                description: 'Unknown api error happened. Try again later',
+                status: 'error',
+                isClosable: true
+            });
+        }
+    );
 
     clearState(): void {
         this.tiers.clear();
@@ -118,7 +147,11 @@ function mapTierDTOToTier(tierDTO: DTOTier): TonApiTier {
     };
 }
 
-function mapAppTierDTOToSelectedTier(tierDTO: DTOAppTier): TonApiSelectedTier {
+function mapAppTierDTOToSelectedTier(tierDTO: DTOAppTier | null): TonApiSelectedTier | null {
+    if (!tierDTO) {
+        return null;
+    }
+
     return {
         id: tierDTO.id,
         name: tierDTO.name,
@@ -127,6 +160,7 @@ function mapAppTierDTOToSelectedTier(tierDTO: DTOAppTier): TonApiSelectedTier {
             requestsPerSecondLimit: tierDTO.rpc
         },
         subscriptionDate: new Date(tierDTO.date_create),
+        renewsDate: new Date(tierDTO.next_payment),
         active: true
     };
 }
@@ -135,13 +169,13 @@ function mapDTOPaymentToTonApiPayment(
     tiers: TonApiTier[],
     payment: DTOCharge
 ): TonApiPayment | null {
-    const tier = tiers.find(item => item.id === Number(payment.info));
+    const tier = tiers.find(item => item.id === Number(payment.tier_id));
     if (!tier) {
         return null;
     }
 
     return {
-        id: Math.random().toString(), // TODO
+        id: payment.id,
         tier,
         date: new Date(payment.date_create),
         amount: new TonCurrencyAmount(payment.amount)

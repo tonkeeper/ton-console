@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useCallback, useMemo } from 'react';
 import { H2, H4, Overlay } from 'src/shared';
 import { Box, Button, Divider, Flex, Skeleton, useDisclosure, chakra } from '@chakra-ui/react';
 import {
@@ -12,6 +12,16 @@ import { observer } from 'mobx-react-lite';
 
 const BalancePage: FunctionComponent = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
+
+    const onRefreshClick = useCallback(() => {
+        subscriptionsStore.fetchSubscriptions();
+        billingStore.fetchBillingHistory();
+    }, []);
+
+    const refreshLoading = useMemo(() => {
+        return subscriptionsStore.subscriptionsLoading || billingStore.billingHistoryLoading;
+    }, [billingStore.billingHistoryLoading, subscriptionsStore.subscriptionsLoading]);
+
     return (
         <>
             <Overlay h="fit-content" p="0">
@@ -31,8 +41,8 @@ const BalancePage: FunctionComponent = () => {
                             Refill
                         </Button>
                         <Button
-                            isLoading={balanceStore.balances.isLoading}
-                            onClick={balanceStore.fetchBalancesAndRefills}
+                            isLoading={refreshLoading}
+                            onClick={onRefreshClick}
                             size="lg"
                             variant="secondary"
                         >

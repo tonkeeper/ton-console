@@ -12,7 +12,9 @@ import {
     Text,
     MenuList,
     MenuItem,
-    Menu
+    Menu,
+    Center,
+    Spinner
 } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent } from 'react';
 import { CancelIcon24, toDate, VerticalDotsIcon16 } from 'src/shared';
@@ -21,11 +23,16 @@ import { subscriptionsStore } from 'src/widgets';
 
 const SubscriptionsTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
     if (subscriptionsStore.subscriptionsLoading) {
-        return null;
+        return (
+            <Center h="100px">
+                <Spinner />
+            </Center>
+        );
     }
 
     return (
         <TableContainer
+            minH="100px"
             border="1px"
             borderColor="background.contentTint"
             borderRadius="sm"

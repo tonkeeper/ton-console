@@ -1,4 +1,15 @@
-import { Link, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react';
+import {
+    Center,
+    Link,
+    Spinner,
+    Table,
+    TableContainer,
+    Tbody,
+    Td,
+    Th,
+    Thead,
+    Tr
+} from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent } from 'react';
 import { explorer, shortAddress, toDateTime } from 'src/shared';
 import { observer } from 'mobx-react-lite';
@@ -6,11 +17,16 @@ import { billingStore } from 'src/widgets/billing';
 
 const BillingHistoryTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
     if (billingStore.billingHistoryLoading) {
-        return null;
+        return (
+            <Center h="100px">
+                <Spinner />
+            </Center>
+        );
     }
 
     return (
         <TableContainer
+            minH="100px"
             border="1px"
             borderColor="background.contentTint"
             borderRadius="sm"

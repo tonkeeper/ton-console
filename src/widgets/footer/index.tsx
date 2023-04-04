@@ -1,5 +1,6 @@
 import { FunctionComponent } from 'react';
 import { Box, Flex, Link } from '@chakra-ui/react';
+import { EXTERNAL_LINKS } from 'src/shared';
 
 export const Footer: FunctionComponent = () => {
     return (
@@ -8,7 +9,7 @@ export const Footer: FunctionComponent = () => {
                 <Link href="https://tonapi.io/docs" isExternal>
                     Documentation
                 </Link>
-                <Link href="https://t.me/tonrostislav" isExternal>
+                <Link href={EXTERNAL_LINKS.SUPPORT} isExternal>
                     Support
                 </Link>
             </Flex>

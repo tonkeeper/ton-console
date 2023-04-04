@@ -92,8 +92,6 @@ export interface DTOAppTier {
     rpc: number;
     /** @example 1000000000 */
     ton_price: number;
-    /** @example true */
-    active: boolean;
     /** @example "2023-04-23" */
     next_payment: string;
     /** @example "2023-03-23" */
@@ -533,11 +531,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 /** @example "Test Project" */
                 name?: string;
                 /**
-                 * @format int64
-                 * @example 1
-                 */
-                tier_id?: number;
-                /**
                  * If you want to delete a avatar, put null in the image field.
                  * @format binary
                  */
@@ -755,6 +748,46 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/v1/services/tonapi/tier`,
                 method: 'GET',
                 query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags services
+         * @name UpdateTonApiTier
+         * @summary Update TonAPI tier for project
+         * @request PATCH:/api/v1/services/tonapi/tier
+         * @secure
+         */
+        updateTonApiTier: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            data: {
+                /**
+                 * @format int64
+                 * @example 1
+                 */
+                tier_id?: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    tier: DTOAppTier;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/tonapi/tier`,
+                method: 'PATCH',
+                query: query,
+                body: data,
                 secure: true,
                 ...params
             }),

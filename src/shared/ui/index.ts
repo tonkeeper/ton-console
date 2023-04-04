@@ -7,3 +7,4 @@ export * from './image-input';
 export * from './image';
 export { Pad } from './Pad';
 export { CopyPad } from './CopyPad';
+export { ButtonLink } from './ButtonLink';
