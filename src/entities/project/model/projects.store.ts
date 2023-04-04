@@ -6,12 +6,11 @@ import {
     getWindow,
     createReaction,
     createAsyncAction,
-    TonCurrencyAmount,
     serializeState,
     deserializeState
 } from 'src/shared';
 import { Project, CreateProjectFormValues } from './interfaces';
-import { SERVICE, tGUserStore } from 'src/entities';
+import { tGUserStore } from 'src/entities';
 import { createStandaloneToast } from '@chakra-ui/react';
 import { UpdateProjectFormValues } from 'src/entities/project/model/interfaces/update-project-form-values';
 
@@ -40,7 +39,7 @@ class ProjectsStore {
                 }
             ],
             storage: getWindow()!.localStorage
-        }).then(() => console.log(this.projects));
+        });
 
         createReaction(
             () => tGUserStore.user,
@@ -178,19 +177,7 @@ function mapProjectDtoToProject(projectDTO: DTOProject): Project {
         id: projectDTO.id,
         name: projectDTO.name,
         imgUrl: projectDTO.avatar,
-        creationDate: new Date(projectDTO.date_create),
-        subscriptions: [
-            {
-                id: 1,
-                renewsDate: new Date(),
-                details: {
-                    service: SERVICE.TONAPI,
-                    tierId: 1
-                },
-                price: new TonCurrencyAmount(1000000000),
-                interval: 'Monthly'
-            }
-        ]
+        creationDate: new Date(projectDTO.date_create)
     };
 }
 

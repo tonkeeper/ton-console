@@ -1,16 +1,17 @@
 import { makeAutoObservable } from 'mobx';
 import {
+    apiClient,
     createEffect,
     CurrencyAmount,
     deserializeLoadableState,
+    DTODeposit,
     getWindow,
     Loadable,
     serializeLoadableState,
     TonCurrencyAmount
 } from 'src/shared';
 import { projectsStore } from '../../project';
-import { BillingHistory } from './interfaces';
-import { SERVICE } from 'src/entities';
+import { Refill } from './interfaces';
 import { makePersistable } from 'mobx-persist-store';
 
 class BalancesStore {
@@ -18,7 +19,7 @@ class BalancesStore {
 
     depositAddress = new Loadable<string | undefined>(undefined);
 
-    billingHistory = new Loadable<BillingHistory>([]);
+    refills = new Loadable<Refill[]>([]);
 
     constructor() {
         makeAutoObservable(this);
@@ -32,7 +33,7 @@ class BalancesStore {
                     deserialize: deserializeLoadableState
                 },
                 {
-                    key: 'billingHistory',
+                    key: 'refills',
                     serialize: serializeLoadableState,
                     deserialize: deserializeLoadableState
                 }
@@ -42,8 +43,7 @@ class BalancesStore {
             createEffect(() => {
                 if (projectsStore.selectedProject) {
                     this.fetchDepositAddress();
-                    this.fetchBalances();
-                    this.fetchBillingHistory();
+                    this.fetchBalancesAndRefills();
                 } else {
                     this.clearState();
                 }
@@ -51,22 +51,26 @@ class BalancesStore {
         );
     }
 
-    fetchBalancesAndHistory(): void {
-        this.fetchBalances();
-        this.fetchBillingHistory();
-    }
-
-    fetchBalances = async (): Promise<void> => {
+    fetchBalancesAndRefills = async (): Promise<void> => {
+        this.refills.error = null;
         this.balances.error = null;
 
         try {
+            this.refills.isLoading = true;
             this.balances.isLoading = true;
-            await new Promise(r => setTimeout(r, 2000));
-            this.balances.value = [new TonCurrencyAmount(Math.random() * 1000000000)];
+
+            const response = await apiClient.api.getProjectDepositsHistory(
+                projectsStore.selectedProject!.id
+            );
+
+            this.refills.value = response.data.history.map(mapDTODepositToRefill);
+            this.balances.value = [new TonCurrencyAmount(response.data.balance!.balance)];
         } catch (e) {
             console.error(e);
+            this.refills.error = e;
             this.balances.error = e;
         }
+        this.refills.isLoading = false;
         this.balances.isLoading = false;
     };
 
@@ -75,12 +79,11 @@ class BalancesStore {
 
         try {
             this.depositAddress.isLoading = true;
-            /*const response = await apiClient.project.getDepositAddress(
+            const response = await apiClient.api.getDepositAddress(
                 projectsStore.selectedProject!.id
-            );*/
+            );
 
-            //this.depositAddress.value = response.data.ton_deposit_wallet;
-            this.depositAddress.value = 'EQDoBhI8JERdpXHytsrGxCSvJwlPTejMSxMB8y_syxr3XgYq';
+            this.depositAddress.value = response.data.ton_deposit_wallet;
         } catch (e) {
             console.error(e);
             this.depositAddress.error = e;
@@ -88,42 +91,20 @@ class BalancesStore {
         this.depositAddress.isLoading = false;
     };
 
-    fetchBillingHistory = async (): Promise<void> => {
-        this.billingHistory.error = null;
-
-        try {
-            this.billingHistory.isLoading = true;
-            this.billingHistory.value = [
-                {
-                    action: 'payment',
-                    amount: new TonCurrencyAmount(1000000000),
-                    date: new Date(),
-                    description: {
-                        service: SERVICE.TONAPI,
-                        tierId: 1
-                    },
-                    id: 0
-                },
-                {
-                    action: 'refill',
-                    amount: new TonCurrencyAmount(2000000000),
-                    fromAddress: 'EQDoBhI8JERdpXHytsrGxCSvJwlPTejMSxMB8y_syxr3XgYq',
-                    date: new Date(),
-                    id: 1
-                }
-            ];
-        } catch (e) {
-            console.error(e);
-            this.billingHistory.error = e;
-        }
-        this.billingHistory.isLoading = false;
-    };
-
     private clearState(): void {
         this.balances.clear();
-        this.billingHistory.clear();
+        this.refills.clear();
         this.depositAddress.clear();
     }
+}
+
+function mapDTODepositToRefill(dtoDeposit: DTODeposit): Refill {
+    return {
+        id: Math.random(), // TODO
+        date: new Date(dtoDeposit.date_create || Date.now()), // TODO
+        amount: new TonCurrencyAmount(dtoDeposit.balance),
+        fromAddress: dtoDeposit.address
+    };
 }
 
 export const balanceStore = new BalancesStore();

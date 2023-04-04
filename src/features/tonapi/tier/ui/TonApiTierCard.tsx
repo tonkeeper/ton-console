@@ -10,15 +10,14 @@ import {
     Text
 } from '@chakra-ui/react';
 import { H2, TickIcon, toDate } from 'src/shared';
-import { ITonApiSubscription, TonApiTier } from '../model';
+import { isTonApiSelectedTier, TonApiSelectedTier, TonApiTier } from '../model';
 
 export const TonApiTierCard: FunctionComponent<
     ComponentProps<typeof Card> & {
-        tier: TonApiTier;
+        tier: TonApiTier | TonApiSelectedTier;
         button: ReactNode;
-        subscription?: ITonApiSubscription;
     }
-> = ({ tier, button, subscription, ...rest }) => {
+> = ({ tier, button, ...rest }) => {
     return (
         <Card {...rest}>
             <CardHeader>
@@ -46,9 +45,9 @@ export const TonApiTierCard: FunctionComponent<
                         </Text>
                     </ListItem>
                 </List>
-                {subscription && (
+                {isTonApiSelectedTier(tier) && (
                     <Text textStyle="body2" color="text.secondary">
-                        Available until {toDate(subscription.renewsDate)}
+                        Available until {toDate(tier.subscriptionDate)}
                     </Text>
                 )}
             </CardBody>

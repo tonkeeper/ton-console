@@ -1,38 +1,26 @@
 import { makeAutoObservable } from 'mobx';
-import { makePersistable } from 'mobx-persist-store';
 import {
     apiClient,
-    getWindow,
     DTOTier,
     createEffect,
     TonCurrencyAmount,
-    serializeState,
-    deserializeState
+    Loadable,
+    DTOAppTier,
+    DTOCharge
 } from 'src/shared';
-import { TonApiTier } from './interfaces';
-import { tGUserStore } from 'src/entities';
+import { TonApiPayment, TonApiTier } from './interfaces';
+import { projectsStore, tGUserStore } from 'src/entities';
+import { TonApiSelectedTier } from './interfaces';
 
 class TonApiTiersStore {
-    tiers: TonApiTier[] = [];
+    tiers = new Loadable<TonApiTier[]>([]);
 
-    isLoading = false;
+    selectedTier = new Loadable<TonApiSelectedTier | null>(null);
 
-    error: unknown = null;
+    paymentsHistory = new Loadable<TonApiPayment[]>([]);
 
     constructor() {
         makeAutoObservable(this);
-
-        makePersistable(this, {
-            name: 'TonApiTiersStore',
-            properties: [
-                {
-                    key: 'tiers',
-                    serialize: serializeState,
-                    deserialize: deserializeState
-                }
-            ],
-            storage: getWindow()!.localStorage
-        });
 
         createEffect(() => {
             if (tGUserStore.user) {
@@ -41,26 +29,78 @@ class TonApiTiersStore {
                 this.clearState();
             }
         });
+
+        createEffect(() => {
+            if (projectsStore.selectedProject) {
+                this.fetchTiers();
+            } else {
+                this.selectedTier.clear();
+            }
+        });
+
+        createEffect(() => {
+            if (this.tiers.value && projectsStore.selectedProject) {
+                this.fetchPaymentsHistory();
+            } else {
+                this.paymentsHistory.clear();
+            }
+        });
     }
 
     fetchTiers = async (): Promise<void> => {
-        this.isLoading = true;
+        this.tiers.isLoading = true;
+        this.tiers.error = null;
 
         try {
-            const tiers = await apiClient.api.getTiers();
-
-            this.tiers = tiers.data.items.map(mapTierDTOToTier);
+            const tiers = await apiClient.api.getTonApiTiers();
+            this.tiers.value = tiers.data.items.map(mapTierDTOToTier);
         } catch (e) {
             console.error(e);
+            this.tiers.error = e;
         }
 
-        this.isLoading = false;
+        this.tiers.isLoading = false;
+    };
+
+    fetchSelectedTier = async (): Promise<void> => {
+        this.selectedTier.isLoading = true;
+
+        try {
+            const response = await apiClient.api.getTonApiTier({
+                project_id: projectsStore.selectedProject!.id
+            });
+
+            this.selectedTier.value = mapAppTierDTOToSelectedTier(response.data.tier);
+        } catch (e) {
+            console.error(e);
+            this.selectedTier.error = e;
+        }
+
+        this.selectedTier.isLoading = true;
+    };
+
+    fetchPaymentsHistory = async (): Promise<void> => {
+        this.paymentsHistory.isLoading = true;
+
+        try {
+            const response = await apiClient.api.getTonApiPaymentsHistory({
+                project_id: projectsStore.selectedProject!.id
+            });
+
+            this.paymentsHistory.value = response.data.history
+                .map(payment => mapDTOPaymentToTonApiPayment(this.tiers.value, payment))
+                .filter(i => !!i) as TonApiPayment[];
+        } catch (e) {
+            console.error(e);
+            this.paymentsHistory.error = e;
+        }
+
+        this.paymentsHistory.isLoading = false;
     };
 
     clearState(): void {
-        this.tiers = [];
-        this.isLoading = false;
-        this.error = null;
+        this.tiers.clear();
+        this.selectedTier.clear();
     }
 }
 
@@ -76,6 +116,40 @@ function mapTierDTOToTier(tierDTO: DTOTier): TonApiTier {
                 subscriptionsLimit: tierDTO.burst
             }
         }
+    };
+}
+
+function mapAppTierDTOToSelectedTier(tierDTO: DTOAppTier): TonApiSelectedTier {
+    return {
+        id: tierDTO.id,
+        name: tierDTO.name,
+        price: new TonCurrencyAmount(tierDTO.ton_price),
+        description: {
+            requestsPerSecondLimit: tierDTO.rpc,
+            connections: {
+                accountsLimit: tierDTO.burst,
+                subscriptionsLimit: tierDTO.burst
+            }
+        },
+        subscriptionDate: new Date(tierDTO.date_create),
+        active: true
+    };
+}
+
+function mapDTOPaymentToTonApiPayment(
+    tiers: TonApiTier[],
+    payment: DTOCharge
+): TonApiPayment | null {
+    const tier = tiers.find(item => item.id === Number(payment.info));
+    if (!tier) {
+        return null;
+    }
+
+    return {
+        id: Math.random().toString(), // TODO
+        tier,
+        date: new Date(payment.date_create),
+        amount: new TonCurrencyAmount(payment.amount)
     };
 }
 

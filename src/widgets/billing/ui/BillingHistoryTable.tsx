@@ -1,13 +1,14 @@
 import { Link, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent } from 'react';
 import { explorer, shortAddress, toDateTime } from 'src/shared';
-import { balanceStore } from 'src/entities';
-import { PaymentDescription } from './PaymentDescription';
 import { observer } from 'mobx-react-lite';
+import { billingStore } from 'src/widgets/billing';
 
-const TransactionsHistoryTable: FunctionComponent<
-    ComponentProps<typeof TableContainer>
-> = props => {
+const BillingHistoryTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
+    if (billingStore.billingHistoryLoading) {
+        return null;
+    }
+
     return (
         <TableContainer
             border="1px"
@@ -26,15 +27,13 @@ const TransactionsHistoryTable: FunctionComponent<
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {balanceStore.billingHistory.value.map(historyItem => (
+                    {billingStore.billingHistory.map(historyItem => (
                         <Tr key={historyItem.id}>
                             <Td>{toDateTime(historyItem.date)}</Td>
 
                             {historyItem.action === 'payment' ? (
                                 <>
-                                    <Td>
-                                        <PaymentDescription description={historyItem.description} />
-                                    </Td>
+                                    <Td>{historyItem.name}</Td>
                                     <Td textAlign="right">
                                         -{historyItem.amount.stringCurrencyAmount}
                                     </Td>
@@ -66,4 +65,4 @@ const TransactionsHistoryTable: FunctionComponent<
     );
 };
 
-export default observer(TransactionsHistoryTable);
+export default observer(BillingHistoryTable);

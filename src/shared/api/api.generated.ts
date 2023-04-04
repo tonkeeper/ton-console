@@ -90,7 +90,7 @@ export interface DTOAppTier {
     burst: number;
     /** @example 5 */
     rpc: number;
-    /** @example 100 */
+    /** @example 1000000000 */
     ton_price: number;
     /** @example true */
     active: boolean;
@@ -105,6 +105,8 @@ export interface DTODeposit {
     balance: string;
     /** @example "TON" */
     currency: string;
+    /** @example "2023-03-23" */
+    date_create?: string;
 }
 
 export interface DTOCharge {
@@ -114,7 +116,7 @@ export interface DTOCharge {
      */
     project_id: number;
     /** @example "payment_tier" */
-    type_of_charge: string;
+    type_of_charge: DTOChargeTypeOfCharge;
     info?: string;
     /**
      * @format int64
@@ -127,7 +129,7 @@ export interface DTOCharge {
 
 export interface DTOBalance {
     /** @example "TON" */
-    currency?: string;
+    currency: string;
     /**
      * @format int64
      * @example 1000000000
@@ -143,10 +145,8 @@ export interface DTOProject {
     id: number;
     /** @example "Test project" */
     name: string;
-    tonapi_tier?: DTOAppTier;
-    tonapi_tokens?: DTOToken[];
     /** @example "https://tonapi.io/static/test.png" */
-    avatar: string;
+    avatar?: string;
     /** @example "2023-03-23" */
     date_create: string;
 }
@@ -186,6 +186,11 @@ export enum DTOErrorCode {
     DTOErrorAlreadySelectedTier = 17,
     DTOErrorDownGradeTier = 18,
     DTOErrorInsufficientFunds = 19
+}
+
+/** @example "payment_tier" */
+export enum DTOChargeTypeOfCharge {
+    DTOPaymentTier = 'payment_tier'
 }
 
 import axios, {
@@ -466,28 +471,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags tier
-         * @name GetTiers
-         * @summary Get active tiers
-         * @request GET:/api/v1/tiers
-         * @secure
-         */
-        getTiers: (params: RequestParams = {}) =>
-            this.request<
-                {
-                    items: DTOTier[];
-                },
-                DTOError
-            >({
-                path: `/api/v1/tiers`,
-                method: 'GET',
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
          * @tags project
          * @name CreateProject
          * @summary Create project
@@ -616,7 +599,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 {
-                    token?: DTOToken;
+                    token: DTOToken;
                 },
                 DTOError
             >({
@@ -668,27 +651,26 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 method: 'DELETE',
                 secure: true,
                 ...params
-            })
-    };
-    project = {
+            }),
+
         /**
          * No description
          *
          * @tags project
          * @name GetDepositAddress
          * @summary Get project deposit address
-         * @request GET:/project/{id}/payments/deposit-address
+         * @request GET:/api/v1/project/{id}/deposit/address
          * @secure
          */
         getDepositAddress: (id: number, params: RequestParams = {}) =>
             this.request<
                 {
                     /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
-                    ton_deposit_wallet?: string;
+                    ton_deposit_wallet: string;
                 },
                 DTOError
             >({
-                path: `/project/${id}/payments/deposit-address`,
+                path: `/api/v1/project/${id}/deposit/address`,
                 method: 'GET',
                 secure: true,
                 ...params
@@ -698,24 +680,139 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags project
-         * @name GetPaymentsHistory
-         * @summary Get payments/history
-         * @request GET:/project/{id}/payments/history
+         * @name GetProjectDepositsHistory
+         * @summary Get project deposits history
+         * @request GET:/api/v1/project/{id}/deposits/history
          * @secure
          */
-        getPaymentsHistory: (id: number, params: RequestParams = {}) =>
+        getProjectDepositsHistory: (id: number, params: RequestParams = {}) =>
             this.request<
                 {
-                    balance?: DTOBalance;
-                    history?: {
-                        payments?: DTOCharge[];
-                        deposits?: DTODeposit[];
-                    };
+                    balance: DTOBalance;
+                    history: DTODeposit[];
                 },
                 DTOError
             >({
-                path: `/project/${id}/payments/history`,
+                path: `/api/v1/project/${id}/deposits/history`,
                 method: 'GET',
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags services
+         * @name GetTonApiTokens
+         * @summary Get TonAPI tokens
+         * @request GET:/api/v1/services/tonapi/tokens
+         * @secure
+         */
+        getTonApiTokens: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: DTOToken[];
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/tonapi/tokens`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags services
+         * @name GetTonApiTier
+         * @summary Get project TonAPI tier
+         * @request GET:/api/v1/services/tonapi/tier
+         * @secure
+         */
+        getTonApiTier: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    tier: DTOAppTier;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/tonapi/tier`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags services
+         * @name GetTonApiTiers
+         * @summary Get active TonAPI tiers
+         * @request GET:/api/v1/services/tonapi/tiers
+         * @secure
+         */
+        getTonApiTiers: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    items: DTOTier[];
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/tonapi/tiers`,
+                method: 'GET',
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags services
+         * @name GetTonApiPaymentsHistory
+         * @summary Get TonAPI payments history
+         * @request GET:/api/v1/services/tonapi/payments/history
+         * @secure
+         */
+        getTonApiPaymentsHistory: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    history: DTOCharge[];
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/tonapi/payments/history`,
+                method: 'GET',
+                query: query,
                 secure: true,
                 ...params
             })

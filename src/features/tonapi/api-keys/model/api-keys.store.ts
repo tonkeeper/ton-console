@@ -1,4 +1,4 @@
-import { createAsyncAction, createEffect } from 'src/shared';
+import { apiClient, createAsyncAction, createEffect, DTOToken } from 'src/shared';
 import { EditApiKeyForm, ApiKey, CreateApiKeyForm } from './interfaces';
 import { projectsStore } from 'src/entities';
 import { createStandaloneToast } from '@chakra-ui/react';
@@ -18,22 +18,16 @@ class ApiKeysStore {
 
     fetchApiKeys = async (): Promise<void> => {
         this.isLoading = true;
-
         try {
-            this.apiKeys = [
-                {
-                    id: 0,
-                    name: 'First',
-                    value: '1234567890123456789012345678901234567890',
-                    creationDate: new Date()
-                },
-                {
-                    id: 1,
-                    name: 'Second',
-                    value: '1234567890123456789012345678901234567891',
-                    creationDate: new Date()
-                }
-            ];
+            const response = await apiClient.api.getProjects();
+
+            const currentProject = response.data.items.find(
+                project => project.id === projectsStore.selectedProject?.id
+            );
+
+            if (currentProject) {
+                this.apiKeys = currentProject.tonapi_tokens?.map(mapApiTokenDTOToApiKey) || [];
+            }
         } catch (e) {
             console.error(e);
         }
@@ -43,19 +37,14 @@ class ApiKeysStore {
 
     createApiKey = createAsyncAction(
         async (form: CreateApiKeyForm) => {
-            await new Promise(r => setTimeout(r, 1500));
-
-            /* const response = await apiClient.api.generateProjectToken(
+            const response = await apiClient.api.generateProjectToken(
                 projectsStore.selectedProject!.id,
                 form
-            );*/
+            );
 
-            this.apiKeys.push({
-                id: Math.random(),
-                name: form.name,
-                value: Math.random().toString(),
-                creationDate: new Date()
-            });
+            if (response.data.token) {
+                this.apiKeys.push(mapApiTokenDTOToApiKey(response.data.token));
+            }
 
             const { toast } = createStandaloneToast();
             toast({
@@ -78,6 +67,8 @@ class ApiKeysStore {
     editApiKey = createAsyncAction(
         async ({ id, name }: EditApiKeyForm) => {
             await new Promise(r => setTimeout(r, 1500));
+
+            await apiClient.api.updateProjectToken(projectsStore.selectedProject!.id, id, { name });
 
             const key = this.apiKeys.find(item => item.id === id);
 
@@ -107,6 +98,8 @@ class ApiKeysStore {
         async (id: number) => {
             await new Promise(r => setTimeout(r, 1500));
 
+            await apiClient.api.deleteProjectToken(projectsStore.selectedProject!.id, id);
+
             this.apiKeys = this.apiKeys.filter(item => item.id !== id);
 
             const { toast } = createStandaloneToast();
@@ -126,6 +119,15 @@ class ApiKeysStore {
             });
         }
     );
+}
+
+function mapApiTokenDTOToApiKey(apiTokenDTO: DTOToken): ApiKey {
+    return {
+        name: apiTokenDTO.name,
+        value: apiTokenDTO.token,
+        creationDate: new Date(apiTokenDTO.date_create),
+        id: apiTokenDTO.id
+    };
 }
 
 export const apiKeysStore = new ApiKeysStore();

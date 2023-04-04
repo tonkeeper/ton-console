@@ -1,10 +1,9 @@
-import { FunctionComponent, useCallback, useMemo, useState } from 'react';
+import { FunctionComponent, useCallback, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Flex } from '@chakra-ui/react';
 import { TonApiPaymentDetailsModal } from './TonApiPaymentDetailsModal';
-import { ITonApiSubscription, TonApiTier, tonApiTiersStore } from '../model';
+import { TonApiTier, tonApiTiersStore } from '../model';
 import { TonApiTierCard } from './TonApiTierCard';
-import { projectsStore, SERVICE } from 'src/entities';
 
 const TonApiTiersList: FunctionComponent = () => {
     const [selectedTier, setSelectedTier] = useState<TonApiTier | undefined>(undefined);
@@ -14,27 +13,23 @@ const TonApiTiersList: FunctionComponent = () => {
         console.log(confirm);
     }, []);
 
-    const currentSubscription = useMemo(() => {
-        return projectsStore.selectedProject!.subscriptions.find(
-            item => item.details.service === SERVICE.TONAPI
-        ) as ITonApiSubscription | undefined;
-    }, [projectsStore.selectedProject]);
-
-    if (tonApiTiersStore.isLoading) {
+    if (tonApiTiersStore.tiers.isLoading) {
         return null;
     }
 
     return (
         <>
             <Flex gap="4">
-                {tonApiTiersStore.tiers.map(tier => {
-                    const isCurrentSubscription = currentSubscription?.details.tierId === tier.id;
+                {tonApiTiersStore.tiers.value.map(tier => {
+                    const isCurrentSubscription =
+                        tonApiTiersStore.selectedTier.value?.id === tier.id;
 
                     return (
                         <TonApiTierCard
                             key={tier.id}
-                            tier={tier}
-                            subscription={isCurrentSubscription ? currentSubscription : undefined}
+                            tier={
+                                isCurrentSubscription ? tonApiTiersStore.selectedTier.value! : tier
+                            }
                             flex="1"
                             button={
                                 isCurrentSubscription ? (

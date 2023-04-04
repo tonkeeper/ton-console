@@ -83,24 +83,6 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
   
-  /api/v1/tiers:
-    get:
-      summary: "Get active tiers"
-      operationId: getTiers
-      security:
-        - JWTAuth: [ "common" ]
-      tags:
-        - tier
-      responses:
-        '200':
-          $ref: '#/components/responses/Tiers'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  
   /api/v1/project:
     post:
       summary: "Create project"
@@ -239,7 +221,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /project/{id}/payments/deposit-address:
+  /api/v1/project/{id}/deposit/address:
     get:
       summary: "Get project deposit address"
       operationId: getDepositAddress
@@ -258,16 +240,91 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /project/{id}/payments/history:
+  /api/v1/project/{id}/deposits/history:
     get:
-      summary: "Get payments/history"
-      operationId: getPaymentsHistory
+      summary: "Get project deposits history"
+      operationId: getProjectDepositsHistory
       security:
         - JWTAuth: [ "common" ]
       tags:
         - project
       parameters:
         - $ref: '#/components/parameters/projectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/DepositsHistory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
+  /api/v1/services/tonapi/tokens:
+    get:
+      summary: "Get TonAPI tokens"
+      operationId: getTonApiTokens
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - services
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/TonApiTokens'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/tier:
+    get:
+      summary: "Get project TonAPI tier"
+      operationId: getTonApiTier
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - services
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/TonApiTier'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/tiers:
+    get:
+      summary: "Get active TonAPI tiers"
+      operationId: getTonApiTiers
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - services
+      responses:
+        '200':
+          $ref: '#/components/responses/Tiers'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/payments/history:
+    get:
+      summary: "Get TonAPI payments history"
+      operationId: getTonApiPaymentsHistory
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - services
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
       responses:
         '200':
           $ref: '#/components/responses/PaymentsHistory'
@@ -292,6 +349,14 @@ components:
       description: Project ID
       in: path
       name: id
+      required: true
+      schema:
+        type: integer
+        format: int64
+    queryProjectID:
+      description: Project ID
+      in: query
+      name: project_id
       required: true
       schema:
         type: integer
@@ -532,7 +597,7 @@ components:
           example: 5
         ton_price:
           type: integer
-          example: 100
+          example: 1000000000
         active:
           type: boolean
           example: true
@@ -555,10 +620,12 @@ components:
         currency:
           type: string
           example: "TON"
+        date_create:
+          type: string
+          example: "2023-03-23"
     Charge:
       type: object
       required:
-        - id
         - project_id
         - type_of_charge
         - amount
@@ -571,6 +638,8 @@ components:
         type_of_charge:
           type: string
           example: "payment_tier"
+          enum:
+            - "payment_tier"
         info:
           type: string
         amount:
@@ -584,6 +653,7 @@ components:
       type: object
       required:
         - balance
+        - currency
       properties:
         currency:
           type: string
@@ -597,8 +667,6 @@ components:
       required:
         - id
         - name
-        - avatar
-        - active
         - date_create
       properties:
         id:
@@ -608,12 +676,6 @@ components:
         name:
           type: string
           example: "Test project"
-        tonapi_tier:
-          $ref: '#/components/schemas/AppTier'
-        tonapi_tokens:
-          type: array
-          items:
-            $ref: '#/components/schemas/Token'
         avatar:
           type: string
           example: "https://tonapi.io/static/test.png"
@@ -675,6 +737,8 @@ components:
         application/json:
           schema:
             type: object
+            required:
+              - ton_deposit_wallet
             properties:
               ton_deposit_wallet:
                 type: string
@@ -685,29 +749,64 @@ components:
         application/json:
           schema:
             type: object
+            required:
+              - history
+            properties:
+              history:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Charge'
+    DepositsHistory:
+      description: "Deposits history"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - balance
+              - history
             properties:
               balance:
                 $ref: '#/components/schemas/Balance'
               history:
-                type: object
-                properties:
-                  payments:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Charge'
-                  deposits:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Deposit'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Deposit'
     TokenCreated:
       description: "Token has been created"
       content:
         application/json:
           schema:
             type: object
+            required:
+              - token
             properties:
               token:
                 $ref: '#/components/schemas/Token'
+    TonApiTokens:
+      description: "TonAPI tokens"
+      content:
+        application/json:
+          schema:
+            required:
+              - items
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Token'
+    TonApiTier:
+      description: "TonAPI tier"
+      content:
+        application/json:
+          schema:
+            required:
+              - tier
+            type: object
+            properties:
+              tier:
+                $ref: '#/components/schemas/AppTier'
     ProjectCreated:
       description: "Project has been created"
       content:

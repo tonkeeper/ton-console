@@ -15,13 +15,15 @@ import {
     Menu
 } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent } from 'react';
-import { projectsStore } from 'src/entities';
 import { CancelIcon24, toDate, VerticalDotsIcon16 } from 'src/shared';
-import { SubscriptionDetails } from './SubscriptionDetails';
+import { observer } from 'mobx-react-lite';
+import { subscriptionsStore } from 'src/widgets';
 
-export const SubscriptionsTable: FunctionComponent<
-    ComponentProps<typeof TableContainer>
-> = props => {
+const SubscriptionsTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
+    if (subscriptionsStore.subscriptionsLoading) {
+        return null;
+    }
+
     return (
         <TableContainer
             border="1px"
@@ -41,11 +43,9 @@ export const SubscriptionsTable: FunctionComponent<
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {projectsStore.selectedProject?.subscriptions.map(subscription => (
+                    {subscriptionsStore.subscriptions.map(subscription => (
                         <Tr key={subscription.id}>
-                            <Td>
-                                <SubscriptionDetails details={subscription.details} />
-                            </Td>
+                            <Td>{subscription.plan}</Td>
                             <Td>{subscription.interval}</Td>
                             <Td>{toDate(subscription.renewsDate)}</Td>
                             <Td>
@@ -58,7 +58,7 @@ export const SubscriptionsTable: FunctionComponent<
                                             <VerticalDotsIcon16 />
                                         </MenuButton>
                                         <MenuList w="132px">
-                                            <MenuItem>
+                                            <MenuItem onClick={subscription.onCancel}>
                                                 <CancelIcon24 mr="2" />
                                                 <Text textStyle="label2">Cancel</Text>
                                             </MenuItem>
@@ -73,3 +73,5 @@ export const SubscriptionsTable: FunctionComponent<
         </TableContainer>
     );
 };
+
+export default observer(SubscriptionsTable);
