@@ -1,11 +1,6 @@
 import { FunctionComponent, useCallback, useMemo } from 'react';
-import { Button, Center, Flex, useDisclosure, chakra } from '@chakra-ui/react';
-import {
-    CreateProjectForm,
-    CreateProjectFormValues,
-    DeleteProjectConfirmation,
-    projectsStore
-} from 'src/entities';
+import { Button, Center, Flex } from '@chakra-ui/react';
+import { CreateProjectForm, CreateProjectFormValues, projectsStore } from 'src/entities';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toJS } from 'mobx';
 import { H4, Overlay } from 'src/shared';
@@ -14,7 +9,6 @@ import { observer } from 'mobx-react-lite';
 const EditProjectPage: FunctionComponent = () => {
     const formId = 'edit-project-form';
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
     const methods = useForm();
     const { formState } = methods;
 
@@ -38,17 +32,6 @@ const EditProjectPage: FunctionComponent = () => {
             });
         },
         [formState.dirtyFields, projectsStore.selectedProject]
-    );
-
-    const onDeleteModalClose = useCallback(
-        (confirm?: boolean) => {
-            onClose();
-
-            if (confirm) {
-                projectsStore.deleteProject(projectsStore.selectedProject!.id);
-            }
-        },
-        [onClose, projectsStore.selectedProject, projectsStore.deleteProject]
     );
 
     return (
@@ -75,24 +58,8 @@ const EditProjectPage: FunctionComponent = () => {
                     >
                         Save
                     </Button>
-                    <Button
-                        w="100%"
-                        isLoading={projectsStore.deleteProject.isLoading}
-                        onClick={onOpen}
-                        variant="secondary"
-                    >
-                        Delete&nbsp;
-                        <chakra.span maxW="100%" overflow="hidden" textOverflow="ellipsis">
-                            {projectsStore.selectedProject!.name}
-                        </chakra.span>
-                    </Button>
                 </Flex>
             </Center>
-            <DeleteProjectConfirmation
-                projectName={projectsStore.selectedProject!.name}
-                isOpen={isOpen}
-                onClose={onDeleteModalClose}
-            />
         </Overlay>
     );
 };
