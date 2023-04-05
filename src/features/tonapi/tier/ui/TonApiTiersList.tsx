@@ -34,6 +34,8 @@ const TonApiTiersList: FunctionComponent = () => {
         setSelectedTier(undefined);
     }, []);
 
+    const currentTier = tonApiTiersStore.selectedTier.value;
+
     if (tonApiTiersStore.tiers.isLoading || balanceStore.balances.isLoading) {
         return null;
     }
@@ -42,15 +44,12 @@ const TonApiTiersList: FunctionComponent = () => {
         <>
             <Flex gap="4">
                 {tonApiTiersStore.tiers.value.map(tier => {
-                    const isCurrentSubscription =
-                        tonApiTiersStore.selectedTier.value?.id === tier.id;
+                    const isCurrentSubscription = currentTier?.id === tier.id;
 
                     return (
                         <TonApiTierCard
                             key={tier.id}
-                            tier={
-                                isCurrentSubscription ? tonApiTiersStore.selectedTier.value! : tier
-                            }
+                            tier={isCurrentSubscription ? currentTier! : tier}
                             flex="1"
                             button={
                                 isCurrentSubscription ? (
@@ -65,6 +64,9 @@ const TonApiTiersList: FunctionComponent = () => {
                                 ) : (
                                     <Button
                                         w="100%"
+                                        isDisabled={
+                                            !!currentTier && currentTier.price.isGT(tier.price)
+                                        }
                                         onClick={() => onSelectTier(tier)}
                                         variant={tier.name === 'Pro' ? 'primary' : 'secondary'}
                                     >

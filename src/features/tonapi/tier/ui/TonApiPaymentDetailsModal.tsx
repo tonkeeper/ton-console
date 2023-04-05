@@ -15,15 +15,18 @@ import {
 import { H4, Pad } from 'src/shared';
 import { TonApiTier, tonApiTiersStore } from '../model';
 import { observer } from 'mobx-react-lite';
+import { balanceStore } from 'src/entities';
 
 const TonApiPaymentDetailsModal: FunctionComponent<{
     isOpen: boolean;
     onClose: () => void;
     tier?: TonApiTier;
 }> = ({ tier, ...rest }) => {
-    const onConfirm = useCallback(() => {
-        tonApiTiersStore.selectTier(tier!.id).then(rest.onClose);
-    }, [tonApiTiersStore.selectTier, tier]);
+    const onConfirm = useCallback(async () => {
+        await tonApiTiersStore.selectTier(tier!.id);
+        await balanceStore.fetchBalancesAndRefills();
+        rest.onClose();
+    }, [tier]);
 
     return (
         <Modal scrollBehavior="inside" size="md" {...rest}>

@@ -159,68 +159,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /api/v1/project/{id}/generate/token:
-    post:
-      summary: "Generate project token"
-      operationId: generateProjectToken
-      security:
-        - JWTAuth: [ "common" ]
-      tags:
-        - project
-      requestBody:
-        $ref: "#/components/requestBodies/TokenInput"
-      parameters:
-        - $ref: '#/components/parameters/projectID'
-      responses:
-        '201':
-          $ref: '#/components/responses/TokenCreated'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/project/{id}/token/{token_id}:
-    patch:
-      summary: "Update project token"
-      operationId: updateProjectToken
-      security:
-        - JWTAuth: [ "common" ]
-      tags:
-        - project
-      requestBody:
-        $ref: "#/components/requestBodies/TokenInput"
-      parameters:
-        - $ref: '#/components/parameters/projectID'
-        - $ref: '#/components/parameters/tokenID'
-      responses:
-        '200':
-          $ref: '#/components/responses/Ok'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-    delete:
-      summary: "Delete project token"
-      operationId: deleteProjectToken
-      security:
-        - JWTAuth: [ "common" ]
-      tags:
-        - project
-      parameters:
-        - $ref: '#/components/parameters/projectID'
-        - $ref: '#/components/parameters/tokenID'
-      responses:
-        '200':
-          $ref: '#/components/responses/Ok'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
   /api/v1/project/{id}/deposit/address:
     get:
       summary: "Get project deposit address"
@@ -279,10 +217,72 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/generate/token:
+    post:
+      summary: "Generate TonAPI project token"
+      operationId: generateTonAPIProjectToken
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - services
+      requestBody:
+        $ref: "#/components/requestBodies/TokenInput"
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '201':
+          $ref: '#/components/responses/TokenCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/token/{id}:
+    patch:
+      summary: "Update TonAPI project token"
+      operationId: updateTonApiProjectToken
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - services
+      requestBody:
+        $ref: "#/components/requestBodies/TokenInput"
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+        - $ref: '#/components/parameters/tokenID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: "Delete TonAPI project token"
+      operationId: deleteTonAPIProjectToken
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - services
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+        - $ref: '#/components/parameters/tokenID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /api/v1/services/tonapi/tier:
     get:
       summary: "Get project TonAPI tier"
-      operationId: getTonApiTier
+      operationId: getTonApiProjectTier
       security:
         - JWTAuth: [ "common" ]
       tags:
@@ -360,7 +360,7 @@ components:
     tokenID:
       description: Token ID
       in: path
-      name: token_id
+      name: id
       required: true
       schema:
         type: integer

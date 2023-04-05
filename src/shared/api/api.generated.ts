@@ -573,79 +573,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags project
-         * @name GenerateProjectToken
-         * @summary Generate project token
-         * @request POST:/api/v1/project/{id}/generate/token
-         * @secure
-         */
-        generateProjectToken: (
-            id: number,
-            data: {
-                /** @example "My token" */
-                name: string;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    token: DTOToken;
-                },
-                DTOError
-            >({
-                path: `/api/v1/project/${id}/generate/token`,
-                method: 'POST',
-                body: data,
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags project
-         * @name UpdateProjectToken
-         * @summary Update project token
-         * @request PATCH:/api/v1/project/{id}/token/{token_id}
-         * @secure
-         */
-        updateProjectToken: (
-            id: number,
-            tokenId: number,
-            data: {
-                /** @example "My token" */
-                name: string;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<DTOOk, DTOError>({
-                path: `/api/v1/project/${id}/token/${tokenId}`,
-                method: 'PATCH',
-                body: data,
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags project
-         * @name DeleteProjectToken
-         * @summary Delete project token
-         * @request DELETE:/api/v1/project/{id}/token/{token_id}
-         * @secure
-         */
-        deleteProjectToken: (id: number, tokenId: number, params: RequestParams = {}) =>
-            this.request<DTOOk, DTOError>({
-                path: `/api/v1/project/${id}/token/${tokenId}`,
-                method: 'DELETE',
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags project
          * @name GetDepositAddress
          * @summary Get project deposit address
          * @request GET:/api/v1/project/{id}/deposit/address
@@ -724,12 +651,110 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags services
-         * @name GetTonApiTier
+         * @name GenerateTonApiProjectToken
+         * @summary Generate TonAPI project token
+         * @request POST:/api/v1/services/tonapi/generate/token
+         * @secure
+         */
+        generateTonApiProjectToken: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            data: {
+                /** @example "My token" */
+                name: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    token: DTOToken;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/tonapi/generate/token`,
+                method: 'POST',
+                query: query,
+                body: data,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags services
+         * @name UpdateTonApiProjectToken
+         * @summary Update TonAPI project token
+         * @request PATCH:/api/v1/services/tonapi/token/{id}
+         * @secure
+         */
+        updateTonApiProjectToken: (
+            id: number,
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            data: {
+                /** @example "My token" */
+                name: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<DTOOk, DTOError>({
+                path: `/api/v1/services/tonapi/token/${id}`,
+                method: 'PATCH',
+                query: query,
+                body: data,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags services
+         * @name DeleteTonApiProjectToken
+         * @summary Delete TonAPI project token
+         * @request DELETE:/api/v1/services/tonapi/token/{id}
+         * @secure
+         */
+        deleteTonApiProjectToken: (
+            id: number,
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<DTOOk, DTOError>({
+                path: `/api/v1/services/tonapi/token/${id}`,
+                method: 'DELETE',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags services
+         * @name GetTonApiProjectTier
          * @summary Get project TonAPI tier
          * @request GET:/api/v1/services/tonapi/tier
          * @secure
          */
-        getTonApiTier: (
+        getTonApiProjectTier: (
             query: {
                 /**
                  * Project ID

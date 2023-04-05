@@ -40,7 +40,7 @@ export const TonApiTierCard: FunctionComponent<
                 </List>
                 {isTonApiSelectedTier(tier) && (
                     <Text textStyle="body2" color="text.secondary">
-                        Available until {toDate(tier.subscriptionDate)}
+                        Available until {toDate(tier.renewsDate)}
                     </Text>
                 )}
             </CardBody>

@@ -52,8 +52,6 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
         setModal(null);
     }, []);
 
-    console.log(copiedKey);
-
     return (
         <>
             <TableContainer

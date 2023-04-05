@@ -38,8 +38,8 @@ class ApiKeysStore {
 
     createApiKey = createAsyncAction(
         async (form: CreateApiKeyForm) => {
-            const response = await apiClient.api.generateProjectToken(
-                projectsStore.selectedProject!.id,
+            const response = await apiClient.api.generateTonApiProjectToken(
+                { project_id: projectsStore.selectedProject!.id },
                 form
             );
 
@@ -67,7 +67,11 @@ class ApiKeysStore {
 
     editApiKey = createAsyncAction(
         async ({ id, name }: EditApiKeyForm) => {
-            await apiClient.api.updateProjectToken(projectsStore.selectedProject!.id, id, { name });
+            await apiClient.api.updateTonApiProjectToken(
+                id,
+                { project_id: projectsStore.selectedProject!.id },
+                { name }
+            );
 
             const key = this.apiKeys.find(item => item.id === id);
 
@@ -97,7 +101,9 @@ class ApiKeysStore {
         async (id: number) => {
             await new Promise(r => setTimeout(r, 1500));
 
-            await apiClient.api.deleteProjectToken(projectsStore.selectedProject!.id, id);
+            await apiClient.api.deleteTonApiProjectToken(id, {
+                project_id: projectsStore.selectedProject!.id
+            });
 
             this.apiKeys = this.apiKeys.filter(item => item.id !== id);
 

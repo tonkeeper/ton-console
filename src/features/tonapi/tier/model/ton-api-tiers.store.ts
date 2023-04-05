@@ -68,7 +68,7 @@ class TonApiTiersStore {
         this.selectedTier.isLoading = true;
 
         try {
-            const response = await apiClient.api.getTonApiTier({
+            const response = await apiClient.api.getTonApiProjectTier({
                 project_id: projectsStore.selectedProject!.id
             });
 
