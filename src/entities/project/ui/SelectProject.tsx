@@ -27,6 +27,7 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
                             <HStack spacing="2">
                                 <Image
                                     w="7"
+                                    minW="7"
                                     h="7"
                                     borderRadius="sm"
                                     src={projectsStore.selectedProject.imgUrl}
@@ -44,6 +45,7 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
                                 >
                                     <Image
                                         w="7"
+                                        minW="7"
                                         h="7"
                                         mr="2"
                                         borderRadius="sm"
@@ -60,6 +62,7 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
                             <MenuItem onClick={onOpen}>
                                 <Center
                                     w="7"
+                                    minW="7"
                                     h="7"
                                     mr="2"
                                     borderRadius="sm"

@@ -1,5 +1,5 @@
 import { FunctionComponent, useCallback, useMemo } from 'react';
-import { Button, Center, Flex, useDisclosure } from '@chakra-ui/react';
+import { Button, Center, Flex, useDisclosure, chakra } from '@chakra-ui/react';
 import {
     CreateProjectForm,
     CreateProjectFormValues,
@@ -81,7 +81,10 @@ const EditProjectPage: FunctionComponent = () => {
                         onClick={onOpen}
                         variant="secondary"
                     >
-                        Delete {projectsStore.selectedProject!.name}
+                        Delete&nbsp;
+                        <chakra.span maxW="100%" overflow="hidden" textOverflow="ellipsis">
+                            {projectsStore.selectedProject!.name}
+                        </chakra.span>
                     </Button>
                 </Flex>
             </Center>
