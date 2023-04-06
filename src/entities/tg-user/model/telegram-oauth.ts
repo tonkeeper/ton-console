@@ -2,7 +2,7 @@ import { getWindow, hasProperty } from 'src/shared';
 
 interface Options {
     bot_id: string;
-    request_access?: boolean;
+    request_access?: string;
     lang?: string;
 }
 
@@ -41,7 +41,7 @@ export async function loginViaTG(): Promise<TGLoginData | null> {
     }
     return new Promise(res => {
         window.Telegram.Login.auth(
-            { bot_id: import.meta.env.VITE_TG_OAUTH_BOT_ID, request_access: true },
+            { bot_id: import.meta.env.VITE_TG_OAUTH_BOT_ID, request_access: 'write' },
             data => {
                 res(data || null);
             }

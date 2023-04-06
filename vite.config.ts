@@ -19,7 +19,7 @@ export default ({ mode }) => {
                 entry: '/src/main.tsx',
                 inject: {
                     data: {
-                        injectScript: `<script async src="https://telegram.org/js/telegram-widget.js?21" data-telegram-login="${VITE_TG_OAUTH_BOT_NAME}" data-userpic="false" data-request-access="write" onload="setTimeout(document.getElementById('telegram-login-${VITE_TG_OAUTH_BOT_NAME}').style.display = 'none')"></script>`
+                        injectScript: `<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="${VITE_TG_OAUTH_BOT_NAME}" data-userpic="false" data-request-access="write" onload="setTimeout(document.getElementById('telegram-login-${VITE_TG_OAUTH_BOT_NAME}').style.display = 'none')"></script>`
                     },
                     tags: [
                         {
