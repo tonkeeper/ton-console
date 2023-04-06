@@ -1,0 +1,70 @@
+import { FunctionComponent } from 'react';
+import { ButtonLink, DocsIcon16, EXTERNAL_LINKS, H1, H2, H3, Overlay, TgIcon } from 'src/shared';
+import { Button, Flex, Text, useBreakpointValue } from '@chakra-ui/react';
+import { tGUserStore } from 'src/entities';
+import { observer } from 'mobx-react-lite';
+import { TonApiPricing } from 'src/pages/landing/TonApiPricing';
+import { Footer } from 'src/widgets';
+
+const LandingPage: FunctionComponent = () => {
+    const Heading = useBreakpointValue({
+        md: H1,
+        base: H2
+    })!;
+
+    return (
+        <Overlay pt="0">
+            <Flex align="center" direction="column" h="100%">
+                <Flex
+                    align="center"
+                    justify="center"
+                    direction="column"
+                    flex="1"
+                    maxW="648px"
+                    mx="auto"
+                    pt={{ base: 10, md: 18, lg: 8 }}
+                    pb={{ base: 12, md: 15, lg: 8 }}
+                    textAlign={{ base: 'start', md: 'center' }}
+                >
+                    <Heading mb="5">Connecting businesses to the TON ecosystem</Heading>
+                    <Text textStyle="body1" mb={{ base: 8, md: 10 }} color="text.secondary">
+                        The TON ecosystem is a decentralized blockchain platform developed by
+                        Telegram. It has a range of features that make it attractive for businesses,
+                        including high throughput, low transaction fees, and a smart contract
+                        system.
+                    </Text>
+                    <Flex
+                        direction={{ base: 'column', md: 'row' }}
+                        gap="3"
+                        w={{ base: '100%', md: 'auto' }}
+                    >
+                        <Button
+                            isLoading={tGUserStore.isAuthProcess}
+                            leftIcon={<TgIcon color="constant.white" />}
+                            onClick={tGUserStore.login}
+                            variant="primary"
+                        >
+                            Connect and try
+                        </Button>
+                        <ButtonLink
+                            leftIcon={<DocsIcon16 />}
+                            href={EXTERNAL_LINKS.DOCUMENTATION}
+                            isExternal
+                            variant="secondary"
+                        >
+                            Documentation
+                        </ButtonLink>
+                    </Flex>
+                </Flex>
+                <H3 mb="7">Pricing</H3>
+                <TonApiPricing
+                    mb={{ base: 8, md: 14, lg: 16 }}
+                    maxW={{ base: '648px', lg: 'unset' }}
+                />
+                <Footer gap="6" />
+            </Flex>
+        </Overlay>
+    );
+};
+
+export default observer(LandingPage);

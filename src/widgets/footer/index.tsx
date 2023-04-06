@@ -1,18 +1,16 @@
-import { FunctionComponent } from 'react';
-import { Box, Flex, Link } from '@chakra-ui/react';
+import { ComponentProps, FunctionComponent } from 'react';
+import { Flex, Link } from '@chakra-ui/react';
 import { EXTERNAL_LINKS } from 'src/shared';
 
-export const Footer: FunctionComponent = () => {
+export const Footer: FunctionComponent<ComponentProps<typeof Flex>> = props => {
     return (
-        <Box as="footer" ml="1">
-            <Flex wrap="wrap" gap="4" rowGap="1.5" mb="1.5" pl="1">
-                <Link href="https://tonapi.io/docs" isExternal>
-                    Documentation
-                </Link>
-                <Link href={EXTERNAL_LINKS.SUPPORT} isExternal>
-                    Support
-                </Link>
-            </Flex>
-        </Box>
+        <Flex as="footer" gap="4" {...props}>
+            <Link p="1" href={EXTERNAL_LINKS.DOCUMENTATION} isExternal>
+                Documentation
+            </Link>
+            <Link p="1" href={EXTERNAL_LINKS.SUPPORT} isExternal>
+                Support
+            </Link>
+        </Flex>
     );
 };

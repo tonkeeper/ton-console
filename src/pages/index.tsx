@@ -6,21 +6,23 @@ import { Layout } from './layouts';
 import { projectsStore, tGUserStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import SettingsRouting from 'src/pages/settings';
+import { LayoutSolid } from 'src/pages/layouts/LayoutSolid';
+import { LayoutWithAside } from 'src/pages/layouts/LayoutWithAside';
 
-const NewUserPage = lazy(() => import('./new-user/NewUserPage'));
-const CreateFirstProjectPage = lazy(() => import('./new-user/CreateFirstProjectPage'));
+const LandingPage = lazy(() => import('./landing'));
+const CreateFirstProjectPage = lazy(() => import('./create-first-project'));
 const BalancePage = lazy(() => import('./balance'));
 
 const Routing: FunctionComponent = () => {
     if (!tGUserStore.user) {
         return (
             <Routes>
-                <Route path="/" element={<Layout aside={false} />}>
+                <Route path="/" element={<LayoutSolid />}>
                     <Route
                         index
                         element={
                             <Suspense>
-                                <NewUserPage />
+                                <LandingPage />
                             </Suspense>
                         }
                     ></Route>
@@ -33,7 +35,7 @@ const Routing: FunctionComponent = () => {
     if (!projectsStore.selectedProject) {
         return (
             <Routes>
-                <Route path="/" element={<Layout aside={false} />}>
+                <Route path="/" element={<Layout />}>
                     <Route
                         index
                         element={
@@ -50,7 +52,7 @@ const Routing: FunctionComponent = () => {
 
     return (
         <Routes>
-            <Route path="/" element={<Layout />}>
+            <Route path="/" element={<LayoutWithAside />}>
                 <Route path="tonapi">{TonapiRouting}</Route>
                 <Route
                     path="balance"

@@ -9,11 +9,17 @@ import {
     MenuButton,
     MenuItem,
     MenuList,
-    Text
+    Text,
+    useBreakpointValue
 } from '@chakra-ui/react';
 import { ArrowIcon, DisconnectIcon, MenuButtonStyled, TgIcon } from 'src/shared';
 
 export const TgUserButton: FunctionComponent = observer(() => {
+    const buttonText = useBreakpointValue({
+        base: 'Connect',
+        md: 'Connect Telegram'
+    });
+
     if (tGUserStore.user) {
         return (
             <Menu placement="bottom">
@@ -43,7 +49,7 @@ export const TgUserButton: FunctionComponent = observer(() => {
                 onClick={tGUserStore.login}
                 variant="secondary"
             >
-                Connect Telegram
+                {buttonText}
             </Button>
         );
     }
