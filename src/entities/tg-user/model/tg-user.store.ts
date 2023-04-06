@@ -31,6 +31,7 @@ class TGUserStore {
         const tgOAuthResponse = await loginViaTG();
 
         if (!tgOAuthResponse) {
+            this.isAuthProcess = false;
             return;
         }
 
