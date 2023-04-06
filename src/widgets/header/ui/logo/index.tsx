@@ -7,7 +7,7 @@ export const Logo: FunctionComponent<ComponentProps<typeof HStack>> = props => {
     return (
         <HStack as={Link} spacing="2" to="/" {...props}>
             <TonConsoleIcon />
-            <H4>Console</H4>
+            <H4 cursor="pointer">Console</H4>
         </HStack>
     );
 };

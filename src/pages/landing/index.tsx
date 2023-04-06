@@ -28,10 +28,8 @@ const LandingPage: FunctionComponent = () => {
                 >
                     <Heading mb="5">Connecting businesses to the TON ecosystem</Heading>
                     <Text textStyle="body1" mb={{ base: 8, md: 10 }} color="text.secondary">
-                        The TON ecosystem is a decentralized blockchain platform developed by
-                        Telegram. It has a range of features that make it attractive for businesses,
-                        including high throughput, low transaction fees, and a smart contract
-                        system.
+                        Launch a successful business with TON blockchain: manage dapps, tokens and
+                        payments in one place with powerful API and deep commercial integrations
                     </Text>
                     <Flex
                         direction={{ base: 'column', md: 'row' }}
