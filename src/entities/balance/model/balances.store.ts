@@ -8,6 +8,7 @@ import {
     getWindow,
     Loadable,
     serializeLoadableState,
+    subscribeToVisibilitychange,
     TonCurrencyAmount
 } from 'src/shared';
 import { projectsStore } from '../../project';
@@ -49,15 +50,28 @@ class BalancesStore {
                 }
             })
         );
+
+        let interval: ReturnType<typeof setInterval>;
+        subscribeToVisibilitychange(
+            () =>
+                (interval = setInterval(() => {
+                    if (projectsStore.selectedProject) {
+                        this.fetchBalancesAndRefills(true);
+                    }
+                }, 3000)),
+            () => clearInterval(interval)
+        );
     }
 
-    fetchBalancesAndRefills = async (): Promise<void> => {
+    fetchBalancesAndRefills = async (silently?: boolean): Promise<void> => {
         this.refills.error = null;
         this.balances.error = null;
 
         try {
-            this.refills.isLoading = true;
-            this.balances.isLoading = true;
+            if (!silently) {
+                this.refills.isLoading = true;
+                this.balances.isLoading = true;
+            }
 
             const response = await apiClient.api.getProjectDepositsHistory(
                 projectsStore.selectedProject!.id
@@ -67,11 +81,16 @@ class BalancesStore {
             this.balances.value = [new TonCurrencyAmount(response.data.balance!.balance)];
         } catch (e) {
             console.error(e);
-            this.refills.error = e;
-            this.balances.error = e;
+            if (!silently) {
+                this.refills.error = e;
+                this.balances.error = e;
+            }
         }
-        this.refills.isLoading = false;
-        this.balances.isLoading = false;
+
+        if (!silently) {
+            this.refills.isLoading = false;
+            this.balances.isLoading = false;
+        }
     };
 
     fetchDepositAddress = async (): Promise<void> => {

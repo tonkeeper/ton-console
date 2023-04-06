@@ -16,3 +16,22 @@ export function openLink(href: string, target = '_self'): void {
 export function openLinkBlank(href: string): void {
     openLink(href, '_blank');
 }
+
+export function subscribeToVisibilitychange(onFocus: () => void, onHide: () => void): void {
+    const document = getWindow()?.document;
+    if (!document) {
+        return;
+    }
+
+    if (!document.hidden) {
+        onFocus();
+    }
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            onFocus();
+        } else {
+            onHide();
+        }
+    });
+}
