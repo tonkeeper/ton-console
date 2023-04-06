@@ -1,4 +1,4 @@
-import { FunctionComponent, Suspense } from 'react';
+import { FunctionComponent, Suspense, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import TonapiRouting from 'src/pages/tonapi';
 import { lazy } from '@loadable/component';
@@ -14,6 +14,20 @@ const CreateFirstProjectPage = lazy(() => import('./create-first-project'));
 const BalancePage = lazy(() => import('./balance'));
 
 const Routing: FunctionComponent = () => {
+    // Scale layout for mobile devices until adaptive layout is not ready
+    useEffect(() => {
+        const metatag = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
+        if (!metatag) {
+            return;
+        }
+
+        if (!tGUserStore.user) {
+            metatag.content = 'width=device-width, initial-scale=1.0';
+        } else {
+            metatag.content = 'width=1350px';
+        }
+    }, [tGUserStore.user]);
+
     if (!tGUserStore.user) {
         return (
             <Routes>

@@ -8,6 +8,7 @@ export const Header: FunctionComponent<ComponentProps<typeof Flex>> = props => {
         <Flex
             as="header"
             align="center"
+            justify="space-between"
             h="68px"
             pr="6"
             pl="5"
