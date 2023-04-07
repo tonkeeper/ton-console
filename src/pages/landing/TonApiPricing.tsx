@@ -62,7 +62,10 @@ export const TonApiPricing: FunctionComponent<ComponentProps<typeof Flex>> = pro
                     <Text textStyle="label2" mb="3" color="text.primary">
                         {tier.name}
                     </Text>
-                    <H2 mb="4">{tier.price}</H2>
+                    <H2>{tier.price}</H2>
+                    <Text textStyle="body2" mb="4" color="text.secondary">
+                        per month
+                    </Text>
                     <List flex="1" spacing="2">
                         <ListItem display="flex">
                             <ListIcon as={TickIcon} color="accent.green" />
