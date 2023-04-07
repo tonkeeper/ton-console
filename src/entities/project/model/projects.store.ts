@@ -179,7 +179,7 @@ function mapProjectDtoToProject(projectDTO: DTOProject): Project {
         name: projectDTO.name,
         imgUrl: projectDTO.avatar,
         creationDate: new Date(projectDTO.date_create),
-        fallbackBackground: gradient(toColor(projectDTO.id ^ 127))
+        fallbackBackground: gradient(toColor(Math.abs(projectDTO.id ^ 127), { min: 30, max: 215 }))
     };
 }
 

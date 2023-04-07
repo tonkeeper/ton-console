@@ -1,5 +1,9 @@
-export function toColor(value: number): string {
-    value = value % 255;
+export function toColor(value: number, range?: { min?: number; max?: number }): string {
+    range ||= {} as { min: number; max: number };
+    range.min ||= 0;
+    range.max ||= 255;
+    const rangeLimit = range.max - range.min;
+    value = (value % rangeLimit) + range.min;
 
     const getComponent = (shift: 0 | 2 | 4): number =>
         Math.round(Math.sin(0.024 * value + shift) * 127 + 128);
