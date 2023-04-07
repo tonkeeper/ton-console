@@ -4,11 +4,11 @@ import {
     apiClient,
     DTOProject,
     getWindow,
-    createReaction,
     createAsyncAction,
     serializeState,
     deserializeState,
-    toColor
+    toColor,
+    createEffect
 } from 'src/shared';
 import { Project, CreateProjectFormValues } from './interfaces';
 import { tGUserStore } from 'src/entities';
@@ -40,16 +40,15 @@ class ProjectsStore {
                 }
             ],
             storage: getWindow()!.localStorage
-        }).then(this.fetchProjects);
-
-        createReaction(
-            () => tGUserStore.user,
-            user => {
-                if (!user) {
+        }).then(() => {
+            createEffect(() => {
+                if (tGUserStore.user) {
+                    this.fetchProjects();
+                } else {
                     this.clearState();
                 }
-            }
-        );
+            });
+        });
     }
 
     fetchProjects = async (): Promise<void> => {
@@ -179,7 +178,7 @@ function mapProjectDtoToProject(projectDTO: DTOProject): Project {
         name: projectDTO.name,
         imgUrl: projectDTO.avatar,
         creationDate: new Date(projectDTO.date_create),
-        fallbackBackground: gradient(toColor(Math.abs(projectDTO.id ^ 127), { min: 30, max: 215 }))
+        fallbackBackground: gradient(toColor(Math.abs(projectDTO.id ^ 255), { min: 30, max: 215 }))
     };
 }
 
