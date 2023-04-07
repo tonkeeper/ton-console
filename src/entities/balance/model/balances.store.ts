@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import {
     apiClient,
     createEffect,
+    createReaction,
     CurrencyAmount,
     deserializeLoadableState,
     DTODeposit,
@@ -14,6 +15,7 @@ import {
 import { projectsStore } from '../../project';
 import { Refill } from './interfaces';
 import { makePersistable } from 'mobx-persist-store';
+import { createStandaloneToast } from '@chakra-ui/react';
 
 class BalancesStore {
     balances = new Loadable<CurrencyAmount[]>([]);
@@ -60,6 +62,20 @@ class BalancesStore {
                     }
                 }, 3000)),
             () => clearInterval(interval)
+        );
+
+        createReaction(
+            () => this.balances.value?.[0],
+            (tonBalance, prevTonBalance) => {
+                if (tonBalance && prevTonBalance && tonBalance.isGT(prevTonBalance)) {
+                    const { toast } = createStandaloneToast();
+                    toast({
+                        title: 'Balance refilled successfully',
+                        status: 'success',
+                        isClosable: true
+                    });
+                }
+            }
         );
     }
 
@@ -119,10 +135,10 @@ class BalancesStore {
 
 function mapDTODepositToRefill(dtoDeposit: DTODeposit): Refill {
     return {
-        id: Math.random(), // TODO
-        date: new Date(dtoDeposit.date_create || Date.now()), // TODO
-        amount: new TonCurrencyAmount(dtoDeposit.balance),
-        fromAddress: dtoDeposit.address
+        id: new Date(dtoDeposit.income_date).getTime(),
+        date: new Date(dtoDeposit.income_date),
+        amount: new TonCurrencyAmount(dtoDeposit.amount),
+        fromAddress: dtoDeposit.source_address
     };
 }
 

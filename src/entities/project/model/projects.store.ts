@@ -135,12 +135,12 @@ class ProjectsStore {
             }
 
             const { toast } = createStandaloneToast();
-            toast({ title: 'Project deleted successfully', status: 'success', isClosable: true });
+            toast({ title: 'Project updated successfully', status: 'success', isClosable: true });
         },
         () => {
             const { toast } = createStandaloneToast();
             toast({
-                title: "Project wasn't deleted",
+                title: "Project wasn't updated",
                 description: 'Unknown api error happened. Try again later',
                 status: 'error',
                 isClosable: true

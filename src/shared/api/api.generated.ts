@@ -100,13 +100,16 @@ export interface DTOAppTier {
 
 export interface DTODeposit {
     /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
-    address: string;
-    /** @example "1000000" */
-    balance: string;
-    /** @example "TON" */
-    currency: string;
+    deposit_address: string;
+    /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
+    source_address: string;
     /** @example "2023-03-23" */
-    date_create?: string;
+    income_date: string;
+    /**
+     * @format int64
+     * @example 1000000000
+     */
+    amount: number;
 }
 
 export interface DTOCharge {

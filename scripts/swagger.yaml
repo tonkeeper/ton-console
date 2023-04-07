@@ -634,22 +634,24 @@ components:
     Deposit:
       type: object
       required:
-        - address
-        - balance
-        - currency
+        - deposit_address
+        - source_address
+        - income_date
+        - amount
       properties:
-        address:
+        deposit_address:
           type: string
           example: "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR"
-        balance:
+        source_address:
           type: string
-          example: "1000000"
-        currency:
-          type: string
-          example: "TON"
-        date_create:
+          example: "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR"
+        income_date:
           type: string
           example: "2023-03-23"
+        amount:
+          type: integer
+          format: int64
+          example: 1000000000
     Charge:
       type: object
       required:
