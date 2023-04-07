@@ -27,13 +27,27 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
             <Menu placement="bottom">
                 <MenuButton as={MenuButtonStyled} w="240px" rightIcon={<ArrowIcon />}>
                     <HStack spacing="2">
-                        <Image
-                            w="7"
-                            minW="7"
-                            h="7"
-                            borderRadius="sm"
-                            src={projectsStore.selectedProject.imgUrl}
-                        />
+                        {projectsStore.selectedProject.imgUrl ? (
+                            <Image
+                                w="7"
+                                minW="7"
+                                h="7"
+                                borderRadius="sm"
+                                src={projectsStore.selectedProject.imgUrl}
+                            />
+                        ) : (
+                            <Center
+                                w="7"
+                                minW="7"
+                                h="7"
+                                mr="2"
+                                color="constant.white"
+                                bg={projectsStore.selectedProject.fallbackBackground}
+                                borderRadius="sm"
+                            >
+                                {projectsStore.selectedProject.name[0]}
+                            </Center>
+                        )}
                         <Text textStyle="label2" noOfLines={1}>
                             {projectsStore.selectedProject.name}
                         </Text>
@@ -45,14 +59,28 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
                             key={project.id}
                             onClick={() => projectsStore.selectProject(project.id)}
                         >
-                            <Image
-                                w="7"
-                                minW="7"
-                                h="7"
-                                mr="2"
-                                borderRadius="sm"
-                                src={project.imgUrl}
-                            />
+                            {project.imgUrl ? (
+                                <Image
+                                    w="7"
+                                    minW="7"
+                                    h="7"
+                                    mr="2"
+                                    borderRadius="sm"
+                                    src={project.imgUrl}
+                                />
+                            ) : (
+                                <Center
+                                    w="7"
+                                    minW="7"
+                                    h="7"
+                                    mr="2"
+                                    color="constant.white"
+                                    bg={project.fallbackBackground}
+                                    borderRadius="sm"
+                                >
+                                    {project.name[0]}
+                                </Center>
+                            )}
                             <Text textStyle="label2" color="text.primary" noOfLines={1}>
                                 {project.name}
                             </Text>

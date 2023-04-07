@@ -7,7 +7,8 @@ import {
     createReaction,
     createAsyncAction,
     serializeState,
-    deserializeState
+    deserializeState,
+    toColor
 } from 'src/shared';
 import { Project, CreateProjectFormValues } from './interfaces';
 import { tGUserStore } from 'src/entities';
@@ -39,7 +40,7 @@ class ProjectsStore {
                 }
             ],
             storage: getWindow()!.localStorage
-        });
+        }).then(this.fetchProjects);
 
         createReaction(
             () => tGUserStore.user,
@@ -177,8 +178,13 @@ function mapProjectDtoToProject(projectDTO: DTOProject): Project {
         id: projectDTO.id,
         name: projectDTO.name,
         imgUrl: projectDTO.avatar,
-        creationDate: new Date(projectDTO.date_create)
+        creationDate: new Date(projectDTO.date_create),
+        fallbackBackground: gradient(toColor(projectDTO.id ^ 127))
     };
+}
+
+function gradient(color: string): string {
+    return `linear-gradient(27.61deg, ${color} -4.58%, ${color}60 107.4%)`;
 }
 
 export const projectsStore = new ProjectsStore();
