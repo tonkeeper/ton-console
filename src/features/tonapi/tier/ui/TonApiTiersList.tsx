@@ -64,9 +64,9 @@ const TonApiTiersList: FunctionComponent = () => {
                                 ) : (
                                     <Button
                                         w="100%"
-                                        /*isDisabled={
-                                            !!currentTier && currentTier.price.isGT(tier.price) // TODO включить перед релизом
-                                        }*/
+                                        isDisabled={
+                                            !!currentTier && currentTier.price.isGT(tier.price)
+                                        }
                                         onClick={() => onSelectTier(tier)}
                                         variant={tier.name === 'Pro' ? 'primary' : 'secondary'}
                                     >

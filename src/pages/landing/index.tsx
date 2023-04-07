@@ -1,6 +1,6 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 import { ButtonLink, DocsIcon16, EXTERNAL_LINKS, H1, H2, H3, Overlay, TgIcon } from 'src/shared';
-import { Button, Flex, Text, useBreakpointValue } from '@chakra-ui/react';
+import { Button, Flex, SlideFade, Text, useBreakpointValue } from '@chakra-ui/react';
 import { tGUserStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { TonApiPricing } from 'src/pages/landing/TonApiPricing';
@@ -11,6 +11,9 @@ const LandingPage: FunctionComponent = () => {
         md: H1,
         base: H2
     })!;
+
+    const [isOpen, seIsOpen] = useState(false);
+    useEffect(() => seIsOpen(true), []);
 
     return (
         <Overlay pt="0">
@@ -55,10 +58,12 @@ const LandingPage: FunctionComponent = () => {
                     </Flex>
                 </Flex>
                 <H3 mb="7">Pricing</H3>
-                <TonApiPricing
-                    mb={{ base: 8, md: 14, lg: 16 }}
-                    maxW={{ base: '648px', lg: 'unset' }}
-                />
+                <SlideFade transition={{ enter: { duration: 0.5 } }} in={isOpen} offsetY="-10px">
+                    <TonApiPricing
+                        mb={{ base: 8, md: 14, lg: 16 }}
+                        maxW={{ base: '648px', lg: 'unset' }}
+                    />
+                </SlideFade>
                 <Footer gap="6" />
             </Flex>
         </Overlay>
