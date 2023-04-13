@@ -1,42 +1,35 @@
-import { apiClient, createAsyncAction, createEffect, DTOToken } from 'src/shared';
+import { apiClient, createImmediateReaction, DTOToken, Loadable } from 'src/shared';
 import { EditApiKeyForm, ApiKey, CreateApiKeyForm } from './interfaces';
 import { projectsStore } from 'src/entities';
-import { createStandaloneToast } from '@chakra-ui/react';
 import { makeAutoObservable } from 'mobx';
 
 class ApiKeysStore {
-    apiKeys: ApiKey[] = [];
-
-    isLoading = false;
+    apiKeys$ = new Loadable<ApiKey[]>([]);
 
     constructor() {
         makeAutoObservable(this);
 
-        createEffect(() => {
-            if (projectsStore.selectedProject) {
-                this.fetchApiKeys();
-            } else {
-                this.clearStore();
+        createImmediateReaction(
+            () => projectsStore.selectedProject,
+            project => {
+                if (project) {
+                    this.fetchApiKeys();
+                } else {
+                    this.clearStore();
+                }
             }
-        });
+        );
     }
 
-    fetchApiKeys = async (): Promise<void> => {
-        this.isLoading = true;
-        try {
-            const response = await apiClient.api.getTonApiTokens({
-                project_id: projectsStore.selectedProject!.id
-            });
+    fetchApiKeys = this.apiKeys$.createAsyncAction(async () => {
+        const response = await apiClient.api.getTonApiTokens({
+            project_id: projectsStore.selectedProject!.id
+        });
 
-            this.apiKeys = response.data.items.map(mapApiTokenDTOToApiKey);
-        } catch (e) {
-            console.error(e);
-        }
+        return response.data.items.map(mapApiTokenDTOToApiKey);
+    });
 
-        this.isLoading = false;
-    };
-
-    createApiKey = createAsyncAction(
+    createApiKey = this.apiKeys$.createAsyncAction(
         async (form: CreateApiKeyForm) => {
             const response = await apiClient.api.generateTonApiProjectToken(
                 { project_id: projectsStore.selectedProject!.id },
@@ -44,28 +37,20 @@ class ApiKeysStore {
             );
 
             if (response.data.token) {
-                this.apiKeys.push(mapApiTokenDTOToApiKey(response.data.token));
+                this.apiKeys$.value.push(mapApiTokenDTOToApiKey(response.data.token));
             }
-
-            const { toast } = createStandaloneToast();
-            toast({
-                title: 'Api key has been created successfully',
-                status: 'success',
-                isClosable: true
-            });
         },
-        () => {
-            const { toast } = createStandaloneToast();
-            toast({
-                title: "Api key wasn't created",
-                description: 'Unknown api error happened. Try again later',
-                status: 'error',
-                isClosable: true
-            });
+        {
+            successToast: {
+                title: 'Api key has been created successfully'
+            },
+            errorToast: {
+                title: "Api key wasn't created"
+            }
         }
     );
 
-    editApiKey = createAsyncAction(
+    editApiKey = this.apiKeys$.createAsyncAction(
         async ({ id, name }: EditApiKeyForm) => {
             await apiClient.api.updateTonApiProjectToken(
                 id,
@@ -73,61 +58,42 @@ class ApiKeysStore {
                 { name }
             );
 
-            const key = this.apiKeys.find(item => item.id === id);
+            const key = this.apiKeys$.value.find(item => item.id === id);
 
             if (key) {
                 key.name = name;
             }
-
-            const { toast } = createStandaloneToast();
-            toast({
-                title: 'Api key has been modified successfully',
-                status: 'success',
-                isClosable: true
-            });
         },
-        () => {
-            const { toast } = createStandaloneToast();
-            toast({
-                title: "Api key wasn't modified",
-                description: 'Unknown api error happened. Try again later',
-                status: 'error',
-                isClosable: true
-            });
+        {
+            successToast: {
+                title: 'Api key has been modified successfully'
+            },
+            errorToast: {
+                title: "Api key wasn't modified"
+            }
         }
     );
 
-    deleteApiKey = createAsyncAction(
+    deleteApiKey = this.apiKeys$.createAsyncAction(
         async (id: number) => {
-            await new Promise(r => setTimeout(r, 1500));
-
             await apiClient.api.deleteTonApiProjectToken(id, {
                 project_id: projectsStore.selectedProject!.id
             });
 
-            this.apiKeys = this.apiKeys.filter(item => item.id !== id);
-
-            const { toast } = createStandaloneToast();
-            toast({
-                title: 'Api key has been deleted successfully',
-                status: 'success',
-                isClosable: true
-            });
+            return this.apiKeys$.value.filter(item => item.id !== id);
         },
-        () => {
-            const { toast } = createStandaloneToast();
-            toast({
-                title: "Api key wasn't deleted",
-                description: 'Unknown api error happened. Try again later',
-                status: 'error',
-                isClosable: true
-            });
+        {
+            successToast: {
+                title: 'Api key has been deleted successfully'
+            },
+            errorToast: {
+                title: "Api key wasn't deleted"
+            }
         }
     );
 
     clearStore(): void {
-        this.isLoading = false;
-        this.apiKeys = [];
+        this.apiKeys$.clear();
     }
 }
 

@@ -21,14 +21,14 @@ const Routing: FunctionComponent = () => {
             return;
         }
 
-        if (!tGUserStore.user) {
+        if (!tGUserStore.user$.value) {
             metatag.content = 'width=device-width, initial-scale=1.0';
         } else {
             metatag.content = 'width=1350px';
         }
-    }, [tGUserStore.user]);
+    }, [tGUserStore.user$.value]);
 
-    if (!tGUserStore.user) {
+    if (!tGUserStore.user$.value) {
         return (
             <Routes>
                 <Route path="/" element={<LayoutSolid />}>

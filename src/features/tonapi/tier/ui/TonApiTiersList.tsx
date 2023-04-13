@@ -1,6 +1,6 @@
 import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, Flex, useDisclosure } from '@chakra-ui/react';
+import { Button, Center, Flex, Spinner, useDisclosure } from '@chakra-ui/react';
 import TonApiPaymentDetailsModal from './TonApiPaymentDetailsModal';
 import { TonApiTier, tonApiTiersStore } from '../model';
 import { TonApiTierCard } from './TonApiTierCard';
@@ -16,8 +16,8 @@ const TonApiTiersList: FunctionComponent = () => {
     } = useDisclosure();
 
     const tonBalance = useMemo(() => {
-        return balanceStore.balances.value[0] || null;
-    }, [balanceStore.balances.value]);
+        return balanceStore.balances[0] || null;
+    }, [balanceStore.balances]);
 
     const onSelectTier = useCallback(
         (tier: TonApiTier) => {
@@ -34,16 +34,20 @@ const TonApiTiersList: FunctionComponent = () => {
         setSelectedTier(undefined);
     }, []);
 
-    const currentTier = tonApiTiersStore.selectedTier.value;
-
-    if (tonApiTiersStore.tiers.isLoading || balanceStore.balances.isLoading) {
-        return null;
+    if (!tonApiTiersStore.tiers$.isResolved || !tonApiTiersStore.selectedTier$.isResolved) {
+        return (
+            <Center h="360px">
+                <Spinner />
+            </Center>
+        );
     }
+
+    const currentTier = tonApiTiersStore.selectedTier$.value;
 
     return (
         <>
             <Flex gap="4">
-                {tonApiTiersStore.tiers.value.map(tier => {
+                {tonApiTiersStore.tiers$.value.map(tier => {
                     const isCurrentSubscription = currentTier?.id === tier.id;
 
                     return (

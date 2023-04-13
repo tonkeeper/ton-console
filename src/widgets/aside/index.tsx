@@ -23,9 +23,9 @@ const Aside: FunctionComponent = () => {
                     <Text textStyle="label2" color="text.primary">
                         Balance
                     </Text>
-                    {balanceStore.balances.value[0] && (
+                    {balanceStore.balances[0] && (
                         <Text textStyle="body3" color="text.secondary">
-                            {balanceStore.balances.value[0].stringCurrencyAmount}
+                            {balanceStore.balances[0].stringCurrencyAmount}
                         </Text>
                     )}
                 </Flex>

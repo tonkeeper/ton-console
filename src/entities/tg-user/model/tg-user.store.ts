@@ -1,60 +1,45 @@
 import { makeAutoObservable } from 'mobx';
-import { loginViaTG } from './telegram-oauth';
+import { loginViaTG, TGLoginData } from './telegram-oauth';
 import { TgUser } from './interfaces/tg-user';
-import { makePersistable } from 'mobx-persist-store';
-import { apiClient, deserializeState, getWindow, serializeState } from 'src/shared';
-import { projectsStore } from 'src/entities/project';
+import { apiClient, Loadable } from 'src/shared';
+import { projectsStore } from 'src/entities';
 
 class TGUserStore {
-    user: TgUser | null = null;
-
-    isAuthProcess = false;
+    user$ = new Loadable<TgUser | null>(null, { makePersistableAs: 'TGUser' });
 
     constructor() {
         makeAutoObservable(this);
-
-        makePersistable(this, {
-            name: 'TGUserStore',
-            properties: [
-                {
-                    key: 'user',
-                    serialize: serializeState,
-                    deserialize: deserializeState
-                }
-            ],
-            storage: getWindow()!.localStorage
-        });
     }
 
-    login = async (): Promise<void> => {
-        this.isAuthProcess = true;
+    login = this.user$.createAsyncAction(async () => {
         const tgOAuthResponse = await loginViaTG();
 
         if (!tgOAuthResponse) {
-            this.isAuthProcess = false;
             return;
         }
 
         await apiClient.api.authViaTg(tgOAuthResponse);
 
-        await projectsStore.fetchProjects();
-
-        this.user = {
-            id: tgOAuthResponse.id,
-            firstName: tgOAuthResponse.first_name,
-            lastName: tgOAuthResponse.last_name,
-            imageUrl: tgOAuthResponse.photo_url
-        };
-        this.isAuthProcess = false;
-    };
-
-    logout = async (): Promise<void> => {
-        try {
-            await apiClient.api.accountLogout();
-        } catch (e) {
-            console.log(e);
+        await projectsStore.fetchProjects(); // TODO вынести в стор-фасад для авторизации
+        if (projectsStore.projects$.value.length) {
+            projectsStore.selectProject(projectsStore.projects$.value[0].id);
         }
-        this.user = null;
+
+        this.user$.value = mapTgUserDTOToTgUser(tgOAuthResponse);
+    });
+
+    logout = this.user$.createAsyncAction(async () => {
+        await apiClient.api.accountLogout();
+        this.user$.value = null;
+    });
+}
+
+function mapTgUserDTOToTgUser(userDTO: TGLoginData): TgUser {
+    return {
+        id: userDTO.id,
+        firstName: userDTO.first_name,
+        lastName: userDTO.last_name,
+        imageUrl: userDTO.photo_url
     };
 }
 

@@ -5,15 +5,15 @@ import { Subscription } from 'src/widgets/subscriptions/model/interfaces/subscri
 
 class SubscriptionsStore {
     get subscriptions(): Subscription[] {
-        if (tonApiTiersStore.selectedTier.value) {
-            return [mapTonapiTierToSubscription(tonApiTiersStore.selectedTier.value)];
+        if (tonApiTiersStore.selectedTier$.value) {
+            return [mapTonapiTierToSubscription(tonApiTiersStore.selectedTier$.value)];
         }
 
         return [];
     }
 
     get subscriptionsLoading(): boolean {
-        return tonApiTiersStore.selectedTier.isLoading;
+        return tonApiTiersStore.selectedTier$.isLoading;
     }
 
     constructor() {

@@ -11,7 +11,7 @@ import { balanceStore } from 'src/entities';
 
 class BillingStore {
     get billingHistory(): BillingHistory {
-        const refills: BillingHistoryRefillItem[] = balanceStore.refills.value.map(item => ({
+        const refills: BillingHistoryRefillItem[] = balanceStore.refills.map(item => ({
             ...item,
             action: 'refill'
         }));
@@ -23,15 +23,15 @@ class BillingStore {
     }
 
     get billingHistoryLoading(): boolean {
-        return this.paymentsHistoryLoading || balanceStore.refills.isLoading;
+        return this.paymentsHistoryLoading || balanceStore.portfolio$.isLoading;
     }
 
     private get paymentsHistory(): Payment[] {
-        return tonApiTiersStore.paymentsHistory.value.map(mapTonapiPaymentToPayment);
+        return tonApiTiersStore.paymentsHistory$.value.map(mapTonapiPaymentToPayment);
     }
 
     private get paymentsHistoryLoading(): boolean {
-        return tonApiTiersStore.paymentsHistory.isLoading;
+        return tonApiTiersStore.paymentsHistory$.isLoading;
     }
 
     constructor() {
@@ -39,10 +39,7 @@ class BillingStore {
     }
 
     fetchBillingHistory = createAsyncAction(async () => {
-        await Promise.all([
-            balanceStore.fetchBalancesAndRefills(),
-            tonApiTiersStore.fetchPaymentsHistory()
-        ]);
+        await Promise.all([balanceStore.fetchPortfolio(), tonApiTiersStore.fetchPaymentsHistory()]);
     });
 }
 

@@ -9,15 +9,15 @@ import { SelectPlanFirstly } from 'src/pages/tonapi/api-keys/SelectPlanFirstly';
 const ApiKeysPage: FunctionComponent = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    if (tonApiTiersStore.selectedTier.isLoading) {
-        return <>Loading ...</>;
+    if (!tonApiTiersStore.selectedTier$.isResolved || !apiKeysStore.apiKeys$.isResolved) {
+        return null;
     }
 
-    if (!tonApiTiersStore.selectedTier.value) {
+    if (!tonApiTiersStore.selectedTier$.value) {
         return <SelectPlanFirstly />;
     }
 
-    if (!apiKeysStore.apiKeys.length) {
+    if (!apiKeysStore.apiKeys$.value.length) {
         return <EmptyApiKeys />;
     }
 

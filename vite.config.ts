@@ -45,7 +45,10 @@ export default ({ mode }) => {
                     target: VITE_BASE_PROXY_URL,
                     changeOrigin: true,
                     secure: true,
-                    cookiePathRewrite: '/'
+                    cookiePathRewrite: '/',
+                    headers: {
+                        Connection: 'keep-alive'
+                    }
                 }
             }
         },
