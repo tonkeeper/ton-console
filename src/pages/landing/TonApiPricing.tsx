@@ -4,6 +4,18 @@ import { H2, TickIcon } from 'src/shared';
 
 const tiers = [
     {
+        name: 'Start',
+        price: 'FREE',
+        included: {
+            requestsPerSecondLimit: 0.25,
+            subscription: {
+                connectionsLimit: 1,
+                accountsLimit: 5
+            },
+            webhooks: false
+        }
+    },
+    {
         name: 'Lite',
         price: '1 TON',
         included: {
