@@ -1,10 +1,14 @@
-import { FunctionComponent, useEffect, useState } from 'react';
+import { ComponentProps, FunctionComponent, useEffect, useState } from 'react';
 import { ButtonLink, DocsIcon16, EXTERNAL_LINKS, H1, H2, H3, Overlay, TgIcon } from 'src/shared';
 import { Button, Flex, SlideFade, Text, useBreakpointValue } from '@chakra-ui/react';
 import { tGUserStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { TonApiPricing } from 'src/pages/landing/TonApiPricing';
 import { Footer } from 'src/widgets';
+
+const SlideFadeTransition: FunctionComponent<ComponentProps<typeof SlideFade>> = props => (
+    <SlideFade transition={{ enter: { duration: 0.5 } }} {...props} />
+);
 
 const LandingPage: FunctionComponent = () => {
     const Heading = useBreakpointValue({
@@ -17,7 +21,7 @@ const LandingPage: FunctionComponent = () => {
 
     return (
         <Overlay pt="0">
-            <Flex align="center" direction="column" h="100%">
+            <Flex align="center" direction="column" maxW="1440px" h="100%" mx="auto">
                 <Flex
                     align="center"
                     justify="center"
@@ -58,12 +62,14 @@ const LandingPage: FunctionComponent = () => {
                     </Flex>
                 </Flex>
                 <H3 mb="7">Pricing</H3>
-                <SlideFade transition={{ enter: { duration: 0.5 } }} in={isOpen} offsetY="-10px">
-                    <TonApiPricing
-                        mb={{ base: 8, md: 14, lg: 16 }}
-                        maxW={{ base: '648px', lg: 'unset' }}
-                    />
-                </SlideFade>
+                <TonApiPricing
+                    as={SlideFadeTransition}
+                    w="100%"
+                    in={isOpen}
+                    offsetY="-10px"
+                    mb={{ base: 8, md: 14, lg: 16 }}
+                    px={{ base: 0, md: 10 }}
+                />
                 <Footer gap="6" />
             </Flex>
         </Overlay>

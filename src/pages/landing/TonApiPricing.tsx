@@ -1,5 +1,5 @@
 import { ComponentProps, FunctionComponent } from 'react';
-import { Box, Flex, List, ListIcon, ListItem, Text } from '@chakra-ui/react';
+import { Box, Grid, List, ListIcon, ListItem, Text } from '@chakra-ui/react';
 import { H2, TickIcon } from 'src/shared';
 
 const tiers = [
@@ -53,19 +53,23 @@ const tiers = [
     }
 ];
 
-export const TonApiPricing: FunctionComponent<ComponentProps<typeof Flex>> = props => {
+export const TonApiPricing: FunctionComponent<ComponentProps<typeof Grid>> = props => {
     return (
-        <Flex
+        <Grid
             gap="4"
             {...props}
             justify="center"
-            direction={{ base: 'column', lg: 'row' }}
+            templateColumns="repeat(4, 1fr)"
             w="100%"
+            gridTemplate={{
+                base: 'auto / 1fr',
+                lg: '1fr 1fr / 1fr 1fr',
+                xl: '1fr / repeat(4, 1fr)'
+            }}
         >
             {tiers.map(tier => (
                 <Box
                     key={tier.name}
-                    w={{ base: '100%', lg: '310px' }}
                     px="6"
                     py="5"
                     borderRadius="lg"
@@ -104,6 +108,6 @@ export const TonApiPricing: FunctionComponent<ComponentProps<typeof Flex>> = pro
                     </List>
                 </Box>
             ))}
-        </Flex>
+        </Grid>
     );
 };
