@@ -25,7 +25,18 @@ export class Loadable<T> {
         );
     }
 
-    constructor(value: T, options?: { makePersistableAs?: string }) {
+    constructor(
+        value: T,
+        options?: {
+            makePersistable?:
+                | {
+                      storeKey: string;
+                      notModifyStatusBefore?: boolean;
+                      notModifyStatusAfter?: boolean;
+                  }
+                | string;
+        }
+    ) {
         this.defaultValue = value;
         this.value = value;
 
@@ -41,9 +52,25 @@ export class Loadable<T> {
             value: observable
         });
 
-        if (options?.makePersistableAs) {
+        if (options?.makePersistable) {
+            let storeKey: string;
+            let modifyStatusBefore = true;
+            let modifyStatusAfter = true;
+
+            if (typeof options.makePersistable === 'string') {
+                storeKey = options.makePersistable;
+            } else {
+                storeKey = options.makePersistable.storeKey;
+                modifyStatusBefore = !options.makePersistable.notModifyStatusBefore;
+                modifyStatusAfter = !options.makePersistable.notModifyStatusAfter;
+            }
+
+            if (modifyStatusBefore) {
+                this.state = 'pending';
+            }
+
             this.persistableResolved = makePersistable(this, {
-                name: options.makePersistableAs,
+                name: storeKey,
                 properties: [
                     {
                         key: 'value',
@@ -53,6 +80,10 @@ export class Loadable<T> {
                 ],
                 storage: getWindow()!.localStorage
             }) as unknown as Promise<void>;
+
+            if (modifyStatusAfter) {
+                this.persistableResolved.then(() => (this.state = 'ready'));
+            }
         } else {
             this.persistableResolved = Promise.resolve();
         }
