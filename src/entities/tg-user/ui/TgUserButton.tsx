@@ -20,16 +20,21 @@ export const TgUserButton: FunctionComponent = observer(() => {
         md: 'Connect Telegram'
     });
 
-    if (tGUserStore.user) {
+    if (tGUserStore.user$.value) {
         return (
             <Menu placement="bottom">
                 <MenuButton as={MenuButtonStyled} maxW="200px" rightIcon={<ArrowIcon />}>
                     <HStack spacing="2">
-                        {tGUserStore.user.imageUrl && (
-                            <Image w="7" h="7" borderRadius="100" src={tGUserStore.user.imageUrl} />
+                        {tGUserStore.user$.value.imageUrl && (
+                            <Image
+                                w="7"
+                                h="7"
+                                borderRadius="100"
+                                src={tGUserStore.user$.value.imageUrl}
+                            />
                         )}
                         <Text textStyle="label2" noOfLines={1}>
-                            {tGUserStore.user.firstName} {tGUserStore.user.lastName}
+                            {tGUserStore.user$.value.firstName} {tGUserStore.user$.value.lastName}
                         </Text>
                     </HStack>
                 </MenuButton>
@@ -44,7 +49,7 @@ export const TgUserButton: FunctionComponent = observer(() => {
     } else {
         return (
             <Button
-                isLoading={tGUserStore.isAuthProcess}
+                isLoading={tGUserStore.user$.isLoading}
                 leftIcon={<TgIcon />}
                 onClick={tGUserStore.login}
                 variant="secondary"

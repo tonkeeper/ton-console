@@ -1,54 +1,42 @@
 import { makeAutoObservable } from 'mobx';
 import {
     apiClient,
-    createEffect,
+    createImmediateReaction,
     CurrencyAmount,
-    deserializeLoadableState,
     DTODeposit,
-    getWindow,
     Loadable,
-    serializeLoadableState,
     subscribeToVisibilitychange,
     TonCurrencyAmount
 } from 'src/shared';
 import { projectsStore } from '../../project';
-import { Refill } from './interfaces';
-import { makePersistable } from 'mobx-persist-store';
+import { Portfolio, Refill } from './interfaces';
 
 class BalancesStore {
-    balances = new Loadable<CurrencyAmount[]>([]);
+    portfolio$ = new Loadable<Portfolio | null>(null);
 
-    depositAddress = new Loadable<string | undefined>(undefined);
+    depositAddress$ = new Loadable<string | undefined>(undefined);
 
-    refills = new Loadable<Refill[]>([]);
+    get balances(): CurrencyAmount[] {
+        return this.portfolio$.value?.balances || [];
+    }
+
+    get refills(): Refill[] {
+        return this.portfolio$.value?.refills || [];
+    }
 
     constructor() {
         makeAutoObservable(this);
 
-        makePersistable(this, {
-            name: 'BalancesStore',
-            properties: [
-                {
-                    key: 'balances',
-                    serialize: serializeLoadableState,
-                    deserialize: deserializeLoadableState
-                },
-                {
-                    key: 'refills',
-                    serialize: serializeLoadableState,
-                    deserialize: deserializeLoadableState
-                }
-            ],
-            storage: getWindow()!.localStorage
-        }).then(() =>
-            createEffect(() => {
-                if (projectsStore.selectedProject) {
+        createImmediateReaction(
+            () => projectsStore.selectedProject,
+            project => {
+                if (project) {
                     this.fetchDepositAddress();
-                    this.fetchBalancesAndRefills();
+                    this.fetchPortfolio();
                 } else {
                     this.clearState();
                 }
-            })
+            }
         );
 
         let interval: ReturnType<typeof setInterval>;
@@ -56,65 +44,34 @@ class BalancesStore {
             () =>
                 (interval = setInterval(() => {
                     if (projectsStore.selectedProject) {
-                        this.fetchBalancesAndRefills(true);
+                        this.fetchPortfolio({ silently: true });
                     }
                 }, 3000)),
             () => clearInterval(interval)
         );
     }
 
-    fetchBalancesAndRefills = async (silently?: boolean): Promise<void> => {
-        this.refills.error = null;
-        this.balances.error = null;
+    fetchPortfolio = this.portfolio$.createAsyncAction(async () => {
+        const response = await apiClient.api.getProjectDepositsHistory(
+            projectsStore.selectedProject!.id
+        );
 
-        try {
-            if (!silently) {
-                this.refills.isLoading = true;
-                this.balances.isLoading = true;
-            }
+        return {
+            balances: [new TonCurrencyAmount(response.data.balance.balance)],
+            refills: response.data.history.map(mapDTODepositToRefill)
+        };
+    });
 
-            const response = await apiClient.api.getProjectDepositsHistory(
-                projectsStore.selectedProject!.id
-            );
+    fetchDepositAddress = this.depositAddress$.createAsyncAction(async () => {
+        const response = await apiClient.api.getDepositAddress(projectsStore.selectedProject!.id);
 
-            this.refills.value = response.data.history.map(mapDTODepositToRefill);
-            this.balances.value = [new TonCurrencyAmount(response.data.balance!.balance)];
-        } catch (e) {
-            console.error(e);
-            if (!silently) {
-                this.refills.error = e;
-                this.balances.error = e;
-            }
-        }
+        return response.data.ton_deposit_wallet;
+    });
 
-        if (!silently) {
-            this.refills.isLoading = false;
-            this.balances.isLoading = false;
-        }
+    clearState = (): void => {
+        this.portfolio$.clear();
+        this.depositAddress$.clear();
     };
-
-    fetchDepositAddress = async (): Promise<void> => {
-        this.depositAddress.error = null;
-
-        try {
-            this.depositAddress.isLoading = true;
-            const response = await apiClient.api.getDepositAddress(
-                projectsStore.selectedProject!.id
-            );
-
-            this.depositAddress.value = response.data.ton_deposit_wallet;
-        } catch (e) {
-            console.error(e);
-            this.depositAddress.error = e;
-        }
-        this.depositAddress.isLoading = false;
-    };
-
-    private clearState(): void {
-        this.balances.clear();
-        this.refills.clear();
-        this.depositAddress.clear();
-    }
 }
 
 function mapDTODepositToRefill(dtoDeposit: DTODeposit): Refill {

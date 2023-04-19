@@ -19,7 +19,7 @@ const RefillModal: FunctionComponent<{
     isOpen: boolean;
     onClose: () => void;
 }> = props => {
-    const depositAddress = balanceStore.depositAddress.value;
+    const depositAddress = balanceStore.depositAddress$.value;
     return (
         <Modal scrollBehavior="inside" size="md" {...props}>
             <ModalOverlay />

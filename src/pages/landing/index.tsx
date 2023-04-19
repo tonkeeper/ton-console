@@ -40,7 +40,7 @@ const LandingPage: FunctionComponent = () => {
                         w={{ base: '100%', md: 'auto' }}
                     >
                         <Button
-                            isLoading={tGUserStore.isAuthProcess}
+                            isLoading={tGUserStore.user$.isLoading}
                             leftIcon={<TgIcon color="constant.white" />}
                             onClick={tGUserStore.login}
                             variant="primary"

@@ -27,11 +27,11 @@ const BalancePage: FunctionComponent = () => {
             <Overlay h="fit-content" p="0">
                 <Box pt="5" pb="6" px="6">
                     <H2 mb="5" display="flex" alignItems="center" gap="2">
-                        {balanceStore.balances.isLoading ? (
+                        {balanceStore.portfolio$.isLoading ? (
                             <Skeleton w="60px" h="6" />
                         ) : (
                             <chakra.span minW="60px" textAlign="center">
-                                {balanceStore.balances.value[0]?.stringAmount}
+                                {balanceStore.balances[0]?.stringAmount}
                             </chakra.span>
                         )}{' '}
                         TON

@@ -54,7 +54,7 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
                     </HStack>
                 </MenuButton>
                 <MenuList zIndex={100} w="256px">
-                    {projectsStore.projects.map(project => (
+                    {projectsStore.projects$.value.map(project => (
                         <MenuItem
                             key={project.id}
                             onClick={() => projectsStore.selectProject(project.id)}

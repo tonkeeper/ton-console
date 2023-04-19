@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, untracked } from 'mobx';
 import {
     apiClient,
     DTOTier,
@@ -7,102 +7,78 @@ import {
     Loadable,
     DTOAppTier,
     DTOCharge,
-    createAsyncAction
+    createImmediateReaction
 } from 'src/shared';
 import { TonApiPayment, TonApiTier } from './interfaces';
 import { projectsStore, tGUserStore } from 'src/entities';
 import { TonApiSelectedTier } from './interfaces';
-import { createStandaloneToast } from '@chakra-ui/react';
 
 class TonApiTiersStore {
-    tiers = new Loadable<TonApiTier[]>([]);
+    tiers$ = new Loadable<TonApiTier[]>([]);
 
-    selectedTier = new Loadable<TonApiSelectedTier | null>(null);
+    selectedTier$ = new Loadable<TonApiSelectedTier | null>(null);
 
-    paymentsHistory = new Loadable<TonApiPayment[]>([]);
+    paymentsHistory$ = new Loadable<TonApiPayment[]>([]);
 
     constructor() {
         makeAutoObservable(this);
 
-        createEffect(() => {
-            if (tGUserStore.user) {
-                this.fetchTiers();
-            } else {
-                this.clearState();
+        createImmediateReaction(
+            () => tGUserStore.user$.value,
+            user => {
+                if (user) {
+                    this.fetchTiers();
+                } else {
+                    this.clearState();
+                }
             }
-        });
+        );
+
+        createImmediateReaction(
+            () => projectsStore.selectedProject,
+            project => {
+                if (project) {
+                    this.fetchSelectedTier();
+                } else {
+                    this.selectedTier$.clear();
+                }
+            }
+        );
 
         createEffect(() => {
-            if (projectsStore.selectedProject) {
-                this.fetchSelectedTier();
+            if (this.tiers$.isResolved && projectsStore.selectedProjectId) {
+                untracked(this.fetchPaymentsHistory);
             } else {
-                this.selectedTier.clear();
-            }
-        });
-
-        createEffect(() => {
-            if (this.tiers.value && projectsStore.selectedProject) {
-                this.fetchPaymentsHistory();
-            } else {
-                this.paymentsHistory.clear();
+                this.paymentsHistory$.clear();
             }
         });
     }
 
-    fetchTiers = async (): Promise<void> => {
-        this.tiers.isLoading = true;
-        this.tiers.error = null;
+    fetchTiers = this.tiers$.createAsyncAction(async () => {
+        const tiers = await apiClient.api.getTonApiTiers();
+        return tiers.data.items.map(mapTierDTOToTier);
+    });
 
-        try {
-            const tiers = await apiClient.api.getTonApiTiers();
-            this.tiers.value = tiers.data.items.map(mapTierDTOToTier);
-        } catch (e) {
-            console.error(e);
-            this.tiers.error = e;
-        }
+    fetchSelectedTier = this.selectedTier$.createAsyncAction(async () => {
+        const response = await apiClient.api.getTonApiProjectTier({
+            project_id: projectsStore.selectedProject!.id
+        });
 
-        this.tiers.isLoading = false;
-    };
+        return mapAppTierDTOToSelectedTier(response.data.tier);
+    });
 
-    fetchSelectedTier = async (): Promise<void> => {
-        this.selectedTier.isLoading = true;
+    fetchPaymentsHistory = this.paymentsHistory$.createAsyncAction(async () => {
+        const response = await apiClient.api.getTonApiPaymentsHistory({
+            project_id: projectsStore.selectedProject!.id
+        });
 
-        try {
-            const response = await apiClient.api.getTonApiProjectTier({
-                project_id: projectsStore.selectedProject!.id
-            });
+        return response.data.history
+            .map(payment => mapDTOPaymentToTonApiPayment(this.tiers$.value, payment))
+            .filter(i => !!i) as TonApiPayment[];
+    });
 
-            this.selectedTier.value = mapAppTierDTOToSelectedTier(response.data.tier);
-        } catch (e) {
-            console.error(e);
-            this.selectedTier.error = e;
-        }
-
-        this.selectedTier.isLoading = false;
-    };
-
-    fetchPaymentsHistory = async (): Promise<void> => {
-        this.paymentsHistory.isLoading = true;
-
-        try {
-            const response = await apiClient.api.getTonApiPaymentsHistory({
-                project_id: projectsStore.selectedProject!.id
-            });
-
-            this.paymentsHistory.value = response.data.history
-                .map(payment => mapDTOPaymentToTonApiPayment(this.tiers.value, payment))
-                .filter(i => !!i) as TonApiPayment[];
-        } catch (e) {
-            console.error(e);
-            this.paymentsHistory.error = e;
-        }
-
-        this.paymentsHistory.isLoading = false;
-    };
-
-    selectTier = createAsyncAction(
+    selectTier = this.selectedTier$.createAsyncAction(
         async (tierId: number) => {
-            this.selectedTier.isLoading = true;
             const result = await apiClient.api.updateTonApiTier(
                 { project_id: projectsStore.selectedProject!.id },
                 {
@@ -110,29 +86,22 @@ class TonApiTiersStore {
                 }
             );
 
-            this.selectedTier.value = mapAppTierDTOToSelectedTier(result.data.tier);
-            this.selectedTier.isLoading = false;
-
-            const { toast } = createStandaloneToast();
-            toast({ title: 'Successful purchase', status: 'success', isClosable: true });
+            return mapAppTierDTOToSelectedTier(result.data.tier);
         },
-        e => {
-            console.error(e);
-            this.selectedTier.isLoading = false;
-
-            const { toast } = createStandaloneToast();
-            toast({
-                title: 'Unsuccessful purchase',
-                description: 'Unknown api error happened. Try again later',
-                status: 'error',
-                isClosable: true
-            });
+        {
+            successToast: {
+                title: 'Successful purchase'
+            },
+            errorToast: {
+                title: 'Unsuccessful purchase'
+            }
         }
     );
 
     clearState(): void {
-        this.tiers.clear();
-        this.selectedTier.clear();
+        this.tiers$.clear();
+        this.selectedTier$.clear();
+        this.paymentsHistory$.clear();
     }
 }
 

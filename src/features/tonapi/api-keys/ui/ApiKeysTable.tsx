@@ -71,7 +71,7 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {apiKeysStore.apiKeys.map(apiKey => (
+                        {apiKeysStore.apiKeys$.value.map(apiKey => (
                             <Tr key={apiKey.id}>
                                 <Td overflow="hidden" maxW="200px" textOverflow="ellipsis">
                                     {apiKey.name}

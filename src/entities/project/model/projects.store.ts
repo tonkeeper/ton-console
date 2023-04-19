@@ -4,82 +4,98 @@ import {
     apiClient,
     DTOProject,
     getWindow,
-    createAsyncAction,
     serializeState,
     deserializeState,
     toColor,
-    createEffect
+    Loadable,
+    replaceIfNotEqual,
+    createImmediateReaction
 } from 'src/shared';
 import { Project, CreateProjectFormValues } from './interfaces';
 import { tGUserStore } from 'src/entities';
-import { createStandaloneToast } from '@chakra-ui/react';
 import { UpdateProjectFormValues } from 'src/entities/project/model/interfaces/update-project-form-values';
 
 class ProjectsStore {
-    projects: Project[] = [];
+    projects$ = new Loadable<Project[]>([], { makePersistableAs: 'Projects' });
 
-    selectedProject: Project | null = null;
+    selectedProjectId: number | null = null;
 
-    isLoading = false;
+    get selectedProject(): Project | null {
+        if (this.selectedProjectId == null) {
+            return null;
+        }
+
+        return this.projects$.value.find(project => project.id === this.selectedProjectId) || null;
+    }
 
     constructor() {
         makeAutoObservable(this);
 
         makePersistable(this, {
-            name: 'ProjectsStore',
+            name: 'SelectedProject',
             properties: [
                 {
-                    key: 'projects',
-                    serialize: serializeState,
-                    deserialize: deserializeState
-                },
-                {
-                    key: 'selectedProject',
+                    key: 'selectedProjectId',
                     serialize: serializeState,
                     deserialize: deserializeState
                 }
             ],
             storage: getWindow()!.localStorage
         }).then(() => {
-            createEffect(() => {
-                if (tGUserStore.user) {
-                    this.fetchProjects();
-                } else {
-                    this.clearState();
-                }
-            });
+            createImmediateReaction(
+                () => tGUserStore.user$.value,
+                async user => {
+                    if (user) {
+                        await this.fetchProjects();
+
+                        if (this.selectedProjectId == null && this.projects$.value.length) {
+                            this.selectProject(this.projects$.value[0].id);
+                        }
+                    } else {
+                        this.clearState();
+                    }
+                },
+                { fireImmediately: true }
+            );
         });
     }
 
-    fetchProjects = async (): Promise<void> => {
-        this.isLoading = true;
+    fetchProjects = this.projects$.createAsyncAction(async () => {
+        const response = await apiClient.api.getProjects();
 
-        try {
-            const projects = await apiClient.api.getProjects();
-
-            this.projects = projects.data.items.map(mapProjectDtoToProject);
-
-            if (this.projects.length) {
-                this.selectProject(this.projects[0].id);
+        response.data.items.map(mapProjectDtoToProject).forEach(project => {
+            const existingProject = this.projects$.value.find(item => item.id === project.id);
+            if (existingProject) {
+                replaceIfNotEqual(existingProject, 'name', project.name);
+                replaceIfNotEqual(existingProject, 'imgUrl', project.imgUrl);
+                replaceIfNotEqual(
+                    existingProject,
+                    'fallbackBackground',
+                    project.fallbackBackground
+                );
+                replaceIfNotEqual(
+                    existingProject,
+                    'creationDate',
+                    project.creationDate,
+                    (a, b) => a.getTime() === b.getTime()
+                );
+            } else {
+                this.projects$.value.push(project);
             }
-        } catch (e) {
-            console.error(e);
-        }
-
-        this.isLoading = false;
-    };
+        });
+    });
 
     selectProject = (id: number): void => {
-        this.selectedProject = this.projects.find(project => project.id === id) || null;
+        this.selectedProjectId = id;
     };
 
     private clearState = (): void => {
-        this.projects = [];
-        this.selectedProject = null;
+        this.projects$.clear();
+        this.selectedProjectId = null;
     };
 
-    createProject = createAsyncAction(
-        async (form: CreateProjectFormValues): Promise<void> => {
+    createProject = this.projects$.createAsyncAction(
+        async (form: CreateProjectFormValues) => {
             const request: Parameters<typeof apiClient.api.createProject>[0] = {
                 name: form.name
             };
@@ -91,24 +107,20 @@ class ProjectsStore {
             const response = await apiClient.api.createProject(request);
 
             const project = mapProjectDtoToProject(response.data.project);
-            this.projects = this.projects.concat(project);
-            this.selectedProject = project;
-
-            const { toast } = createStandaloneToast();
-            toast({ title: 'Project created successfully', status: 'success', isClosable: true });
+            this.projects$.value = this.projects$.value.concat(project);
+            this.selectedProjectId = project.id;
         },
-        () => {
-            const { toast } = createStandaloneToast();
-            toast({
-                title: "Project wasn't created",
-                description: 'Unknown api error happened. Try again later',
-                status: 'error',
-                isClosable: true
-            });
+        {
+            successToast: {
+                title: 'Project created successfully'
+            },
+            errorToast: {
+                title: "Project wasn't created"
+            }
         }
     );
 
-    updateProject = createAsyncAction(
+    updateProject = this.projects$.createAsyncAction(
         async (form: UpdateProjectFormValues): Promise<void> => {
             const request: Parameters<typeof apiClient.api.updateProject>[1] = {};
 
@@ -123,51 +135,36 @@ class ProjectsStore {
             const response = await apiClient.api.updateProject(form.projectId, request);
             const project = mapProjectDtoToProject(response.data.project);
 
-            const projectIndex = this.projects.findIndex(item => item.id === project.id);
+            const projectIndex = this.projects$.value.findIndex(item => item.id === project.id);
             if (projectIndex !== -1) {
-                this.projects.splice(projectIndex, 1, project);
+                this.projects$.value[projectIndex] = project;
             } else {
-                this.projects.push(project);
+                this.projects$.value.push(project);
             }
-
-            if (this.selectedProject?.id === project.id) {
-                this.selectedProject = project;
-            }
-
-            const { toast } = createStandaloneToast();
-            toast({ title: 'Project updated successfully', status: 'success', isClosable: true });
         },
-        () => {
-            const { toast } = createStandaloneToast();
-            toast({
-                title: "Project wasn't updated",
-                description: 'Unknown api error happened. Try again later',
-                status: 'error',
-                isClosable: true
-            });
+        {
+            successToast: {
+                title: 'Project updated successfully'
+            },
+            errorToast: {
+                title: "Project wasn't updated"
+            }
         }
     );
 
-    deleteProject = createAsyncAction(
-        async (projectId: number): Promise<void> => {
+    deleteProject = this.projects$.createAsyncAction(
+        async (projectId: number) => {
             await apiClient.api.deleteProject(projectId);
 
-            this.projects = this.projects.filter(item => item.id !== projectId);
-            if (this.selectedProject?.id === projectId) {
-                this.selectedProject = this.projects[0] || null;
-            }
-
-            const { toast } = createStandaloneToast();
-            toast({ title: 'Project deleted successfully', status: 'success', isClosable: true });
+            return this.projects$.value.filter(item => item.id !== projectId);
         },
-        () => {
-            const { toast } = createStandaloneToast();
-            toast({
-                title: "Project wasn't deleted",
-                description: 'Unknown api error happened. Try again later',
-                status: 'error',
-                isClosable: true
-            });
+        {
+            successToast: {
+                title: 'Project deleted successfully'
+            },
+            errorToast: {
+                title: "Project wasn't deleted"
+            }
         }
     );
 }

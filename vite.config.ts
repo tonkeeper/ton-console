@@ -8,7 +8,10 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import { createHtmlPlugin } from 'vite-plugin-html';
 
 export default ({ mode }) => {
-    const { VITE_TG_OAUTH_BOT_NAME, VITE_BASE_PROXY_URL } = loadEnv(mode, process.cwd());
+    const { VITE_TG_OAUTH_BOT_NAME, VITE_BASE_PROXY_URL, VITE_CD_CHECK_STRING } = loadEnv(
+        mode,
+        process.cwd()
+    );
 
     return defineConfig({
         plugins: [
@@ -28,6 +31,13 @@ export default ({ mode }) => {
                             attrs: {
                                 id: 'root'
                             }
+                        },
+                        {
+                            injectTo: 'head',
+                            tag: 'meta',
+                            attrs: {
+                                'data-cd-check': VITE_CD_CHECK_STRING
+                            }
                         }
                     ]
                 }
@@ -45,7 +55,10 @@ export default ({ mode }) => {
                     target: VITE_BASE_PROXY_URL,
                     changeOrigin: true,
                     secure: true,
-                    cookiePathRewrite: '/'
+                    cookiePathRewrite: '/',
+                    headers: {
+                        Connection: 'keep-alive'
+                    }
                 }
             }
         },

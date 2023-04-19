@@ -1,4 +1,5 @@
 export { createReaction } from './create-reaction';
+export { createImmediateReaction } from './create-immediate-reaction';
 export { createEffect } from './create-effect';
 export { createAsyncAction } from './create-async-action';
 export { Loadable } from './loadable';

@@ -24,7 +24,7 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
 }> = ({ tier, ...rest }) => {
     const onConfirm = useCallback(async () => {
         await tonApiTiersStore.selectTier(tier!.id);
-        await balanceStore.fetchBalancesAndRefills();
+        await balanceStore.fetchPortfolio();
         rest.onClose();
     }, [tier]);
 
