@@ -76,9 +76,15 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                                 <Td overflow="hidden" maxW="200px" textOverflow="ellipsis">
                                     {apiKey.name}
                                 </Td>
-                                <Td>
+                                <Td overflow="hidden" w="100%" maxW="0">
                                     <Flex align="center" gap="1">
-                                        {apiKey.value}
+                                        <chakra.span
+                                            flexShrink="1"
+                                            textOverflow="ellipsis"
+                                            overflow="hidden"
+                                        >
+                                            {apiKey.value}
+                                        </chakra.span>
                                         {copiedKey !== undefined && copiedKey === apiKey.id ? (
                                             <TickIcon />
                                         ) : (
