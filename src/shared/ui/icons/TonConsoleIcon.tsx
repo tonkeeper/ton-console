@@ -1,9 +1,10 @@
 import { Icon } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, forwardRef } from 'react';
 
-export const TonConsoleIcon: FunctionComponent<ComponentProps<typeof Icon>> = props => {
+export const TonConsoleIcon = forwardRef<SVGElement, ComponentProps<typeof Icon>>((props, ref) => {
     return (
         <Icon
+            ref={ref}
             w="32px"
             h="32px"
             fill="none"
@@ -43,4 +44,6 @@ export const TonConsoleIcon: FunctionComponent<ComponentProps<typeof Icon>> = pr
             />
         </Icon>
     );
-};
+});
+
+TonConsoleIcon.displayName = 'TonConsoleIcon';
