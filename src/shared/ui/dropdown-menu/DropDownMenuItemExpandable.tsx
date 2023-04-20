@@ -7,7 +7,8 @@ import {
     ReactElement,
     ReactNode,
     useEffect,
-    useMemo
+    useMemo,
+    useState
 } from 'react';
 import {
     Accordion,
@@ -37,6 +38,7 @@ const _active = { backgroundColor: 'transparent', transform: 'scale(0.97)' };
 export const DropDownMenuItemExpandable: FunctionComponent<
     DropDownMenuItemExpandableProps
 > = props => {
+    const [shouldAnimate, setShouldAnimate] = useState(false);
     const path = useMemo(() => {
         let value = props.path;
         if (value && props.linkTo) {
@@ -75,8 +77,10 @@ export const DropDownMenuItemExpandable: FunctionComponent<
         return isOpen ? [0] : [];
     }, [isOpen]);
 
+    useEffect(() => setShouldAnimate(true), []);
+
     return (
-        <Accordion allowToggle index={index}>
+        <Accordion allowToggle index={index} reduceMotion={!shouldAnimate}>
             <AccordionItem border="none">
                 {({ isExpanded }) => (
                     <>
