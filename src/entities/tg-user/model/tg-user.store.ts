@@ -29,7 +29,11 @@ class TGUserStore {
     });
 
     logout = this.user$.createAsyncAction(async () => {
-        await apiClient.api.accountLogout();
+        try {
+            await apiClient.api.accountLogout();
+        } catch (e) {
+            console.error(e);
+        }
         this.user$.value = null;
     });
 }
