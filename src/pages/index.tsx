@@ -28,6 +28,10 @@ const Routing: FunctionComponent = () => {
         }
     }, [tGUserStore.user$.value]);
 
+    if (!tGUserStore.user$.isResolved) {
+        return null;
+    }
+
     if (!tGUserStore.user$.value) {
         return (
             <Routes>

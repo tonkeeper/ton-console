@@ -43,7 +43,7 @@ class TGUserStore {
             await projectsStore.fetchProjects();
         } catch (e) {
             if (e instanceof AxiosError && e.response?.status === 401) {
-                this.logout();
+                await this.logout();
             }
         }
     });
