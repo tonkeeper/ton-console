@@ -44,6 +44,11 @@ export default {
         fontWeight: 700,
         lineHeight: '32px'
     },
+    h3Thin: {
+        fontSize: '24px',
+        fontWeight: 400,
+        lineHeight: '32px'
+    },
     h4: {
         fontSize: '20px',
         fontWeight: 700,

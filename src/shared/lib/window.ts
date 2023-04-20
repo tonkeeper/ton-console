@@ -35,3 +35,11 @@ export function subscribeToVisibilitychange(onFocus: () => void, onHide: () => v
         }
     });
 }
+
+export function setIntervalWhenPageOnFocus(intervalCallback: () => void, timeout: number): void {
+    let interval: ReturnType<typeof setInterval>;
+    subscribeToVisibilitychange(
+        () => (interval = setInterval(intervalCallback, timeout)),
+        () => clearInterval(interval)
+    );
+}

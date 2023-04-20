@@ -36,6 +36,10 @@ export class Loadable<T> {
             isLoading: computed,
             isResolved: computed,
             clear: action,
+            setValue: action,
+            setStartLoading: action,
+            setEndLoading: action,
+            setErroredState: action,
             createAsyncAction: false,
             error: observable,
             value: observable
@@ -158,6 +162,32 @@ export class Loadable<T> {
         });
 
         return fn;
+    }
+
+    public setValue(value: T): void {
+        this.value = value;
+    }
+
+    public setStartLoading(): void {
+        if (this.isResolved) {
+            this.state = 'refreshing';
+        } else {
+            this.state = 'pending';
+        }
+    }
+
+    public setEndLoading(): void {
+        this.state = 'ready';
+    }
+
+    public setErroredState(e: unknown): void {
+        this.error = e;
+
+        if (this.isResolved) {
+            this.state = 'refetchErrored';
+        } else {
+            this.state = 'resolveErrored';
+        }
     }
 
     clear(value?: T): void {

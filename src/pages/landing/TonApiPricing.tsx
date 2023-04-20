@@ -1,11 +1,13 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Box, Grid, List, ListIcon, ListItem, Text } from '@chakra-ui/react';
-import { H2, TickIcon } from 'src/shared';
+import { CURRENCY, H2, H3Thin, TickIcon } from 'src/shared';
+import { CurrencyRate } from 'src/entities';
 
 const tiers = [
     {
         name: 'Start',
-        price: 'FREE',
+        tonPrice: 'FREE',
+        usdPriceStub: 'Forever',
         included: {
             requestsPerSecondLimit: 0.25,
             subscription: {
@@ -17,7 +19,7 @@ const tiers = [
     },
     {
         name: 'Lite',
-        price: '1 TON',
+        tonPrice: '1',
         included: {
             requestsPerSecondLimit: 1,
             subscription: {
@@ -29,7 +31,7 @@ const tiers = [
     },
     {
         name: 'Standard',
-        price: '20 TON',
+        tonPrice: '20',
         included: {
             requestsPerSecondLimit: 50,
             subscription: {
@@ -41,7 +43,7 @@ const tiers = [
     },
     {
         name: 'Pro',
-        price: '200 TON',
+        tonPrice: '200',
         included: {
             requestsPerSecondLimit: 600,
             subscription: {
@@ -78,10 +80,23 @@ export const TonApiPricing: FunctionComponent<ComponentProps<typeof Grid>> = pro
                     <Text textStyle="label2" mb="3" color="text.primary">
                         {tier.name}
                     </Text>
-                    <H2>{tier.price}</H2>
-                    <Text textStyle="body2" mb="4" color="text.secondary">
-                        per month
-                    </Text>
+                    <H2 mb="1">{tier.tonPrice} TON</H2>
+                    {tier.usdPriceStub ? (
+                        <H3Thin mb="4" color="text.secondary">
+                            {tier.usdPriceStub}
+                        </H3Thin>
+                    ) : (
+                        <CurrencyRate
+                            as={H3Thin}
+                            mb="4"
+                            color="text.secondary"
+                            currency={CURRENCY.TON}
+                            amount={tier.tonPrice}
+                        >
+                            &nbsp;per month
+                        </CurrencyRate>
+                    )}
+
                     <List flex="1" spacing="2">
                         <ListItem display="flex">
                             <ListIcon as={TickIcon} color="accent.green" />

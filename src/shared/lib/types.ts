@@ -1,3 +1,7 @@
+import BigNumber from 'bignumber.js';
+
+export type Amount = string | number | BigNumber;
+
 export function hasProperties<T extends string>(
     value: unknown,
     propertyKeys: T[]

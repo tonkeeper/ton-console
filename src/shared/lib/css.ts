@@ -18,3 +18,9 @@ function componentToHex(c: number): string {
     const hex = c.toString(16);
     return hex.length === 1 ? '0' + hex : hex;
 }
+
+export function subtractPixels(value: string, subtrahend: string): string {
+    value = value.replace('px', '');
+    subtrahend = subtrahend.replace('px', '');
+    return (Number(value) - Number(subtrahend)).toString() + 'px';
+}
