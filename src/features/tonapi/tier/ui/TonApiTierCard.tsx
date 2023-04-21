@@ -34,7 +34,7 @@ export const TonApiTierCard: FunctionComponent<
                     color="text.secondary"
                     leftSign="≈ "
                     currency={tier.price.currency}
-                    amount={tier.price.stringAmount}
+                    amount={tier.price.amount}
                 >
                     &nbsp;USD, per month
                 </CurrencyRate>

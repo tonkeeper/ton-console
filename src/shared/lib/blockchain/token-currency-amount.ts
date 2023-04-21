@@ -14,6 +14,8 @@ export class TokenCurrencyAmount implements CurrencyAmount {
 
     private readonly decimalPlaces = 3;
 
+    public readonly weiAmount: BigNumber;
+
     public readonly amount: BigNumber;
 
     public readonly currency: CURRENCY;
@@ -34,7 +36,7 @@ export class TokenCurrencyAmount implements CurrencyAmount {
         if (decimalPlaces === undefined) {
             decimalPlaces = this.decimalPlaces;
         }
-        return fromWei(this.amount, this.decimals).decimalPlaces(decimalPlaces).toString();
+        return fromWei(this.weiAmount, this.decimals).decimalPlaces(decimalPlaces).toString();
     }
 
     toStringCurrencyAmount(precision: number): string {
@@ -45,40 +47,41 @@ export class TokenCurrencyAmount implements CurrencyAmount {
         return {
             $type: 'TokenCurrencyAmount',
             currency: this.currency,
-            weiAmount: this.amount.toString(),
+            weiAmount: this.weiAmount.toString(),
             decimals: this.decimals
         };
     }
 
     constructor({ weiAmount, currency, decimals }: TokenCurrencyAmountStruct) {
-        this.amount = new BigNumber(weiAmount);
+        this.weiAmount = new BigNumber(weiAmount);
         this.currency = currency;
         this.decimals = decimals;
+        this.amount = new BigNumber(fromWei(this.weiAmount, this.decimals));
     }
 
     public isEQ(currencyAmount: CurrencyAmount): boolean {
         this.checkIfCanCompareCurrencies(currencyAmount);
-        return this.amount.eq(currencyAmount.amount);
+        return this.weiAmount.eq(currencyAmount.weiAmount);
     }
 
     isGT(currencyAmount: CurrencyAmount): boolean {
         this.checkIfCanCompareCurrencies(currencyAmount);
-        return this.amount.gt(currencyAmount.amount);
+        return this.weiAmount.gt(currencyAmount.weiAmount);
     }
 
     isGTE(currencyAmount: CurrencyAmount): boolean {
         this.checkIfCanCompareCurrencies(currencyAmount);
-        return this.amount.gte(currencyAmount.amount);
+        return this.weiAmount.gte(currencyAmount.weiAmount);
     }
 
     isLT(currencyAmount: CurrencyAmount): boolean {
         this.checkIfCanCompareCurrencies(currencyAmount);
-        return this.amount.lt(currencyAmount.amount);
+        return this.weiAmount.lt(currencyAmount.weiAmount);
     }
 
     isLTE(currencyAmount: CurrencyAmount): boolean {
         this.checkIfCanCompareCurrencies(currencyAmount);
-        return this.amount.lte(currencyAmount.amount);
+        return this.weiAmount.lte(currencyAmount.weiAmount);
     }
 
     private checkIfCanCompareCurrencies(currencyAmount: CurrencyAmount): never | void {
