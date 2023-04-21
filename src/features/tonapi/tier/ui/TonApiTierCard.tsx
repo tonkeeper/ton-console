@@ -32,11 +32,11 @@ export const TonApiTierCard: FunctionComponent<
                     textStyle="body2"
                     mb="4"
                     color="text.secondary"
-                    leftSign="≈ "
+                    leftSign="$"
                     currency={tier.price.currency}
                     amount={tier.price.amount}
                 >
-                    &nbsp;USD, per month
+                    &nbsp;per month
                 </CurrencyRate>
                 <List flex="1" mb="6" spacing="2">
                     <ListItem display="flex">

@@ -80,7 +80,9 @@ export const TonApiPricing: FunctionComponent<ComponentProps<typeof Grid>> = pro
                     <Text textStyle="label2" mb="3" color="text.primary">
                         {tier.name}
                     </Text>
-                    <H2 mb="1">{tier.tonPrice} TON</H2>
+                    <H2 mb="1">
+                        {tier.tonPrice === 'FREE' ? tier.tonPrice : `${tier.tonPrice} TON`}
+                    </H2>
                     {tier.usdPriceStub ? (
                         <H3Thin mb="4" color="text.secondary">
                             {tier.usdPriceStub}
@@ -89,6 +91,7 @@ export const TonApiPricing: FunctionComponent<ComponentProps<typeof Grid>> = pro
                         <CurrencyRate
                             as={H3Thin}
                             mb="4"
+                            textStyle="h3Thin"
                             color="text.secondary"
                             currency={CURRENCY.TON}
                             amount={tier.tonPrice}
