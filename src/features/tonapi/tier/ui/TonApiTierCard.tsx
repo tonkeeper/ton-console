@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { H2, TickIcon, toDate } from 'src/shared';
 import { isTonApiSelectedTier, TonApiSelectedTier, TonApiTier } from '../model';
+import { CurrencyRate } from 'src/entities';
 
 export const TonApiTierCard: FunctionComponent<
     ComponentProps<typeof Card> & {
@@ -27,9 +28,16 @@ export const TonApiTierCard: FunctionComponent<
             </CardHeader>
             <CardBody flexDir="column" display="flex">
                 <H2>{tier.price.stringCurrencyAmount}</H2>
-                <Text textStyle="body2" mb="4" color="text.secondary">
-                    per month
-                </Text>
+                <CurrencyRate
+                    textStyle="body2"
+                    mb="4"
+                    color="text.secondary"
+                    leftSign="≈ "
+                    currency={tier.price.currency}
+                    amount={tier.price.stringAmount}
+                >
+                    &nbsp;USD, per month
+                </CurrencyRate>
                 <List flex="1" mb="6" spacing="2">
                     <ListItem display="flex">
                         <ListIcon as={TickIcon} color="accent.green" />

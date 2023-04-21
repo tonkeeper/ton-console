@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import { Loadable, CURRENCY, createAsyncAction, setIntervalWhenPageOnFocus } from 'src/shared';
 import { Rates$ } from './interfaces';
 import BigNumber from 'bignumber.js';
+import { fetchRate } from './rates.api';
 
 class RatesStore {
     rates$: Rates$ = {
@@ -13,7 +14,7 @@ class RatesStore {
 
         this.fetchRates();
 
-        setIntervalWhenPageOnFocus(() => this.fetchRates({ silently: true }), 3000);
+        setIntervalWhenPageOnFocus(() => this.fetchRates({ silently: true }), 60000);
     }
 
     fetchRate = createAsyncAction(async (currency: CURRENCY, options?: { silently: boolean }) => {
@@ -23,9 +24,9 @@ class RatesStore {
                 currencyRate.setStartLoading();
             }
 
-            await new Promise(r => setTimeout(r, 1500));
+            const price = await fetchRate(currency);
 
-            currencyRate.setValue(new BigNumber(2.2333131323414));
+            currencyRate.setValue(price);
 
             if (!options?.silently) {
                 currencyRate.setEndLoading();
