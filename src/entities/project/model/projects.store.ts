@@ -16,7 +16,7 @@ import { tGUserStore } from 'src/entities';
 import { UpdateProjectFormValues } from 'src/entities/project/model/interfaces/update-project-form-values';
 
 class ProjectsStore {
-    projects$ = new Loadable<Project[]>([], { makePersistableAs: 'Projects' });
+    projects$ = new Loadable<Project[]>([], { makePersistable: 'Projects' });
 
     selectedProjectId: number | null = null;
 

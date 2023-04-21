@@ -4,6 +4,8 @@ import BigNumber from 'bignumber.js';
 export interface CurrencyAmount {
     readonly currency: CURRENCY;
 
+    readonly weiAmount: BigNumber;
+
     readonly amount: BigNumber;
 
     stringCurrency: string;

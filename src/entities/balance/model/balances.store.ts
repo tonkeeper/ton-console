@@ -5,7 +5,7 @@ import {
     CurrencyAmount,
     DTODeposit,
     Loadable,
-    subscribeToVisibilitychange,
+    setIntervalWhenPageOnFocus,
     TonCurrencyAmount
 } from 'src/shared';
 import { projectsStore } from '../../project';
@@ -39,16 +39,11 @@ class BalancesStore {
             }
         );
 
-        let interval: ReturnType<typeof setInterval>;
-        subscribeToVisibilitychange(
-            () =>
-                (interval = setInterval(() => {
-                    if (projectsStore.selectedProject) {
-                        this.fetchPortfolio({ silently: true });
-                    }
-                }, 3000)),
-            () => clearInterval(interval)
-        );
+        setIntervalWhenPageOnFocus(() => {
+            if (projectsStore.selectedProject) {
+                this.fetchPortfolio({ silently: true });
+            }
+        }, 3000);
     }
 
     fetchPortfolio = this.portfolio$.createAsyncAction(async () => {
