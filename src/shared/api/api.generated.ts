@@ -92,6 +92,10 @@ export interface DTOAppTier {
     rpc: number;
     /** @example 1000000000 */
     ton_price: number;
+    /** @example 50 */
+    long_polling_sub: number;
+    /** @example 10 */
+    entity_per_conn?: number;
     /** @example "2023-04-23" */
     next_payment: string;
     /** @example "2023-03-23" */
@@ -161,10 +165,24 @@ export interface DTOToken {
     id: number;
     /** @example "My token" */
     name: string;
+    /** @example 5 */
+    limit_rps?: number;
     /** @example "AE5TZRWIIOR2O2YAAAAGFP2HEWFZJYBP222A567CBF6JIL7S4RIZSCOAZRZOEW7AKMRICGQ" */
     token: string;
     /** @example "2023-03-23" */
     date_create: string;
+}
+
+export interface DTOStats {
+    result: {
+        metric: {
+            /** @example "DnsResolve" */
+            operation: string;
+        };
+        values: any[];
+    }[];
+    /** @example "matrix" */
+    resultType: string;
 }
 
 /** backend error code */
@@ -670,6 +688,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             data: {
                 /** @example "My token" */
                 name: string;
+                /** @example 5 */
+                limit_rps?: number;
             },
             params: RequestParams = {}
         ) =>
@@ -708,6 +728,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             data: {
                 /** @example "My token" */
                 name: string;
+                /** @example 5 */
+                limit_rps?: number;
             },
             params: RequestParams = {}
         ) =>
@@ -868,6 +890,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 DTOError
             >({
                 path: `/api/v1/services/tonapi/payments/history`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * @description To filter the stats, are expected  start and end query parameters in unix format, where end is the day closer to the current one, for example start=1675958400&end=1676908800,
+         *
+         * @tags services
+         * @name GetTonApiTokensStats
+         * @summary Get TonAPI stats by tokens
+         * @request GET:/api/v1/services/tonapi/stats
+         * @secure
+         */
+        getTonApiTokensStats: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+                /**
+                 * Start date
+                 * @format int64
+                 */
+                start: number;
+                /**
+                 * End date
+                 * @format int64
+                 */
+                end: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    stats: DTOStats;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/tonapi/stats`,
                 method: 'GET',
                 query: query,
                 secure: true,

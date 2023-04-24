@@ -1,5 +1,6 @@
 import {
     BalanceIcon24,
+    DashboardIcon,
     DropDownMenu,
     DropDownMenuItem,
     DropDownMenuItemExpandable,
@@ -14,6 +15,9 @@ import { observer } from 'mobx-react-lite';
 const Aside: FunctionComponent = () => {
     return (
         <DropDownMenu>
+            <DropDownMenuItem linkTo="dashboard" leftIcon={<DashboardIcon />}>
+                Dashboard
+            </DropDownMenuItem>
             <DropDownMenuItemExpandable leftIcon={<TonapiIcon />} content="TON API" linkTo="tonapi">
                 <DropDownMenuItem linkTo="api-keys">Api keys and calls</DropDownMenuItem>
                 <DropDownMenuItem linkTo="pricing">Pricing</DropDownMenuItem>
