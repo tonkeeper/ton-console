@@ -54,8 +54,7 @@ class ProjectsStore {
                     } else {
                         this.clearState();
                     }
-                },
-                { fireImmediately: true }
+                }
             );
         });
     }

@@ -354,6 +354,31 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/stats:
+    get:
+      summary: "Get TonAPI stats by tokens"
+      operationId: getTonApiTokensStats
+      description: "To filter the stats, are expected  start and end query parameters in unix format,
+       where end is the day closer to the current one, for example start=1675958400&end=1676908800,"
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - services
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+        - $ref: '#/components/parameters/queryStartDate'
+        - $ref: '#/components/parameters/queryEndDate'
+        - $ref: '#/components/parameters/queryStep'
+        - $ref: '#/components/parameters/queryDetailed'
+      responses:
+        '200':
+          $ref: '#/components/responses/TonApiTokensStats'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
 components:
   parameters:
@@ -381,6 +406,37 @@ components:
       schema:
         type: integer
         format: int64
+    queryStartDate:
+      description: Start date
+      in: query
+      name: start
+      required: true
+      schema:
+        type: integer
+        format: int64
+    queryEndDate:
+      description: End date
+      in: query
+      name: end
+      required: true
+      schema:
+        type: integer
+        format: int64
+    queryStep:
+      description: Step
+      in: query
+      name: step
+      schema:
+        type: integer
+        format: int64
+    queryDetailed:
+      description: Show more detailed information
+      in: query
+      name: detailed
+      schema:
+        type: boolean
+        example: true
+  
   
   requestBodies:
     TgAuthInput:
@@ -426,6 +482,9 @@ components:
               name:
                 type: string
                 example: "My token"
+              limit_rps:
+                type: number
+                example: 5
     TonProofInput:
       description: "Data that is expected from TON Connect"
       content:
@@ -605,6 +664,7 @@ components:
         - name
         - rpc
         - burst
+        - long_polling_sub
         - ton_price
         - next_payment
         - date_create
@@ -625,6 +685,12 @@ components:
         ton_price:
           type: integer
           example: 1000000000
+        long_polling_sub:
+          type: integer
+          example: 50
+        entity_per_conn:
+          type: integer
+          example: 10
         next_payment:
           type: string
           example: "2023-04-23"
@@ -722,12 +788,46 @@ components:
         name:
           type: string
           example: "My token"
+        limit_rps:
+          type: number
+          example: 5
         token:
           type: string
           example: "AE5TZRWIIOR2O2YAAAAGFP2HEWFZJYBP222A567CBF6JIL7S4RIZSCOAZRZOEW7AKMRICGQ"
         date_create:
           type: string
           example: "2023-03-23"
+    Stats:
+      type: object
+      required:
+        - result
+        - resultType
+      properties:
+        result:
+          type: array
+          items:
+            type: object
+            required:
+              - metric
+              - values
+            properties:
+              metric:
+                type: object
+                properties:
+                  operation:
+                    type: string
+                    example: "DnsResolve"
+              values:
+                type: array
+                items:
+                  additionalProperties: true
+                  example: [
+                    1681462656,
+                    "0.03508771929824561"
+                  ]
+        resultType:
+          type: string
+          example: "matrix"
   
   responses:
     NotFound:
@@ -781,6 +881,17 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Charge'
+    TonApiTokensStats:
+      description: "TonApi tokens stats"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - stats
+            properties:
+              stats:
+                $ref: '#/components/schemas/Stats'
     DepositsHistory:
       description: "Deposits history"
       content:

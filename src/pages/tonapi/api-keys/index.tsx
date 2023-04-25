@@ -3,14 +3,18 @@ import { EmptyApiKeys } from './EmptyApiKeys';
 import { observer } from 'mobx-react-lite';
 import { apiKeysStore, ApiKeysTable, CreateApiKeyModal, tonApiTiersStore } from 'src/features';
 import { Overlay } from 'src/shared';
-import { Button, useDisclosure } from '@chakra-ui/react';
+import { Button, Center, Spinner, useDisclosure } from '@chakra-ui/react';
 import { SelectPlanFirstly } from 'src/pages/tonapi/api-keys/SelectPlanFirstly';
 
 const ApiKeysPage: FunctionComponent = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     if (!tonApiTiersStore.selectedTier$.isResolved || !apiKeysStore.apiKeys$.isResolved) {
-        return null;
+        return (
+            <Center h="300px">
+                <Spinner />
+            </Center>
+        );
     }
 
     if (!tonApiTiersStore.selectedTier$.value) {

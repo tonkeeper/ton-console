@@ -20,7 +20,7 @@ export const TonApiTierCard: FunctionComponent<
     }
 > = ({ tier, button, ...rest }) => {
     return (
-        <Card {...rest}>
+        <Card size="lg" variant="outline" {...rest}>
             <CardHeader>
                 <Text textStyle="label2" color="text.primary">
                     {tier.name}
