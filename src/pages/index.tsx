@@ -90,8 +90,8 @@ const Routing: FunctionComponent = () => {
                     }
                 />
                 <Route path="settings">{SettingsRouting}</Route>
-                <Route index element={<Navigate to="tonapi" replace />} />
-                <Route path="*" element={<Navigate to="tonapi" replace />} />
+                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route path="*" element={<Navigate to="dashboard" replace />} />
             </Route>
         </Routes>
     );

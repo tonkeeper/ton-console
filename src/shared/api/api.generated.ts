@@ -177,7 +177,7 @@ export interface DTOStats {
     result: {
         metric: {
             /** @example "DnsResolve" */
-            operation: string;
+            operation?: string;
         };
         values: any[];
     }[];
@@ -922,6 +922,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @format int64
                  */
                 end: number;
+                /**
+                 * Step
+                 * @format int64
+                 */
+                step?: number;
+                /**
+                 * Show more detailed information
+                 * @example true
+                 */
+                detailed?: boolean;
             },
             params: RequestParams = {}
         ) =>

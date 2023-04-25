@@ -1,7 +1,9 @@
 import { ComponentProps, FunctionComponent } from 'react';
-import { TonApiSelectedTier } from '../../tonapi';
+import { TonApiSelectedTier } from '../../tier';
 import { Card, CardBody, CardHeader, List, ListIcon, ListItem, Text } from '@chakra-ui/react';
 import { TickIcon, toDate } from 'src/shared';
+
+const freeTierLimit = 0.25;
 
 export const DashboardTierCard: FunctionComponent<
     { tier: TonApiSelectedTier | null } & ComponentProps<typeof Card>
@@ -23,7 +25,8 @@ export const DashboardTierCard: FunctionComponent<
                     <ListItem display="flex">
                         <ListIcon as={TickIcon} color="text.primary" />
                         <Text textStyle="body2" color="text.primary">
-                            {tier?.description.requestsPerSecondLimit || 1} requests per second
+                            {tier?.description.requestsPerSecondLimit || freeTierLimit} requests per
+                            second
                         </Text>
                     </ListItem>
                 </List>
