@@ -30,11 +30,11 @@ class BalancesStore {
         createImmediateReaction(
             () => projectsStore.selectedProject,
             project => {
+                this.clearState();
+
                 if (project) {
                     this.fetchDepositAddress();
                     this.fetchPortfolio();
-                } else {
-                    this.clearState();
                 }
             }
         );

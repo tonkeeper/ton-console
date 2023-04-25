@@ -1,9 +1,11 @@
 import {
     BalanceIcon24,
+    DashboardIcon,
     DropDownMenu,
     DropDownMenuItem,
     DropDownMenuItemExpandable,
     SettingsIcon,
+    TextWithSkeleton,
     TonapiIcon
 } from 'src/shared';
 import { FunctionComponent } from 'react';
@@ -14,6 +16,9 @@ import { observer } from 'mobx-react-lite';
 const Aside: FunctionComponent = () => {
     return (
         <DropDownMenu>
+            <DropDownMenuItem linkTo="dashboard" leftIcon={<DashboardIcon />}>
+                Dashboard
+            </DropDownMenuItem>
             <DropDownMenuItemExpandable leftIcon={<TonapiIcon />} content="TON API" linkTo="tonapi">
                 <DropDownMenuItem linkTo="api-keys">Api keys and calls</DropDownMenuItem>
                 <DropDownMenuItem linkTo="pricing">Pricing</DropDownMenuItem>
@@ -23,11 +28,14 @@ const Aside: FunctionComponent = () => {
                     <Text textStyle="label2" color="text.primary">
                         Balance
                     </Text>
-                    {balanceStore.balances[0] && (
-                        <Text textStyle="body3" color="text.secondary">
-                            {balanceStore.balances[0].stringCurrencyAmount}
-                        </Text>
-                    )}
+                    <TextWithSkeleton
+                        isLoading={!balanceStore.portfolio$.isResolved}
+                        textStyle="body3"
+                        color="text.secondary"
+                        skeletonWidth="45px"
+                    >
+                        {balanceStore.balances[0]?.stringCurrencyAmount}
+                    </TextWithSkeleton>
                 </Flex>
             </DropDownMenuItem>
             <DropDownMenuItemExpandable

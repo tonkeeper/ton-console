@@ -12,10 +12,10 @@ class ApiKeysStore {
         createImmediateReaction(
             () => projectsStore.selectedProject,
             project => {
+                this.clearStore();
+
                 if (project) {
                     this.fetchApiKeys();
-                } else {
-                    this.clearStore();
                 }
             }
         );
