@@ -26,10 +26,10 @@ class TonApiTiersStore {
         createImmediateReaction(
             () => tGUserStore.user$.value,
             user => {
+                this.clearState();
+
                 if (user) {
                     this.fetchTiers();
-                } else {
-                    this.clearState();
                 }
             }
         );
@@ -37,10 +37,10 @@ class TonApiTiersStore {
         createImmediateReaction(
             () => projectsStore.selectedProject,
             project => {
+                this.selectedTier$.clear();
+
                 if (project) {
                     this.fetchSelectedTier();
-                } else {
-                    this.selectedTier$.clear();
                 }
             }
         );

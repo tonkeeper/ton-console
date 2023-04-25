@@ -53,7 +53,7 @@ const DashboardChart: FunctionComponent<ComponentProps<typeof Box>> = props => {
 
     if (!tonApiStatsStore.stats$.isResolved || !tonApiTiersStore.selectedTier$.isResolved) {
         return (
-            <Center h="75px" {...props}>
+            <Center h="200px" {...props}>
                 <Spinner />
             </Center>
         );

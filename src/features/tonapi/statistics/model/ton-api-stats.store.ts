@@ -12,10 +12,10 @@ class TonApiStatsStore {
         createImmediateReaction(
             () => projectsStore.selectedProject,
             project => {
+                this.clearStore();
+
                 if (project) {
                     this.fetchStats();
-                } else {
-                    this.clearStore();
                 }
             }
         );

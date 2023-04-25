@@ -5,6 +5,7 @@ import {
     DropDownMenuItem,
     DropDownMenuItemExpandable,
     SettingsIcon,
+    TextWithSkeleton,
     TonapiIcon
 } from 'src/shared';
 import { FunctionComponent } from 'react';
@@ -27,11 +28,14 @@ const Aside: FunctionComponent = () => {
                     <Text textStyle="label2" color="text.primary">
                         Balance
                     </Text>
-                    {balanceStore.balances[0] && (
-                        <Text textStyle="body3" color="text.secondary">
-                            {balanceStore.balances[0].stringCurrencyAmount}
-                        </Text>
-                    )}
+                    <TextWithSkeleton
+                        isLoading={!balanceStore.portfolio$.isResolved}
+                        textStyle="body3"
+                        color="text.secondary"
+                        skeletonWidth="45px"
+                    >
+                        {balanceStore.balances[0]?.stringCurrencyAmount}
+                    </TextWithSkeleton>
                 </Flex>
             </DropDownMenuItem>
             <DropDownMenuItemExpandable
