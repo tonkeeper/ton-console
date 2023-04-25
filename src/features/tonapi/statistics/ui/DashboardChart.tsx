@@ -77,7 +77,7 @@ const DashboardChart: FunctionComponent<ComponentProps<typeof Box>> = props => {
                 }
             }}
         >
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="99%" height="100%">
                 <LineChart width={400} height={400} data={toJS(data)}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <Line
