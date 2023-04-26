@@ -10,28 +10,30 @@ import {
     ModalOverlay,
     Text
 } from '@chakra-ui/react';
-import { H4 } from 'src/shared';
+import { CopyPad, createTransferLink, H4, Pad } from 'src/shared';
+import { QRCodeSVG } from 'qrcode.react';
+import { balanceStore } from '../model';
 import { observer } from 'mobx-react-lite';
 
 const RefillModal: FunctionComponent<{
     isOpen: boolean;
     onClose: () => void;
 }> = props => {
-    //  const depositAddress = balanceStore.depositAddress$.value;
+    const depositAddress = balanceStore.depositAddress$.value;
     return (
         <Modal scrollBehavior="inside" size="md" {...props}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>
                     <H4 mb="1">Balance Refill</H4>
-                    {/* <Text textStyle="body2" color="text.secondary">
+                    <Text textStyle="body2" color="text.secondary">
                         Scan QR code for refill or send Toncoin by address bellow. Send only Toncoin
                         on this address. Sending other coins may result in permanent loss.
-                    </Text>*/}
+                    </Text>
                 </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody pt="0" pb="4">
-                    {/*{depositAddress && (
+                    {depositAddress && (
                         <>
                             <Pad mb="4" display="flex" alignItems="center" justifyContent="center">
                                 <QRCodeSVG
@@ -42,8 +44,7 @@ const RefillModal: FunctionComponent<{
                             </Pad>
                             <CopyPad text={depositAddress} />
                         </>
-                    )}*/}
-                    <Text>Payments are currently not available. Please try again later.</Text>
+                    )}
                 </ModalBody>
 
                 <ModalFooter gap="3" pt="0">
