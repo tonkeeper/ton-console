@@ -7,7 +7,8 @@ import {
     Loadable,
     DTOAppTier,
     DTOCharge,
-    createImmediateReaction
+    createImmediateReaction,
+    UsdCurrencyAmount
 } from 'src/shared';
 import { TonApiPayment, TonApiTier } from './interfaces';
 import { projectsStore, tGUserStore } from 'src/entities';
@@ -109,7 +110,7 @@ function mapTierDTOToTier(tierDTO: DTOTier): TonApiTier {
     return {
         id: tierDTO.id,
         name: tierDTO.name,
-        price: new TonCurrencyAmount(tierDTO.ton_price),
+        price: new UsdCurrencyAmount(tierDTO.usd_price),
         description: {
             requestsPerSecondLimit: tierDTO.rpc
         }
@@ -124,12 +125,12 @@ function mapAppTierDTOToSelectedTier(tierDTO: DTOAppTier | null): TonApiSelected
     return {
         id: tierDTO.id,
         name: tierDTO.name,
-        price: new TonCurrencyAmount(tierDTO.ton_price),
+        price: new UsdCurrencyAmount(tierDTO.usd_price),
         description: {
             requestsPerSecondLimit: tierDTO.rpc
         },
         subscriptionDate: new Date(tierDTO.date_create),
-        renewsDate: new Date(tierDTO.next_payment),
+        renewsDate: tierDTO.next_payment ? new Date(tierDTO.next_payment) : undefined,
         active: true
     };
 }

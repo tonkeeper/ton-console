@@ -1,18 +1,22 @@
 import { ComponentProps, FunctionComponent, PropsWithChildren, useState } from 'react';
 import { Skeleton, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { Amount, CURRENCY, getWindow, subtractPixels } from 'src/shared';
+import { Amount, CRYPTO_CURRENCY, getWindow, subtractPixels } from 'src/shared';
 import { ratesStore } from 'src/entities/rates';
 import { computed } from 'mobx';
+import BigNumber from 'bignumber.js';
 const CurrencyRate: FunctionComponent<
     PropsWithChildren<
         ComponentProps<typeof Text> & {
             showSkeletonOnUpdate?: boolean;
             leftSign?: string;
-            currency: CURRENCY;
-            amount: Amount;
+            currency: CRYPTO_CURRENCY;
+            amount?: Amount;
             skeletonWidth?: string | number;
             precision?: number;
+            reverse?: boolean;
+            amountLoading?: boolean;
+            contentUnderSkeleton?: string;
         }
     >
 > = ({
@@ -23,12 +27,15 @@ const CurrencyRate: FunctionComponent<
     amount,
     skeletonWidth,
     precision,
+    reverse,
+    amountLoading,
+    contentUnderSkeleton,
     ...rest
 }) => {
     const sign = leftSign === undefined ? '$' : leftSign;
     const precisionWithFallback = precision === undefined ? 2 : precision;
     const [skeletonHeight, setSkeletonHeight] = useState('30px');
-    const rate$ = ratesStore.rates$[currency as CURRENCY];
+    const rate$ = ratesStore.rates$[currency as CRYPTO_CURRENCY];
 
     const ref = (element: HTMLElement | null): void => {
         const window = getWindow();
@@ -38,21 +45,28 @@ const CurrencyRate: FunctionComponent<
         }
     };
 
-    const value = computed(() =>
-        ratesStore.rates$[currency as CURRENCY].value
-            .multipliedBy(amount)
-            .decimalPlaces(precisionWithFallback)
-            .toString()
-    );
+    const value = computed(() => {
+        if (amount === undefined) {
+            return undefined;
+        }
+
+        const rate = ratesStore.rates$[currency as CRYPTO_CURRENCY].value;
+
+        const result = reverse ? new BigNumber(amount).div(rate) : rate.multipliedBy(amount);
+
+        return result.decimalPlaces(precisionWithFallback).toString();
+    });
 
     return (
         <Text ref={ref} alignItems="center" display="flex" {...rest}>
-            {!rate$.isResolved || (rate$.isLoading && showSkeletonOnUpdate) ? (
+            {amountLoading || !rate$.isResolved || (rate$.isLoading && showSkeletonOnUpdate) ? (
                 <Skeleton display="inline-block" w={skeletonWidth || '40px'} h={skeletonHeight} />
+            ) : value.get() !== undefined ? (
+                sign + value + (contentUnderSkeleton || '')
             ) : (
-                sign + value
+                ''
             )}
-            {children}
+            {value.get() !== undefined && children}
         </Text>
     );
 };

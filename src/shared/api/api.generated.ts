@@ -70,12 +70,8 @@ export interface DTOTier {
     burst: number;
     /** @example 5 */
     rpc: number;
-    /**
-     * The price is in nano tons
-     * @format int64
-     * @example 1000000000
-     */
-    ton_price: number;
+    /** @example 100 */
+    usd_price: number;
 }
 
 export interface DTOAppTier {
@@ -90,14 +86,14 @@ export interface DTOAppTier {
     burst: number;
     /** @example 5 */
     rpc: number;
-    /** @example 1000000000 */
-    ton_price: number;
+    /** @example 100 */
+    usd_price: number;
     /** @example 50 */
     long_polling_sub: number;
     /** @example 10 */
     entity_per_conn?: number;
     /** @example "2023-04-23" */
-    next_payment: string;
+    next_payment?: string;
     /** @example "2023-03-23" */
     date_create: string;
 }
@@ -123,7 +119,12 @@ export interface DTOCharge {
      * @format int64
      * @example 1
      */
-    tier_id: number;
+    tier_id?: number;
+    /**
+     * @format int64
+     * @example 1
+     */
+    pushes_package_id?: number;
     /**
      * @format int64
      * @example 1000000000
@@ -183,6 +184,24 @@ export interface DTOStats {
     }[];
     /** @example "matrix" */
     resultType: string;
+}
+
+export interface DTOPushesPackage {
+    /**
+     * @format int64
+     * @example 1
+     */
+    id: number;
+    /** @example "Lite" */
+    name: string;
+    /** @example 1000 */
+    limits: number;
+    /**
+     * The price is in nano tons
+     * @format int64
+     * @example 1000000000
+     */
+    ton_price: number;
 }
 
 /** backend error code */
@@ -639,7 +658,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags services
+         * @tags tonapi_service
          * @name GetTonApiTokens
          * @summary Get TonAPI tokens
          * @request GET:/api/v1/services/tonapi/tokens
@@ -671,7 +690,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags services
+         * @tags tonapi_service
          * @name GenerateTonApiProjectToken
          * @summary Generate TonAPI project token
          * @request POST:/api/v1/services/tonapi/generate/token
@@ -710,7 +729,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags services
+         * @tags tonapi_service
          * @name UpdateTonApiProjectToken
          * @summary Update TonAPI project token
          * @request PATCH:/api/v1/services/tonapi/token/{id}
@@ -745,7 +764,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags services
+         * @tags tonapi_service
          * @name DeleteTonApiProjectToken
          * @summary Delete TonAPI project token
          * @request DELETE:/api/v1/services/tonapi/token/{id}
@@ -773,7 +792,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags services
+         * @tags tonapi_service
          * @name GetTonApiProjectTier
          * @summary Get project TonAPI tier
          * @request GET:/api/v1/services/tonapi/tier
@@ -805,7 +824,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags services
+         * @tags tonapi_service
          * @name UpdateTonApiTier
          * @summary Update TonAPI tier for project
          * @request PATCH:/api/v1/services/tonapi/tier
@@ -845,7 +864,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags services
+         * @tags tonapi_service
          * @name GetTonApiTiers
          * @summary Get active TonAPI tiers
          * @request GET:/api/v1/services/tonapi/tiers
@@ -867,7 +886,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags services
+         * @tags tonapi_service
          * @name GetTonApiPaymentsHistory
          * @summary Get TonAPI payments history
          * @request GET:/api/v1/services/tonapi/payments/history
@@ -899,7 +918,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * @description To filter the stats, are expected  start and end query parameters in unix format, where end is the day closer to the current one, for example start=1675958400&end=1676908800,
          *
-         * @tags services
+         * @tags tonapi_service
          * @name GetTonApiTokensStats
          * @summary Get TonAPI stats by tokens
          * @request GET:/api/v1/services/tonapi/stats
@@ -942,6 +961,95 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 DTOError
             >({
                 path: `/api/v1/services/tonapi/stats`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pushes_service
+         * @name GetPushesPackages
+         * @summary Get pushes packages
+         * @request GET:/api/v1/services/pushes/packages
+         * @secure
+         */
+        getPushesPackages: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    items: DTOPushesPackage[];
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/pushes/packages`,
+                method: 'GET',
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pushes_service
+         * @name BuyPushesPackage
+         * @summary Buy pushes package
+         * @request POST:/api/v1/services/pushes/package
+         * @secure
+         */
+        buyPushesPackage: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            data: {
+                /**
+                 * @format int64
+                 * @example 1
+                 */
+                id?: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<DTOOk, DTOError>({
+                path: `/api/v1/services/pushes/package`,
+                method: 'POST',
+                query: query,
+                body: data,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pushes_service
+         * @name GetPushesPaymentsHistory
+         * @summary Get Pushes payments history
+         * @request GET:/api/v1/services/pushes/payments/history
+         * @secure
+         */
+        getPushesPaymentsHistory: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    history: DTOCharge[];
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/pushes/payments/history`,
                 method: 'GET',
                 query: query,
                 secure: true,

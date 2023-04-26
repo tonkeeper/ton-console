@@ -17,8 +17,6 @@ import { tonApiStatsStore } from '../model';
 import { toDate, toDateTime } from 'src/shared';
 import { toJS } from 'mobx';
 
-const freeTierLimit = 1;
-
 const DashboardChart: FunctionComponent<ComponentProps<typeof Box>> = props => {
     const { colors } = useTheme();
     const data = tonApiStatsStore.stats$.value?.chart;
@@ -41,13 +39,13 @@ const DashboardChart: FunctionComponent<ComponentProps<typeof Box>> = props => {
     const formatXLabel = useCallback((timestamp: number) => toDate(new Date(timestamp)), []);
 
     const shouldDrawLimit = useMemo(() => {
-        if (!data?.length) {
+        if (!data?.length || !selectedTier) {
             return false;
         }
 
         return (
             Math.max(...data.map(item => item.requests)) >=
-            (selectedTier?.description.requestsPerSecondLimit || freeTierLimit) * 0.67
+            selectedTier.description.requestsPerSecondLimit * 0.67
         );
     }, [data, selectedTier]);
 
@@ -88,18 +86,20 @@ const DashboardChart: FunctionComponent<ComponentProps<typeof Box>> = props => {
                         stroke={colors.accent.blue}
                     />
                     {shouldDrawLimit && (
-                        <ReferenceLine
-                            ifOverflow="extendDomain"
-                            y={selectedTier?.description.requestsPerSecondLimit || freeTierLimit}
-                            stroke={colors.accent.red}
-                        />
+                        <>
+                            <ReferenceLine
+                                ifOverflow="extendDomain"
+                                y={selectedTier?.description.requestsPerSecondLimit}
+                                stroke={colors.accent.red}
+                            />
+                            <Line
+                                dot={false}
+                                dataKey="ReferenceLineStub"
+                                name="Limit"
+                                stroke={colors.accent.red}
+                            />
+                        </>
                     )}
-                    <Line
-                        dot={false}
-                        dataKey="ReferenceLineStub"
-                        name="Limit"
-                        stroke={colors.accent.red}
-                    />
                     <XAxis
                         dataKey="time"
                         domain={['dataMin', 'dataMax']}

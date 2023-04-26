@@ -1,13 +1,13 @@
 import { FunctionComponent, useCallback, useMemo } from 'react';
-import { H2, H4, Overlay } from 'src/shared';
-import { Box, Button, Divider, Flex, Skeleton, useDisclosure, chakra } from '@chakra-ui/react';
+import { CRYPTO_CURRENCY, H2, H4, Overlay } from 'src/shared';
+import { Box, Button, Divider, Flex, Skeleton, useDisclosure } from '@chakra-ui/react';
 import {
-    SubscriptionsTable,
     BillingHistoryTable,
+    billingStore,
     subscriptionsStore,
-    billingStore
+    SubscriptionsTable
 } from 'src/widgets';
-import { balanceStore, RefillModal } from 'src/entities';
+import { balanceStore, CurrencyRate, RefillModal } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 
 const BalancePage: FunctionComponent = () => {
@@ -26,16 +26,23 @@ const BalancePage: FunctionComponent = () => {
         <>
             <Overlay h="fit-content" p="0">
                 <Box pt="5" pb="6" px="6">
-                    <H2 mb="5" display="flex" alignItems="center" gap="2">
+                    <H2 mb="1" display="flex" alignItems="center" gap="2">
                         {balanceStore.portfolio$.isLoading ? (
-                            <Skeleton w="60px" h="6" />
+                            <Skeleton w="100px" h="6" />
                         ) : (
-                            <chakra.span minW="60px" textAlign="center">
-                                {balanceStore.balances[0]?.stringAmount}
-                            </chakra.span>
-                        )}{' '}
-                        TON
+                            balanceStore.balances[0]?.stringAmount + ' TON'
+                        )}
                     </H2>
+                    <CurrencyRate
+                        textStyle="body2"
+                        color="text.secondary"
+                        mb="5"
+                        currency={CRYPTO_CURRENCY.TON}
+                        leftSign=""
+                        amount={balanceStore.balances[0]?.amount}
+                        amountLoading={balanceStore.portfolio$.isLoading}
+                        contentUnderSkeleton="&nbsp;USD"
+                    />
                     <Flex gap="3">
                         <Button onClick={onOpen} size="lg">
                             Refill

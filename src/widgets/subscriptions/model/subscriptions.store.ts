@@ -5,8 +5,9 @@ import { Subscription } from 'src/widgets/subscriptions/model/interfaces/subscri
 
 class SubscriptionsStore {
     get subscriptions(): Subscription[] {
-        if (tonApiTiersStore.selectedTier$.value) {
-            return [mapTonapiTierToSubscription(tonApiTiersStore.selectedTier$.value)];
+        const tier = tonApiTiersStore.selectedTier$.value;
+        if (tier && tier.renewsDate) {
+            return [mapTonapiTierToSubscription(tier as Required<TonApiSelectedTier>)];
         }
 
         return [];
@@ -25,7 +26,7 @@ class SubscriptionsStore {
     });
 }
 
-function mapTonapiTierToSubscription(tier: TonApiSelectedTier): Subscription {
+function mapTonapiTierToSubscription(tier: Required<TonApiSelectedTier>): Subscription {
     return {
         id: `tonapi-${tier.id}`,
         plan: `TON API «${tier.name}»`,
