@@ -3,19 +3,25 @@ import { ErrorOption, Path, useForm } from 'react-hook-form';
 
 export type AsyncValidationState = 'idle' | 'validating' | 'succeed';
 
-export function useAsyncValidator<N extends string, T extends string | number = string>(
+export function useAsyncValidator<
+    N extends string,
+    T extends string | number = string,
+    R = unknown
+>(
     methods: Pick<
-        ReturnType<typeof useForm<{ [key in N]: T }>>,
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        ReturnType<typeof useForm<any>>,
         'clearErrors' | 'setError' | 'formState' | 'getFieldState' | 'watch'
     >,
     fieldName: Path<{ [key in N]: T }>,
-    validator: (val: T) => Promise<ErrorOption | undefined | null>,
+    validator: (val: T) => Promise<ErrorOption | undefined | null | { success: true; result: R }>,
     debounceTime?: number
-): AsyncValidationState {
+): [AsyncValidationState, R | undefined] {
     const finalDebounceTime = debounceTime === undefined ? 500 : debounceTime;
     const [validationState, setValidationState] = useState<'idle' | 'validating' | 'succeed'>(
         'idle'
     );
+    const [validationProduct, setValidationProduct] = useState<R | undefined>(undefined);
 
     const { clearErrors, setError, formState, getFieldState, watch } = methods;
     const { error } = getFieldState(fieldName, formState);
@@ -24,6 +30,7 @@ export function useAsyncValidator<N extends string, T extends string | number = 
     useEffect(() => {
         let shouldCancel = false;
         setValidationState('idle');
+        setValidationProduct(undefined);
         const validate = async (): Promise<void> => {
             if (!error && value) {
                 clearErrors(fieldName);
@@ -33,13 +40,23 @@ export function useAsyncValidator<N extends string, T extends string | number = 
                     return;
                 }
                 setValidationState('validating');
-                const result = await validator(value);
+                const validationResult = await validator(value);
                 if (!shouldCancel) {
-                    if (result) {
-                        setError(fieldName, result);
-                        setValidationState('idle');
-                    } else {
+                    if (!validationResult) {
                         setValidationState('succeed');
+                        return;
+                    }
+
+                    if (
+                        validationResult &&
+                        'success' in validationResult &&
+                        validationResult.success
+                    ) {
+                        setValidationProduct(validationResult.result);
+                        setValidationState('succeed');
+                    } else {
+                        setError(fieldName, validationResult as ErrorOption);
+                        setValidationState('idle');
                     }
                 }
             }
@@ -52,5 +69,5 @@ export function useAsyncValidator<N extends string, T extends string | number = 
         };
     }, [error, value, clearErrors, setError, validator]);
 
-    return validationState;
+    return [validationState, validationProduct];
 }
