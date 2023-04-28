@@ -1,11 +1,11 @@
 import { Loadable } from './loadable';
-import { TokenCurrencyAmount } from '../blockchain';
+import { BasicCurrencyAmount, TokenCurrencyAmount } from '../currency';
 import { toJS } from 'mobx';
 
 const dateFormat =
     /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
 
-const serializables = [TokenCurrencyAmount];
+const serializables = [TokenCurrencyAmount, BasicCurrencyAmount];
 
 function reviver(_: string, value: unknown): unknown {
     if (typeof value === 'string' && dateFormat.test(value)) {
@@ -15,9 +15,8 @@ function reviver(_: string, value: unknown): unknown {
     if (value && typeof value === 'object' && '$type' in value) {
         const Constructor = serializables.find(item => item.name === value.$type);
         if (Constructor) {
-            return new Constructor(
-                value as unknown as ConstructorParameters<typeof Constructor>[0]
-            );
+            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+            return new Constructor(value as any);
         }
     }
 

@@ -133,6 +133,7 @@ module.exports = {
                 '@typescript-eslint/return-await': 'error',
                 '@typescript-eslint/indent': 'off',
                 '@typescript-eslint/no-non-null-assertion': 'off',
+                '@typescript-eslint/no-redeclare': ['error', { ignoreDeclarationMerge: true }],
 
                 /* react */
                 'react/react-in-jsx-scope': 'off',

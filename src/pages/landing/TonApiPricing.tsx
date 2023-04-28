@@ -6,20 +6,7 @@ import { CurrencyRate } from 'src/entities';
 const tiers = [
     {
         name: 'Start',
-        tonPrice: 'FREE',
-        usdPriceStub: 'Forever',
-        included: {
-            requestsPerSecondLimit: 0.25,
-            subscription: {
-                connectionsLimit: 1,
-                accountsLimit: 5
-            },
-            webhooks: false
-        }
-    },
-    {
-        name: 'Lite',
-        tonPrice: '1',
+        usdPrice: 'FREE',
         included: {
             requestsPerSecondLimit: 1,
             subscription: {
@@ -30,8 +17,20 @@ const tiers = [
         }
     },
     {
+        name: 'Lite',
+        usdPrice: 9.9,
+        included: {
+            requestsPerSecondLimit: 3,
+            subscription: {
+                connectionsLimit: 1,
+                accountsLimit: 5
+            },
+            webhooks: false
+        }
+    },
+    {
         name: 'Standard',
-        tonPrice: '20',
+        usdPrice: 95,
         included: {
             requestsPerSecondLimit: 50,
             subscription: {
@@ -43,7 +42,7 @@ const tiers = [
     },
     {
         name: 'Pro',
-        tonPrice: '200',
+        usdPrice: 890,
         included: {
             requestsPerSecondLimit: 600,
             subscription: {
@@ -80,23 +79,23 @@ export const TonApiPricing: FunctionComponent<ComponentProps<typeof Grid>> = pro
                     <Text textStyle="label2" mb="3" color="text.primary">
                         {tier.name}
                     </Text>
-                    <H2 mb="1">
-                        {tier.tonPrice === 'FREE' ? tier.tonPrice : `${tier.tonPrice} TON`}
-                    </H2>
-                    {tier.usdPriceStub ? (
+                    <H2 mb="1">{tier.usdPrice === 'FREE' ? tier.usdPrice : `$${tier.usdPrice}`}</H2>
+                    {tier.usdPrice === 'FREE' ? (
                         <H3Thin mb="4" color="text.secondary">
-                            {tier.usdPriceStub}
+                            Forever
                         </H3Thin>
                     ) : (
                         <CurrencyRate
                             as={H3Thin}
                             mb="4"
+                            leftSign=""
                             textStyle="h3Thin"
                             color="text.secondary"
                             currency={CURRENCY.TON}
-                            amount={tier.tonPrice}
+                            amount={tier.usdPrice}
+                            reverse
                         >
-                            &nbsp;per month
+                            &nbsp;TON per month
                         </CurrencyRate>
                     )}
 

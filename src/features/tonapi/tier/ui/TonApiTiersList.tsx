@@ -4,7 +4,7 @@ import { Button, Center, Flex, Spinner, useDisclosure } from '@chakra-ui/react';
 import TonApiPaymentDetailsModal from './TonApiPaymentDetailsModal';
 import { TonApiTier, tonApiTiersStore } from '../model';
 import { TonApiTierCard } from './TonApiTierCard';
-import { balanceStore, RefillModal } from 'src/entities';
+import { balanceStore, ratesStore, RefillModal } from 'src/entities';
 import { ButtonLink, EXTERNAL_LINKS } from 'src/shared';
 
 const TonApiTiersList: FunctionComponent = () => {
@@ -19,15 +19,22 @@ const TonApiTiersList: FunctionComponent = () => {
         return balanceStore.balances[0] || null;
     }, [balanceStore.balances]);
 
+    const tonRate = ratesStore.rates$.TON.value;
+    const tonRateResolved = ratesStore.rates$.TON.isResolved;
+
     const onSelectTier = useCallback(
         (tier: TonApiTier) => {
-            if (!tonBalance || tier.price.isGT(tonBalance)) {
+            if (
+                tonBalance &&
+                tonRateResolved &&
+                tier.price.amount.gt(tonBalance.amount.multipliedBy(tonRate))
+            ) {
                 return onRefillModalOpen();
             }
 
             setSelectedTier(tier);
         },
-        [tonBalance]
+        [tonBalance, tonRate, tonRateResolved]
     );
 
     const onPaymentModalClose = useCallback(() => {
@@ -62,6 +69,7 @@ const TonApiTiersList: FunctionComponent = () => {
                                         href={EXTERNAL_LINKS.SUPPORT}
                                         isExternal
                                         variant="secondary"
+                                        isDisabled={currentTier?.price.amount.isZero()}
                                     >
                                         Cancel
                                     </ButtonLink>

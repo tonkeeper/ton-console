@@ -9,7 +9,7 @@ import {
     ListItem,
     Text
 } from '@chakra-ui/react';
-import { H2, TickIcon, toDate } from 'src/shared';
+import { CURRENCY, H2, TickIcon, toDate } from 'src/shared';
 import { isTonApiSelectedTier, TonApiSelectedTier, TonApiTier } from '../model';
 import { CurrencyRate } from 'src/entities';
 
@@ -27,17 +27,24 @@ export const TonApiTierCard: FunctionComponent<
                 </Text>
             </CardHeader>
             <CardBody flexDir="column" display="flex">
-                <H2>{tier.price.stringCurrencyAmount}</H2>
-                <CurrencyRate
-                    textStyle="body2"
-                    mb="4"
-                    color="text.secondary"
-                    leftSign="$"
-                    currency={tier.price.currency}
-                    amount={tier.price.amount}
-                >
-                    &nbsp;per month
-                </CurrencyRate>
+                {tier.price.amount.isZero() ? (
+                    <H2 mb="9">FREE</H2>
+                ) : (
+                    <>
+                        <H2>{tier.price.stringCurrencyAmount}</H2>
+                        <CurrencyRate
+                            textStyle="body2"
+                            mb="4"
+                            leftSign=""
+                            color="text.secondary"
+                            currency={CURRENCY.TON}
+                            amount={tier.price.amount}
+                            reverse
+                        >
+                            &nbsp;TON per month
+                        </CurrencyRate>
+                    </>
+                )}
                 <List flex="1" mb="6" spacing="2">
                     <ListItem display="flex">
                         <ListIcon as={TickIcon} color="accent.green" />
@@ -46,7 +53,7 @@ export const TonApiTierCard: FunctionComponent<
                         </Text>
                     </ListItem>
                 </List>
-                {isTonApiSelectedTier(tier) && (
+                {isTonApiSelectedTier(tier) && tier.renewsDate && (
                     <Text textStyle="body2" color="text.secondary">
                         Available until {toDate(tier.renewsDate)}
                     </Text>

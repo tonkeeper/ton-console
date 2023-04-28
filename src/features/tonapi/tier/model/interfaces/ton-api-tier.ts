@@ -1,4 +1,4 @@
-import { CurrencyAmount } from 'src/shared';
+import { UsdCurrencyAmount } from 'src/shared';
 
 export interface TonApiTier {
     id: number;
@@ -6,5 +6,5 @@ export interface TonApiTier {
     description: {
         requestsPerSecondLimit: number;
     };
-    price: CurrencyAmount;
+    price: UsdCurrencyAmount;
 }

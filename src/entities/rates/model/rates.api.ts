@@ -1,14 +1,14 @@
-import { CURRENCY } from 'src/shared';
+import { CRYPTO_CURRENCY } from 'src/shared';
 import BigNumber from 'bignumber.js';
 
 const backendCurrenciesMapping = {
-    [CURRENCY.TON]: {
+    [CRYPTO_CURRENCY.TON]: {
         request: 'ton',
         response: 'TON'
     }
 };
 
-export async function fetchRate(currency: CURRENCY): Promise<BigNumber> {
+export async function fetchRate(currency: CRYPTO_CURRENCY): Promise<BigNumber> {
     const response = await fetch(
         `${import.meta.env.VITE_TONAPI_BASE_URL}rates?tokens=${
             backendCurrenciesMapping[currency].request

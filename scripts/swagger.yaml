@@ -205,7 +205,7 @@ paths:
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - services
+        - tonapi_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       responses:
@@ -224,7 +224,7 @@ paths:
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - services
+        - tonapi_service
       requestBody:
         $ref: "#/components/requestBodies/TokenInput"
       parameters:
@@ -245,7 +245,7 @@ paths:
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - services
+        - tonapi_service
       requestBody:
         $ref: "#/components/requestBodies/TokenInput"
       parameters:
@@ -266,7 +266,7 @@ paths:
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - services
+        - tonapi_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
         - $ref: '#/components/parameters/tokenID'
@@ -286,7 +286,7 @@ paths:
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - services
+        - tonapi_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       responses:
@@ -304,7 +304,7 @@ paths:
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - services
+        - tonapi_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       requestBody:
@@ -325,7 +325,7 @@ paths:
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - services
+        - tonapi_service
       responses:
         '200':
           $ref: '#/components/responses/Tiers'
@@ -342,7 +342,7 @@ paths:
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - services
+        - tonapi_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       responses:
@@ -363,7 +363,7 @@ paths:
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - services
+        - tonapi_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
         - $ref: '#/components/parameters/queryStartDate'
@@ -373,6 +373,64 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/TonApiTokensStats'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
+  /api/v1/services/pushes/packages:
+    get:
+      summary: "Get pushes packages"
+      operationId: getPushesPackages
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - pushes_service
+      responses:
+        '200':
+          $ref: '#/components/responses/PushesPackages'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/pushes/package:
+    post:
+      summary: "Buy pushes package"
+      operationId: buyPushesPackage
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - pushes_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/PushesBuyPackageInput"
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/pushes/payments/history:
+    get:
+      summary: "Get Pushes payments history"
+      operationId: getPushesPaymentsHistory
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - pushes_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/PaymentsHistory'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -561,6 +619,17 @@ components:
                 type: integer
                 format: int64
                 example: 1
+    PushesBuyPackageInput:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+                example: 1
 
   schemas:
     Ok:
@@ -637,7 +706,7 @@ components:
         - name
         - rpc
         - burst
-        - ton_price
+        - usd_price
       properties:
         id:
           type: integer
@@ -652,11 +721,9 @@ components:
         rpc:
           type: number
           example: 5
-        ton_price:
-          description: "The price is in nano tons"
-          type: integer
-          format: int64
-          example: 1000000000
+        usd_price:
+          type: number
+          example: 100
     AppTier:
       type: object
       required:
@@ -665,8 +732,7 @@ components:
         - rpc
         - burst
         - long_polling_sub
-        - ton_price
-        - next_payment
+        - usd_price
         - date_create
       properties:
         id:
@@ -682,9 +748,9 @@ components:
         rpc:
           type: number
           example: 5
-        ton_price:
-          type: integer
-          example: 1000000000
+        usd_price:
+          type: number
+          example: 100
         long_polling_sub:
           type: integer
           example: 50
@@ -722,7 +788,6 @@ components:
       type: object
       required:
         - id
-        - tier_id
         - amount
         - date_create
       properties:
@@ -730,6 +795,10 @@ components:
           type: string
           example: "742af494-e2cd-441f-98e8-ac6075280eff"
         tier_id:
+          type: integer
+          format: int64
+          example: 1
+        pushes_package_id:
           type: integer
           format: int64
           example: 1
@@ -828,6 +897,29 @@ components:
         resultType:
           type: string
           example: "matrix"
+    PushesPackage:
+      type: object
+      required:
+        - id
+        - name
+        - limits
+        - ton_price
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: "Lite"
+        limits:
+          type: integer
+          example: 1000
+        ton_price:
+          description: "The price is in nano tons"
+          type: integer
+          format: int64
+          example: 1000000000
   
   responses:
     NotFound:
@@ -1003,6 +1095,19 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Project'
+    PushesPackages:
+      description: "Pushes packages"
+      content:
+        application/json:
+          schema:
+            required:
+              - items
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PushesPackage'
   
   securitySchemes:
     JWTAuth:

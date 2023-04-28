@@ -7,3 +7,4 @@ export * from './blockchain';
 export * from './format';
 export * from './css';
 export * from './object';
+export * from './currency';
