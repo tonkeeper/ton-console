@@ -130,6 +130,8 @@ export interface DTOCharge {
      * @example 1000000000
      */
     amount: number;
+    /** @example 2.25 */
+    exchange_rate: number;
     /** @example "2023-03-23" */
     date_create: string;
 }

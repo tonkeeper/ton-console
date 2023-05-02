@@ -789,6 +789,7 @@ components:
       required:
         - id
         - amount
+        - exchange_rate
         - date_create
       properties:
         id:
@@ -806,6 +807,9 @@ components:
           type: integer
           format: int64
           example: 1000000000
+        exchange_rate:
+          type: number
+          example: 2.25
         date_create:
           type: string
           example: "2023-03-23"

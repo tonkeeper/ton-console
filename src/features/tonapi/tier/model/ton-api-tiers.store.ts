@@ -144,11 +144,16 @@ function mapDTOPaymentToTonApiPayment(
         return null;
     }
 
+    const tonAmount = new TonCurrencyAmount(payment.amount);
+
     return {
         id: payment.id,
         tier,
         date: new Date(payment.date_create),
-        amount: new TonCurrencyAmount(payment.amount)
+        amount: tonAmount,
+        amountUsdEquivalent: new UsdCurrencyAmount(
+            tonAmount.amount.multipliedBy(payment.exchange_rate)
+        )
     };
 }
 
