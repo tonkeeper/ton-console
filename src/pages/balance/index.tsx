@@ -37,8 +37,9 @@ const BalancePage: FunctionComponent = () => {
                         textStyle="body2"
                         color="text.secondary"
                         mb="5"
+                        skeletonWidth="70px"
                         currency={CRYPTO_CURRENCY.TON}
-                        leftSign=""
+                        leftSign={balanceStore.balances[0]?.amount.isZero() ? '' : '≈'}
                         amount={balanceStore.balances[0]?.amount}
                         amountLoading={balanceStore.portfolio$.isLoading}
                         contentUnderSkeleton="&nbsp;USD"
