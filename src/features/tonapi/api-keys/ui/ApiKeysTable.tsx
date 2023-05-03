@@ -13,7 +13,8 @@ import {
     MenuList,
     MenuItem,
     Menu,
-    IconButton
+    IconButton,
+    Box
 } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent, useCallback, useEffect, useState } from 'react';
 import {
@@ -22,6 +23,7 @@ import {
     DeleteIcon24,
     EditIcon24,
     TickIcon,
+    TooltipHoverable,
     VerticalDotsIcon16
 } from 'src/shared';
 import { ApiKey, apiKeysStore } from '../model';
@@ -73,8 +75,21 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                     <Tbody>
                         {apiKeysStore.apiKeys$.value.map(apiKey => (
                             <Tr key={apiKey.id}>
-                                <Td overflow="hidden" maxW="200px" textOverflow="ellipsis">
-                                    {apiKey.name}
+                                <Td overflow="hidden" maxW="200px">
+                                    <TooltipHoverable
+                                        host={
+                                            <Box
+                                                overflow="hidden"
+                                                w="fit-content"
+                                                maxW="100%"
+                                                textOverflow="ellipsis"
+                                            >
+                                                {apiKey.name}
+                                            </Box>
+                                        }
+                                    >
+                                        {apiKey.name}
+                                    </TooltipHoverable>
                                 </Td>
                                 <Td overflow="hidden" w="100%" maxW="0">
                                     <Flex align="center" gap="1">
