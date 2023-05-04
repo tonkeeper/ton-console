@@ -66,8 +66,11 @@ export interface DTOTier {
     id: number;
     /** @example "Test tier" */
     name: string;
-    /** @example 1 */
-    burst: number;
+    /** @example 5 */
+    long_polling_sub: number;
+    /** @example 5 */
+    entity_per_conn: number;
+    capabilities: string[];
     /** @example 5 */
     rpc: number;
     /** @example 100 */
@@ -82,8 +85,6 @@ export interface DTOAppTier {
     id: number;
     /** @example "Test tier" */
     name: string;
-    /** @example 1 */
-    burst: number;
     /** @example 5 */
     rpc: number;
     /** @example 100 */
@@ -91,7 +92,8 @@ export interface DTOAppTier {
     /** @example 50 */
     long_polling_sub: number;
     /** @example 10 */
-    entity_per_conn?: number;
+    entity_per_conn: number;
+    capabilities: string[];
     /** @example "2023-04-23" */
     next_payment?: string;
     /** @example "2023-03-23" */
@@ -124,12 +126,14 @@ export interface DTOCharge {
      * @format int64
      * @example 1
      */
-    pushes_package_id?: number;
+    messages_package_id?: number;
     /**
      * @format int64
      * @example 1000000000
      */
     amount: number;
+    /** @example 2.25 */
+    exchange_rate: number;
     /** @example "2023-03-23" */
     date_create: string;
 }
@@ -186,7 +190,7 @@ export interface DTOStats {
     resultType: string;
 }
 
-export interface DTOPushesPackage {
+export interface DTOMessagesPackage {
     /**
      * @format int64
      * @example 1
@@ -196,12 +200,28 @@ export interface DTOPushesPackage {
     name: string;
     /** @example 1000 */
     limits: number;
+    /** @example 100 */
+    usd_price: number;
+}
+
+export interface DTOMessagesApp {
     /**
-     * The price is in nano tons
      * @format int64
-     * @example 1000000000
+     * @example 3652012454
      */
-    ton_price: number;
+    id: number;
+    /** @example "MyApp-123" */
+    name: string;
+    /** @example "https://my_dapp.io/avatar.png" */
+    image?: string;
+    /** @example 1647024163 */
+    project_id: number;
+    /** @example "https://my_dapp.io" */
+    url: string;
+    /** @example true */
+    verify: boolean;
+    /** @example "2023-03-23" */
+    date_create: string;
 }
 
 /** backend error code */
@@ -970,20 +990,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags pushes_service
-         * @name GetPushesPackages
-         * @summary Get pushes packages
-         * @request GET:/api/v1/services/pushes/packages
+         * @tags messages_service
+         * @name GetMessagesPackages
+         * @summary Get messages packages
+         * @request GET:/api/v1/services/messages/packages
          * @secure
          */
-        getPushesPackages: (params: RequestParams = {}) =>
+        getMessagesPackages: (params: RequestParams = {}) =>
             this.request<
                 {
-                    items: DTOPushesPackage[];
+                    items: DTOMessagesPackage[];
                 },
                 DTOError
             >({
-                path: `/api/v1/services/pushes/packages`,
+                path: `/api/v1/services/messages/packages`,
                 method: 'GET',
                 secure: true,
                 ...params
@@ -992,13 +1012,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags pushes_service
-         * @name BuyPushesPackage
-         * @summary Buy pushes package
-         * @request POST:/api/v1/services/pushes/package
+         * @tags messages_service
+         * @name BuyMessagesPackage
+         * @summary Buy messages package
+         * @request POST:/api/v1/services/messages/package
          * @secure
          */
-        buyPushesPackage: (
+        buyMessagesPackage: (
             query: {
                 /**
                  * Project ID
@@ -1011,12 +1031,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @format int64
                  * @example 1
                  */
-                id?: number;
+                id: number;
             },
             params: RequestParams = {}
         ) =>
             this.request<DTOOk, DTOError>({
-                path: `/api/v1/services/pushes/package`,
+                path: `/api/v1/services/messages/package`,
                 method: 'POST',
                 query: query,
                 body: data,
@@ -1027,10 +1047,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags pushes_service
+         * @tags messages_service
          * @name GetPushesPaymentsHistory
-         * @summary Get Pushes payments history
-         * @request GET:/api/v1/services/pushes/payments/history
+         * @summary Get messages payments history
+         * @request GET:/api/v1/services/messages/payments/history
          * @secure
          */
         getPushesPaymentsHistory: (
@@ -1049,7 +1069,118 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 },
                 DTOError
             >({
-                path: `/api/v1/services/pushes/payments/history`,
+                path: `/api/v1/services/messages/payments/history`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name CreateMessagesApp
+         * @summary Create messages app
+         * @request POST:/api/v1/services/messages/app
+         * @secure
+         */
+        createMessagesApp: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            data: {
+                /** @example "https://my_dapp.io" */
+                url: string;
+                /** @example "My dapp" */
+                name?: string;
+                /** @example "https://my_dapp.io/avatar.png" */
+                image?: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @example "DkPazejgbwoAAAAAZFNueLGu-1GCWVgvk5Av_1EK2Ml5LzQItlrivLPtTPMsu5A2" */
+                    payload: string;
+                    /**
+                     * @format int64
+                     * @example 1683189368
+                     */
+                    valid_until: number;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/messages/app`,
+                method: 'POST',
+                query: query,
+                body: data,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name VerifyMessagesApp
+         * @summary Verify messages app
+         * @request POST:/api/v1/services/messages/app/verify
+         * @secure
+         */
+        verifyMessagesApp: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            data: {
+                /** @example "DkPazejgbwoAAAAAZFNueLGu-1GCWVgvk5Av_1EK2Ml5LzQItlrivLPtTPMsu5A2" */
+                payload: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<DTOOk, DTOError>({
+                path: `/api/v1/services/messages/app/verify`,
+                method: 'POST',
+                query: query,
+                body: data,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name GetMessagesApps
+         * @summary Get messages apps
+         * @request GET:/api/v1/services/messages/apps
+         * @secure
+         */
+        getMessagesApps: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: DTOMessagesApp[];
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/messages/apps`,
                 method: 'GET',
                 query: query,
                 secure: true,

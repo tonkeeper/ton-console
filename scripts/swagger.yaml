@@ -197,7 +197,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/tonapi/tokens:
     get:
       summary: "Get TonAPI tokens"
@@ -380,35 +380,35 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
   
-  /api/v1/services/pushes/packages:
+  /api/v1/services/messages/packages:
     get:
-      summary: "Get pushes packages"
-      operationId: getPushesPackages
+      summary: "Get messages packages"
+      operationId: getMessagesPackages
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - pushes_service
+        - messages_service
       responses:
         '200':
-          $ref: '#/components/responses/PushesPackages'
+          $ref: '#/components/responses/MessagesPackages'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /api/v1/services/pushes/package:
+  /api/v1/services/messages/package:
     post:
-      summary: "Buy pushes package"
-      operationId: buyPushesPackage
+      summary: "Buy messages package"
+      operationId: buyMessagesPackage
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - pushes_service
+        - messages_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       requestBody:
-        $ref: "#/components/requestBodies/PushesBuyPackageInput"
+        $ref: "#/components/requestBodies/MessagesBuyPackageInput"
       responses:
         '200':
           $ref: '#/components/responses/Ok'
@@ -418,14 +418,14 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /api/v1/services/pushes/payments/history:
+  /api/v1/services/messages/payments/history:
     get:
-      summary: "Get Pushes payments history"
+      summary: "Get messages payments history"
       operationId: getPushesPaymentsHistory
       security:
         - JWTAuth: [ "common" ]
       tags:
-        - pushes_service
+        - messages_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       responses:
@@ -437,6 +437,68 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/services/messages/app:
+    post:
+      summary: "Create messages app"
+      operationId: createMessagesApp
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - messages_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/MessagesAppCreateInput"
+      responses:
+        '200':
+          $ref: '#/components/responses/MessagesAppCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/messages/app/verify:
+    post:
+      summary: "Verify messages app"
+      operationId: verifyMessagesApp
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - messages_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/MessagesAppVerifyInput"
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/messages/apps:
+    get:
+      summary: "Get messages apps"
+      operationId: getMessagesApps
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - messages_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/MessagesApps'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
 
 components:
   parameters:
@@ -619,18 +681,50 @@ components:
                 type: integer
                 format: int64
                 example: 1
-    PushesBuyPackageInput:
+    MessagesBuyPackageInput:
       description: "Data that is expected"
       content:
         application/json:
           schema:
             type: object
+            required:
+              - id
             properties:
               id:
                 type: integer
                 format: int64
                 example: 1
-
+    MessagesAppCreateInput:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            required:
+              - url
+            type: object
+            properties:
+              url:
+                type: string
+                example: "https://my_dapp.io"
+              name:
+                type: string
+                example: "My dapp"
+              image:
+                type: string
+                example: "https://my_dapp.io/avatar.png"
+    MessagesAppVerifyInput:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            required:
+              - payload
+            type: object
+            properties:
+              payload:
+                type: string
+                example: "DkPazejgbwoAAAAAZFNueLGu-1GCWVgvk5Av_1EK2Ml5LzQItlrivLPtTPMsu5A2"
+  
   schemas:
     Ok:
       type: object
@@ -705,8 +799,10 @@ components:
         - id
         - name
         - rpc
-        - burst
         - usd_price
+        - long_polling_sub
+        - entity_per_conn
+        - capabilities
       properties:
         id:
           type: integer
@@ -715,9 +811,16 @@ components:
         name:
           type: string
           example: "Test tier"
-        burst:
+        long_polling_sub:
           type: integer
-          example: 1
+          example: 5
+        entity_per_conn:
+          type: integer
+          example: 5
+        capabilities:
+          items:
+            type: string
+            example: [ "mempool" ]
         rpc:
           type: number
           example: 5
@@ -730,8 +833,9 @@ components:
         - id
         - name
         - rpc
-        - burst
         - long_polling_sub
+        - entity_per_conn
+        - capabilities
         - usd_price
         - date_create
       properties:
@@ -742,9 +846,6 @@ components:
         name:
           type: string
           example: "Test tier"
-        burst:
-          type: integer
-          example: 1
         rpc:
           type: number
           example: 5
@@ -757,6 +858,10 @@ components:
         entity_per_conn:
           type: integer
           example: 10
+        capabilities:
+          items:
+            type: string
+            example: [ "mempool" ]
         next_payment:
           type: string
           example: "2023-04-23"
@@ -789,6 +894,7 @@ components:
       required:
         - id
         - amount
+        - exchange_rate
         - date_create
       properties:
         id:
@@ -798,7 +904,7 @@ components:
           type: integer
           format: int64
           example: 1
-        pushes_package_id:
+        messages_package_id:
           type: integer
           format: int64
           example: 1
@@ -806,6 +912,9 @@ components:
           type: integer
           format: int64
           example: 1000000000
+        exchange_rate:
+          type: number
+          example: 2.25
         date_create:
           type: string
           example: "2023-03-23"
@@ -897,13 +1006,13 @@ components:
         resultType:
           type: string
           example: "matrix"
-    PushesPackage:
+    MessagesPackage:
       type: object
       required:
         - id
         - name
         - limits
-        - ton_price
+        - usd_price
       properties:
         id:
           type: integer
@@ -915,11 +1024,41 @@ components:
         limits:
           type: integer
           example: 1000
-        ton_price:
-          description: "The price is in nano tons"
+        usd_price:
+          type: number
+          example: 100
+    MessagesApp:
+      type: object
+      required:
+        - id
+        - name
+        - project_id
+        - url
+        - verify
+        - date_create
+      properties:
+        id:
           type: integer
           format: int64
-          example: 1000000000
+          example: 3652012454
+        name:
+          type: string
+          example: "MyApp-123"
+        image:
+          type: string
+          example: "https://my_dapp.io/avatar.png"
+        project_id:
+          type: integer
+          example: 1647024163
+        url:
+          type: string
+          example: "https://my_dapp.io"
+        verify:
+          type: boolean
+          example: true
+        date_create:
+          type: string
+          example: "2023-03-23"
   
   responses:
     NotFound:
@@ -1095,8 +1234,8 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Project'
-    PushesPackages:
-      description: "Pushes packages"
+    MessagesPackages:
+      description: "Messages packages"
       content:
         application/json:
           schema:
@@ -1107,7 +1246,37 @@ components:
               items:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PushesPackage'
+                  $ref: '#/components/schemas/MessagesPackage'
+    MessagesAppCreated:
+      description: "Messages app has been created"
+      content:
+        application/json:
+          schema:
+            required:
+              - payload
+              - valid_until
+            type: object
+            properties:
+              payload:
+                type: string
+                example: "DkPazejgbwoAAAAAZFNueLGu-1GCWVgvk5Av_1EK2Ml5LzQItlrivLPtTPMsu5A2"
+              valid_until:
+                type: integer
+                format: int64
+                example: 1683189368
+    MessagesApps:
+      description: "Messages apps"
+      content:
+        application/json:
+          schema:
+            required:
+              - items
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MessagesApp'
   
   securitySchemes:
     JWTAuth:
