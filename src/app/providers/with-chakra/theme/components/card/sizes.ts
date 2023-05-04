@@ -23,7 +23,7 @@ export default {
     }),
     lg: definePartsStyle({
         container: {
-            minH: '360px'
+            minH: '60px'
         },
         header: {
             px: '6',

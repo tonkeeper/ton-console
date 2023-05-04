@@ -8,3 +8,5 @@ export * from './image';
 export { Pad } from './Pad';
 export { CopyPad } from './CopyPad';
 export { ButtonLink } from './ButtonLink';
+export * from './tooltip';
+export { Span } from './Span';

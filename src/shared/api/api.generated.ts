@@ -66,8 +66,11 @@ export interface DTOTier {
     id: number;
     /** @example "Test tier" */
     name: string;
-    /** @example 1 */
-    burst: number;
+    /** @example 5 */
+    long_polling_sub: number;
+    /** @example 5 */
+    entity_per_conn: number;
+    capabilities: string[];
     /** @example 5 */
     rpc: number;
     /** @example 100 */
@@ -82,8 +85,6 @@ export interface DTOAppTier {
     id: number;
     /** @example "Test tier" */
     name: string;
-    /** @example 1 */
-    burst: number;
     /** @example 5 */
     rpc: number;
     /** @example 100 */
@@ -91,7 +92,8 @@ export interface DTOAppTier {
     /** @example 50 */
     long_polling_sub: number;
     /** @example 10 */
-    entity_per_conn?: number;
+    entity_per_conn: number;
+    capabilities: string[];
     /** @example "2023-04-23" */
     next_payment?: string;
     /** @example "2023-03-23" */
@@ -130,6 +132,8 @@ export interface DTOCharge {
      * @example 1000000000
      */
     amount: number;
+    /** @example 2.25 */
+    exchange_rate: number;
     /** @example "2023-03-23" */
     date_create: string;
 }

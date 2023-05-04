@@ -61,7 +61,8 @@ const EditApiKeyModal: FunctionComponent<{
                                 placeholder="Name"
                                 {...register('name', {
                                     required: 'This is required',
-                                    minLength: { value: 3, message: 'Minimum length should be 3' }
+                                    minLength: { value: 3, message: 'Minimum length should be 3' },
+                                    maxLength: { value: 64, message: 'Maximum length is 64' }
                                 })}
                             />
                             <FormErrorMessage>

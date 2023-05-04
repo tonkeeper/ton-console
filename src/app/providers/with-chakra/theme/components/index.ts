@@ -10,6 +10,7 @@ import FormError from './form-error';
 import Card from './card';
 import Divider from './divider';
 import Table from './table';
+import Popover from './popover';
 
 export default {
     Button,
@@ -23,5 +24,6 @@ export default {
     FormError,
     Card,
     Divider,
-    Table
+    Table,
+    Popover
 };

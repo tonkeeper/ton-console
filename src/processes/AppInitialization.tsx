@@ -6,7 +6,7 @@ import {
     useRef,
     useState
 } from 'react';
-import { Center, Fade, useConst } from '@chakra-ui/react';
+import { Box, Center, Fade, useConst } from '@chakra-ui/react';
 import { TonConsoleIcon } from 'src/shared';
 import { tGUserStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
@@ -52,7 +52,13 @@ const AppInitialization: FunctionComponent<PropsWithChildren> = props => {
             >
                 <TonConsoleIcon ref={ref} transition="opacity 0.1s linear" h="64px" w="64px" />
             </Center>
-            {props.children}
+            <Box
+                overflow={userResolved ? 'auto' : 'hidden'}
+                h="100%"
+                maxH={userResolved ? 'unset' : '100%'}
+            >
+                {props.children}
+            </Box>
         </>
     );
 };

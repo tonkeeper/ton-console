@@ -5,6 +5,9 @@ export interface TonApiTier {
     name: string;
     description: {
         requestsPerSecondLimit: number;
+        realtimeConnectionsLimit: number;
+        entitiesPerRealtimeConnectionLimit: number;
+        mempool: boolean;
     };
     price: UsdCurrencyAmount;
 }

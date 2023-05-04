@@ -8,7 +8,8 @@ import {
     Td,
     Th,
     Thead,
-    Tr
+    Tr,
+    chakra
 } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent } from 'react';
 import { explorer, shortAddress, toDateTime } from 'src/shared';
@@ -52,6 +53,19 @@ const BillingHistoryTable: FunctionComponent<ComponentProps<typeof TableContaine
                                     <Td>{historyItem.name}</Td>
                                     <Td textAlign="right">
                                         -{historyItem.amount.stringCurrencyAmount}
+                                        {historyItem.amountUsdEquivalent && (
+                                            <>
+                                                &nbsp;
+                                                <chakra.span color="text.secondary">
+                                                    (
+                                                    {
+                                                        historyItem.amountUsdEquivalent
+                                                            .stringCurrencyAmount
+                                                    }
+                                                    )
+                                                </chakra.span>
+                                            </>
+                                        )}
                                     </Td>
                                 </>
                             ) : (
