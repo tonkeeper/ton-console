@@ -17,6 +17,15 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 
+const defaultModifiers = [
+    {
+        name: 'preventOverflow',
+        options: {
+            padding: 8
+        }
+    }
+];
+
 export const TooltipHoverable: FunctionComponent<
     PropsWithChildren<{ host: ReactElement | string } & ComponentProps<typeof Popover>>
 > = ({ host, children, ...rest }) => {
@@ -46,7 +55,7 @@ export const TooltipHoverable: FunctionComponent<
     }, [host, onOpen, onClose]);
 
     return (
-        <Popover autoFocus={false} isOpen={isOpenDebounced} {...rest}>
+        <Popover autoFocus={false} isOpen={isOpenDebounced} modifiers={defaultModifiers} {...rest}>
             <PopoverTrigger>{hostWithTrigger}</PopoverTrigger>
             <PopoverContent
                 w="inherit"
