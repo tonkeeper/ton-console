@@ -3,7 +3,7 @@ import { ButtonLink, DocsIcon16, EXTERNAL_LINKS, H1, H2, H3, Overlay, TgIcon } f
 import { Button, Flex, SlideFade, Text, useBreakpointValue } from '@chakra-ui/react';
 import { tGUserStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
-import { TonApiPricing } from 'src/pages/landing/TonApiPricing';
+import TonApiPricing from './TonApiPricing';
 import { Footer } from 'src/widgets';
 
 const SlideFadeTransition: FunctionComponent<ComponentProps<typeof SlideFade>> = props => (

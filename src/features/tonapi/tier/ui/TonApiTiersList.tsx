@@ -60,6 +60,7 @@ const TonApiTiersList: FunctionComponent = () => {
                     return (
                         <GridItem key={tier.id}>
                             <TonApiTierCard
+                                h="100%"
                                 tier={isCurrentSubscription ? currentTier! : tier}
                                 button={
                                     isCurrentSubscription ? (

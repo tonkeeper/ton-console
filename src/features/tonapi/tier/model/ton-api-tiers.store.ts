@@ -11,7 +11,7 @@ import {
     UsdCurrencyAmount
 } from 'src/shared';
 import { TonApiPayment, TonApiTier } from './interfaces';
-import { projectsStore, tGUserStore } from 'src/entities';
+import { projectsStore } from 'src/entities';
 import { TonApiSelectedTier } from './interfaces';
 
 class TonApiTiersStore {
@@ -24,16 +24,7 @@ class TonApiTiersStore {
     constructor() {
         makeAutoObservable(this);
 
-        createImmediateReaction(
-            () => tGUserStore.user$.value,
-            user => {
-                this.clearState();
-
-                if (user) {
-                    this.fetchTiers();
-                }
-            }
-        );
+        this.fetchTiers();
 
         createImmediateReaction(
             () => projectsStore.selectedProject,
@@ -112,7 +103,10 @@ function mapTierDTOToTier(tierDTO: DTOTier): TonApiTier {
         name: tierDTO.name,
         price: new UsdCurrencyAmount(tierDTO.usd_price),
         description: {
-            requestsPerSecondLimit: tierDTO.rpc
+            requestsPerSecondLimit: tierDTO.rpc,
+            realtimeConnectionsLimit: tierDTO.long_polling_sub,
+            entitiesPerRealtimeConnectionLimit: tierDTO.entity_per_conn,
+            mempool: tierDTO.capabilities.includes('mempool')
         }
     };
 }
@@ -127,7 +121,10 @@ function mapAppTierDTOToSelectedTier(tierDTO: DTOAppTier | null): TonApiSelected
         name: tierDTO.name,
         price: new UsdCurrencyAmount(tierDTO.usd_price),
         description: {
-            requestsPerSecondLimit: tierDTO.rpc
+            requestsPerSecondLimit: tierDTO.rpc,
+            realtimeConnectionsLimit: tierDTO.long_polling_sub,
+            entitiesPerRealtimeConnectionLimit: tierDTO.entity_per_conn,
+            mempool: tierDTO.capabilities.includes('mempool')
         },
         subscriptionDate: new Date(tierDTO.date_create),
         renewsDate: tierDTO.next_payment ? new Date(tierDTO.next_payment) : undefined,

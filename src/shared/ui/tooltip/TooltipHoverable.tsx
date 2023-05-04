@@ -1,5 +1,6 @@
 import {
     cloneElement,
+    ComponentProps,
     FunctionComponent,
     isValidElement,
     PropsWithChildren,
@@ -17,8 +18,8 @@ import {
 } from '@chakra-ui/react';
 
 export const TooltipHoverable: FunctionComponent<
-    PropsWithChildren<{ host: ReactElement | string }>
-> = ({ host, children }) => {
+    PropsWithChildren<{ host: ReactElement | string } & ComponentProps<typeof Popover>>
+> = ({ host, children, ...rest }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [isOpenDebounced, setIsOpenDebounced] = useState(false);
@@ -45,7 +46,7 @@ export const TooltipHoverable: FunctionComponent<
     }, [host, onOpen, onClose]);
 
     return (
-        <Popover autoFocus={false} isOpen={isOpenDebounced}>
+        <Popover autoFocus={false} isOpen={isOpenDebounced} {...rest}>
             <PopoverTrigger>{hostWithTrigger}</PopoverTrigger>
             <PopoverContent
                 w="inherit"

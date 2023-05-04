@@ -705,8 +705,10 @@ components:
         - id
         - name
         - rpc
-        - burst
         - usd_price
+        - long_polling_sub
+        - entity_per_conn
+        - capabilities
       properties:
         id:
           type: integer
@@ -715,9 +717,16 @@ components:
         name:
           type: string
           example: "Test tier"
-        burst:
+        long_polling_sub:
           type: integer
-          example: 1
+          example: 5
+        entity_per_conn:
+          type: integer
+          example: 5
+        capabilities:
+          items:
+            type: string
+            example: [ "mempool" ]
         rpc:
           type: number
           example: 5
@@ -730,8 +739,9 @@ components:
         - id
         - name
         - rpc
-        - burst
         - long_polling_sub
+        - entity_per_conn
+        - capabilities
         - usd_price
         - date_create
       properties:
@@ -742,9 +752,6 @@ components:
         name:
           type: string
           example: "Test tier"
-        burst:
-          type: integer
-          example: 1
         rpc:
           type: number
           example: 5
@@ -757,6 +764,10 @@ components:
         entity_per_conn:
           type: integer
           example: 10
+        capabilities:
+          items:
+            type: string
+            example: [ "mempool" ]
         next_payment:
           type: string
           example: "2023-04-23"
