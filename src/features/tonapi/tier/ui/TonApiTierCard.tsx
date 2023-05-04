@@ -90,7 +90,7 @@ export const TonApiTierCard: FunctionComponent<
                     )}
                 </List>
                 {isTonApiSelectedTier(tier) && tier.renewsDate && (
-                    <Text textStyle="body2" color="text.secondary">
+                    <Text textStyle="body2" mt="3" color="text.secondary">
                         Available until {toDate(tier.renewsDate)}
                     </Text>
                 )}
