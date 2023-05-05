@@ -1,6 +1,6 @@
 import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, Center, Flex, Spinner, useDisclosure } from '@chakra-ui/react';
+import { Button, Center, Grid, GridItem, Spinner, useDisclosure } from '@chakra-ui/react';
 import TonApiPaymentDetailsModal from './TonApiPaymentDetailsModal';
 import { TonApiTier, tonApiTiersStore } from '../model';
 import { TonApiTierCard } from './TonApiTierCard';
@@ -53,43 +53,44 @@ const TonApiTiersList: FunctionComponent = () => {
 
     return (
         <>
-            <Flex gap="4">
+            <Grid gap="4" templateColumns="repeat(auto-fit, minmax(250px, 1fr))">
                 {tonApiTiersStore.tiers$.value.map(tier => {
                     const isCurrentSubscription = currentTier?.id === tier.id;
 
                     return (
-                        <TonApiTierCard
-                            key={tier.id}
-                            tier={isCurrentSubscription ? currentTier! : tier}
-                            flex="1"
-                            button={
-                                isCurrentSubscription ? (
-                                    <ButtonLink
-                                        w="100%"
-                                        href={EXTERNAL_LINKS.SUPPORT}
-                                        isExternal
-                                        variant="secondary"
-                                        isDisabled={currentTier?.price.amount.isZero()}
-                                    >
-                                        Cancel
-                                    </ButtonLink>
-                                ) : (
-                                    <Button
-                                        w="100%"
-                                        isDisabled={
-                                            !!currentTier && currentTier.price.isGT(tier.price)
-                                        }
-                                        onClick={() => onSelectTier(tier)}
-                                        variant={tier.name === 'Pro' ? 'primary' : 'secondary'}
-                                    >
-                                        Choose {tier.name}
-                                    </Button>
-                                )
-                            }
-                        />
+                        <GridItem key={tier.id}>
+                            <TonApiTierCard
+                                h="100%"
+                                tier={isCurrentSubscription ? currentTier! : tier}
+                                button={
+                                    isCurrentSubscription ? (
+                                        <ButtonLink
+                                            w="100%"
+                                            href={EXTERNAL_LINKS.SUPPORT}
+                                            isExternal
+                                            variant="secondary"
+                                            isDisabled={currentTier?.price.amount.isZero()}
+                                        >
+                                            Cancel
+                                        </ButtonLink>
+                                    ) : (
+                                        <Button
+                                            w="100%"
+                                            isDisabled={
+                                                !!currentTier && currentTier.price.isGT(tier.price)
+                                            }
+                                            onClick={() => onSelectTier(tier)}
+                                            variant={tier.name === 'Pro' ? 'primary' : 'secondary'}
+                                        >
+                                            Choose {tier.name}
+                                        </Button>
+                                    )
+                                }
+                            />
+                        </GridItem>
                     );
                 })}
-            </Flex>
+            </Grid>
             <TonApiPaymentDetailsModal
                 isOpen={!!selectedTier}
                 onClose={onPaymentModalClose}

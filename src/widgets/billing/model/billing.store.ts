@@ -48,7 +48,8 @@ function mapTonapiPaymentToPayment(payment: TonApiPayment): Payment {
         id: `tonapi-${payment.id}`,
         name: `TON API «${payment.tier.name}»`,
         date: payment.date,
-        amount: payment.amount
+        amount: payment.amount,
+        amountUsdEquivalent: payment.amountUsdEquivalent
     };
 }
 

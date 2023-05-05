@@ -1,5 +1,12 @@
 import { FunctionComponent, useCallback, useEffect } from 'react';
-import { chakra, FormControl, FormLabel, Input, StyleProps } from '@chakra-ui/react';
+import {
+    chakra,
+    FormControl,
+    FormErrorMessage,
+    FormLabel,
+    Input,
+    StyleProps
+} from '@chakra-ui/react';
 import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
 import { ImageInput, imageUrlToFilesList } from 'src/shared';
 import { CreateProjectFormValues } from '../model/interfaces';
@@ -60,9 +67,13 @@ export const CreateProjectForm: FunctionComponent<
                     placeholder="Project name"
                     {...register('name', {
                         required: 'This is required',
-                        minLength: { value: 3, message: 'Minimum length should be 3' }
+                        minLength: { value: 3, message: 'Minimum length should be 3' },
+                        maxLength: { value: 64, message: 'Maximum length is 64' }
                     })}
                 />
+                <FormErrorMessage>
+                    {formState.errors.name && formState.errors.name.message}
+                </FormErrorMessage>
             </FormControl>
 
             <FormControl mb="0">

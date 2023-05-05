@@ -18,3 +18,4 @@ export { EditIcon24 } from './EditIcon24';
 export { DeleteIcon24 } from './DeleteIcon24';
 export { CopyIcon16 } from './CopyIcon16';
 export { DocsIcon16 } from './DocsIcon16';
+export { InfoIcon16 } from './InfoIcon16';

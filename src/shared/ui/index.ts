@@ -9,3 +9,5 @@ export { Pad } from './Pad';
 export { CopyPad } from './CopyPad';
 export { ButtonLink } from './ButtonLink';
 export * from './async-input';
+export * from './tooltip';
+export { Span } from './Span';

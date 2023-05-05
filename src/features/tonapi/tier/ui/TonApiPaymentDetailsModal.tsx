@@ -10,12 +10,13 @@ import {
     ModalOverlay,
     Text,
     chakra,
-    Flex
+    Flex,
+    Box
 } from '@chakra-ui/react';
-import { H4, Pad } from 'src/shared';
+import { CURRENCY, H4, Pad } from 'src/shared';
 import { TonApiTier, tonApiTiersStore } from '../model';
 import { observer } from 'mobx-react-lite';
-import { balanceStore } from 'src/entities';
+import { balanceStore, CurrencyRate } from 'src/entities';
 
 const TonApiPaymentDetailsModal: FunctionComponent<{
     isOpen: boolean;
@@ -45,7 +46,7 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
                             <Text textStyle="body2" color="text.secondary">
                                 Plan
                             </Text>
-                            <Text textStyle="body2" color="text.secondary">
+                            <Text textStyle="body2" color="text.primary">
                                 {tier?.name}
                             </Text>
                         </Flex>
@@ -53,7 +54,7 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
                             <Text textStyle="body2" color="text.secondary">
                                 Included
                             </Text>
-                            <Text textStyle="body2" color="text.secondary" textAlign="right">
+                            <Text textStyle="body2" color="text.primary" textAlign="right">
                                 {tier?.description.requestsPerSecondLimit} requests per second
                             </Text>
                         </Flex>
@@ -61,7 +62,7 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
                             <Text textStyle="body2" color="text.secondary">
                                 Period
                             </Text>
-                            <Text textStyle="body2" color="text.secondary">
+                            <Text textStyle="body2" color="text.primary">
                                 Monthly
                             </Text>
                         </Flex>
@@ -69,9 +70,24 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
                             <Text textStyle="body2" color="text.secondary">
                                 Price
                             </Text>
-                            <Text textStyle="body2" color="text.secondary">
-                                {tier?.price.stringCurrencyAmount}
-                            </Text>
+                            <Box>
+                                <Text textStyle="body2" color="text.primary" textAlign="right">
+                                    {tier?.price.stringCurrencyAmount}
+                                </Text>
+                                {tier && (
+                                    <CurrencyRate
+                                        textStyle="body2"
+                                        color="text.secondary"
+                                        textAlign="right"
+                                        amount={tier.price.amount}
+                                        currency={CURRENCY.TON}
+                                        leftSign=""
+                                        reverse
+                                    >
+                                        &nbsp;TON
+                                    </CurrencyRate>
+                                )}
+                            </Box>
                         </Flex>
                     </Pad>
                     <Text textStyle="body3" color="text.secondary">

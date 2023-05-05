@@ -1,9 +1,9 @@
 import { ComponentProps, FunctionComponent, useEffect, useState } from 'react';
-import { ButtonLink, DocsIcon16, EXTERNAL_LINKS, H1, H2, H3, Overlay, TgIcon } from 'src/shared';
+import { ButtonLink, DocsIcon16, EXTERNAL_LINKS, H1, H2, Overlay, TgIcon } from 'src/shared';
 import { Button, Flex, SlideFade, Text, useBreakpointValue } from '@chakra-ui/react';
 import { tGUserStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
-import { TonApiPricing } from 'src/pages/landing/TonApiPricing';
+import TonApiPricing from './TonApiPricing';
 import { Footer } from 'src/widgets';
 
 const SlideFadeTransition: FunctionComponent<ComponentProps<typeof SlideFade>> = props => (
@@ -28,6 +28,7 @@ const LandingPage: FunctionComponent = () => {
                     direction="column"
                     flex="1"
                     maxW="648px"
+                    maxH="600px"
                     mx="auto"
                     pt={{ base: 10, md: 18, lg: 8 }}
                     pb={{ base: 12, md: 15, lg: 8 }}
@@ -61,13 +62,13 @@ const LandingPage: FunctionComponent = () => {
                         </ButtonLink>
                     </Flex>
                 </Flex>
-                <H3 mb="7">Pricing</H3>
                 <TonApiPricing
                     as={SlideFadeTransition}
                     w="100%"
+                    flex="1"
                     in={isOpen}
                     offsetY="-10px"
-                    mb={{ base: 8, md: 14, lg: 16 }}
+                    mb={{ base: 8, md: 14, lg: 6 }}
                     px={{ base: 0, md: 10 }}
                 />
                 <Footer gap="6" />
