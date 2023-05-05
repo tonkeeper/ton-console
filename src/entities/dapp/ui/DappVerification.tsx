@@ -55,7 +55,7 @@ export const DappVerification: FunctionComponent<
                 gap="2"
                 display="flex"
                 mb="4"
-                href={DAPPS_LINKS.DOCUMENTATION}
+                href={DAPPS_LINKS.VALIDATION_DOCUMENTATION}
                 isExternal
             >
                 <FileIcon16 />

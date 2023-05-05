@@ -3,18 +3,20 @@ import {
     Box,
     Button,
     chakra,
+    Flex,
     FormControl,
     FormErrorMessage,
     Input,
+    Link,
     Menu,
     MenuButton,
     MenuItem,
     MenuList,
     Text
 } from '@chakra-ui/react';
-import { ArrowIcon, AsyncInput, TickIcon, useAsyncValidator } from 'src/shared';
+import { ArrowIcon, AsyncInput, Span, TickIcon, useAsyncValidator } from 'src/shared';
 import { ErrorOption, useForm } from 'react-hook-form';
-import { CreateDappForm } from '../model';
+import { CreateDappForm, DAPPS_LINKS } from '../model';
 
 type AppUrlFormStruct = {
     manifest: string;
@@ -99,33 +101,43 @@ export const DAppUrlInputForm: FunctionComponent<
             <Text textStyle="label1" mb="6" color="text.primary">
                 Register your app
             </Text>
-            <Menu gutter={2} placement="bottom-start">
-                <MenuButton
-                    as={Button}
-                    mb="1"
-                    pl="0"
-                    _hover={{ transform: 'unset' }}
-                    _active={{ transform: 'unset' }}
-                    rightIcon={<ArrowIcon />}
-                    variant="flat"
+            <Flex align="center" justify="space-between">
+                <Menu gutter={2} placement="bottom-start">
+                    <MenuButton
+                        as={Button}
+                        mb="1"
+                        pl="0"
+                        _hover={{ transform: 'unset' }}
+                        _active={{ transform: 'unset' }}
+                        rightIcon={<ArrowIcon />}
+                        variant="flat"
+                    >
+                        {inputsLabels[selectedInput]}
+                    </MenuButton>
+                    <MenuList zIndex={100} minW="100px">
+                        {(Object.keys(inputsLabels) as ('manifest' | 'url')[]).map(key => (
+                            <MenuItem key={key} onClick={() => setSelectedInput(key)}>
+                                <Text textStyle="label2" mr="2" color="text.primary" noOfLines={1}>
+                                    {inputsLabels[key]}
+                                </Text>
+                                {selectedInput === key && <TickIcon ml="auto" />}
+                            </MenuItem>
+                        ))}
+                    </MenuList>
+                </Menu>
+                <Link
+                    textStyle="label2"
+                    color="text.accent"
+                    href={DAPPS_LINKS.APP_URL_DOCUMENTATION}
+                    isExternal
                 >
-                    {inputsLabels[selectedInput]}
-                </MenuButton>
-                <MenuList zIndex={100} minW="100px">
-                    {(Object.keys(inputsLabels) as ('manifest' | 'url')[]).map(key => (
-                        <MenuItem key={key} onClick={() => setSelectedInput(key)}>
-                            <Text textStyle="label2" mr="2" color="text.primary" noOfLines={1}>
-                                {inputsLabels[key]}
-                            </Text>
-                            {selectedInput === key && <TickIcon ml="auto" />}
-                        </MenuItem>
-                    ))}
-                </MenuList>
-            </Menu>
+                    Documentation
+                </Link>
+            </Flex>
             <chakra.form noValidate onSubmit={handleSubmit(submitMiddleware)}>
                 <FormControl
                     display={selectedInput === 'manifest' ? 'block' : 'none'}
-                    mb="6"
+                    mb="4"
                     isInvalid={!!errors.manifest}
                 >
                     <AsyncInput
@@ -147,7 +159,7 @@ export const DAppUrlInputForm: FunctionComponent<
                 </FormControl>
                 <FormControl
                     display={selectedInput === 'url' ? 'block' : 'none'}
-                    mb="6"
+                    mb="4"
                     isInvalid={!!errors.url}
                 >
                     <Input
@@ -164,6 +176,14 @@ export const DAppUrlInputForm: FunctionComponent<
                     />
                     <FormErrorMessage>{errors.url && errors.url.message}</FormErrorMessage>
                 </FormControl>
+                {selectedInput === 'manifest' && !!validationProduct?.url && (
+                    <Text textStyle="body2" mb="4" color="text.secondary">
+                        App url
+                        <Span textStyle="body2" fontFamily="mono" color="text.primary" ml="4">
+                            {validationProduct?.url}
+                        </Span>
+                    </Text>
+                )}
                 <Button
                     isDisabled={!isDirty || !isValid || isValidating}
                     isLoading={submitButtonLoading}

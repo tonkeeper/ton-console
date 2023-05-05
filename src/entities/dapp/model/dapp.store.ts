@@ -61,25 +61,36 @@ class DappStore {
         };
     });
 
-    validatePendingDapp = this.dapps$.createAsyncAction(async () => {
-        const token = this.pendingDapp?.token;
-        if (!token) {
-            throw new Error('Dapp to validate is not set');
-        }
-
-        await apiClient.api.verifyMessagesApp(
-            {
-                project_id: projectsStore.selectedProject!.id
-            },
-            {
-                payload: token
+    validatePendingDapp = this.dapps$.createAsyncAction(
+        async () => {
+            const token = this.pendingDapp?.token;
+            if (!token) {
+                throw new Error('Dapp to validate is not set');
             }
-        );
 
-        this.pendingDapp = null;
+            await apiClient.api.verifyMessagesApp(
+                {
+                    project_id: projectsStore.selectedProject!.id
+                },
+                {
+                    payload: token
+                }
+            );
 
-        return dappsApiRequest(projectsStore.selectedProject!.id);
-    });
+            this.pendingDapp = null;
+
+            return dappsApiRequest(projectsStore.selectedProject!.id);
+        },
+        {
+            successToast: {
+                title: 'Dapp validated successfully'
+            },
+            errorToast: {
+                title: 'Dapp validation error',
+                description: 'Make sure you put the file to your webserver'
+            }
+        }
+    );
 
     clearPendingDapp = (): void => {
         this.pendingDapp = null;

@@ -9,10 +9,9 @@ export const RegisterApp: FunctionComponent = () => {
             <Box maxW="800px" px="6">
                 <H4 mb="1">App Messages</H4>
                 <Text textStyle="body2" mb="5" color="text.secondary">
-                    Register your app. Text description. Register your app. Text description.
-                    Register your app. Text description. Register your app. Text description.
-                    Register your app. Text description.
-                    <Link color="accent.blue" href="https://google.com" isExternal>
+                    Interact with users of your dapp through push messages inside Tonkinper — an
+                    effective way to increase customer engagement and retention.&nbsp;
+                    <Link color="accent.blue" href="https://docs.tonconsole.com/" isExternal>
                         Learn more
                     </Link>
                 </Text>
