@@ -4,6 +4,7 @@ import {
     DropDownMenu,
     DropDownMenuItem,
     DropDownMenuItemExpandable,
+    MessageIcon24,
     SettingsIcon,
     TextWithSkeleton,
     TonapiIcon
@@ -23,7 +24,7 @@ const Aside: FunctionComponent = () => {
                 <DropDownMenuItem linkTo="api-keys">Api keys and calls</DropDownMenuItem>
                 <DropDownMenuItem linkTo="pricing">Pricing</DropDownMenuItem>
             </DropDownMenuItemExpandable>
-            <DropDownMenuItem linkTo="app-messages" leftIcon={<DashboardIcon />}>
+            <DropDownMenuItem linkTo="app-messages" leftIcon={<MessageIcon24 />}>
                 App Messages
             </DropDownMenuItem>
             <DropDownMenuItem leftIcon={<BalanceIcon24 />} linkTo="balance">

@@ -6,16 +6,15 @@ import { CopyIcon24 } from './icons/CopyIcon24';
 const padAnimation = {
     transition: '0.15s ease-in-out',
     _hover: {
-        transform: 'scale(1.03)'
+        transform: 'scale(1.01)'
     },
     _active: {
-        transform: 'scale(0.98)'
+        transform: 'scale(0.99)'
     }
 };
-export const CopyPad: FunctionComponent<ComponentProps<typeof Pad> & { text: string }> = ({
-    text,
-    ...rest
-}) => {
+export const CopyPad: FunctionComponent<
+    ComponentProps<typeof Pad> & { text: string; iconAlign?: 'start' | 'center' }
+> = ({ text, iconAlign, ...rest }) => {
     const { hasCopied, onCopy } = useClipboard(text);
 
     return (
@@ -36,7 +35,7 @@ export const CopyPad: FunctionComponent<ComponentProps<typeof Pad> & { text: str
                     {text}
                 </Text>
 
-                <CopyIcon24 />
+                <CopyIcon24 alignSelf={iconAlign === 'start' ? 'flex-start' : 'center'} />
             </Pad>
         </Tooltip>
     );

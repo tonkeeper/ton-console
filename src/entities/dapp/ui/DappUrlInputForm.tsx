@@ -14,22 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { ArrowIcon, AsyncInput, TickIcon, useAsyncValidator } from 'src/shared';
 import { ErrorOption, useForm } from 'react-hook-form';
-
-const validator = async (
-    val: string
-): Promise<ErrorOption | undefined | { success: true; result: string }> => {
-    await new Promise(r => setTimeout(r, 2000));
-    if (val.includes('123')) {
-        return {
-            success: true,
-            result: val.slice(0, -1)
-        };
-    }
-
-    return {
-        message: 'Cannot parse manifest'
-    };
-};
+import { CreateDappForm } from '../model';
 
 type AppUrlFormStruct = {
     manifest: string;
@@ -41,11 +26,15 @@ const inputsLabels = {
     url: 'Input dApp url directly'
 };
 
-export const AppUrlForm: FunctionComponent<
+export const DAppUrlInputForm: FunctionComponent<
     ComponentProps<typeof Box> & {
-        onSubmit: (appUrl: string) => void;
+        onSubmit: (dappForm: CreateDappForm) => void;
+        submitButtonLoading: boolean;
+        validator: (
+            val: string
+        ) => Promise<ErrorOption | undefined | { success: true; result: CreateDappForm }>;
     }
-> = ({ onSubmit, ...rest }) => {
+> = ({ onSubmit, validator, submitButtonLoading, ...rest }) => {
     const [selectedInput, setSelectedInput] = useState<'manifest' | 'url'>('manifest');
     const methods = useForm<AppUrlFormStruct>({
         mode: 'onChange'
@@ -93,7 +82,7 @@ export const AppUrlForm: FunctionComponent<
     const submitMiddleware = useCallback(
         (form: AppUrlFormStruct) => {
             if (form.url) {
-                return onSubmit(form.url);
+                return onSubmit({ url: form.url });
             }
 
             if (validationProduct) {
@@ -175,7 +164,11 @@ export const AppUrlForm: FunctionComponent<
                     />
                     <FormErrorMessage>{errors.url && errors.url.message}</FormErrorMessage>
                 </FormControl>
-                <Button isDisabled={!isDirty || !isValid || isValidating} type="submit">
+                <Button
+                    isDisabled={!isDirty || !isValid || isValidating}
+                    isLoading={submitButtonLoading}
+                    type="submit"
+                >
                     Submit
                 </Button>
             </chakra.form>

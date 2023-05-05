@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx';
 import {
+    addPath,
     apiClient,
     createAsyncAction,
     createImmediateReaction,
@@ -8,6 +9,7 @@ import {
 } from 'src/shared';
 import { projectsStore } from '../../project';
 import { CreateDappForm, Dapp, PendingDapp } from './interfaces';
+import { fetchDappFormByManifestUrl } from './dapp-url-validator';
 
 class DappStore {
     dapps$ = new Loadable<Dapp[]>([]);
@@ -34,6 +36,17 @@ class DappStore {
     });
 
     createDapp = createAsyncAction(async (form: CreateDappForm) => {
+        if (!form.name || !form.image) {
+            try {
+                const dappForm = await fetchDappFormByManifestUrl(
+                    addPath(form.url, 'tonconnect-manifest.json')
+                );
+                form = { ...form, name: dappForm.name, image: dappForm.image };
+            } catch {
+                /* empty */
+            }
+        }
+
         const response = await apiClient.api.createMessagesApp(
             {
                 project_id: projectsStore.selectedProject!.id
@@ -48,7 +61,7 @@ class DappStore {
         };
     });
 
-    validateDapp = this.dapps$.createAsyncAction(async () => {
+    validatePendingDapp = this.dapps$.createAsyncAction(async () => {
         const token = this.pendingDapp?.token;
         if (!token) {
             throw new Error('Dapp to validate is not set');
@@ -68,9 +81,13 @@ class DappStore {
         return dappsApiRequest(projectsStore.selectedProject!.id);
     });
 
+    clearPendingDapp = (): void => {
+        this.pendingDapp = null;
+    };
+
     clearState = (): void => {
         this.dapps$.clear();
-        this.pendingDapp = null;
+        this.clearPendingDapp();
     };
 }
 
