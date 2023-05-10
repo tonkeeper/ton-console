@@ -5,6 +5,7 @@ import { FunctionComponent } from 'react';
 import { Divider } from '@chakra-ui/react';
 import { PendingDappInfo } from './PendingDappInfo';
 import { DappVerification } from './DappVerification';
+import { toJS } from 'mobx';
 
 const DappRegistrationForm: FunctionComponent = () => {
     if (!dappStore.pendingDapp) {
@@ -25,14 +26,14 @@ const DappRegistrationForm: FunctionComponent = () => {
                 maxW="800px"
                 px="6"
                 mb="5"
-                pendingDapp={dappStore.pendingDapp}
+                pendingDapp={toJS(dappStore.pendingDapp)}
                 onReset={dappStore.clearPendingDapp}
             />
             <Divider mb="4" />
             <DappVerification
                 maxW="850px"
                 px="6"
-                pendingDapp={dappStore.pendingDapp}
+                pendingDapp={toJS(dappStore.pendingDapp)}
                 onSubmit={dappStore.validatePendingDapp}
                 submitLoading={dappStore.validatePendingDapp.isLoading}
             />

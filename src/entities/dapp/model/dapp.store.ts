@@ -126,7 +126,7 @@ function mapDTODappToDapp(dtoDapp: DTOMessagesApp): Dapp {
     }
 
     if (dtoDapp.image) {
-        dapp.name = dtoDapp.image;
+        dapp.image = dtoDapp.image;
     }
 
     return dapp;

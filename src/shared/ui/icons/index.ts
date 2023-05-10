@@ -21,3 +21,5 @@ export { DocsIcon16 } from './DocsIcon16';
 export { InfoIcon16 } from './InfoIcon16';
 export { FileIcon16 } from './FileIcon16';
 export { MessageIcon24 } from './MessageIcon24';
+export { FilledTickIcon18 } from './FilledTickIcon18';
+export { FilledWarnIcon16 } from './FilledWarnIcon16';

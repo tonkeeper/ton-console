@@ -1185,6 +1185,39 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 query: query,
                 secure: true,
                 ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name GetMessagesBalance
+         * @summary Get messages balance
+         * @request GET:/api/v1/services/messages/balance
+         * @secure
+         */
+        getMessagesBalance: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @example 100 */
+                    balance: number;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/messages/balance`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
             })
     };
 }

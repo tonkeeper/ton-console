@@ -498,6 +498,25 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/services/messages/balance:
+    get:
+      summary: "Get messages balance"
+      operationId: getMessagesBalance
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - messages_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/MessagesBalance'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
 
 components:
@@ -1277,6 +1296,18 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/MessagesApp'
+    MessagesBalance:
+      description: "Messages balance"
+      content:
+        application/json:
+          schema:
+            required:
+              - balance
+            type: object
+            properties:
+              balance:
+                type: integer
+                example: 100
   
   securitySchemes:
     JWTAuth:

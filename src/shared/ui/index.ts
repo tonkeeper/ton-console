@@ -11,3 +11,4 @@ export { ButtonLink } from './ButtonLink';
 export * from './async-input';
 export * from './tooltip';
 export { Span } from './Span';
+export * from './checkbox';

@@ -6,10 +6,12 @@ import {
     DTODeposit,
     Loadable,
     setIntervalWhenPageOnFocus,
-    TonCurrencyAmount
+    TonCurrencyAmount,
+    UsdCurrencyAmount
 } from 'src/shared';
 import { projectsStore } from '../../project';
 import { Portfolio, Refill } from './interfaces';
+import { ratesStore } from 'src/entities';
 
 class BalancesStore {
     portfolio$ = new Loadable<Portfolio | null>(null);
@@ -22,6 +24,20 @@ class BalancesStore {
 
     get refills(): Refill[] {
         return this.portfolio$.value?.refills || [];
+    }
+
+    get tonBalance(): TonCurrencyAmount | null {
+        return (this.portfolio$.value?.balances[0] as TonCurrencyAmount) || null;
+    }
+
+    get tonBalanceUSDEquivalent(): UsdCurrencyAmount | null {
+        if (ratesStore.rates$.TON.isResolved && this.tonBalance) {
+            return new UsdCurrencyAmount(
+                ratesStore.rates$.TON.value.multipliedBy(this.tonBalance.amount)
+            );
+        }
+
+        return null;
     }
 
     constructor() {

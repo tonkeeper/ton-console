@@ -12,6 +12,7 @@ import Divider from './divider';
 import Table from './table';
 import Popover from './popover';
 import Tooltip from './tooltip';
+import Tabs from './tabs';
 
 export default {
     Button,
@@ -27,5 +28,6 @@ export default {
     Divider,
     Table,
     Popover,
-    Tooltip
+    Tooltip,
+    Tabs
 };

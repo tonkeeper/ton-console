@@ -27,6 +27,7 @@ export const CopyPad: FunctionComponent<
                 cursor="pointer"
                 gap="7"
                 alignItems="center"
+                justifyContent="space-between"
                 onClick={onCopy}
                 {...padAnimation}
                 {...rest}
