@@ -137,7 +137,7 @@ export const DAppUrlInputForm: FunctionComponent<
             <chakra.form noValidate onSubmit={handleSubmit(submitMiddleware)}>
                 <FormControl
                     display={selectedInput === 'manifest' ? 'block' : 'none'}
-                    mb="4"
+                    mb="5"
                     isInvalid={!!errors.manifest}
                 >
                     <AsyncInput
@@ -159,7 +159,7 @@ export const DAppUrlInputForm: FunctionComponent<
                 </FormControl>
                 <FormControl
                     display={selectedInput === 'url' ? 'block' : 'none'}
-                    mb="4"
+                    mb="5"
                     isInvalid={!!errors.url}
                 >
                     <Input
