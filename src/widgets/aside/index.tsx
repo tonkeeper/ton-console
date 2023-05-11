@@ -25,7 +25,7 @@ const Aside: FunctionComponent = () => {
                 <DropDownMenuItem linkTo="pricing">Pricing</DropDownMenuItem>
             </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="app-messages" leftIcon={<MessageIcon24 />}>
-                App Messages
+                Tonkeeper Messages
             </DropDownMenuItem>
             <DropDownMenuItem leftIcon={<BalanceIcon24 />} linkTo="balance">
                 <Flex direction="column">

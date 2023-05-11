@@ -1,17 +1,27 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren } from 'react';
+import { ComponentProps, FunctionComponent, PropsWithChildren, useId } from 'react';
 import { Box, Card, CardBody, Link, Text } from '@chakra-ui/react';
-import { ArrowIcon, ConsoleDocsIcon32 } from 'src/shared';
+import { ArrowIcon, ConsoleDocsIcon32, EXTERNAL_LINKS } from 'src/shared';
 
 export const DocsLink: FunctionComponent<PropsWithChildren<ComponentProps<typeof Card>>> = ({
     children,
     ...rest
 }) => {
+    const arrowId = useId();
+
     return (
         <Card
             as={Link}
-            px="4"
+            pr="5"
+            pl="4"
             py="3"
-            _hover={{ textDecoration: 'unset' }}
+            _hover={{
+                textDecoration: 'unset',
+                bg: 'background.contentTint',
+                ['#' + CSS.escape(arrowId)]: { transform: 'rotate(-90deg) translateY(4px)' }
+            }}
+            transition="background 0.1s linear"
+            href={EXTERNAL_LINKS.DOCUMENTATION}
+            isExternal
             variant="outline"
             {...rest}
         >
@@ -27,7 +37,13 @@ export const DocsLink: FunctionComponent<PropsWithChildren<ComponentProps<typeof
                         </Text>
                     )}
                 </Box>
-                <ArrowIcon ml="3" alignSelf="center" transform="rotate(-90deg)" />
+                <ArrowIcon
+                    transition="transform 0.1s linear"
+                    id={arrowId}
+                    ml="3"
+                    alignSelf="center"
+                    transform="rotate(-90deg)"
+                />
             </CardBody>
         </Card>
     );

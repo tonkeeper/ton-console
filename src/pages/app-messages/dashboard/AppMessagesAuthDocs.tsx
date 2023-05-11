@@ -117,7 +117,7 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                     </TabPanel>
                 </TabPanels>
             </Tabs>
-            <DocsLink mb="6" mx="6" />
+            <DocsLink mb="1" mx="6" />
         </Box>
     );
 };
