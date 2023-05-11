@@ -83,7 +83,7 @@ const Routing: FunctionComponent = () => {
                 />
                 <Route path="tonapi">{TonapiRouting}</Route>
                 <Route
-                    path="app-messages"
+                    path="tonkeeper-messages"
                     element={
                         <Suspense>
                             <AppMessagesPage />
