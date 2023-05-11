@@ -1,5 +1,5 @@
 import { ComponentProps, FunctionComponent } from 'react';
-import { H4, Overlay } from 'src/shared';
+import { formatWithSuffix, H4, Overlay } from 'src/shared';
 import { Box, Button, Skeleton, Text, useDisclosure } from '@chakra-ui/react';
 import { appMessagesStore, MessagesRefillModal } from 'src/features';
 import { observer } from 'mobx-react-lite';
@@ -15,7 +15,7 @@ const AppMessagesBalance: FunctionComponent<ComponentProps<typeof Box>> = props 
                 {appMessagesStore.balance$.isLoading ? (
                     <Skeleton w="100px" h="6" />
                 ) : (
-                    appMessagesStore.balance$.value || 0
+                    formatWithSuffix(appMessagesStore.balance$.value || 0)
                 )}
             </H4>
             <Text textStyle="body2" mb="5" color="text.secondary">

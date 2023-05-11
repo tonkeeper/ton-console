@@ -1,6 +1,6 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Box, Flex, Skeleton } from '@chakra-ui/react';
-import { InfoTooltip, Span } from 'src/shared';
+import { formatWithSuffix, InfoTooltip, Span } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { appMessagesStore } from 'src/features';
 
@@ -53,7 +53,7 @@ const AppMessagesStats: FunctionComponent<ComponentProps<typeof Box>> = props =>
                     <InfoTooltip>Push messages balance that you can send to your users</InfoTooltip>
                 </Box>
                 <Span textStyle="body2" textAlign="end">
-                    {isResolved ? balance : <Skeleton w="100px" h="3" />}
+                    {isResolved ? formatWithSuffix(balance) : <Skeleton w="100px" h="3" />}
                 </Span>
             </Flex>
             <Flex justify="space-between">

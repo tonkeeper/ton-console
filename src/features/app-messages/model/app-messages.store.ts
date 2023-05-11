@@ -2,7 +2,6 @@ import { makeAutoObservable } from 'mobx';
 import {
     apiClient,
     awaitValueResolved,
-    createAsyncAction,
     createImmediateReaction,
     DTOCharge,
     DTOMessagesPackage,
@@ -37,6 +36,7 @@ class AppMessagesStore {
 
                 if (project) {
                     this.fetchBalance();
+                    this.fetchPaymentsHistory();
                 }
             }
         );
@@ -79,14 +79,24 @@ class AppMessagesStore {
         };
     });
 
-    buyPackage = createAsyncAction(async (packageId: AppMessagesPackage['id']) => {
-        await apiClient.api.buyMessagesPackage(
-            { project_id: projectsStore.selectedProject!.id },
-            { id: packageId }
-        );
+    buyPackage = this.balance$.createAsyncAction(
+        async (packageId: AppMessagesPackage['id']) => {
+            await apiClient.api.buyMessagesPackage(
+                { project_id: projectsStore.selectedProject!.id },
+                { id: packageId }
+            );
 
-        await this.fetchBalance();
-    });
+            await this.fetchBalance();
+        },
+        {
+            successToast: {
+                title: 'Successful purchase'
+            },
+            errorToast: {
+                title: 'Unsuccessful purchase'
+            }
+        }
+    );
 
     fetchPaymentsHistory = this.paymentsHistory$.createAsyncAction(async () => {
         const packages = await awaitValueResolved(this.packages$);

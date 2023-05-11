@@ -32,7 +32,7 @@ const CurrencyRate: FunctionComponent<
     contentUnderSkeleton,
     ...rest
 }) => {
-    const sign = leftSign === undefined ? '$' : leftSign;
+    const sign = leftSign === undefined ? '' : leftSign;
     const precisionWithFallback = precision === undefined ? 2 : precision;
     const [skeletonHeight, setSkeletonHeight] = useState('30px');
     const rate$ = ratesStore.rates$[currency as CRYPTO_CURRENCY];
