@@ -2,9 +2,9 @@ import { FunctionComponent } from 'react';
 import { H4, Overlay } from 'src/shared';
 import { Box, Divider, Flex, Text } from '@chakra-ui/react';
 import { CurrentDappCard } from 'src/entities';
-import { AppMessagesStats } from './AppMessagesStats';
-import { AppMessagesAuthDocs } from './AppMessagesAuthDocs';
-import { AppMessagesBalance } from './AppMessagesBalance';
+import AppMessagesStats from './AppMessagesStats';
+import AppMessagesAuthDocs from './AppMessagesAuthDocs';
+import AppMessagesBalance from './AppMessagesBalance';
 
 export const AppMessagesDashboard: FunctionComponent = () => {
     return (
@@ -19,11 +19,11 @@ export const AppMessagesDashboard: FunctionComponent = () => {
                     <Text textStyle="label1" mb="5">
                         Statistics
                     </Text>
-                    <AppMessagesStats maxW="356px" />
+                    <AppMessagesStats maxW="256px" />
                 </Box>
                 <Divider />
-                <Box pt="5" px="6">
-                    <Text textStyle="label1" mb="5">
+                <Box pt="5">
+                    <Text textStyle="label1" mb="5" px="6">
                         Authorization
                     </Text>
                     <AppMessagesAuthDocs />

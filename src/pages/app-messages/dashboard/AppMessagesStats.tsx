@@ -1,8 +1,15 @@
 import { ComponentProps, FunctionComponent } from 'react';
-import { Box, Flex, Text } from '@chakra-ui/react';
+import { Box, Flex, Skeleton } from '@chakra-ui/react';
 import { InfoTooltip, Span } from 'src/shared';
+import { observer } from 'mobx-react-lite';
+import { appMessagesStore } from 'src/features';
 
-export const AppMessagesStats: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const AppMessagesStats: FunctionComponent<ComponentProps<typeof Box>> = props => {
+    const stats = appMessagesStore.stats$.value;
+    const balance = appMessagesStore.balance$.value;
+    const isResolved =
+        appMessagesStore.stats$.isResolved && stats && appMessagesStore.balance$.isResolved;
+
     return (
         <Box {...props}>
             <Flex justify="space-between">
@@ -11,48 +18,58 @@ export const AppMessagesStats: FunctionComponent<ComponentProps<typeof Box>> = p
                         All users
                     </Span>
                     &nbsp;
-                    <InfoTooltip>текст тултипа</InfoTooltip>
+                    <InfoTooltip>
+                        All dApp users with login by Tonkeeper and Ton Connect 2.0
+                    </InfoTooltip>
                 </Box>
-                <Text textStyle="body2" textAlign="end">
-                    123
-                </Text>
+                <Span textStyle="body2" textAlign="end">
+                    {isResolved ? stats!.totalUsers : <Skeleton w="100px" h="3" />}
+                </Span>
             </Flex>
             <Flex justify="space-between">
                 <Box mb="2">
                     <Span textStyle="body2" color="text.secondary">
-                        With notifications enabled
+                        Enable notifications
                     </Span>
                     &nbsp;
-                    <InfoTooltip>текст тултипа</InfoTooltip>
+                    <InfoTooltip>
+                        Users who have allowed push notifications from your dApp
+                    </InfoTooltip>
                 </Box>
-                <Text textStyle="body2" textAlign="end">
-                    123
-                </Text>
+                <Span textStyle="body2" textAlign="end">
+                    {isResolved ? (
+                        stats!.usersWithEnabledNotifications
+                    ) : (
+                        <Skeleton w="100px" h="3" />
+                    )}
+                </Span>
             </Flex>
             <Flex justify="space-between">
                 <Box mb="2">
                     <Span textStyle="body2" color="text.secondary">
-                        Available notifications
+                        Available messages
                     </Span>
                     &nbsp;
-                    <InfoTooltip>текст тултипа</InfoTooltip>
+                    <InfoTooltip>Push messages balance that you can send to your users</InfoTooltip>
                 </Box>
-                <Text textStyle="body2" textAlign="end">
-                    123
-                </Text>
+                <Span textStyle="body2" textAlign="end">
+                    {isResolved ? balance : <Skeleton w="100px" h="3" />}
+                </Span>
             </Flex>
             <Flex justify="space-between">
                 <Box mb="2">
                     <Span textStyle="body2" color="text.secondary">
-                        Notifications sent last week
+                        Sent last 7 days
                     </Span>
                     &nbsp;
-                    <InfoTooltip>текст тултипа</InfoTooltip>
+                    <InfoTooltip>Messages with delivered to dApp users last 7 days</InfoTooltip>
                 </Box>
-                <Text textStyle="body2" textAlign="end">
-                    123
-                </Text>
+                <Span textStyle="body2" textAlign="end">
+                    {isResolved ? stats!.sentNotificationsLastWeek : <Skeleton w="100px" h="3" />}
+                </Span>
             </Flex>
         </Box>
     );
 };
+
+export default observer(AppMessagesStats);

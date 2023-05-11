@@ -61,6 +61,24 @@ class DappStore {
         };
     });
 
+    deleteValidatedDapp = this.dapps$.createAsyncAction(
+        async (id: Dapp['id']) => {
+            await apiClient.api.deleteMessagesApp({
+                app_id: id
+            });
+
+            return dappsApiRequest(projectsStore.selectedProject!.id);
+        },
+        {
+            successToast: {
+                title: 'Dapp deleted successfully'
+            },
+            errorToast: {
+                title: "Dapp wasn't deleted"
+            }
+        }
+    );
+
     validatePendingDapp = this.dapps$.createAsyncAction(
         async () => {
             const token = this.pendingDapp?.token;

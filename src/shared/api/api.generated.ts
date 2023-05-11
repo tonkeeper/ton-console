@@ -1127,6 +1127,33 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags messages_service
+         * @name DeleteMessagesApp
+         * @summary Delete messages app
+         * @request DELETE:/api/v1/services/messages/app
+         * @secure
+         */
+        deleteMessagesApp: (
+            query: {
+                /**
+                 * App ID
+                 * @format int64
+                 */
+                app_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<DTOOk, DTOError>({
+                path: `/api/v1/services/messages/app`,
+                method: 'DELETE',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
          * @name VerifyMessagesApp
          * @summary Verify messages app
          * @request POST:/api/v1/services/messages/app/verify
@@ -1214,6 +1241,113 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 DTOError
             >({
                 path: `/api/v1/services/messages/balance`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name GetMessagesAppToken
+         * @summary Get messages app token
+         * @request GET:/api/v1/services/messages/token
+         * @secure
+         */
+        getMessagesAppToken: (
+            query: {
+                /**
+                 * App ID
+                 * @format int64
+                 */
+                app_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @example "TC-PUSHES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA==" */
+                    token: string;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/messages/token`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name RegenerateMessagesAppToken
+         * @summary Regenerate messages app token
+         * @request PATCH:/api/v1/services/messages/token
+         * @secure
+         */
+        regenerateMessagesAppToken: (
+            query: {
+                /**
+                 * App ID
+                 * @format int64
+                 */
+                app_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @example "TC-PUSHES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA==" */
+                    token: string;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/messages/token`,
+                method: 'PATCH',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name GetMessagesStats
+         * @summary Get messages stats
+         * @request GET:/api/v1/services/messages/stats
+         * @secure
+         */
+        getMessagesStats: (
+            query: {
+                /**
+                 * App ID
+                 * @format int64
+                 */
+                app_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    stats: {
+                        /** @example 10000 */
+                        users: number;
+                        /** @example 100 */
+                        sent_in_week: number;
+                        /** @example 100 */
+                        enable_notifications: number;
+                        /** @example 100 */
+                        available_messages: number;
+                    };
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/messages/stats`,
                 method: 'GET',
                 query: query,
                 secure: true,

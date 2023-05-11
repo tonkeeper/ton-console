@@ -13,6 +13,7 @@ import Table from './table';
 import Popover from './popover';
 import Tooltip from './tooltip';
 import Tabs from './tabs';
+import Code from './code';
 
 export default {
     Button,
@@ -29,5 +30,6 @@ export default {
     Table,
     Popover,
     Tooltip,
-    Tabs
+    Tabs,
+    Code
 };

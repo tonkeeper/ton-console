@@ -458,6 +458,24 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+    delete:
+      summary: "Delete messages app"
+      operationId: deleteMessagesApp
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - messages_service
+      parameters:
+        - $ref: '#/components/parameters/queryAppID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /api/v1/services/messages/app/verify:
     post:
       summary: "Verify messages app"
@@ -517,7 +535,62 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-
+  /api/v1/services/messages/token:
+    get:
+      summary: "Get messages app token"
+      operationId: getMessagesAppToken
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - messages_service
+      parameters:
+        - $ref: '#/components/parameters/queryAppID'
+      responses:
+        '200':
+          $ref: '#/components/responses/MessagesAppToken'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      summary: "Regenerate messages app token"
+      operationId: regenerateMessagesAppToken
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - messages_service
+      parameters:
+        - $ref: '#/components/parameters/queryAppID'
+      responses:
+        '200':
+          $ref: '#/components/responses/MessagesAppToken'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/messages/stats:
+    get:
+      summary: "Get messages stats"
+      operationId: getMessagesStats
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - messages_service
+      parameters:
+        - $ref: '#/components/parameters/queryAppID'
+      responses:
+        '200':
+          $ref: '#/components/responses/MessagesStats'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
 components:
   parameters:
@@ -541,6 +614,14 @@ components:
       description: Project ID
       in: query
       name: project_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+    queryAppID:
+      description: App ID
+      in: query
+      name: app_id
       required: true
       schema:
         type: integer
@@ -1308,6 +1389,47 @@ components:
               balance:
                 type: integer
                 example: 100
+    MessagesAppToken:
+      description: "Messages app token"
+      content:
+        application/json:
+          schema:
+            required:
+              - token
+            type: object
+            properties:
+              token:
+                type: string
+                example: "TC-PUSHES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA=="
+    MessagesStats:
+      description: "Messages stats"
+      content:
+        application/json:
+          schema:
+            required:
+              - stats
+            type: object
+            properties:
+              stats:
+                type: object
+                required:
+                  - users
+                  - sent_in_week
+                  - enable_notifications
+                  - available_messages
+                properties:
+                  users:
+                    type: integer
+                    example: 10000
+                  sent_in_week:
+                    type: integer
+                    example: 100
+                  enable_notifications:
+                    type: integer
+                    example: 100
+                  available_messages:
+                    type: integer
+                    example: 100
   
   securitySchemes:
     JWTAuth:

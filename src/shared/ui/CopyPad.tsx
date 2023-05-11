@@ -1,6 +1,6 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Pad } from './Pad';
-import { Text, Tooltip, useClipboard } from '@chakra-ui/react';
+import { Spinner, Text, Tooltip, useClipboard } from '@chakra-ui/react';
 import { CopyIcon24 } from './icons/CopyIcon24';
 
 const padAnimation = {
@@ -13,8 +13,12 @@ const padAnimation = {
     }
 };
 export const CopyPad: FunctionComponent<
-    ComponentProps<typeof Pad> & { text: string; iconAlign?: 'start' | 'center' }
-> = ({ text, iconAlign, ...rest }) => {
+    ComponentProps<typeof Pad> & {
+        text: string;
+        iconAlign?: 'start' | 'center';
+        isLoading?: boolean;
+    }
+> = ({ text, iconAlign, isLoading, ...rest }) => {
     const { hasCopied, onCopy } = useClipboard(text);
 
     return (
@@ -24,17 +28,23 @@ export const CopyPad: FunctionComponent<
                 px="4"
                 pr="2.5"
                 display="flex"
-                cursor="pointer"
+                cursor={isLoading ? 'default' : 'pointer'}
                 gap="7"
                 alignItems="center"
                 justifyContent="space-between"
-                onClick={onCopy}
-                {...padAnimation}
+                opacity={isLoading ? '0.48' : '1'}
+                onClick={isLoading ? () => {} : onCopy}
+                wordBreak="break-word"
+                {...(!isLoading && padAnimation)}
                 {...rest}
             >
-                <Text textStyle="body2" color="primary" fontFamily="mono" wordBreak="break-word">
-                    {text}
-                </Text>
+                {isLoading ? (
+                    <Spinner mx="auto" size="sm" />
+                ) : (
+                    <Text textStyle="body2" color="primary" fontFamily="mono">
+                        {text}
+                    </Text>
+                )}
 
                 <CopyIcon24 alignSelf={iconAlign === 'start' ? 'flex-start' : 'center'} />
             </Pad>

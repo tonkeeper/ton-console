@@ -7,7 +7,9 @@ const variants = {
             borderBottom: 'none'
         },
         tablist: {
-            borderBottom: 'none'
+            pb: '1px',
+            borderBottomWidth: '1px',
+            borderBottomColor: 'separator.common'
         }
     })
 };

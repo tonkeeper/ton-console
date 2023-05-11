@@ -12,3 +12,4 @@ export * from './async-input';
 export * from './tooltip';
 export { Span } from './Span';
 export * from './checkbox';
+export { DocsLink } from './DocsLink';

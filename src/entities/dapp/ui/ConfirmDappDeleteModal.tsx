@@ -40,7 +40,7 @@ export const ConfirmDappDeleteModal: FunctionComponent<{
                         type="submit"
                         variant="primary"
                     >
-                        Reset
+                        Delete
                     </Button>
                 </ModalFooter>
             </ModalContent>

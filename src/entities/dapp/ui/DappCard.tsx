@@ -11,19 +11,22 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 import { DeleteIcon24, Image, VerticalDotsIcon16 } from 'src/shared';
-import { Dapp } from 'src/entities';
+import { Dapp, dappStore } from 'src/entities';
 import { ConfirmDappDeleteModal } from './ConfirmDappDeleteModal';
 import { observer } from 'mobx-react-lite';
 
 const DappCard: FunctionComponent<
-    ComponentProps<typeof Card> & { dapp: Pick<Dapp, 'name' | 'image' | 'url'>; withMenu?: boolean }
+    ComponentProps<typeof Card> & {
+        dapp: Pick<Dapp, 'name' | 'image' | 'url'> & { id?: Dapp['id'] };
+        withMenu?: boolean;
+    }
 > = ({ dapp, withMenu, ...rest }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const onDelete = (confirm?: boolean): void => {
         onClose();
-        if (confirm) {
-            //
+        if (confirm && dapp.id !== undefined) {
+            dappStore.deleteValidatedDapp(dapp.id);
         }
     };
 

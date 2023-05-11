@@ -11,15 +11,19 @@ import {
     TonCurrencyAmount,
     UsdCurrencyAmount
 } from 'src/shared';
-import { projectsStore } from 'src/entities';
-import { AppMessagesPackage, AppMessagesPayment } from './interfaces';
+import { dappStore, projectsStore } from 'src/entities';
+import { AppMessagesPackage, AppMessagesPayment, AppMessagesStats } from './interfaces';
 
 class AppMessagesStore {
     packages$ = new Loadable<AppMessagesPackage[]>([]);
 
     balance$ = new Loadable<number>(0);
 
+    stats$ = new Loadable<AppMessagesStats | null>(null);
+
     paymentsHistory$ = new Loadable<AppMessagesPayment[]>([]);
+
+    dappToken$ = new Loadable<string | null>(null);
 
     constructor() {
         makeAutoObservable(this);
@@ -36,6 +40,18 @@ class AppMessagesStore {
                 }
             }
         );
+
+        createImmediateReaction(
+            () => dappStore.dapps$.value,
+            dapps => {
+                this.clearDappRelatedState();
+
+                if (dapps && dapps[0]) {
+                    this.fetchStats();
+                    this.fetchDappToken();
+                }
+            }
+        );
     }
 
     fetchPackages = this.packages$.createAsyncAction(async () => {
@@ -49,6 +65,18 @@ class AppMessagesStore {
         });
 
         return result.data.balance;
+    });
+
+    fetchStats = this.stats$.createAsyncAction(async () => {
+        const result = await apiClient.api.getMessagesStats({
+            app_id: dappStore.dapps$.value[0].id
+        });
+
+        return {
+            totalUsers: result.data.stats.users,
+            usersWithEnabledNotifications: result.data.stats.enable_notifications,
+            sentNotificationsLastWeek: result.data.stats.sent_in_week
+        };
     });
 
     buyPackage = createAsyncAction(async (packageId: AppMessagesPackage['id']) => {
@@ -71,9 +99,40 @@ class AppMessagesStore {
             .filter(notNull);
     });
 
+    fetchDappToken = this.dappToken$.createAsyncAction(async () => {
+        const response = await apiClient.api.getMessagesAppToken({
+            app_id: dappStore.dapps$.value[0].id
+        });
+
+        return response.data.token;
+    });
+
+    regenerateDappToken = this.dappToken$.createAsyncAction(
+        async () => {
+            const response = await apiClient.api.regenerateMessagesAppToken({
+                app_id: dappStore.dapps$.value[0].id
+            });
+
+            return response.data.token;
+        },
+        {
+            successToast: {
+                title: 'Token regenerated successfully'
+            },
+            errorToast: {
+                title: 'Token regeneration error'
+            }
+        }
+    );
+
     clearState = (): void => {
         this.paymentsHistory$.clear();
         this.balance$.clear();
+    };
+
+    clearDappRelatedState = (): void => {
+        this.dappToken$.clear();
+        this.stats$.clear();
     };
 }
 
