@@ -95,9 +95,9 @@ class DappStore {
                 }
             );
 
+            const dappsList = await dappsApiRequest(projectsStore.selectedProject!.id);
             this.pendingDapp = null;
-
-            return dappsApiRequest(projectsStore.selectedProject!.id);
+            return dappsList;
         },
         {
             successToast: {
