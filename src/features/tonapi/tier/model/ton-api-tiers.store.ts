@@ -38,7 +38,7 @@ class TonApiTiersStore {
         );
 
         createEffect(() => {
-            if (this.tiers$.isResolved && projectsStore.selectedProjectId) {
+            if (this.tiers$.isResolved && projectsStore.selectedProject?.id) {
                 untracked(this.fetchPaymentsHistory);
             } else {
                 this.paymentsHistory$.clear();

@@ -11,21 +11,24 @@ import {
     replaceIfNotEqual,
     createImmediateReaction
 } from 'src/shared';
-import { Project, CreateProjectFormValues } from './interfaces';
-import { tGUserStore } from 'src/entities';
-import { UpdateProjectFormValues } from 'src/entities/project/model/interfaces/update-project-form-values';
+import { Project, CreateProjectFormValues, UpdateProjectFormValues } from './interfaces';
+import { tGUserStore } from '../../tg-user';
 
 class ProjectsStore {
     projects$ = new Loadable<Project[]>([], { makePersistable: 'Projects' });
 
-    selectedProjectId: number | null = null;
+    private selectedProjectId: number | null = null;
 
     get selectedProject(): Project | null {
         if (this.selectedProjectId == null) {
             return null;
         }
 
-        return this.projects$.value.find(project => project.id === this.selectedProjectId) || null;
+        return (
+            this.projects$.value.find(project => project.id === this.selectedProjectId) ||
+            this.projects$.value[0] ||
+            null
+        );
     }
 
     constructor() {
@@ -38,7 +41,7 @@ class ProjectsStore {
                     key: 'selectedProjectId',
                     serialize: serializeState,
                     deserialize: deserializeState
-                }
+                } as unknown as keyof this
             ],
             storage: getWindow()!.localStorage
         }).then(() => {
