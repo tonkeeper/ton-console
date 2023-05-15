@@ -35,10 +35,12 @@
     "react-i18next": "^12.2.0",
     "react-router-dom": "^6.9.0",
     "recharts": "^2.5.0",
+    "ton-core": "^0.49.1",
     "vite-plugin-html": "^3.2.0"
   },
   "devDependencies": {
     "@chakra-ui/styled-system": "^2.7.0",
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@types/compose-function": "^0.0.30",

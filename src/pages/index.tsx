@@ -13,6 +13,7 @@ const LandingPage = lazy(() => import('./landing'));
 const CreateFirstProjectPage = lazy(() => import('./create-first-project'));
 const BalancePage = lazy(() => import('./balance'));
 const DashboardPage = lazy(() => import('./dashboard'));
+const InvoicesPage = lazy(() => import('./invoices'));
 
 const Routing: FunctionComponent = () => {
     // Scale layout for mobile devices until adaptive layout is not ready
@@ -77,6 +78,14 @@ const Routing: FunctionComponent = () => {
                     element={
                         <Suspense>
                             <DashboardPage />
+                        </Suspense>
+                    }
+                />
+                <Route
+                    path="invoices"
+                    element={
+                        <Suspense>
+                            <InvoicesPage />
                         </Suspense>
                     }
                 />
