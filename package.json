@@ -33,6 +33,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.43.5",
     "react-i18next": "^12.2.0",
+    "react-imask": "^6.6.1",
     "react-router-dom": "^6.9.0",
     "recharts": "^2.5.0",
     "ton-core": "^0.49.1",
