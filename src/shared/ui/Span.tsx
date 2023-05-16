@@ -1,6 +1,8 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, forwardRef } from 'react';
 import { Box, chakra } from '@chakra-ui/react';
 
-export const Span: FunctionComponent<ComponentProps<typeof Box>> = props => {
-    return <chakra.span {...props} />;
-};
+export const Span = forwardRef<HTMLSpanElement, ComponentProps<typeof Box>>((props, ref) => {
+    return <chakra.span ref={ref} {...props} />;
+});
+
+Span.displayName = 'Span';

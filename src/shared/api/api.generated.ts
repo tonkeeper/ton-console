@@ -126,7 +126,7 @@ export interface DTOCharge {
      * @format int64
      * @example 1
      */
-    pushes_package_id?: number;
+    messages_package_id?: number;
     /**
      * @format int64
      * @example 1000000000
@@ -190,7 +190,7 @@ export interface DTOStats {
     resultType: string;
 }
 
-export interface DTOPushesPackage {
+export interface DTOMessagesPackage {
     /**
      * @format int64
      * @example 1
@@ -200,12 +200,56 @@ export interface DTOPushesPackage {
     name: string;
     /** @example 1000 */
     limits: number;
+    /** @example 100 */
+    usd_price: number;
+}
+
+export interface DTOMessagesApp {
     /**
-     * The price is in nano tons
+     * @format int64
+     * @example 3652012454
+     */
+    id: number;
+    /** @example "MyApp-123" */
+    name: string;
+    /** @example "https://my_dapp.io/avatar.png" */
+    image?: string;
+    /** @example 1647024163 */
+    project_id: number;
+    /** @example "https://my_dapp.io" */
+    url: string;
+    /** @example true */
+    verify: boolean;
+    /** @example "2023-03-23" */
+    date_create: string;
+}
+
+export interface DTOInvoicesInvoice {
+    /** @example "60ffb075-8957-4d01-b976-a0122e294fa0" */
+    id: string;
+    /**
+     * @format int64
+     * @example 4177275498
+     */
+    app_id: number;
+    /**
      * @format int64
      * @example 1000000000
      */
-    ton_price: number;
+    amount: number;
+    /**
+     * @format int64
+     * @example 100
+     */
+    life_time: number;
+    /** @example false */
+    subtract_fee_from_amount: boolean;
+    /** @example "Test description" */
+    description: string;
+    /** @example "pending_status" */
+    status: DTOInvoicesInvoiceStatus;
+    /** @example "2023-03-23" */
+    date_create: string;
 }
 
 /** backend error code */
@@ -229,6 +273,14 @@ export enum DTOErrorCode {
     DTOErrorAlreadySelectedTier = 17,
     DTOErrorDownGradeTier = 18,
     DTOErrorInsufficientFunds = 19
+}
+
+/** @example "pending_status" */
+export enum DTOInvoicesInvoiceStatus {
+    DTOPendingStatus = 'pending_status',
+    DTOSuccessStatus = 'success_status',
+    DTOCancelStatus = 'cancel_status',
+    DTOExpiredStatus = 'expired_status'
 }
 
 import axios, {
@@ -974,20 +1026,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags pushes_service
-         * @name GetPushesPackages
-         * @summary Get pushes packages
-         * @request GET:/api/v1/services/pushes/packages
+         * @tags messages_service
+         * @name GetMessagesPackages
+         * @summary Get messages packages
+         * @request GET:/api/v1/services/messages/packages
          * @secure
          */
-        getPushesPackages: (params: RequestParams = {}) =>
+        getMessagesPackages: (params: RequestParams = {}) =>
             this.request<
                 {
-                    items: DTOPushesPackage[];
+                    items: DTOMessagesPackage[];
                 },
                 DTOError
             >({
-                path: `/api/v1/services/pushes/packages`,
+                path: `/api/v1/services/messages/packages`,
                 method: 'GET',
                 secure: true,
                 ...params
@@ -996,13 +1048,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags pushes_service
-         * @name BuyPushesPackage
-         * @summary Buy pushes package
-         * @request POST:/api/v1/services/pushes/package
+         * @tags messages_service
+         * @name BuyMessagesPackage
+         * @summary Buy messages package
+         * @request POST:/api/v1/services/messages/package
          * @secure
          */
-        buyPushesPackage: (
+        buyMessagesPackage: (
             query: {
                 /**
                  * Project ID
@@ -1015,12 +1067,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @format int64
                  * @example 1
                  */
-                id?: number;
+                id: number;
             },
             params: RequestParams = {}
         ) =>
             this.request<DTOOk, DTOError>({
-                path: `/api/v1/services/pushes/package`,
+                path: `/api/v1/services/messages/package`,
                 method: 'POST',
                 query: query,
                 body: data,
@@ -1031,10 +1083,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags pushes_service
+         * @tags messages_service
          * @name GetPushesPaymentsHistory
-         * @summary Get Pushes payments history
-         * @request GET:/api/v1/services/pushes/payments/history
+         * @summary Get messages payments history
+         * @request GET:/api/v1/services/messages/payments/history
          * @secure
          */
         getPushesPaymentsHistory: (
@@ -1053,7 +1105,661 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 },
                 DTOError
             >({
-                path: `/api/v1/services/pushes/payments/history`,
+                path: `/api/v1/services/messages/payments/history`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name CreateMessagesApp
+         * @summary Create messages app
+         * @request POST:/api/v1/services/messages/app
+         * @secure
+         */
+        createMessagesApp: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            data: {
+                /** @example "https://my_dapp.io" */
+                url: string;
+                /** @example "My dapp" */
+                name?: string;
+                /** @example "https://my_dapp.io/avatar.png" */
+                image?: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @example "DkPazejgbwoAAAAAZFNueLGu-1GCWVgvk5Av_1EK2Ml5LzQItlrivLPtTPMsu5A2" */
+                    payload: string;
+                    /**
+                     * @format int64
+                     * @example 1683189368
+                     */
+                    valid_until: number;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/messages/app`,
+                method: 'POST',
+                query: query,
+                body: data,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name DeleteMessagesApp
+         * @summary Delete messages app
+         * @request DELETE:/api/v1/services/messages/app
+         * @secure
+         */
+        deleteMessagesApp: (
+            query: {
+                /**
+                 * App ID
+                 * @format int64
+                 */
+                app_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<DTOOk, DTOError>({
+                path: `/api/v1/services/messages/app`,
+                method: 'DELETE',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name VerifyMessagesApp
+         * @summary Verify messages app
+         * @request POST:/api/v1/services/messages/app/verify
+         * @secure
+         */
+        verifyMessagesApp: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            data: {
+                /** @example "DkPazejgbwoAAAAAZFNueLGu-1GCWVgvk5Av_1EK2Ml5LzQItlrivLPtTPMsu5A2" */
+                payload: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<DTOOk, DTOError>({
+                path: `/api/v1/services/messages/app/verify`,
+                method: 'POST',
+                query: query,
+                body: data,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name GetMessagesApps
+         * @summary Get messages apps
+         * @request GET:/api/v1/services/messages/apps
+         * @secure
+         */
+        getMessagesApps: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: DTOMessagesApp[];
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/messages/apps`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name GetMessagesBalance
+         * @summary Get messages balance
+         * @request GET:/api/v1/services/messages/balance
+         * @secure
+         */
+        getMessagesBalance: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @example 100 */
+                    balance: number;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/messages/balance`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name GetMessagesAppToken
+         * @summary Get messages app token
+         * @request GET:/api/v1/services/messages/token
+         * @secure
+         */
+        getMessagesAppToken: (
+            query: {
+                /**
+                 * App ID
+                 * @format int64
+                 */
+                app_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @example "TC-PUSHES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA==" */
+                    token: string;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/messages/token`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name RegenerateMessagesAppToken
+         * @summary Regenerate messages app token
+         * @request PATCH:/api/v1/services/messages/token
+         * @secure
+         */
+        regenerateMessagesAppToken: (
+            query: {
+                /**
+                 * App ID
+                 * @format int64
+                 */
+                app_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @example "TC-PUSHES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA==" */
+                    token: string;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/messages/token`,
+                method: 'PATCH',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags messages_service
+         * @name GetMessagesStats
+         * @summary Get messages stats
+         * @request GET:/api/v1/services/messages/stats
+         * @secure
+         */
+        getMessagesStats: (
+            query: {
+                /**
+                 * App ID
+                 * @format int64
+                 */
+                app_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    stats: {
+                        /** @example 10000 */
+                        users: number;
+                        /** @example 100 */
+                        sent_in_week: number;
+                        /** @example 100 */
+                        enable_notifications: number;
+                        /** @example 100 */
+                        available_messages: number;
+                    };
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/messages/stats`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name CreateInvoicesApp
+         * @summary Create invoices app
+         * @request POST:/api/v1/services/invoices/app
+         * @secure
+         */
+        createInvoicesApp: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            data: {
+                /** @example "Test name" */
+                name: string;
+                /** @example "Test description" */
+                description?: string;
+                /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+                recipient_address: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    app: {
+                        /**
+                         * @format int64
+                         * @example 4177275498
+                         */
+                        id: number;
+                        /**
+                         * @format int64
+                         * @example 4268870487
+                         */
+                        project_id: number;
+                        /** @example "Test name" */
+                        name: string;
+                        /** @example "Test description" */
+                        description: string;
+                        /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+                        recipient_address: string;
+                        /** @example "2023-03-23" */
+                        date_create: string;
+                    };
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/invoices/app`,
+                method: 'POST',
+                query: query,
+                body: data,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name GetInvoicesApp
+         * @summary Get invoices app by project id
+         * @request GET:/api/v1/services/invoices/app
+         * @secure
+         */
+        getInvoicesApp: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    app: {
+                        /**
+                         * @format int64
+                         * @example 4177275498
+                         */
+                        id: number;
+                        /**
+                         * @format int64
+                         * @example 4268870487
+                         */
+                        project_id: number;
+                        /** @example "Test name" */
+                        name: string;
+                        /** @example "Test description" */
+                        description: string;
+                        /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+                        recipient_address: string;
+                        /** @example "2023-03-23" */
+                        date_create: string;
+                    };
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/invoices/app`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name UpdateInvoicesApp
+         * @summary Update invoices app
+         * @request PATCH:/api/v1/services/invoices/app/{id}
+         * @secure
+         */
+        updateInvoicesApp: (
+            id: number,
+            data: {
+                /** @example "Test name" */
+                name?: string;
+                /** @example "Test description" */
+                description?: string;
+                /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+                recipient_address?: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    app: {
+                        /**
+                         * @format int64
+                         * @example 4177275498
+                         */
+                        id: number;
+                        /**
+                         * @format int64
+                         * @example 4268870487
+                         */
+                        project_id: number;
+                        /** @example "Test name" */
+                        name: string;
+                        /** @example "Test description" */
+                        description: string;
+                        /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+                        recipient_address: string;
+                        /** @example "2023-03-23" */
+                        date_create: string;
+                    };
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/invoices/app/${id}`,
+                method: 'PATCH',
+                body: data,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name DeleteInvoicesApp
+         * @summary Delete invoices app
+         * @request DELETE:/api/v1/services/invoices/app/{id}
+         * @secure
+         */
+        deleteInvoicesApp: (id: number, params: RequestParams = {}) =>
+            this.request<DTOOk, DTOError>({
+                path: `/api/v1/services/invoices/app/${id}`,
+                method: 'DELETE',
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name GetInvoicesAppToken
+         * @summary Get invoices app token
+         * @request GET:/api/v1/services/invoices/token
+         * @secure
+         */
+        getInvoicesAppToken: (
+            query: {
+                /**
+                 * App ID
+                 * @format int64
+                 */
+                app_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @example "TC-INVOICES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA==" */
+                    token: string;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/invoices/token`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name RegenerateInvoicesAppToken
+         * @summary Regenerate invoices app token
+         * @request PATCH:/api/v1/services/invoices/token
+         * @secure
+         */
+        regenerateInvoicesAppToken: (
+            query: {
+                /**
+                 * App ID
+                 * @format int64
+                 */
+                app_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @example "TC-INVOICES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA==" */
+                    token: string;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/invoices/token`,
+                method: 'PATCH',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name CreateInvoicesInvoice
+         * @summary Create invoices invoice
+         * @request POST:/api/v1/services/invoices/invoice
+         * @secure
+         */
+        createInvoicesInvoice: (
+            query: {
+                /**
+                 * App ID
+                 * @format int64
+                 */
+                app_id: number;
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            data: {
+                /**
+                 * nano ton are expected
+                 * @format int64
+                 * @example 1000000000
+                 */
+                amount: number;
+                /**
+                 * seconds are expected
+                 * @format int64
+                 * @example 100
+                 */
+                life_time: number;
+                /** @example "Test description" */
+                description?: string;
+                /** @example false */
+                subtract_fee_from_amount?: boolean;
+                /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+                recipient_address: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<DTOInvoicesInvoice, DTOError>({
+                path: `/api/v1/services/invoices/invoice`,
+                method: 'POST',
+                query: query,
+                body: data,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name GetInvoices
+         * @summary Get invoices
+         * @request GET:/api/v1/services/invoices
+         * @secure
+         */
+        getInvoices: (
+            query: {
+                /**
+                 * App ID
+                 * @format int64
+                 */
+                app_id: number;
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+                /**
+                 * Limit
+                 * @maxLength 50
+                 * @example 50
+                 */
+                limit?: number;
+                /**
+                 * Invoice ID
+                 * @example "60ffb075-8957-4d01-b976-a0122e294fa0"
+                 */
+                last_id?: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: DTOInvoicesInvoice[];
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/invoices`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name GetInvoicesInvoice
+         * @summary Get invoices invoice
+         * @request GET:/api/v1/services/invoices/{id}
+         * @secure
+         */
+        getInvoicesInvoice: (
+            id: string,
+            query: {
+                /**
+                 * Invoice ID
+                 * @example "60ffb075-8957-4d01-b976-a0122e294fa0"
+                 */
+                id: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<DTOInvoicesInvoice, DTOError>({
+                path: `/api/v1/services/invoices/${id}`,
                 method: 'GET',
                 query: query,
                 secure: true,
