@@ -1,6 +1,11 @@
 import { makeAutoObservable } from 'mobx';
 import { createAsyncAction } from 'src/shared';
-import { TonApiPayment, tonApiTiersStore } from 'src/features';
+import {
+    appMessagesStore,
+    TonApiPayment,
+    tonApiTiersStore,
+    AppMessagesPayment
+} from 'src/features';
 import {
     BillingHistory,
     BillingHistoryPaymentItem,
@@ -27,11 +32,16 @@ class BillingStore {
     }
 
     private get paymentsHistory(): Payment[] {
-        return tonApiTiersStore.paymentsHistory$.value.map(mapTonapiPaymentToPayment);
+        return tonApiTiersStore.paymentsHistory$.value
+            .map(mapTonapiPaymentToPayment)
+            .concat(appMessagesStore.paymentsHistory$.value.map(mapAppmessagesPaymentToPayment));
     }
 
     private get paymentsHistoryLoading(): boolean {
-        return tonApiTiersStore.paymentsHistory$.isLoading;
+        return (
+            tonApiTiersStore.paymentsHistory$.isLoading ||
+            appMessagesStore.paymentsHistory$.isLoading
+        );
     }
 
     constructor() {
@@ -39,7 +49,11 @@ class BillingStore {
     }
 
     fetchBillingHistory = createAsyncAction(async () => {
-        await Promise.all([balanceStore.fetchPortfolio(), tonApiTiersStore.fetchPaymentsHistory()]);
+        await Promise.all([
+            balanceStore.fetchPortfolio(),
+            tonApiTiersStore.fetchPaymentsHistory(),
+            appMessagesStore.fetchPaymentsHistory()
+        ]);
     });
 }
 
@@ -47,6 +61,16 @@ function mapTonapiPaymentToPayment(payment: TonApiPayment): Payment {
     return {
         id: `tonapi-${payment.id}`,
         name: `TON API «${payment.tier.name}»`,
+        date: payment.date,
+        amount: payment.amount,
+        amountUsdEquivalent: payment.amountUsdEquivalent
+    };
+}
+
+function mapAppmessagesPaymentToPayment(payment: AppMessagesPayment): Payment {
+    return {
+        id: `app messages-${payment.id}`,
+        name: `messages package «${payment.package.name}»`,
         date: payment.date,
         amount: payment.amount,
         amountUsdEquivalent: payment.amountUsdEquivalent

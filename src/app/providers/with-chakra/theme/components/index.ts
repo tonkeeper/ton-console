@@ -13,6 +13,9 @@ import Table from './table';
 import Popover from './popover';
 import Textarea from './textarea';
 import Checkbox from './checkbox';
+import Tooltip from './tooltip';
+import Tabs from './tabs';
+import Code from './code';
 
 export default {
     Button,
@@ -29,5 +32,8 @@ export default {
     Table,
     Popover,
     Textarea,
-    Checkbox
+    Checkbox,
+    Tooltip,
+    Tabs,
+    Code
 };

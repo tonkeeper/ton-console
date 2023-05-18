@@ -23,3 +23,7 @@ export function hasProperty<T extends string>(
 export function exhaustiveCheck(val: never): void {
     console.error('Case', val, 'was not included to the switch-case');
 }
+
+export function notNull<T>(val: T | null): val is T {
+    return !!val;
+}
