@@ -6,6 +6,7 @@ import {
     FormControl,
     FormErrorMessage,
     FormLabel,
+    Grid,
     Input,
     InputGroup,
     InputRightElement,
@@ -13,7 +14,17 @@ import {
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
 import { InvoiceForm } from '../models';
-import { isNumber, mergeRefs, Span, TickIcon, TonCurrencyAmount, tonMask } from 'src/shared';
+import {
+    isNumber,
+    mergeRefs,
+    OptionsInput,
+    OptionsInputOption,
+    OptionsInputText,
+    Span,
+    TickIcon,
+    TonCurrencyAmount,
+    tonMask
+} from 'src/shared';
 import { useIMask } from 'react-imask';
 
 interface InternalForm {
@@ -21,7 +32,7 @@ interface InternalForm {
 
     subtractFeeFromAmount: boolean;
 
-    lifeTimeSeconds: number;
+    lifeTimeMinutes: number;
 
     description: number;
 
@@ -77,6 +88,7 @@ export const CreateInvoiceFrom: FunctionComponent<
         const { amount, ...values } = form;
         onSubmit({
             amount: TonCurrencyAmount.fromRelativeAmount(amount),
+            lifeTimeSeconds: values.lifeTimeMinutes * 60,
             ...values
         });
     };
@@ -121,6 +133,38 @@ export const CreateInvoiceFrom: FunctionComponent<
                     <Span color="text.secondary">Amount the buyer will see</Span>
                     <Span color="text.primary">8 TON</Span>
                 </Flex>
+            </FormControl>
+
+            <FormControl mb="5" isInvalid={!!formState.errors.lifeTimeMinutes} isRequired>
+                <FormLabel htmlFor="lifeTimeMinutes">Life time</FormLabel>
+                <OptionsInput
+                    {...register('lifeTimeMinutes', { required: 'This is required' })}
+                    defaultValue="1440"
+                >
+                    <Grid gap="2" gridTemplate="repeat(2, 1fr) / repeat(3, 1fr)">
+                        <OptionsInputOption value="60">Hour</OptionsInputOption>
+                        <OptionsInputOption value="360">6 Hours</OptionsInputOption>
+                        <OptionsInputOption value="1440">Day</OptionsInputOption>
+                        <OptionsInputOption value="10080">Week</OptionsInputOption>
+                        <OptionsInputOption value="43200">Month</OptionsInputOption>
+                        <OptionsInputText
+                            pr="60px"
+                            placeholder="Few minutes"
+                            rightElement={
+                                <InputRightElement
+                                    textStyle="body2"
+                                    w="60px"
+                                    color="text.secondary"
+                                >
+                                    min
+                                </InputRightElement>
+                            }
+                        />
+                    </Grid>
+                </OptionsInput>
+                <FormErrorMessage>
+                    {formState.errors.lifeTimeMinutes && formState.errors.lifeTimeMinutes.message}
+                </FormErrorMessage>
             </FormControl>
         </chakra.form>
     );
