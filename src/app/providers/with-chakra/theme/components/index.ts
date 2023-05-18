@@ -12,6 +12,7 @@ import Divider from './divider';
 import Table from './table';
 import Popover from './popover';
 import Textarea from './textarea';
+import Checkbox from './checkbox';
 
 export default {
     Button,
@@ -27,5 +28,6 @@ export default {
     Divider,
     Table,
     Popover,
-    Textarea
+    Textarea,
+    Checkbox
 };

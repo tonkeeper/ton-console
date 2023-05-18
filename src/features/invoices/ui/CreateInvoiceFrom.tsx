@@ -1,6 +1,8 @@
 import { FunctionComponent, useEffect } from 'react';
 import {
     chakra,
+    Checkbox,
+    Flex,
     FormControl,
     FormErrorMessage,
     FormLabel,
@@ -11,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
 import { InvoiceForm } from '../models';
-import { isNumber, mergeRefs, TonCurrencyAmount, tonMask } from 'src/shared';
+import { isNumber, mergeRefs, Span, TickIcon, TonCurrencyAmount, tonMask } from 'src/shared';
 import { useIMask } from 'react-imask';
 
 interface InternalForm {
@@ -99,6 +101,26 @@ export const CreateInvoiceFrom: FunctionComponent<
                 <FormErrorMessage>
                     {formState.errors.amount && formState.errors.amount.message}
                 </FormErrorMessage>
+            </FormControl>
+
+            <FormControl mb="5">
+                <Checkbox
+                    mb="3"
+                    defaultChecked
+                    icon={<TickIcon w="12px" />}
+                    id="subtractFeeFromAmount"
+                    {...register('subtractFeeFromAmount')}
+                >
+                    Substract fee from amount
+                </Checkbox>
+                <Flex textStyle="body2" justify="space-between" mb="1">
+                    <Span color="text.secondary">How much money a business will get</Span>
+                    <Span color="text.primary">8 TON</Span>
+                </Flex>
+                <Flex textStyle="body2" justify="space-between">
+                    <Span color="text.secondary">Amount the buyer will see</Span>
+                    <Span color="text.primary">8 TON</Span>
+                </Flex>
             </FormControl>
         </chakra.form>
     );
