@@ -15,6 +15,10 @@ export class TokenCurrencyAmount extends BasicCurrencyAmount implements Currency
 
     public readonly weiAmount: BigNumber;
 
+    get stringWeiAmount(): string {
+        return this.weiAmount.toFixed(0);
+    }
+
     override toStringAmount(decimalPlaces?: number): string {
         if (decimalPlaces === undefined) {
             decimalPlaces = this.decimalPlaces;

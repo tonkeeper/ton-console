@@ -93,15 +93,19 @@ export class Loadable<T> {
         }
     }
 
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    createAsyncAction<A extends (...args: any[]) => Promise<T | void>>(
+    createAsyncAction<
+        N extends boolean,
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        A extends (...args: any[]) => Promise<N extends true ? unknown : T | void>
+    >(
         asyncAction: A,
         options?: {
+            notMutateState?: N;
             successToast?: UseToastOptions;
             errorToast?: UseToastOptions;
             onError?: (e: unknown) => void;
         }
-    ): ((...args: [...Parameters<A>, ({ silently?: boolean } | unknown)?]) => Promise<void>) & {
+    ): ((...args: [...Parameters<A>, ({ silently?: boolean } | unknown)?]) => ReturnType<A>) & {
         isLoading: boolean;
         error: unknown;
     } {
@@ -138,8 +142,8 @@ export class Loadable<T> {
 
             try {
                 const result = await asyncAction(...args);
-                if (result !== undefined) {
-                    runInAction(() => (this.value = result));
+                if (result !== undefined && !options?.notMutateState) {
+                    runInAction(() => (this.value = result as T));
                 }
                 changeState('ready');
 
@@ -152,6 +156,7 @@ export class Loadable<T> {
                         ...options.successToast
                     });
                 }
+                return result;
             } catch (e) {
                 console.error(e);
                 changeError(e);
@@ -180,7 +185,7 @@ export class Loadable<T> {
             }
         }) as ((
             ...args: [...Parameters<A>, ({ silently?: boolean } | unknown)?]
-        ) => Promise<void>) & {
+        ) => ReturnType<A>) & {
             isLoading: boolean;
             error: unknown;
         };

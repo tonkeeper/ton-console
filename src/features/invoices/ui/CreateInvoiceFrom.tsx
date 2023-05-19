@@ -1,5 +1,6 @@
 import { FunctionComponent, useEffect } from 'react';
 import {
+    Button,
     chakra,
     Checkbox,
     Flex,
@@ -10,11 +11,15 @@ import {
     Input,
     InputGroup,
     InputRightElement,
-    StyleProps
+    StyleProps,
+    Text,
+    Textarea
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
 import { InvoiceForm } from '../models';
 import {
+    InfoTooltip,
+    isAddersValid,
     isNumber,
     mergeRefs,
     OptionsInput,
@@ -34,7 +39,7 @@ interface InternalForm {
 
     lifeTimeMinutes: number;
 
-    description: number;
+    description: string;
 
     receiverAddress: string;
 }
@@ -49,16 +54,19 @@ export const CreateInvoiceFrom: FunctionComponent<
 > = ({ onSubmit, defaultValues, disableDefaultFocus, ...rest }) => {
     const { amount: defaultAmount, ...restDefaultValues } = defaultValues || {};
     const context = useFormContext<InternalForm>();
-    let { handleSubmit, register, formState, setFocus } = useForm<InternalForm>({
-        defaultValues: {
-            amount: defaultAmount?.toStringAmount(),
-            ...restDefaultValues
-        }
-    });
+    let { handleSubmit, register, formState, setFocus, watch, setValue, trigger } =
+        useForm<InternalForm>({
+            defaultValues: {
+                amount: defaultAmount?.toStringAmount(),
+                ...restDefaultValues
+            }
+        });
 
     if (context) {
-        ({ handleSubmit, register, formState, setFocus } = context);
+        ({ handleSubmit, register, formState, setFocus, watch, setValue, trigger } = context);
     }
+
+    const addressChanged = watch('receiverAddress') !== restDefaultValues.receiverAddress;
 
     useEffect(() => {
         if (!disableDefaultFocus) {
@@ -116,15 +124,17 @@ export const CreateInvoiceFrom: FunctionComponent<
             </FormControl>
 
             <FormControl mb="5">
-                <Checkbox
-                    mb="3"
-                    defaultChecked
-                    icon={<TickIcon w="12px" />}
-                    id="subtractFeeFromAmount"
-                    {...register('subtractFeeFromAmount')}
-                >
-                    Substract fee from amount
-                </Checkbox>
+                <Flex align="center" gap="1" mb="3">
+                    <Checkbox
+                        defaultChecked
+                        icon={<TickIcon w="12px" />}
+                        id="subtractFeeFromAmount"
+                        {...register('subtractFeeFromAmount')}
+                    >
+                        Subtract fee from amount
+                    </Checkbox>
+                    <InfoTooltip>Описание что это зачем это и тд</InfoTooltip>
+                </Flex>
                 <Flex textStyle="body2" justify="space-between" mb="1">
                     <Span color="text.secondary">How much money a business will get</Span>
                     <Span color="text.primary">8 TON</Span>
@@ -135,7 +145,7 @@ export const CreateInvoiceFrom: FunctionComponent<
                 </Flex>
             </FormControl>
 
-            <FormControl mb="5" isInvalid={!!formState.errors.lifeTimeMinutes} isRequired>
+            <FormControl mb="4" isInvalid={!!formState.errors.lifeTimeMinutes} isRequired>
                 <FormLabel htmlFor="lifeTimeMinutes">Life time</FormLabel>
                 <OptionsInput
                     {...register('lifeTimeMinutes', { required: 'This is required' })}
@@ -148,22 +158,90 @@ export const CreateInvoiceFrom: FunctionComponent<
                         <OptionsInputOption value="10080">Week</OptionsInputOption>
                         <OptionsInputOption value="43200">Month</OptionsInputOption>
                         <OptionsInputText
-                            pr="60px"
-                            placeholder="Few minutes"
+                            placeholder="Few min"
                             rightElement={
-                                <InputRightElement
-                                    textStyle="body2"
-                                    w="60px"
-                                    color="text.secondary"
-                                >
+                                <Span textStyle="body2" color="text.secondary">
                                     min
-                                </InputRightElement>
+                                </Span>
                             }
                         />
                     </Grid>
                 </OptionsInput>
                 <FormErrorMessage>
                     {formState.errors.lifeTimeMinutes && formState.errors.lifeTimeMinutes.message}
+                </FormErrorMessage>
+            </FormControl>
+
+            <FormControl mb="4" isInvalid={!!formState.errors.description}>
+                <FormLabel htmlFor="description">Invoice description</FormLabel>
+                <Input
+                    autoComplete="off"
+                    id="description"
+                    placeholder="Few words about the invoice"
+                    {...register('description', {
+                        maxLength: { value: 255, message: 'Max length is 255 characters' }
+                    })}
+                />
+                <FormErrorMessage pos="static">
+                    {formState.errors.description && formState.errors.description.message}
+                </FormErrorMessage>
+                <Text
+                    textStyle="body3"
+                    mt={!!formState.errors.description ? '0' : '2'}
+                    color="text.secondary"
+                >
+                    This description will be seen by the recipient
+                </Text>
+            </FormControl>
+
+            <FormControl mb="1" isInvalid={!!formState.errors.receiverAddress} isRequired>
+                <Flex align="flex-end" mb="2">
+                    <FormLabel flex="1" mb="0" htmlFor="receiverAddress">
+                        <Span textStyle="label2">Receiver address</Span>
+                    </FormLabel>
+                    <Span textStyle="body3" color="text.secondary">
+                        {addressChanged
+                            ? 'The default address has been changed'
+                            : 'Default address'}
+                    </Span>
+                    {addressChanged && (
+                        <Button
+                            h="fit-content"
+                            ml="2"
+                            p="0"
+                            color="accent.blue"
+                            onClick={() => {
+                                setValue(
+                                    'receiverAddress',
+                                    restDefaultValues.receiverAddress || ''
+                                );
+                                trigger('receiverAddress');
+                            }}
+                            variant="flat"
+                        >
+                            <Span textStyle="label3">Cancel</Span>
+                        </Button>
+                    )}
+                </Flex>
+                <Textarea
+                    minH="calc(3em + 16px)"
+                    resize="none"
+                    autoComplete="off"
+                    id="receiverAddress"
+                    placeholder="EQ..."
+                    {...register('receiverAddress', {
+                        required: 'This is required',
+                        validate(value) {
+                            if (isAddersValid(value)) {
+                                return;
+                            }
+
+                            return 'Invalid address';
+                        }
+                    })}
+                />
+                <FormErrorMessage>
+                    {formState.errors.receiverAddress && formState.errors.receiverAddress.message}
                 </FormErrorMessage>
             </FormControl>
         </chakra.form>

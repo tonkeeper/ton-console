@@ -252,6 +252,29 @@ export interface DTOInvoicesInvoice {
     date_create: string;
 }
 
+export interface DTOInvoicesApp {
+    app?: {
+        /**
+         * @format int64
+         * @example 4177275498
+         */
+        id: number;
+        /**
+         * @format int64
+         * @example 4268870487
+         */
+        project_id: number;
+        /** @example "Test name" */
+        name: string;
+        /** @example "Test description" */
+        description: string;
+        /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+        recipient_address: string;
+        /** @example "2023-03-23" */
+        date_create: string;
+    };
+}
+
 /** backend error code */
 export enum DTOErrorCode {
     DTOErrorUnknown = 1,
@@ -488,7 +511,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @tags auth
          * @name AuthGeneratePayload
          * @summary Generate payload for TON Connect
-         * @request POST:/api/v1/auth/ton-proof/generate_payload
+         * @request POST:/api/v1/auth/proof/payload
          */
         authGeneratePayload: (params: RequestParams = {}) =>
             this.request<
@@ -498,7 +521,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 },
                 DTOError
             >({
-                path: `/api/v1/auth/ton-proof/generate_payload`,
+                path: `/api/v1/auth/proof/payload`,
                 method: 'POST',
                 ...params
             }),
@@ -509,7 +532,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @tags auth
          * @name AuthViaTonConnect
          * @summary Auth via TON Connect
-         * @request POST:/api/v1/auth/ton-proof/check_proof
+         * @request POST:/api/v1/auth/proof/check
          */
         authViaTonConnect: (
             data: {
@@ -535,7 +558,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             params: RequestParams = {}
         ) =>
             this.request<DTOOk, DTOError>({
-                path: `/api/v1/auth/ton-proof/check_proof`,
+                path: `/api/v1/auth/proof/check`,
                 method: 'POST',
                 body: data,
                 ...params
@@ -1393,6 +1416,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
+         * @tags messages_service
+         * @name SendMessagesPush
+         * @summary Send messages push
+         * @request POST:/api/v1/services/messages/push
+         * @secure
+         */
+        sendMessagesPush: (
+            data: {
+                /** @example "Test title" */
+                title?: string;
+                /** @example "Test message" */
+                message: string;
+                /**
+                 * Link for user action, the link will open in Tonkeeper dApp Browser
+                 * @example "https://my_app.com/event"
+                 */
+                link?: string;
+                /**
+                 * If the address has not been transmitted, then push messages will be sent to all users
+                 * @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+                 */
+                address?: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @example 1000 */
+                    success_delivery: number;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/messages/push`,
+                method: 'POST',
+                body: data,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
          * @tags invoices_service
          * @name CreateInvoicesApp
          * @summary Create invoices app
@@ -1419,26 +1484,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 {
-                    app: {
-                        /**
-                         * @format int64
-                         * @example 4177275498
-                         */
-                        id: number;
-                        /**
-                         * @format int64
-                         * @example 4268870487
-                         */
-                        project_id: number;
-                        /** @example "Test name" */
-                        name: string;
-                        /** @example "Test description" */
-                        description: string;
-                        /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-                        recipient_address: string;
-                        /** @example "2023-03-23" */
-                        date_create: string;
-                    };
+                    app: DTOInvoicesApp;
                 },
                 DTOError
             >({
@@ -1469,31 +1515,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             params: RequestParams = {}
         ) =>
-            this.request<
-                {
-                    app: {
-                        /**
-                         * @format int64
-                         * @example 4177275498
-                         */
-                        id: number;
-                        /**
-                         * @format int64
-                         * @example 4268870487
-                         */
-                        project_id: number;
-                        /** @example "Test name" */
-                        name: string;
-                        /** @example "Test description" */
-                        description: string;
-                        /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-                        recipient_address: string;
-                        /** @example "2023-03-23" */
-                        date_create: string;
-                    };
-                },
-                DTOError
-            >({
+            this.request<DTOInvoicesApp, DTOError>({
                 path: `/api/v1/services/invoices/app`,
                 method: 'GET',
                 query: query,
@@ -1522,31 +1544,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             params: RequestParams = {}
         ) =>
-            this.request<
-                {
-                    app: {
-                        /**
-                         * @format int64
-                         * @example 4177275498
-                         */
-                        id: number;
-                        /**
-                         * @format int64
-                         * @example 4268870487
-                         */
-                        project_id: number;
-                        /** @example "Test name" */
-                        name: string;
-                        /** @example "Test description" */
-                        description: string;
-                        /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-                        recipient_address: string;
-                        /** @example "2023-03-23" */
-                        date_create: string;
-                    };
-                },
-                DTOError
-            >({
+            this.request<DTOInvoicesApp, DTOError>({
                 path: `/api/v1/services/invoices/app/${id}`,
                 method: 'PATCH',
                 body: data,
@@ -1681,7 +1679,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             params: RequestParams = {}
         ) =>
-            this.request<DTOInvoicesInvoice, DTOError>({
+            this.request<
+                {
+                    invoice: DTOInvoicesInvoice;
+                },
+                DTOError
+            >({
                 path: `/api/v1/services/invoices/invoice`,
                 method: 'POST',
                 query: query,
@@ -1758,7 +1761,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             params: RequestParams = {}
         ) =>
-            this.request<DTOInvoicesInvoice, DTOError>({
+            this.request<void, DTOError>({
                 path: `/api/v1/services/invoices/${id}`,
                 method: 'GET',
                 query: query,

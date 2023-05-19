@@ -29,7 +29,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /api/v1/auth/ton-proof/generate_payload:
+  /api/v1/auth/proof/payload:
     post:
       summary: "Generate payload for TON Connect"
       operationId: authGeneratePayload
@@ -44,7 +44,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /api/v1/auth/ton-proof/check_proof:
+  /api/v1/auth/proof/check:
     post:
       summary: "Auth via TON Connect"
       description: "The token is recorded in the database and in the user's cookies. 
@@ -591,6 +591,31 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/services/messages/push:
+    post:
+      summary: "Send messages push"
+      operationId: sendMessagesPush
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - messages_service
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/MessagesSendPushInput"
+      responses:
+        '200':
+          $ref: '#/components/responses/MessagesSuccessDeliveryPush'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
   
   /api/v1/services/invoices/app:
     post:
@@ -606,7 +631,7 @@ paths:
         $ref: "#/components/requestBodies/InvoicesAppCreateInput"
       responses:
         '201':
-          $ref: '#/components/responses/InvoicesApp'
+          $ref: '#/components/responses/InvoicesAppCreated'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -722,7 +747,7 @@ paths:
         $ref: "#/components/requestBodies/InvoicesInvoiceCreateInput"
       responses:
         '201':
-          $ref: '#/components/responses/InvoicesInvoice'
+          $ref: '#/components/responses/InvoicesInvoiceCreated'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -1036,6 +1061,29 @@ components:
               payload:
                 type: string
                 example: "DkPazejgbwoAAAAAZFNueLGu-1GCWVgvk5Av_1EK2Ml5LzQItlrivLPtTPMsu5A2"
+    MessagesSendPushInput:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            required:
+              - message
+            type: object
+            properties:
+              title:
+                type: string
+                example: "Test title"
+              message:
+                type: string
+                example: "Test message"
+              link:
+                type: string
+                description: "Link for user action, the link will open in Tonkeeper dApp Browser"
+                example: "https://my_app.com/event"
+              address:
+                type: string
+                description: "If the address has not been transmitted, then push messages will be sent to all users"
+                example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
     InvoicesAppCreateInput:
       description: "Data that is expected"
       content:
@@ -1480,6 +1528,39 @@ components:
         date_create:
           type: string
           example: "2023-03-23"
+    InvoicesApp:
+      type: object
+      properties:
+        app:
+          type: object
+          required:
+            - id
+            - project_id
+            - name
+            - description
+            - recipient_address
+            - date_create
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 4177275498
+            project_id:
+              type: integer
+              format: int64
+              example: 4268870487
+            name:
+              type: string
+              example: "Test name"
+            description:
+              type: string
+              example: "Test description"
+            recipient_address:
+              type: string
+              example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+            date_create:
+              type: string
+              example: "2023-03-23"
   
   responses:
     NotFound:
@@ -1751,8 +1832,20 @@ components:
                   available_messages:
                     type: integer
                     example: 100
-    InvoicesApp:
-      description: "Invoices app"
+    MessagesSuccessDeliveryPush:
+      description: "Count of success delivery"
+      content:
+        application/json:
+          schema:
+            required:
+              - success_delivery
+            type: object
+            properties:
+              success_delivery:
+                type: integer
+                example: 1000
+    InvoicesAppCreated:
+      description: "Invoices app created"
       content:
         application/json:
           schema:
@@ -1761,35 +1854,16 @@ components:
             type: object
             properties:
               app:
-                type: object
-                required:
-                  - id
-                  - project_id
-                  - name
-                  - description
-                  - recipient_address
-                  - date_create
-                properties:
-                  id:
-                    type: integer
-                    format: int64
-                    example: 4177275498
-                  project_id:
-                    type: integer
-                    format: int64
-                    example: 4268870487
-                  name:
-                    type: string
-                    example: "Test name"
-                  description:
-                    type: string
-                    example: "Test description"
-                  recipient_address:
-                    type: string
-                    example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-                  date_create:
-                    type: string
-                    example: "2023-03-23"
+                $ref: '#/components/schemas/InvoicesApp'
+    InvoicesApp:
+      description: "Get invoices app"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              app:
+                $ref: '#/components/schemas/InvoicesApp'
     InvoicesAppToken:
       description: "Invoices app token"
       content:
@@ -1802,7 +1876,7 @@ components:
               token:
                 type: string
                 example: "TC-INVOICES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA=="
-    InvoicesInvoice:
+    InvoicesInvoiceCreated:
       description: "Invoice"
       content:
         application/json:

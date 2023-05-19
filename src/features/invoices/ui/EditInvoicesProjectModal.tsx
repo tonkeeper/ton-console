@@ -41,7 +41,7 @@ const EditInvoicesProjectModal: FunctionComponent<{
                             defaultValues={toJS(app)}
                             id={id}
                             onSubmit={form =>
-                                invoicesStore.editInvoicesApp({ ...form, id: app.id })
+                                invoicesStore.editInvoicesApp({ ...form, id: app.id }).then(onClose)
                             }
                         />
                     )}

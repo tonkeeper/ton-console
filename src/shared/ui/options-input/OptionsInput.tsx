@@ -61,6 +61,7 @@ export const OptionsInput = forwardRef<
         >
             <Box {...group} {...rest}>
                 <chakra.input
+                    defaultValue={defaultValue}
                     display="none"
                     ref={mergeRefs(elementRef, ref)}
                     type="number"

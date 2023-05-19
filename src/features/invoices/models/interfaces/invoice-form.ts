@@ -7,7 +7,7 @@ export interface InvoiceForm {
 
     lifeTimeSeconds: number;
 
-    description: number;
+    description: string;
 
     receiverAddress: string;
 }
