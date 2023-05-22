@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { EditInvoicesProjectForm } from './EditInvoicesProjectForm';
 import { H4 } from 'src/shared';
-import { invoicesStore } from '../models';
+import { invoicesAppStore } from '../models';
 import { observer } from 'mobx-react-lite';
 
 const CreateInvoicesProjectModal: FunctionComponent<{
@@ -33,7 +33,10 @@ const CreateInvoicesProjectModal: FunctionComponent<{
                     </Text>
                 </ModalHeader>
                 <ModalBody>
-                    <EditInvoicesProjectForm id={id} onSubmit={invoicesStore.createInvoicesApp} />
+                    <EditInvoicesProjectForm
+                        id={id}
+                        onSubmit={invoicesAppStore.createInvoicesApp}
+                    />
                 </ModalBody>
                 <ModalFooter gap="3">
                     <Button flex={1} onClick={onClose} variant="secondary">
@@ -42,7 +45,7 @@ const CreateInvoicesProjectModal: FunctionComponent<{
                     <Button
                         flex={1}
                         form={id}
-                        isLoading={invoicesStore.createInvoicesApp.isLoading}
+                        isLoading={invoicesAppStore.createInvoicesApp.isLoading}
                         type="submit"
                         variant="primary"
                     >

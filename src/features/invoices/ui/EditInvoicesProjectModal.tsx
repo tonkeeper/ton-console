@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { EditInvoicesProjectForm } from './EditInvoicesProjectForm';
 import { H4 } from 'src/shared';
-import { invoicesStore } from '../models';
+import { invoicesAppStore } from '../models';
 import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
 
@@ -22,7 +22,7 @@ const EditInvoicesProjectModal: FunctionComponent<{
 }> = ({ isOpen, onClose }) => {
     const id = useId();
 
-    const app = invoicesStore.invoicesApp$.value;
+    const app = invoicesAppStore.invoicesApp$.value;
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside" size="md">
@@ -41,7 +41,9 @@ const EditInvoicesProjectModal: FunctionComponent<{
                             defaultValues={toJS(app)}
                             id={id}
                             onSubmit={form =>
-                                invoicesStore.editInvoicesApp({ ...form, id: app.id }).then(onClose)
+                                invoicesAppStore
+                                    .editInvoicesApp({ ...form, id: app.id })
+                                    .then(onClose)
                             }
                         />
                     )}
@@ -53,7 +55,7 @@ const EditInvoicesProjectModal: FunctionComponent<{
                     <Button
                         flex={1}
                         form={id}
-                        isLoading={invoicesStore.editInvoicesApp.isLoading}
+                        isLoading={invoicesAppStore.editInvoicesApp.isLoading}
                         type="submit"
                         variant="primary"
                     >

@@ -1,7 +1,7 @@
 import RegisterProject from './RegisterProject';
 import { Suspense } from 'react';
 import { observer } from 'mobx-react-lite';
-import { invoicesStore } from 'src/features';
+import { invoicesAppStore } from 'src/features';
 import { Center, Spinner } from '@chakra-ui/react';
 import { Route, useNavigate } from 'react-router-dom';
 import { lazy } from '@loadable/component';
@@ -10,7 +10,7 @@ const ApiDescriptionPage = lazy(() => import('./api-description'));
 const ManageInvoicesPage = lazy(() => import('./manage'));
 
 const InvoicesPage = observer(() => {
-    if (!invoicesStore.invoicesApp$.isResolved) {
+    if (!invoicesAppStore.invoicesApp$.isResolved) {
         return (
             <Center h="200px">
                 <Spinner />
@@ -23,7 +23,7 @@ const InvoicesPage = observer(() => {
 
 const Index = observer(() => {
     const navigate = useNavigate();
-    if (invoicesStore.invoicesApp$.value) {
+    if (invoicesAppStore.invoicesApp$.value) {
         setTimeout(() => navigate('manage'));
         return null;
     }
@@ -33,7 +33,7 @@ const Index = observer(() => {
 
 const ApiDescription = observer(() => {
     const navigate = useNavigate();
-    if (!invoicesStore.invoicesApp$.value) {
+    if (!invoicesAppStore.invoicesApp$.value) {
         setTimeout(() => navigate('../'));
         return null;
     }
@@ -47,7 +47,7 @@ const ApiDescription = observer(() => {
 
 const Manage = observer(() => {
     const navigate = useNavigate();
-    if (!invoicesStore.invoicesApp$.value) {
+    if (!invoicesAppStore.invoicesApp$.value) {
         setTimeout(() => navigate('../'));
         return null;
     }

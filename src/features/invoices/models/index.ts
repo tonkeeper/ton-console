@@ -1,2 +1,3 @@
 export * from './interfaces';
-export { invoicesStore } from './invoices.store';
+export { invoicesAppStore } from './invoices-app.store';
+export { invoicesTableStore } from './invoices-table.store';

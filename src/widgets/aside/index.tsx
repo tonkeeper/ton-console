@@ -13,7 +13,7 @@ import { FunctionComponent } from 'react';
 import { Flex, Text } from '@chakra-ui/react';
 import { balanceStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
-import { invoicesStore } from 'src/features';
+import { invoicesAppStore } from 'src/features';
 
 const Aside: FunctionComponent = () => {
     return (
@@ -21,7 +21,7 @@ const Aside: FunctionComponent = () => {
             <DropDownMenuItem linkTo="dashboard" leftIcon={<DashboardIcon />}>
                 Dashboard
             </DropDownMenuItem>
-            {invoicesStore.invoicesApp$.value ? (
+            {invoicesAppStore.invoicesApp$.value ? (
                 <DropDownMenuItemExpandable
                     leftIcon={<TonapiIcon />}
                     content="Invoices"

@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import { H4, Overlay } from 'src/shared';
 import { Button, Divider, Text, useDisclosure } from '@chakra-ui/react';
-import { CreateInvoicesProjectModal, invoicesStore } from 'src/features';
+import { CreateInvoicesProjectModal, invoicesAppStore } from 'src/features';
 import { observer } from 'mobx-react-lite';
 const RegisterProject: FunctionComponent = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
@@ -24,7 +24,7 @@ const RegisterProject: FunctionComponent = () => {
                 ownership of domain Please follow the steps below to prove the ownership.
             </Text>
             <Button
-                isLoading={invoicesStore.createInvoicesApp.isLoading}
+                isLoading={invoicesAppStore.createInvoicesApp.isLoading}
                 onClick={onOpen}
                 variant="primary"
             >

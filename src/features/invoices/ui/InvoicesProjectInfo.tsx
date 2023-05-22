@@ -2,12 +2,12 @@ import { ComponentProps, FunctionComponent } from 'react';
 import { Box, Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { sliceAddress, Span, TooltipHoverable } from 'src/shared';
-import { invoicesStore } from '../models';
+import { invoicesAppStore } from '../models';
 import EditInvoicesProjectModal from './EditInvoicesProjectModal';
 
 const InvoicesProjectInfo: FunctionComponent<ComponentProps<typeof Flex>> = props => {
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const app = invoicesStore.invoicesApp$.value;
+    const app = invoicesAppStore.invoicesApp$.value;
     if (!app) {
         return null;
     }

@@ -40,15 +40,13 @@ export const ViewInvoiceModalContent: FunctionComponent<{
                     <CardBody textStyle="body2" px="6" py="5">
                         <Flex justify="space-between" mb="3">
                             <Span color="text.secondary">Life time</Span>
-                            <Span color="text.secondary" fontFamily="mono">
+                            <Span color="text.primary" fontFamily="mono">
                                 {formattedTimeLeft}
                             </Span>
                         </Flex>
                         <Flex justify="space-between">
                             <Span color="text.secondary">Amount</Span>
-                            <Span color="text.secondary">
-                                {invoice.amount.stringCurrencyAmount}
-                            </Span>
+                            <Span color="text.primary">{invoice.amount.stringCurrencyAmount}</Span>
                         </Flex>
                         <Flex justify="flex-end">
                             <CurrencyRate

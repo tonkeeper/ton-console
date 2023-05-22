@@ -11,8 +11,9 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { CreateInvoiceFrom } from './CreateInvoiceFrom';
-import { Invoice, invoicesStore } from 'src/features';
+import { Invoice, invoicesAppStore } from 'src/features';
 import { ViewInvoiceModalContent } from './ViewInvoiceModalContent';
+import { invoicesTableStore } from '../models';
 
 const CreateInvoiceModal: FunctionComponent<{
     isOpen: boolean;
@@ -23,11 +24,11 @@ const CreateInvoiceModal: FunctionComponent<{
     const id = useId();
 
     const defaultValues = {
-        receiverAddress: invoicesStore.invoicesApp$.value?.receiverAddress
+        receiverAddress: invoicesAppStore.invoicesApp$.value?.receiverAddress
     };
 
     const closeHandler = (): void => {
-        if (!invoicesStore.createInvoice.isLoading) {
+        if (!invoicesTableStore.createInvoice.isLoading) {
             setCreatedInvoice(null);
             onClose();
         }
@@ -47,7 +48,7 @@ const CreateInvoiceModal: FunctionComponent<{
                             id={id}
                             defaultValues={defaultValues}
                             onSubmit={form =>
-                                invoicesStore.createInvoice(form).then(setCreatedInvoice)
+                                invoicesTableStore.createInvoice(form).then(setCreatedInvoice)
                             }
                         />
                     </ModalBody>
@@ -58,7 +59,7 @@ const CreateInvoiceModal: FunctionComponent<{
                         <Button
                             flex={1}
                             form={id}
-                            isLoading={invoicesStore.createInvoice.isLoading}
+                            isLoading={invoicesTableStore.createInvoice.isLoading}
                             type="submit"
                             variant="primary"
                         >

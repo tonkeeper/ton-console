@@ -3,26 +3,21 @@ import {
     apiClient,
     Loadable,
     createImmediateReaction,
-    toUserFriendlyAddress,
     DTOInvoicesInvoice,
     TonCurrencyAmount,
-    DTOInvoicesInvoiceStatus,
-    DTOInvoicesApp
+    DTOInvoicesInvoiceStatus
 } from 'src/shared';
 import { projectsStore } from 'src/entities';
 import {
     Invoice,
     InvoiceCommon,
     InvoiceForm,
-    InvoicesApp,
-    InvoicesProjectForm,
     InvoiceStatus,
     InvoiceSuccessful
 } from './interfaces';
+import { invoicesAppStore } from './invoices-app.store';
 
-class InvoicesStore {
-    invoicesApp$ = new Loadable<InvoicesApp | null>(null);
-
+class InvoicesTableStore {
     invoices$ = new Loadable<Invoice[]>([]);
 
     constructor() {
@@ -34,75 +29,16 @@ class InvoicesStore {
                 this.clearState();
 
                 if (project) {
-                    this.fetchInvoicesApp();
+                    // this.fetchInvoicesApp();
                 }
             }
         );
     }
 
-    fetchInvoicesApp = this.invoicesApp$.createAsyncAction(async () => {
-        const response = await apiClient.api.getInvoicesApp({
-            project_id: projectsStore.selectedProject!.id
-        });
-
-        if (!response.data.app) {
-            return null;
-        }
-
-        return mapInvoicesAppDTOToInvoicesApp(response.data.app);
-    });
-
-    createInvoicesApp = this.invoicesApp$.createAsyncAction(
-        async (form: InvoicesProjectForm) => {
-            const response = await apiClient.api.createInvoicesApp(
-                {
-                    project_id: projectsStore.selectedProject!.id
-                },
-                {
-                    name: form.name,
-                    recipient_address: form.receiverAddress,
-                    description: form.companyDetails
-                }
-            );
-
-            return mapInvoicesAppDTOToInvoicesApp(
-                response.data.app as unknown as NonNullable<DTOInvoicesApp['app']>
-            ); // TODO новый сваггер
-        },
-        {
-            successToast: {
-                title: 'Invoices app created successfully'
-            },
-            errorToast: {
-                title: 'Invoices app creation error'
-            }
-        }
-    );
-
-    editInvoicesApp = this.invoicesApp$.createAsyncAction(
-        async (form: Partial<InvoicesProjectForm> & { id: number }) => {
-            const response = await apiClient.api.updateInvoicesApp(form.id, {
-                name: form.name,
-                recipient_address: form.receiverAddress,
-                description: form.companyDetails
-            });
-
-            return mapInvoicesAppDTOToInvoicesApp(response.data.app!);
-        },
-        {
-            successToast: {
-                title: 'Invoices app updated successfully'
-            },
-            errorToast: {
-                title: 'Invoices app updating error'
-            }
-        }
-    );
-
     fetchInvoices = this.invoices$.createAsyncAction(async () => {
         const response = await apiClient.api.getInvoices({
             project_id: projectsStore.selectedProject!.id,
-            app_id: this.invoicesApp$.value!.id
+            app_id: invoicesAppStore.invoicesApp$.value!.id
         });
 
         return response.data.items.map(mapInvoiceDTOToInvoice);
@@ -112,7 +48,7 @@ class InvoicesStore {
         async (form: InvoiceForm) => {
             const result = await apiClient.api.createInvoicesInvoice(
                 {
-                    app_id: this.invoicesApp$.value!.id,
+                    app_id: invoicesAppStore.invoicesApp$.value!.id,
                     project_id: projectsStore.selectedProject!.id
                 },
                 {
@@ -140,20 +76,8 @@ class InvoicesStore {
     );
 
     clearState(): void {
-        this.invoicesApp$.clear();
+        this.invoices$.clear();
     }
-}
-
-function mapInvoicesAppDTOToInvoicesApp(
-    invoicesAppDTO: NonNullable<DTOInvoicesApp['app']>
-): InvoicesApp {
-    return {
-        id: invoicesAppDTO.id,
-        name: invoicesAppDTO.name,
-        companyDetails: invoicesAppDTO.description,
-        creationDate: new Date(invoicesAppDTO.date_create),
-        receiverAddress: toUserFriendlyAddress(invoicesAppDTO.recipient_address)
-    };
 }
 
 const mapInvoiceDTOStatusToInvoiceStatus: Record<DTOInvoicesInvoice['status'], InvoiceStatus> = {
@@ -182,4 +106,4 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
     return commonInvoice;
 }
 
-export const invoicesStore = new InvoicesStore();
+export const invoicesTableStore = new InvoicesTableStore();
