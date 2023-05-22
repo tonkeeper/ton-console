@@ -16,6 +16,7 @@ import Checkbox from './checkbox';
 import Tooltip from './tooltip';
 import Tabs from './tabs';
 import Code from './code';
+import Badge from './badge';
 
 export default {
     Button,
@@ -35,5 +36,6 @@ export default {
     Checkbox,
     Tooltip,
     Tabs,
-    Code
+    Code,
+    Badge
 };

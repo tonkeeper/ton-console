@@ -8,8 +8,8 @@ export interface InvoiceCommon {
     validUntil: Date;
     subtractFeeFromAmount: boolean;
     description: string;
-    status: InvoiceStatus;
     creationDate: Date;
+    receiverAddress: string;
 }
 
 export interface InvoiceSuccessful extends InvoiceCommon {
@@ -17,4 +17,8 @@ export interface InvoiceSuccessful extends InvoiceCommon {
     status: 'success';
 }
 
-export type Invoice = InvoiceCommon | InvoiceSuccessful;
+export interface InvoiceNotSuccessful extends InvoiceCommon {
+    status: Exclude<InvoiceStatus, 'success'>;
+}
+
+export type Invoice = InvoiceNotSuccessful | InvoiceSuccessful;

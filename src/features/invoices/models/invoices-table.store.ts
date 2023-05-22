@@ -8,17 +8,23 @@ import {
     DTOInvoicesInvoiceStatus
 } from 'src/shared';
 import { projectsStore } from 'src/entities';
-import {
-    Invoice,
-    InvoiceCommon,
-    InvoiceForm,
-    InvoiceStatus,
-    InvoiceSuccessful
-} from './interfaces';
+import { Invoice, InvoiceCommon, InvoiceForm, InvoiceStatus } from './interfaces';
 import { invoicesAppStore } from './invoices-app.store';
 
 class InvoicesTableStore {
     invoices$ = new Loadable<Invoice[]>([]);
+
+    totalInvoices = 10000;
+
+    pageSize = 30;
+
+    get hasNextPage(): boolean {
+        return this.invoices$.value.length < this.totalInvoices;
+    }
+
+    get tableContentLength(): number {
+        return this.hasNextPage ? this.invoices$.value.length + 1 : this.invoices$.value.length;
+    }
 
     constructor() {
         makeAutoObservable(this);
@@ -34,6 +40,14 @@ class InvoicesTableStore {
             }
         );
     }
+
+    isItemLoaded = (index: number): boolean =>
+        !this.hasNextPage || index < this.invoices$.value.length;
+
+    loadNextPage = this.invoices$.createAsyncAction(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+        return this.invoices$.value.concat([...new Array(this.pageSize)].map(createMockInvoice));
+    });
 
     fetchInvoices = this.invoices$.createAsyncAction(async () => {
         const response = await apiClient.api.getInvoices({
@@ -60,7 +74,7 @@ class InvoicesTableStore {
                 }
             );
 
-            this.fetchInvoices();
+            //this.fetchInvoices();
 
             return mapInvoiceDTOToInvoice(result.data.invoice);
         },
@@ -92,18 +106,38 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
     const commonInvoice: InvoiceCommon = {
         amount: new TonCurrencyAmount(invoiceDTO.amount),
         creationDate,
-        status: mapInvoiceDTOStatusToInvoiceStatus[invoiceDTO.status],
         subtractFeeFromAmount: invoiceDTO.subtract_fee_from_amount,
         id: invoiceDTO.id,
         validUntil: new Date(creationDate.getTime() + invoiceDTO.life_time * 1000),
-        description: invoiceDTO.description
+        description: invoiceDTO.description,
+        receiverAddress: 'EQCmtv9UrlDC27A0KsJNSaloAtHp5G3fli5jJjJug0waNf1u' // TODO
     };
 
-    if (commonInvoice.status === 'success') {
-        return { ...commonInvoice, paidBy: 'TODO' } as InvoiceSuccessful;
+    const status = mapInvoiceDTOStatusToInvoiceStatus[invoiceDTO.status];
+
+    if (status === 'success') {
+        return { ...commonInvoice, paidBy: 'TODO', status }; // TODO
     }
 
-    return commonInvoice;
+    return { ...commonInvoice, status };
+}
+
+function createMockInvoice(): Invoice {
+    const id = Math.round(Math.random() * 1000000);
+    const status = (['pending', 'success', 'cancelled', 'expired'] as const)[id % 4];
+
+    return {
+        amount: new TonCurrencyAmount(1000000000),
+        creationDate: new Date(),
+        status,
+        subtractFeeFromAmount: true,
+        id: id.toString(),
+        validUntil: new Date(Date.now() + 1000 * 3600 * 24),
+        description:
+            'TestdescripotionTestdescripotionTestdescripotionTestdescripotionTestdescripotionTest descripotionTest descripotionTestdescripotion',
+        receiverAddress: 'EQCmtv9UrlDC27A0KsJNSaloAtHp5G3fli5jJjJug0waNf1u',
+        ...(status === 'success' && { paidBy: 'EQCmtv9UrlDC27A0KsJNSaloAtHp5G3fli5jJjJug0waNf1u' })
+    } as Invoice;
 }
 
 export const invoicesTableStore = new InvoicesTableStore();
