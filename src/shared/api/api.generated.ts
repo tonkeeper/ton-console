@@ -225,7 +225,7 @@ export interface DTOMessagesApp {
 }
 
 export interface DTOInvoicesInvoice {
-    /** @example "60ffb075-8957-4d01-b976-a0122e294fa0" */
+    /** @example "60ffb075" */
     id: string;
     /**
      * @format int64
@@ -248,6 +248,10 @@ export interface DTOInvoicesInvoice {
     description: string;
     /** @example "pending_status" */
     status: DTOInvoicesInvoiceStatus;
+    /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+    recipient_address: string;
+    /** @example "2023-03-23" */
+    date_paid?: string;
     /** @example "2023-03-23" */
     date_create: string;
 }
@@ -302,6 +306,30 @@ export enum DTOInvoicesInvoiceStatus {
     DTOSuccessStatus = 'success_status',
     DTOCancelStatus = 'cancel_status',
     DTOExpiredStatus = 'expired_status'
+}
+
+/**
+ * Field
+ * @example "id"
+ */
+export enum DTOGetInvoicesParamsFieldOrder {
+    DTOId = 'id',
+    DTOAmount = 'amount',
+    DTOStatus = 'status',
+    DTOLifeTime = 'life_time',
+    DTODescription = 'description',
+    DTORecipientAddress = 'recipient_address',
+    DTODateCreate = 'date_create',
+    DTODatePaid = 'date_paid'
+}
+
+/**
+ * Type order
+ * @example "desc"
+ */
+export enum DTOGetInvoicesParamsTypeOrder {
+    DTOAsc = 'asc',
+    DTODesc = 'desc'
 }
 
 import axios, {
@@ -542,11 +570,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                      * @example "1678275313"
                      */
                     timestamp?: number;
-                    domain?: {
-                        /** @format uint32 */
-                        length_bytes?: number;
-                        value?: string;
-                    };
+                    domain?: string;
                     signature?: string;
                     /** @example "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa" */
                     payload?: string;
@@ -1730,15 +1754,35 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 limit?: number;
                 /**
                  * Invoice ID
-                 * @example "60ffb075-8957-4d01-b976-a0122e294fa0"
+                 * @example "60ffb075"
                  */
                 last_id?: string;
+                /**
+                 * Field
+                 * @example "id"
+                 */
+                field_order?: DTOGetInvoicesParamsFieldOrder;
+                /**
+                 * Type order
+                 * @example "desc"
+                 */
+                type_order?: DTOGetInvoicesParamsTypeOrder;
+                /**
+                 * Search ID
+                 * @minLength 2
+                 */
+                search_id?: string;
             },
             params: RequestParams = {}
         ) =>
             this.request<
                 {
                     items: DTOInvoicesInvoice[];
+                    /**
+                     * @format int64
+                     * @example 1000
+                     */
+                    count: number;
                 },
                 DTOError
             >({
@@ -1758,21 +1802,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @request GET:/api/v1/services/invoices/{id}
          * @secure
          */
-        getInvoicesInvoice: (
-            id: string,
-            query: {
-                /**
-                 * Invoice ID
-                 * @example "60ffb075-8957-4d01-b976-a0122e294fa0"
-                 */
-                id: string;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<void, DTOError>({
+        getInvoicesInvoice: (id: string, params: RequestParams = {}) =>
+            this.request<
+                {
+                    invoice: DTOInvoicesInvoice;
+                },
+                DTOError
+            >({
                 path: `/api/v1/services/invoices/${id}`,
                 method: 'GET',
-                query: query,
                 secure: true,
                 ...params
             })

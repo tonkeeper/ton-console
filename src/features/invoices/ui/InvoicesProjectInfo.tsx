@@ -21,6 +21,7 @@ const InvoicesProjectInfo: FunctionComponent<ComponentProps<typeof Flex>> = prop
             </Box>
             <Span>&nbsp;·&nbsp;</Span>
             <TooltipHoverable
+                placement="top"
                 host={<Span cursor="default">{sliceAddress(app.receiverAddress)}</Span>}
             >
                 <Span color="text.primary">{app.receiverAddress}</Span>

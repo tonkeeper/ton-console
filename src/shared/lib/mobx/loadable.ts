@@ -15,6 +15,10 @@ export class Loadable<T> {
 
     persistableResolved: Promise<void>;
 
+    lastAsyncActionId = 0;
+
+    shouldCancelCallsIds: number[] = [];
+
     get isLoading(): boolean {
         return this.state === 'pending' || this.state === 'refreshing';
     }
@@ -41,6 +45,8 @@ export class Loadable<T> {
         this.value = value;
 
         makeObservable(this, {
+            shouldCancelCallsIds: true,
+            lastAsyncActionId: false,
             persistableResolved: true,
             state: true,
             defaultValue: false,
@@ -105,18 +111,29 @@ export class Loadable<T> {
             errorToast?: UseToastOptions;
             onError?: (e: unknown) => void;
         }
-    ): ((...args: [...Parameters<A>, ({ silently?: boolean } | unknown)?]) => ReturnType<A>) & {
+    ): ((
+        ...args: [
+            ...Parameters<A>,
+            ({ silently?: boolean; cancelPreviousCall?: boolean } | unknown)?
+        ]
+    ) => ReturnType<A>) & {
         isLoading: boolean;
         error: unknown;
     } {
         const fn = (async (...args) => {
             const callOpts = args[args.length - 1];
-            const silently = Boolean(
-                callOpts &&
-                    typeof callOpts === 'object' &&
-                    'silently' in callOpts &&
-                    callOpts.silently
-            );
+
+            let silently = false;
+            if (callOpts && typeof callOpts === 'object') {
+                silently = 'silently' in callOpts && !!callOpts.silently;
+
+                if ('cancelPreviousCall' in callOpts && !!callOpts.cancelPreviousCall) {
+                    this.shouldCancelCallsIds.push(this.lastAsyncActionId);
+                }
+            }
+
+            this.lastAsyncActionId++;
+            const callId = this.lastAsyncActionId;
 
             const changeState = (state: Loadable<unknown>['state']): void => {
                 if (!silently) {
@@ -142,6 +159,14 @@ export class Loadable<T> {
 
             try {
                 const result = await asyncAction(...args);
+
+                if (this.shouldCancelCallsIds.includes(callId)) {
+                    this.shouldCancelCallsIds = this.shouldCancelCallsIds.filter(
+                        id => id !== callId
+                    );
+                    return;
+                }
+
                 if (result !== undefined && !options?.notMutateState) {
                     runInAction(() => (this.value = result as T));
                 }

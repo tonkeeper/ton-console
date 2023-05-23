@@ -767,6 +767,9 @@ paths:
         - $ref: '#/components/parameters/queryProjectID'
         - $ref: '#/components/parameters/queryLimit'
         - $ref: '#/components/parameters/queryInvoiceLastID'
+        - $ref: '#/components/parameters/queryFieldOrder'
+        - $ref: '#/components/parameters/queryTypeOrder'
+        - $ref: '#/components/parameters/queryInvoicesSearchID'
       responses:
         '200':
           $ref: '#/components/responses/Invoices'
@@ -788,7 +791,7 @@ paths:
         - $ref: '#/components/parameters/invoiceID'
       responses:
         '200':
-          $ref: '#/components/responses/InvoicesInvoice'
+          $ref: '#/components/responses/InvoicesInvoiceGet'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -824,12 +827,12 @@ components:
         format: int64
     invoiceID:
       description: Invoice ID
-      in: query
+      in: path
       name: id
       required: true
       schema:
         type: string
-        example: "60ffb075-8957-4d01-b976-a0122e294fa0"
+        example: "60ffb075"
     queryProjectID:
       description: Project ID
       in: query
@@ -854,7 +857,43 @@ components:
       required: false
       schema:
         type: string
-        example: "60ffb075-8957-4d01-b976-a0122e294fa0"
+        example: "60ffb075"
+    queryFieldOrder:
+      description: Field
+      in: query
+      name: field_order
+      required: false
+      schema:
+        type: string
+        example: "id"
+        enum:
+          - id
+          - amount
+          - status
+          - life_time
+          - description
+          - recipient_address
+          - date_create
+          - date_paid
+    queryTypeOrder:
+      description: Type order
+      in: query
+      name: type_order
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: "desc"
+    queryInvoicesSearchID:
+      description: Search ID
+      in: query
+      name: search_id
+      required: false
+      schema:
+        type: string
+        minLength: 2
     queryAppID:
       description: App ID
       in: query
@@ -963,13 +1002,7 @@ components:
                     format: int64
                     example: "1678275313"
                   domain:
-                    type: object
-                    properties:
-                      length_bytes:
-                        type: integer
-                        format: uint32
-                      value:
-                        type: string
+                    type: string
                   signature:
                     type: string
                   payload:
@@ -1493,12 +1526,13 @@ components:
         - life_time
         - subtract_fee_from_amount
         - description
+        - recipient_address
         - status
         - date_create
       properties:
         id:
           type: string
-          example: "60ffb075-8957-4d01-b976-a0122e294fa0"
+          example: "60ffb075"
         app_id:
           type: integer
           format: int64
@@ -1525,6 +1559,12 @@ components:
             - success_status
             - cancel_status
             - expired_status
+        recipient_address:
+          type: string
+          example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+        date_paid:
+          type: string
+          example: "2023-03-23"
         date_create:
           type: string
           example: "2023-03-23"
@@ -1883,7 +1923,18 @@ components:
                 type: string
                 example: "TC-INVOICES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA=="
     InvoicesInvoiceCreated:
-      description: "Invoice"
+      description: "Created invoice"
+      content:
+        application/json:
+          schema:
+            required:
+              - invoice
+            type: object
+            properties:
+              invoice:
+                $ref: '#/components/schemas/InvoicesInvoice'
+    InvoicesInvoiceGet:
+      description: "Get invoice"
       content:
         application/json:
           schema:
@@ -1900,12 +1951,17 @@ components:
           schema:
             required:
               - items
+              - count
             type: object
             properties:
               items:
                 type: array
                 items:
                   $ref: '#/components/schemas/InvoicesInvoice'
+              count:
+                type: integer
+                format: int64
+                example: 1000
   
   securitySchemes:
     JWTAuth:

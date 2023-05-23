@@ -1,7 +1,12 @@
 import { FunctionComponent } from 'react';
 import { observer } from 'mobx-react-lite';
-import { H4, Overlay, Span } from 'src/shared';
-import { CreateInvoiceModal, InvoicesProjectInfo, InvoicesTable } from 'src/features';
+import { H4, Overlay } from 'src/shared';
+import {
+    CreateInvoiceModal,
+    InvoicesProjectInfo,
+    InvoicesSearchInput,
+    InvoicesTable
+} from 'src/features';
 import { Button, Flex, useDisclosure } from '@chakra-ui/react';
 
 const ManageInvoicesPage: FunctionComponent = () => {
@@ -11,7 +16,7 @@ const ManageInvoicesPage: FunctionComponent = () => {
             <H4 mb="1">Invoices</H4>
             <InvoicesProjectInfo mb="5" />
             <Flex justify="space-between" mb="9">
-                <Span>search</Span>
+                <InvoicesSearchInput w="264px" />
                 <Button onClick={onOpen} size="lg" variant="primary">
                     New Invoice
                 </Button>

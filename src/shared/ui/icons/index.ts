@@ -24,3 +24,7 @@ export { MessageIcon24 } from './MessageIcon24';
 export { FilledTickIcon18 } from './FilledTickIcon18';
 export { FilledWarnIcon16 } from './FilledWarnIcon16';
 export { ConsoleDocsIcon32 } from './ConsoleDocsIcon32';
+export { SearchIcon24 } from './SearchIcon24';
+export { XMarkCircleIcon16 } from './XMarkCircleIcon16';
+export { SortDescIcon16 } from './SortDescIcon16';
+export { SortAscIcon16 } from './SortAscIcon16';

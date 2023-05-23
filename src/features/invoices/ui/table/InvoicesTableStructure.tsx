@@ -1,5 +1,6 @@
 import { Table, Tbody, Th, Thead, Tr, forwardRef, Box } from '@chakra-ui/react';
 import { ComponentProps, PropsWithChildren } from 'react';
+import InvoicesTableColumnLabel from './InvoicesTableSortButton';
 
 export const InvoicesTableStructure = forwardRef<
     PropsWithChildren<ComponentProps<typeof Box>>,
@@ -15,10 +16,9 @@ export const InvoicesTableStructure = forwardRef<
                 variant="simple"
             >
                 <Thead>
-                    <Tr sx={{ th: { px: 2 } }}>
+                    <Tr sx={{ th: { px: 2, zIndex: 2 } }}>
                         <Th
                             pos="sticky"
-                            zIndex={2}
                             top="0"
                             minW="100px"
                             bg="background.contentTint"
@@ -29,7 +29,9 @@ export const InvoicesTableStructure = forwardRef<
                             borderTopLeftRadius="sm"
                             boxSizing="content-box"
                         >
-                            ID
+                            <InvoicesTableColumnLabel pl="32px" column="id">
+                                ID
+                            </InvoicesTableColumnLabel>
                         </Th>
                         <Th
                             pos="sticky"
@@ -38,7 +40,9 @@ export const InvoicesTableStructure = forwardRef<
                             bg="background.contentTint"
                             boxSizing="content-box"
                         >
-                            Status
+                            <InvoicesTableColumnLabel column="status">
+                                Status
+                            </InvoicesTableColumnLabel>
                         </Th>
                         <Th
                             pos="sticky"
@@ -47,7 +51,9 @@ export const InvoicesTableStructure = forwardRef<
                             bg="background.contentTint"
                             boxSizing="content-box"
                         >
-                            Life time
+                            <InvoicesTableColumnLabel column="life-time">
+                                Life time
+                            </InvoicesTableColumnLabel>
                         </Th>
                         <Th
                             pos="sticky"
@@ -56,7 +62,9 @@ export const InvoicesTableStructure = forwardRef<
                             bg="background.contentTint"
                             boxSizing="content-box"
                         >
-                            Invoice description
+                            <InvoicesTableColumnLabel column="description">
+                                Invoice description
+                            </InvoicesTableColumnLabel>
                         </Th>
                         <Th
                             pos="sticky"
@@ -65,7 +73,9 @@ export const InvoicesTableStructure = forwardRef<
                             bg="background.contentTint"
                             boxSizing="content-box"
                         >
-                            Recipient address
+                            <InvoicesTableColumnLabel column="receiver-address">
+                                Recipient address
+                            </InvoicesTableColumnLabel>
                         </Th>
                         <Th
                             pos="sticky"
@@ -80,7 +90,9 @@ export const InvoicesTableStructure = forwardRef<
                             borderTopRightRadius="sm"
                             boxSizing="content-box"
                         >
-                            Amount
+                            <InvoicesTableColumnLabel column="amount">
+                                Amount
+                            </InvoicesTableColumnLabel>
                         </Th>
                     </Tr>
                 </Thead>
