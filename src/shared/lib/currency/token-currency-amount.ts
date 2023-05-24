@@ -19,11 +19,25 @@ export class TokenCurrencyAmount extends BasicCurrencyAmount implements Currency
         return this.weiAmount.toFixed(0);
     }
 
-    override toStringAmount(decimalPlaces?: number): string {
-        if (decimalPlaces === undefined) {
-            decimalPlaces = this.decimalPlaces;
-        }
-        return fromWei(this.weiAmount, this.decimals).decimalPlaces(decimalPlaces).toString();
+    override toStringAmount(options?: {
+        decimalPlaces?: number;
+        thousandSeparators?: boolean;
+    }): string {
+        const decimalPlaces =
+            options?.decimalPlaces === undefined ? this.decimalPlaces : options.decimalPlaces;
+
+        const thousandSeparators =
+            options?.thousandSeparators === undefined
+                ? this.thousandSeparators
+                : options.thousandSeparators;
+
+        const format = {
+            decimalSeparator: '.',
+            groupSeparator: thousandSeparators ? ' ' : '',
+            groupSize: 3
+        };
+
+        return fromWei(this.weiAmount, this.decimals).decimalPlaces(decimalPlaces).toFormat(format);
     }
 
     override toJSON(): TokenCurrencyAmountStruct & { $type: 'TokenCurrencyAmount' } {

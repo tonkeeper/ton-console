@@ -14,6 +14,7 @@ export interface InvoiceCommon {
 
 export interface InvoiceSuccessful extends InvoiceCommon {
     paidBy: string;
+    paymentDate: Date;
     status: 'success';
 }
 

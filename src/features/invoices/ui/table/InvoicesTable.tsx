@@ -21,7 +21,8 @@ const InvoicesTable: FunctionComponent<ComponentProps<typeof Box>> = props => {
                     isItemLoaded={invoicesTableStore.isItemLoaded}
                     itemCount={invoicesTableStore.tableContentLength}
                     loadMoreItems={
-                        invoicesTableStore.loadNextPage.isLoading
+                        invoicesTableStore.loadNextPage.isLoading ||
+                        !invoicesTableStore.invoices$.isResolved
                             ? () => {}
                             : () => invoicesTableStore.loadNextPage()
                     }

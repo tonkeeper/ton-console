@@ -26,7 +26,7 @@ import { invoicesAppStore } from './invoices-app.store';
 class InvoicesTableStore {
     invoices$ = new Loadable<Invoice[]>([]);
 
-    totalInvoices = 1;
+    private totalInvoices = 0;
 
     pageSize = 30;
 
@@ -51,21 +51,26 @@ class InvoicesTableStore {
     constructor() {
         makeAutoObservable(this);
 
+        let dispose: (() => void) | undefined;
+
         createImmediateReaction(
-            () => projectsStore.selectedProject,
-            project => {
+            () => invoicesAppStore.invoicesApp$.value,
+            app => {
+                dispose?.();
                 this.clearState();
+                this.loadFirstPageWithNewParams.cancelAllPendingCalls();
+                this.loadNextPage.cancelAllPendingCalls();
 
-                if (project) {
-                    // this.fetchInvoicesApp();
+                if (app) {
+                    this.loadFirstPageWithNewParams();
+
+                    dispose = reaction(
+                        () => JSON.stringify(this.pagination),
+                        () => {
+                            this.loadFirstPageWithNewParams({ cancelPreviousCall: true });
+                        }
+                    );
                 }
-            }
-        );
-
-        reaction(
-            () => JSON.stringify(this.pagination),
-            () => {
-                this.loadFirstPageWithNewParams({ cancelPreviousCall: true });
             }
         );
     }
@@ -73,18 +78,20 @@ class InvoicesTableStore {
     isItemLoaded = (index: number): boolean =>
         !this.hasNextPage || index < this.invoices$.value.length;
 
-    loadFirstPageWithNewParams = this.invoices$.createAsyncAction(async () => {
-        const response = await this.fetchInvoices();
+    loadFirstPageWithNewParams = this.invoices$.createAsyncAction(
+        async () => {
+            const response = await this.fetchInvoices();
 
-        const invoices = response.data.items.map(mapInvoiceDTOToInvoice);
+            const invoices = response.data.items.map(mapInvoiceDTOToInvoice);
 
-        this.totalInvoices = response.data.count;
-        return invoices;
-    });
+            this.totalInvoices = response.data.count;
+            return invoices;
+        },
+        { resetBeforeExecution: true }
+    );
 
     loadNextPage = this.invoices$.createAsyncAction(async () => {
-        const lastId = this.invoices$.value.at(-1)?.id;
-        const response = await this.fetchInvoices(lastId);
+        const response = await this.fetchInvoices(this.invoices$.value.length);
 
         const invoices = response.data.items.map(mapInvoiceDTOToInvoice);
 
@@ -92,7 +99,7 @@ class InvoicesTableStore {
         return this.invoices$.value.concat(invoices);
     });
 
-    private async fetchInvoices(fromId?: string): ReturnType<typeof apiClient.api.getInvoices> {
+    private async fetchInvoices(offset?: number): ReturnType<typeof apiClient.api.getInvoices> {
         const searchId = this.pagination.filter?.value;
         const sortByColumn = mapSortColumnToFieldOrder[this.pagination.sort.column];
         const sortOrder =
@@ -103,7 +110,7 @@ class InvoicesTableStore {
         return apiClient.api.getInvoices({
             project_id: projectsStore.selectedProject!.id,
             app_id: invoicesAppStore.invoicesApp$.value!.id,
-            ...(fromId !== undefined && { last_id: fromId }),
+            ...(offset !== undefined && { offset }),
             limit: this.pageSize,
             ...(searchId && { search_id: searchId }),
             field_order: sortByColumn,
@@ -164,6 +171,14 @@ class InvoicesTableStore {
 
     clearState(): void {
         this.invoices$.clear();
+        this.pagination = {
+            filter: null,
+            sort: {
+                direction: 'desc',
+                column: 'id'
+            }
+        };
+        this.sortDirectionTouched = false;
     }
 }
 
@@ -189,12 +204,16 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
     const status = mapInvoiceDTOStatusToInvoiceStatus[invoiceDTO.status];
 
     if (status === 'success') {
-        return { ...commonInvoice, paidBy: 'TODO', status }; // TODO
+        return {
+            ...commonInvoice,
+            paidBy: invoiceDTO.paid_address!,
+            paymentDate: new Date(invoiceDTO.date_paid!),
+            status
+        };
     }
 
     return { ...commonInvoice, status };
 }
-
 /*
 function createMockInvoice(): Invoice {
     const id = Math.round(Math.random() * 1000000);
@@ -210,10 +229,13 @@ function createMockInvoice(): Invoice {
         description:
             'TestdescripotionTestdescripotionTestdescripotionTestdescripotionTestdescripotionTest descripotionTest descripotionTestdescripotion',
         receiverAddress: 'EQCmtv9UrlDC27A0KsJNSaloAtHp5G3fli5jJjJug0waNf1u',
-        ...(status === 'success' && { paidBy: 'EQCmtv9UrlDC27A0KsJNSaloAtHp5G3fli5jJjJug0waNf1u' })
+        ...(status === 'success' && {
+            paidBy: 'EQCmtv9UrlDC27A0KsJNSaloAtHp5G3fli5jJjJug0waNf1u',
+            paymentDate: new Date()
+        })
     } as Invoice;
-}
-
+}*/
+/*
 [...new Array(500)].forEach(() => {
            const ttl = 10000 * Math.round(Math.random() * 10);
            this.createInvoice({
@@ -232,8 +254,7 @@ const mapSortColumnToFieldOrder: Record<InvoiceTableSortColumn, DTOGetInvoicesPa
     description: DTOGetInvoicesParamsFieldOrder.DTODescription,
     amount: DTOGetInvoicesParamsFieldOrder.DTOAmount,
     status: DTOGetInvoicesParamsFieldOrder.DTOStatus,
-    'receiver-address': DTOGetInvoicesParamsFieldOrder.DTORecipientAddress,
-    'life-time': DTOGetInvoicesParamsFieldOrder.DTOLifeTime
+    'creation-date': DTOGetInvoicesParamsFieldOrder.DTODateCreate
 };
 
 export const invoicesTableStore = new InvoicesTableStore();

@@ -766,7 +766,7 @@ paths:
         - $ref: '#/components/parameters/queryAppID'
         - $ref: '#/components/parameters/queryProjectID'
         - $ref: '#/components/parameters/queryLimit'
-        - $ref: '#/components/parameters/queryInvoiceLastID'
+        - $ref: '#/components/parameters/queryOffset'
         - $ref: '#/components/parameters/queryFieldOrder'
         - $ref: '#/components/parameters/queryTypeOrder'
         - $ref: '#/components/parameters/queryInvoicesSearchID'
@@ -850,14 +850,14 @@ components:
         type: integer
         example: 50
         maxLength: 50
-    queryInvoiceLastID:
-      description: Invoice ID
+    queryOffset:
+      description: Offset
       in: query
-      name: last_id
+      name: offset
       required: false
       schema:
-        type: string
-        example: "60ffb075"
+        type: integer
+        example: 100
     queryFieldOrder:
       description: Field
       in: query
@@ -873,6 +873,7 @@ components:
           - life_time
           - description
           - recipient_address
+          - paid_address
           - date_create
           - date_paid
     queryTypeOrder:
@@ -1560,6 +1561,9 @@ components:
             - cancel_status
             - expired_status
         recipient_address:
+          type: string
+          example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+        paid_address:
           type: string
           example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
         date_paid:

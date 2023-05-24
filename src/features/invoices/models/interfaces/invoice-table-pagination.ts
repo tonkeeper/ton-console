@@ -1,10 +1,4 @@
-export type InvoiceTableColumn =
-    | 'id'
-    | 'status'
-    | 'life-time'
-    | 'description'
-    | 'receiver-address'
-    | 'amount';
+export type InvoiceTableColumn = 'id' | 'status' | 'creation-date' | 'description' | 'amount';
 export type InvoiceTableFiltrationColumn = Extract<'id', InvoiceTableColumn>;
 export type InvoiceTableSortColumn = InvoiceTableColumn;
 

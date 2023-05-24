@@ -35,7 +35,7 @@ const CreateInvoicesProjectModal: FunctionComponent<{
                 <ModalBody>
                     <EditInvoicesProjectForm
                         id={id}
-                        onSubmit={invoicesAppStore.createInvoicesApp}
+                        onSubmit={form => invoicesAppStore.createInvoicesApp(form)}
                     />
                 </ModalBody>
                 <ModalFooter gap="3">

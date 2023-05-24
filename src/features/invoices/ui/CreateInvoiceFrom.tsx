@@ -57,7 +57,7 @@ export const CreateInvoiceFrom: FunctionComponent<
     let { handleSubmit, register, formState, setFocus, watch, setValue, trigger } =
         useForm<InternalForm>({
             defaultValues: {
-                amount: defaultAmount?.toStringAmount(),
+                amount: defaultAmount?.stringAmount,
                 ...restDefaultValues
             }
         });

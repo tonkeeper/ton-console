@@ -7,12 +7,15 @@ import { SortAscIcon16, SortDescIcon16 } from 'src/shared';
 const InvoicesTableColumnLabel: FunctionComponent<
     PropsWithChildren<ComponentProps<typeof Button> & { column: InvoiceTableColumn }>
 > = ({ children, column, ...rest }) => {
-    const shown =
+    const disabled =
+        !invoicesTableStore.invoices$.value.length && !invoicesTableStore.invoices$.isLoading;
+
+    const defaultShown =
         invoicesTableStore.sortDirectionTouched &&
         invoicesTableStore.pagination.sort.column === column;
 
     const Icon =
-        shown && invoicesTableStore.pagination.sort.direction === 'asc'
+        defaultShown && invoicesTableStore.pagination.sort.direction === 'asc'
             ? SortAscIcon16
             : SortDescIcon16;
 
@@ -23,14 +26,23 @@ const InvoicesTableColumnLabel: FunctionComponent<
             h="fit-content"
             p="0"
             _hover={{ svg: { opacity: 1 } }}
+            _disabled={{
+                opacity: 1,
+                cursor: 'default'
+            }}
+            isDisabled={disabled}
             onClick={
-                shown
+                defaultShown
                     ? invoicesTableStore.toggleSortDirection
                     : () => invoicesTableStore.setSortColumn(column)
             }
             variant="flat"
+            {...(!disabled && {
+                leftIcon: (
+                    <Icon transition="opacity 0.15s ease-in-out" opacity={defaultShown ? 1 : 0} />
+                )
+            })}
             {...rest}
-            leftIcon={<Icon transition="opacity 0.15s ease-in-out" opacity={shown ? 1 : 0} />}
         >
             <Box textStyle="body2" color="text.secondary" fontFamily="mono">
                 {children}

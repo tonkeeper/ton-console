@@ -250,6 +250,8 @@ export interface DTOInvoicesInvoice {
     status: DTOInvoicesInvoiceStatus;
     /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
     recipient_address: string;
+    /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+    paid_address?: string;
     /** @example "2023-03-23" */
     date_paid?: string;
     /** @example "2023-03-23" */
@@ -319,6 +321,7 @@ export enum DTOGetInvoicesParamsFieldOrder {
     DTOLifeTime = 'life_time',
     DTODescription = 'description',
     DTORecipientAddress = 'recipient_address',
+    DTOPaidAddress = 'paid_address',
     DTODateCreate = 'date_create',
     DTODatePaid = 'date_paid'
 }
@@ -1753,10 +1756,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  */
                 limit?: number;
                 /**
-                 * Invoice ID
-                 * @example "60ffb075"
+                 * Offset
+                 * @example 100
                  */
-                last_id?: string;
+                offset?: number;
                 /**
                  * Field
                  * @example "id"

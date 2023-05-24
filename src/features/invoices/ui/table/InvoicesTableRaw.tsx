@@ -1,6 +1,7 @@
 import { FunctionComponent, useContext } from 'react';
 import {
     Box,
+    Button,
     Center,
     Flex,
     IconButton,
@@ -16,7 +17,7 @@ import {
     useClipboard
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { Invoice, invoicesTableStore, InvoiceSuccessful } from '../../models';
+import { Invoice, invoicesTableStore } from '../../models';
 import {
     CopyIcon16,
     sliceAddress,
@@ -24,7 +25,8 @@ import {
     TooltipHoverable,
     toTimeLeft,
     VerticalDotsIcon16,
-    useCountdown
+    useCountdown,
+    toDateTime
 } from 'src/shared';
 import { InvoicesTableContext } from './invoices-table-context';
 import { InvoiceStatusBadge } from './InvoiceStatusBadge';
@@ -33,9 +35,9 @@ const LoadingRaw: FunctionComponent = () => {
     const { rawHeight } = useContext(InvoicesTableContext);
     return (
         <Tr h={rawHeight} maxH={rawHeight}>
-            <Td colSpan={6}>
+            <Td border="none" colSpan={5}>
                 <Center>
-                    <Spinner size="sm" />
+                    <Spinner color="text.secondary" size="sm" />
                 </Center>
             </Td>
         </Tr>
@@ -43,9 +45,11 @@ const LoadingRaw: FunctionComponent = () => {
 };
 
 const ItemRaw: FunctionComponent<{ invoice: Invoice }> = observer(({ invoice }) => {
-    const { onCopy, hasCopied } = useClipboard(invoice.id);
+    const { onCopy: onCopyId, hasCopied: hasCopiedId } = useClipboard(invoice.id);
+    const { onCopy: onCopyPaidBy, hasCopied: hasCopiedPaidBy } = useClipboard(
+        invoice.status === 'success' ? invoice.paidBy : ''
+    );
     const { rawHeight } = useContext(InvoicesTableContext);
-    const slicedAddress = sliceAddress(invoice.receiverAddress, { headLength: 6, tailLength: 6 });
 
     const timeoutSeconds =
         invoice.status === 'pending'
@@ -62,6 +66,8 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice }> = observer(({ invoice }) 
             ? sliceAddress(invoice.paidBy, { headLength: 6, tailLength: 6 })
             : '';
 
+    const paymentDate = invoice.status === 'success' ? toDateTime(invoice.paymentDate) : '';
+
     return (
         <Tr sx={{ td: { px: 2, py: 0 } }} h={rawHeight} maxH={rawHeight}>
             <Td
@@ -70,50 +76,67 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice }> = observer(({ invoice }) 
                 borderLeftColor="background.contentTint"
                 boxSizing="content-box"
             >
-                <Tooltip isOpen={hasCopied} label="Copied!">
+                <Tooltip isOpen={hasCopiedId} label="Copied!">
                     <IconButton
                         h="4"
                         mr="4"
                         aria-label="copy"
                         icon={<CopyIcon16 />}
-                        onClick={onCopy}
+                        onClick={onCopyId}
                         size="fit"
                         variant="flat"
                     />
                 </Tooltip>
                 <Span>{invoice.id}</Span>
             </Td>
-            <Td minW="192px" boxSizing="content-box">
-                <InvoiceStatusBadge status={invoice.status} />
-                {!!paidBy && (
-                    <TooltipHoverable
-                        host={
-                            <Span ml="2" textStyle="body2" color="text.secondary" fontFamily="mono">
-                                {paidBy}
+            <Td minW="320px" boxSizing="content-box">
+                <Flex align="center">
+                    <InvoiceStatusBadge status={invoice.status} />
+                    {invoice.status === 'success' && (
+                        <>
+                            <Span textStyle="body3" ml="2" color="text.secondary">
+                                {paymentDate} ·&nbsp;
                             </Span>
-                        }
-                    >
-                        {(invoice as InvoiceSuccessful).paidBy}
-                    </TooltipHoverable>
-                )}
+                            <Tooltip isOpen={hasCopiedPaidBy} label="Copied!">
+                                <Button
+                                    display="inline-block"
+                                    h="fit-content"
+                                    p="0"
+                                    _hover={{ svg: { opacity: 1 } }}
+                                    onClick={onCopyPaidBy}
+                                    variant="flat"
+                                >
+                                    <Span textStyle="body3" color="text.secondary">
+                                        {paidBy}
+                                    </Span>
+                                    <CopyIcon16
+                                        ml="1"
+                                        opacity="0"
+                                        transition="opacity 0.15s ease-in-out"
+                                    />
+                                </Button>
+                            </Tooltip>
+                        </>
+                    )}
+                    {invoice.status === 'pending' && (
+                        <Span textStyle="body3" ml="2">
+                            {formattedTimeLeft}
+                        </Span>
+                    )}
+                </Flex>
             </Td>
-            <Td minW="108px" boxSizing="content-box">
-                {formattedTimeLeft}
+            <Td minW="180px" boxSizing="content-box">
+                {toDateTime(invoice.creationDate)}
             </Td>
-            <Td minW="228px" maxW="228px" boxSizing="content-box">
-                <TooltipHoverable host={<Span noOfLines={1}>{invoice.description}</Span>}>
-                    <Box maxW="500px">{invoice.description}</Box>
-                </TooltipHoverable>
-            </Td>
-            <Td minW="148px" boxSizing="content-box">
+            <Td minW="240px" maxW="240px" boxSizing="content-box">
                 <TooltipHoverable
                     host={
-                        <Span textStyle="body2" color="text.secondary" fontFamily="mono">
-                            {slicedAddress}
+                        <Span maxW="100%" width="fit-content" noOfLines={1}>
+                            {invoice.description}
                         </Span>
                     }
                 >
-                    {invoice.receiverAddress}
+                    <Box maxW="500px">{invoice.description}</Box>
                 </TooltipHoverable>
             </Td>
             <Td textAlign="right" borderRight="1px" borderRightColor="background.contentTint">

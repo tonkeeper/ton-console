@@ -10,6 +10,10 @@ export class BasicCurrencyAmount implements CurrencyAmount {
 
     public readonly currency: CURRENCY;
 
+    protected readonly decimalPlaces = 2;
+
+    protected readonly thousandSeparators = true;
+
     get stringCurrency(): string {
         return this.currency;
     }
@@ -21,8 +25,6 @@ export class BasicCurrencyAmount implements CurrencyAmount {
     get stringCurrencyAmount(): string {
         return `${this.stringAmount} ${this.stringCurrency}`;
     }
-
-    protected readonly decimalPlaces = 3;
 
     constructor({ amount, currency }: BasicCurrencyAmountStruct) {
         this.amount = new BigNumber(amount);
@@ -54,15 +56,29 @@ export class BasicCurrencyAmount implements CurrencyAmount {
         return this.amount.lte(currencyAmount.amount);
     }
 
-    toStringAmount(decimalPlaces?: number): string {
-        if (decimalPlaces === undefined) {
-            decimalPlaces = this.decimalPlaces;
-        }
-        return this.amount.decimalPlaces(decimalPlaces).toString();
+    toStringAmount(options?: { decimalPlaces?: number; thousandSeparators?: boolean }): string {
+        const decimalPlaces =
+            options?.decimalPlaces === undefined ? this.decimalPlaces : options.decimalPlaces;
+
+        const thousandSeparators =
+            options?.thousandSeparators === undefined
+                ? this.thousandSeparators
+                : options.thousandSeparators;
+
+        const format = {
+            decimalSeparator: '.',
+            groupSeparator: thousandSeparators ? ' ' : '',
+            groupSize: 3
+        };
+
+        return this.amount.decimalPlaces(decimalPlaces).toFormat(format);
     }
 
-    toStringCurrencyAmount(decimalPlaces?: number): string {
-        return `${this.toStringAmount(decimalPlaces)} ${this.stringCurrency}`;
+    toStringCurrencyAmount(options?: {
+        decimalPlaces?: number;
+        thousandSeparators?: boolean;
+    }): string {
+        return `${this.toStringAmount(options)} ${this.stringCurrency}`;
     }
 
     toJSON(): unknown {

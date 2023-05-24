@@ -15,10 +15,6 @@ export class Loadable<T> {
 
     persistableResolved: Promise<void>;
 
-    lastAsyncActionId = 0;
-
-    shouldCancelCallsIds: number[] = [];
-
     get isLoading(): boolean {
         return this.state === 'pending' || this.state === 'refreshing';
     }
@@ -45,8 +41,6 @@ export class Loadable<T> {
         this.value = value;
 
         makeObservable(this, {
-            shouldCancelCallsIds: true,
-            lastAsyncActionId: false,
             persistableResolved: true,
             state: true,
             defaultValue: false,
@@ -110,30 +104,44 @@ export class Loadable<T> {
             successToast?: UseToastOptions;
             errorToast?: UseToastOptions;
             onError?: (e: unknown) => void;
+            resetBeforeExecution?: boolean;
         }
     ): ((
         ...args: [
             ...Parameters<A>,
-            ({ silently?: boolean; cancelPreviousCall?: boolean } | unknown)?
+            { silently?: boolean; cancelPreviousCall?: boolean; cancelAllPreviousCalls?: boolean }?
         ]
     ) => ReturnType<A>) & {
         isLoading: boolean;
         error: unknown;
+        cancelLastCall: () => void;
+        cancelAllPendingCalls: () => void;
     } {
         const fn = (async (...args) => {
+            if (options?.resetBeforeExecution) {
+                this.clear();
+            }
+
             const callOpts = args[args.length - 1];
+
+            const lastCallId = fn.pendingCallsIds.at(-1);
 
             let silently = false;
             if (callOpts && typeof callOpts === 'object') {
                 silently = 'silently' in callOpts && !!callOpts.silently;
 
-                if ('cancelPreviousCall' in callOpts && !!callOpts.cancelPreviousCall) {
-                    this.shouldCancelCallsIds.push(this.lastAsyncActionId);
+                if (
+                    'cancelPreviousCall' in callOpts &&
+                    !!callOpts.cancelPreviousCall &&
+                    lastCallId !== undefined
+                ) {
+                    fn.shouldCancelCallsIds.push(lastCallId);
+                }
+
+                if ('cancelAllPreviousCalls' in callOpts && !!callOpts.cancelAllPreviousCalls) {
+                    fn.shouldCancelCallsIds = fn.pendingCallsIds.slice();
                 }
             }
-
-            this.lastAsyncActionId++;
-            const callId = this.lastAsyncActionId;
 
             const changeState = (state: Loadable<unknown>['state']): void => {
                 if (!silently) {
@@ -156,14 +164,15 @@ export class Loadable<T> {
 
             fn.error = null;
             fn.isLoading = true;
+            const callId = (lastCallId || 0) + 1;
+            fn.pendingCallsIds.push(callId);
 
             try {
                 const result = await asyncAction(...args);
 
-                if (this.shouldCancelCallsIds.includes(callId)) {
-                    this.shouldCancelCallsIds = this.shouldCancelCallsIds.filter(
-                        id => id !== callId
-                    );
+                fn.pendingCallsIds = fn.pendingCallsIds.filter(id => id !== callId);
+                if (fn.shouldCancelCallsIds.includes(callId)) {
+                    fn.shouldCancelCallsIds = fn.shouldCancelCallsIds.filter(id => id !== callId);
                     return;
                 }
 
@@ -213,6 +222,24 @@ export class Loadable<T> {
         ) => ReturnType<A>) & {
             isLoading: boolean;
             error: unknown;
+            cancelLastCall: () => void;
+            cancelAllPendingCalls: () => void;
+            pendingCallsIds: number[];
+            shouldCancelCallsIds: number[];
+        };
+
+        fn.shouldCancelCallsIds = [];
+        fn.pendingCallsIds = [];
+        fn.cancelLastCall = () => {
+            const lastCallId = fn.pendingCallsIds.at(-1);
+            if (lastCallId === undefined) {
+                return;
+            }
+
+            fn.shouldCancelCallsIds.push(lastCallId);
+        };
+        fn.cancelAllPendingCalls = () => {
+            fn.shouldCancelCallsIds = fn.pendingCallsIds.slice();
         };
 
         fn.isLoading = false;

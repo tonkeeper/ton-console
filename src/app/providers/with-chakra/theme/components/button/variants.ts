@@ -17,7 +17,10 @@ function variant(backgroundColor: string, color: string): SystemStyleInterpolati
             }
         },
         _active: {
-            transform: 'scale(0.97)'
+            transform: 'scale(0.97)',
+            _disabled: {
+                transform: 'scale(1)'
+            }
         },
         _disabled: {
             opacity: 0.48
