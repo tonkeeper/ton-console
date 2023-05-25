@@ -18,3 +18,21 @@ export function formatWithSuffix(value: number | string | BigNumber, decimalPlac
 
     return nValue.decimalPlaces(decimalPlaces).toString();
 }
+
+export function formatNumber(
+    value: number | string | BigNumber,
+    options?: { decimalPlaces?: number; thousandSeparators?: boolean }
+): string {
+    const decimalPlaces = options?.decimalPlaces === undefined ? 2 : options.decimalPlaces;
+
+    const thousandSeparators =
+        options?.thousandSeparators === undefined ? true : options.thousandSeparators;
+
+    const format = {
+        decimalSeparator: '.',
+        groupSeparator: thousandSeparators ? ' ' : '',
+        groupSize: 3
+    };
+
+    return new BigNumber(value).decimalPlaces(decimalPlaces).toFormat(format);
+}

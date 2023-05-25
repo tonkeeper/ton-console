@@ -742,12 +742,11 @@ paths:
         - invoices_service
       parameters:
         - $ref: '#/components/parameters/queryAppID'
-        - $ref: '#/components/parameters/queryProjectID'
       requestBody:
         $ref: "#/components/requestBodies/InvoicesInvoiceCreateInput"
       responses:
         '201':
-          $ref: '#/components/responses/InvoicesInvoiceCreated'
+          $ref: '#/components/responses/InvoicesInvoiceResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -764,7 +763,6 @@ paths:
         - invoices_service
       parameters:
         - $ref: '#/components/parameters/queryAppID'
-        - $ref: '#/components/parameters/queryProjectID'
         - $ref: '#/components/parameters/queryLimit'
         - $ref: '#/components/parameters/queryOffset'
         - $ref: '#/components/parameters/queryFieldOrder'
@@ -791,7 +789,43 @@ paths:
         - $ref: '#/components/parameters/invoiceID'
       responses:
         '200':
-          $ref: '#/components/responses/InvoicesInvoiceGet'
+          $ref: '#/components/responses/InvoicesInvoiceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      summary: "Update invoices invoice"
+      operationId: updateInvoicesInvoice
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/invoiceID'
+        - $ref: '#/components/parameters/queryAppID'
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesInvoiceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/fee:
+    get:
+      summary: "Get service invoices fee"
+      operationId: getServiceInvoicesFee
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - invoices_service
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesServiceFee'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -1926,19 +1960,8 @@ components:
               token:
                 type: string
                 example: "TC-INVOICES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA=="
-    InvoicesInvoiceCreated:
-      description: "Created invoice"
-      content:
-        application/json:
-          schema:
-            required:
-              - invoice
-            type: object
-            properties:
-              invoice:
-                $ref: '#/components/schemas/InvoicesInvoice'
-    InvoicesInvoiceGet:
-      description: "Get invoice"
+    InvoicesInvoiceResponse:
+      description: "Invoice"
       content:
         application/json:
           schema:
@@ -1966,6 +1989,19 @@ components:
                 type: integer
                 format: int64
                 example: 1000
+    InvoicesServiceFee:
+      description: "Service invoices fee"
+      content:
+        application/json:
+          schema:
+            required:
+              - fee
+            type: object
+            properties:
+              fee:
+                type: integer
+                description: "percent"
+                example: 1
   
   securitySchemes:
     JWTAuth:

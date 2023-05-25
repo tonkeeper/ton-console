@@ -11,13 +11,15 @@ import {
     Input,
     InputGroup,
     InputRightElement,
+    Skeleton,
     StyleProps,
     Text,
     Textarea
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
-import { InvoiceForm } from '../models';
+import { InvoiceForm, invoicesAppStore } from '../models';
 import {
+    formatNumber,
     InfoTooltip,
     isAddersValid,
     isNumber,
@@ -31,6 +33,7 @@ import {
     tonMask
 } from 'src/shared';
 import { useIMask } from 'react-imask';
+import { observer } from 'mobx-react-lite';
 
 interface InternalForm {
     amount: string;
@@ -51,7 +54,7 @@ export const CreateInvoiceFrom: FunctionComponent<
         defaultValues?: Partial<InvoiceForm>;
         disableDefaultFocus?: boolean;
     }
-> = ({ onSubmit, defaultValues, disableDefaultFocus, ...rest }) => {
+> = observer(({ onSubmit, defaultValues, disableDefaultFocus, ...rest }) => {
     const { amount: defaultAmount, ...restDefaultValues } = defaultValues || {};
     const context = useFormContext<InternalForm>();
     let { handleSubmit, register, formState, setFocus, watch, setValue, trigger } =
@@ -101,6 +104,19 @@ export const CreateInvoiceFrom: FunctionComponent<
         });
     };
 
+    const feePercent = invoicesAppStore.feePercent$.value || 0;
+    const feePercentResolved = invoicesAppStore.feePercent$.isResolved;
+    const subtractFeeFromAmount = watch('subtractFeeFromAmount');
+    const amountRaw = Number(watch('amount'));
+    const amount = isFinite(amountRaw) ? amountRaw : 0;
+    let businessWillGet = amount * ((100 - feePercent) / 100);
+    let buyerWillSee = amount;
+
+    if (!subtractFeeFromAmount) {
+        businessWillGet = amount;
+        buyerWillSee = amount / ((100 - feePercent) / 100);
+    }
+
     return (
         <chakra.form w="100%" onSubmit={handleSubmit(submitMiddleware)} noValidate {...rest}>
             <FormControl mb="8" isInvalid={!!formState.errors.amount} isRequired>
@@ -133,15 +149,39 @@ export const CreateInvoiceFrom: FunctionComponent<
                     >
                         Subtract fee from amount
                     </Checkbox>
-                    <InfoTooltip>Описание что это зачем это и тд</InfoTooltip>
+                    <InfoTooltip>
+                        <Span textStyle="body2" color="text.primary">
+                            Indicates who will be charged {feePercentResolved && feePercent + '% '}
+                            service fee - the business or a buyer
+                        </Span>
+                    </InfoTooltip>
                 </Flex>
                 <Flex textStyle="body2" justify="space-between" mb="1">
-                    <Span color="text.secondary">How much money a business will get</Span>
-                    <Span color="text.primary">8 TON</Span>
+                    <Flex align="center" gap="1" color="text.secondary">
+                        How much money a business will get
+                        <InfoTooltip>
+                            <Span textStyle="body2" color="text.primary">
+                                Excluding blockchain fee
+                            </Span>
+                        </InfoTooltip>
+                    </Flex>
+                    <Span color="text.primary">
+                        {feePercentResolved ? (
+                            formatNumber(businessWillGet) + ' TON'
+                        ) : (
+                            <Skeleton w="40px" h="14px" />
+                        )}
+                    </Span>
                 </Flex>
                 <Flex textStyle="body2" justify="space-between">
                     <Span color="text.secondary">Amount the buyer will see</Span>
-                    <Span color="text.primary">8 TON</Span>
+                    <Span color="text.primary">
+                        {feePercentResolved ? (
+                            formatNumber(buyerWillSee) + ' TON'
+                        ) : (
+                            <Skeleton w="40px" h="14px" />
+                        )}
+                    </Span>
                 </Flex>
             </FormControl>
 
@@ -247,4 +287,4 @@ export const CreateInvoiceFrom: FunctionComponent<
             </FormControl>
         </chakra.form>
     );
-};
+});

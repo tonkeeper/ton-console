@@ -2,6 +2,7 @@ import { CurrencyAmount } from './currency-amount';
 import { CURRENCY } from './CURRENCY';
 import BigNumber from 'bignumber.js';
 import { Amount } from '../types';
+import { formatNumber } from 'src/shared';
 
 type BasicCurrencyAmountStruct = { amount: Amount; currency: CURRENCY };
 
@@ -65,13 +66,7 @@ export class BasicCurrencyAmount implements CurrencyAmount {
                 ? this.thousandSeparators
                 : options.thousandSeparators;
 
-        const format = {
-            decimalSeparator: '.',
-            groupSeparator: thousandSeparators ? ' ' : '',
-            groupSize: 3
-        };
-
-        return this.amount.decimalPlaces(decimalPlaces).toFormat(format);
+        return formatNumber(this.amount, { decimalPlaces, thousandSeparators });
     }
 
     toStringCurrencyAmount(options?: {

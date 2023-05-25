@@ -12,6 +12,10 @@ import { InvoicesApp, InvoicesProjectForm } from './interfaces';
 class InvoicesAppStore {
     invoicesApp$ = new Loadable<InvoicesApp | null>(null);
 
+    appToken$ = new Loadable<string | null>(null);
+
+    feePercent$ = new Loadable<number | null>(null);
+
     constructor() {
         makeAutoObservable(this);
 
@@ -22,6 +26,18 @@ class InvoicesAppStore {
 
                 if (project) {
                     this.fetchInvoicesApp();
+                }
+            }
+        );
+
+        createImmediateReaction(
+            () => this.invoicesApp$.value,
+            app => {
+                this.clearAppRelatedState();
+
+                if (app) {
+                    this.fetchAppToken();
+                    this.fetchFeePercent();
                 }
             }
         );
@@ -84,8 +100,45 @@ class InvoicesAppStore {
         }
     );
 
+    fetchAppToken = this.appToken$.createAsyncAction(async () => {
+        const response = await apiClient.api.getMessagesAppToken({
+            app_id: this.invoicesApp$.value!.id
+        });
+
+        return response.data.token;
+    });
+
+    fetchFeePercent = this.feePercent$.createAsyncAction(async () => {
+        const response = await apiClient.api.getServiceInvoicesFee();
+
+        return response.data.fee;
+    });
+
+    regenerateAppToken = this.appToken$.createAsyncAction(
+        async () => {
+            const response = await apiClient.api.regenerateInvoicesAppToken({
+                app_id: this.invoicesApp$.value!.id
+            });
+
+            return response.data.token;
+        },
+        {
+            successToast: {
+                title: 'Token regenerated successfully'
+            },
+            errorToast: {
+                title: 'Token regeneration error'
+            }
+        }
+    );
+
     clearState(): void {
         this.invoicesApp$.clear();
+    }
+
+    clearAppRelatedState(): void {
+        this.appToken$.clear();
+        this.feePercent$.clear();
     }
 }
 

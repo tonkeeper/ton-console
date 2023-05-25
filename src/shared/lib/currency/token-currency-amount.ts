@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 import { CURRENCY } from './CURRENCY';
 import { fromWei } from 'src/shared/lib/blockchain/wei';
 import { BasicCurrencyAmount } from './basic-currency-amount';
+import { formatNumber } from 'src/shared';
 
 export type TokenCurrencyAmountStruct = {
     weiAmount: string;
@@ -31,13 +32,10 @@ export class TokenCurrencyAmount extends BasicCurrencyAmount implements Currency
                 ? this.thousandSeparators
                 : options.thousandSeparators;
 
-        const format = {
-            decimalSeparator: '.',
-            groupSeparator: thousandSeparators ? ' ' : '',
-            groupSize: 3
-        };
-
-        return fromWei(this.weiAmount, this.decimals).decimalPlaces(decimalPlaces).toFormat(format);
+        return formatNumber(fromWei(this.weiAmount, this.decimals), {
+            decimalPlaces,
+            thousandSeparators
+        });
     }
 
     override toJSON(): TokenCurrencyAmountStruct & { $type: 'TokenCurrencyAmount' } {

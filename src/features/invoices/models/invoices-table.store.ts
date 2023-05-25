@@ -9,7 +9,6 @@ import {
     Loadable,
     TonCurrencyAmount
 } from 'src/shared';
-import { projectsStore } from 'src/entities';
 import {
     Invoice,
     InvoiceCommon,
@@ -34,7 +33,7 @@ class InvoicesTableStore {
         filter: null,
         sort: {
             direction: 'desc',
-            column: 'id'
+            column: 'creation-date'
         }
     };
 
@@ -91,7 +90,7 @@ class InvoicesTableStore {
     );
 
     loadNextPage = this.invoices$.createAsyncAction(async () => {
-        const response = await this.fetchInvoices(this.invoices$.value.length);
+        const response = await this.fetchInvoices({ offset: this.invoices$.value.length });
 
         const invoices = response.data.items.map(mapInvoiceDTOToInvoice);
 
@@ -99,7 +98,19 @@ class InvoicesTableStore {
         return this.invoices$.value.concat(invoices);
     });
 
-    private async fetchInvoices(offset?: number): ReturnType<typeof apiClient.api.getInvoices> {
+    updateCurrentListSilently = this.invoices$.createAsyncAction(async () => {
+        const response = await this.fetchInvoices();
+
+        const invoices = response.data.items.map(mapInvoiceDTOToInvoice);
+
+        this.totalInvoices = response.data.count;
+        return invoices;
+    });
+
+    private async fetchInvoices(options?: {
+        offset?: number;
+        pageSize?: number;
+    }): ReturnType<typeof apiClient.api.getInvoices> {
         const searchId = this.pagination.filter?.value;
         const sortByColumn = mapSortColumnToFieldOrder[this.pagination.sort.column];
         const sortOrder =
@@ -108,10 +119,9 @@ class InvoicesTableStore {
                 : DTOGetInvoicesParamsTypeOrder.DTODesc;
 
         return apiClient.api.getInvoices({
-            project_id: projectsStore.selectedProject!.id,
             app_id: invoicesAppStore.invoicesApp$.value!.id,
-            ...(offset !== undefined && { offset }),
-            limit: this.pageSize,
+            ...(options?.offset !== undefined && { offset: options.offset }),
+            limit: options?.pageSize || this.pageSize,
             ...(searchId && { search_id: searchId }),
             field_order: sortByColumn,
             type_order: sortOrder
@@ -122,8 +132,7 @@ class InvoicesTableStore {
         async (form: InvoiceForm) => {
             const result = await apiClient.api.createInvoicesInvoice(
                 {
-                    app_id: invoicesAppStore.invoicesApp$.value!.id,
-                    project_id: projectsStore.selectedProject!.id
+                    app_id: invoicesAppStore.invoicesApp$.value!.id
                 },
                 {
                     amount: Number(form.amount.stringWeiAmount),
@@ -134,7 +143,7 @@ class InvoicesTableStore {
                 }
             );
 
-            //this.fetchInvoices();
+            await this.updateCurrentListSilently({ silently: true });
 
             return mapInvoiceDTOToInvoice(result.data.invoice);
         },
@@ -175,7 +184,7 @@ class InvoicesTableStore {
             filter: null,
             sort: {
                 direction: 'desc',
-                column: 'id'
+                column: 'creation-date'
             }
         };
         this.sortDirectionTouched = false;

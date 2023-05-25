@@ -1686,11 +1686,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @format int64
                  */
                 app_id: number;
-                /**
-                 * Project ID
-                 * @format int64
-                 */
-                project_id: number;
             },
             data: {
                 /**
@@ -1744,11 +1739,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @format int64
                  */
                 app_id: number;
-                /**
-                 * Project ID
-                 * @format int64
-                 */
-                project_id: number;
                 /**
                  * Limit
                  * @maxLength 50
@@ -1813,6 +1803,65 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 DTOError
             >({
                 path: `/api/v1/services/invoices/${id}`,
+                method: 'GET',
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name UpdateInvoicesInvoice
+         * @summary Update invoices invoice
+         * @request PATCH:/api/v1/services/invoices/{id}
+         * @secure
+         */
+        updateInvoicesInvoice: (
+            id: string,
+            query: {
+                /**
+                 * App ID
+                 * @format int64
+                 */
+                app_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    invoice: DTOInvoicesInvoice;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/invoices/${id}`,
+                method: 'PATCH',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name GetServiceInvoicesFee
+         * @summary Get service invoices fee
+         * @request GET:/api/v1/services/invoices/fee
+         * @secure
+         */
+        getServiceInvoicesFee: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    /**
+                     * percent
+                     * @example 1
+                     */
+                    fee: number;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/invoices/fee`,
                 method: 'GET',
                 secure: true,
                 ...params
