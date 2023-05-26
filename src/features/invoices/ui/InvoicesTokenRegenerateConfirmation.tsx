@@ -9,14 +9,14 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { appMessagesStore } from '../model';
+import { invoicesAppStore } from 'src/features';
 import { observer } from 'mobx-react-lite';
 
-const MessagesTokenRegenerateConfirmation: FunctionComponent<{
+const InvoicesTokenRegenerateConfirmation: FunctionComponent<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ isOpen, onClose }) => {
-    const onConfirm = (): Promise<void> => appMessagesStore.regenerateDappToken().then(onClose);
+    const onConfirm = (): Promise<void> => invoicesAppStore.regenerateAppToken().then(onClose);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside" size="md">
@@ -33,7 +33,7 @@ const MessagesTokenRegenerateConfirmation: FunctionComponent<{
                     </Button>
                     <Button
                         flex={1}
-                        isLoading={appMessagesStore.regenerateDappToken.isLoading}
+                        isLoading={invoicesAppStore.regenerateAppToken.isLoading}
                         onClick={onConfirm}
                         variant="primary"
                     >
@@ -45,4 +45,4 @@ const MessagesTokenRegenerateConfirmation: FunctionComponent<{
     );
 };
 
-export default observer(MessagesTokenRegenerateConfirmation);
+export default observer(InvoicesTokenRegenerateConfirmation);

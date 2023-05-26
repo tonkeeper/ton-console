@@ -6,3 +6,4 @@ export { default as CreateInvoiceModal } from './CreateInvoiceModal';
 export { CreateInvoiceFrom } from './CreateInvoiceFrom';
 export * from './table';
 export { default as InvoicesSearchInput } from './InvoicesSearchInput';
+export { default as InvoicesTokenRegenerateConfirmation } from './InvoicesTokenRegenerateConfirmation';

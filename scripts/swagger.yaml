@@ -832,6 +832,23 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/stats:
+    get:
+      summary: "Get invoices stats"
+      operationId: getInvoicesStats
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - invoices_service
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesStats'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
 components:
   parameters:
@@ -2002,6 +2019,35 @@ components:
                 type: integer
                 description: "percent"
                 example: 1
+    InvoicesStats:
+      description: "Invoices stats"
+      content:
+        application/json:
+          schema:
+            required:
+              - stats
+            type: object
+            properties:
+              stats:
+                type: object
+                required:
+                  - total
+                  - success_total
+                  - success_in_week
+                  - awaiting_payment
+                properties:
+                  total:
+                    type: integer
+                    example: 10000
+                  success_total:
+                    type: integer
+                    example: 10000
+                  success_in_week:
+                    type: integer
+                    example: 10000
+                  awaiting_payment:
+                    type: integer
+                    example: 10000
   
   securitySchemes:
     JWTAuth:

@@ -1865,6 +1865,37 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 method: 'GET',
                 secure: true,
                 ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name GetInvoicesStats
+         * @summary Get invoices stats
+         * @request GET:/api/v1/services/invoices/stats
+         * @secure
+         */
+        getInvoicesStats: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    stats: {
+                        /** @example 10000 */
+                        total: number;
+                        /** @example 10000 */
+                        success_total: number;
+                        /** @example 10000 */
+                        success_in_week: number;
+                        /** @example 10000 */
+                        awaiting_payment: number;
+                    };
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/invoices/stats`,
+                method: 'GET',
+                secure: true,
+                ...params
             })
     };
 }

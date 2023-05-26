@@ -4,10 +4,11 @@ import {
     Loadable,
     createImmediateReaction,
     toUserFriendlyAddress,
-    DTOInvoicesApp
+    DTOInvoicesApp,
+    TonCurrencyAmount
 } from 'src/shared';
 import { projectsStore } from 'src/entities';
-import { InvoicesApp, InvoicesProjectForm } from './interfaces';
+import { InvoicesApp, InvoicesProjectForm, InvoicesStatistics } from './interfaces';
 
 class InvoicesAppStore {
     invoicesApp$ = new Loadable<InvoicesApp | null>(null);
@@ -15,6 +16,8 @@ class InvoicesAppStore {
     appToken$ = new Loadable<string | null>(null);
 
     feePercent$ = new Loadable<number | null>(null);
+
+    statistics$ = new Loadable<InvoicesStatistics | null>(null);
 
     constructor() {
         makeAutoObservable(this);
@@ -38,6 +41,7 @@ class InvoicesAppStore {
                 if (app) {
                     this.fetchAppToken();
                     this.fetchFeePercent();
+                    this.fetchInvoicesStatistics();
                 }
             }
         );
@@ -101,7 +105,7 @@ class InvoicesAppStore {
     );
 
     fetchAppToken = this.appToken$.createAsyncAction(async () => {
-        const response = await apiClient.api.getMessagesAppToken({
+        const response = await apiClient.api.getInvoicesAppToken({
             app_id: this.invoicesApp$.value!.id
         });
 
@@ -132,6 +136,17 @@ class InvoicesAppStore {
         }
     );
 
+    fetchInvoicesStatistics = this.statistics$.createAsyncAction(async () => {
+        const response = await apiClient.api.getInvoicesStats({
+            // TODO
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            app_id: this.invoicesApp$.value!.id
+        });
+
+        return mapInvoicesStatsDTOToInvoicesStats(response.data.stats);
+    });
+
     clearState(): void {
         this.invoicesApp$.clear();
     }
@@ -139,6 +154,7 @@ class InvoicesAppStore {
     clearAppRelatedState(): void {
         this.appToken$.clear();
         this.feePercent$.clear();
+        this.statistics$.clear();
     }
 }
 
@@ -149,6 +165,18 @@ function mapInvoicesAppDTOToInvoicesApp(invoicesAppDTO: DTOInvoicesApp): Invoice
         companyDetails: invoicesAppDTO.description,
         creationDate: new Date(invoicesAppDTO.date_create),
         receiverAddress: toUserFriendlyAddress(invoicesAppDTO.recipient_address)
+    };
+}
+
+function mapInvoicesStatsDTOToInvoicesStats(
+    invoicesStatsDTO: Awaited<ReturnType<typeof apiClient.api.getInvoicesStats>>['data']['stats']
+): InvoicesStatistics {
+    return {
+        totalInvoices: invoicesStatsDTO.total,
+        earnedTotal: new TonCurrencyAmount(invoicesStatsDTO.success_total),
+        earnedLastWeek: new TonCurrencyAmount(invoicesStatsDTO.success_in_week),
+        invoicesInProgress: 0, // TODO
+        awaitingForPaymentAmount: new TonCurrencyAmount(invoicesStatsDTO.awaiting_payment)
     };
 }
 
