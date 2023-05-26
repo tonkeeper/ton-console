@@ -6,7 +6,8 @@ import {
     FilterInvoiceByStatus,
     InvoicesProjectInfo,
     InvoicesSearchInput,
-    InvoicesTable
+    InvoicesTable,
+    RefreshInvoicesTableButton
 } from 'src/features';
 import { Button, Flex, useDisclosure } from '@chakra-ui/react';
 
@@ -14,7 +15,10 @@ const ManageInvoicesPage: FunctionComponent = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     return (
         <Overlay display="flex" flexDirection="column">
-            <H4 mb="1">Invoices</H4>
+            <Flex justify="space-between">
+                <H4 mb="1">Manage invoices</H4>
+                <RefreshInvoicesTableButton alignSelf="flex-end" />
+            </Flex>
             <InvoicesProjectInfo mb="5" />
             <Flex gap="4" mb="9">
                 <InvoicesSearchInput w="264px" />

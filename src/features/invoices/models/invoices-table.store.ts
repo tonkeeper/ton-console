@@ -82,6 +82,8 @@ class InvoicesTableStore {
 
     loadFirstPageWithNewParams = this.invoices$.createAsyncAction(
         async () => {
+            this.loadNextPage.cancelAllPendingCalls();
+
             const response = await this.fetchInvoices();
 
             const invoices = response.data.items.map(mapInvoiceDTOToInvoice);

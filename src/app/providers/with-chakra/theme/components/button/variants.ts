@@ -2,12 +2,13 @@ import { defineStyle } from '@chakra-ui/react';
 import type { SystemStyleInterpolation } from '@chakra-ui/styled-system';
 import textStyles from '../../foundations/textStyles';
 
-function variant(backgroundColor: string, color: string): SystemStyleInterpolation {
+function variant(backgroundColor: string, color: string, isFlat = false): SystemStyleInterpolation {
     return defineStyle({
         ...textStyles.label2,
         backgroundColor,
         borderRadius: 'md',
         color,
+        ...(isFlat && { px: 0, py: 0, p: 0, h: 'fit-content' }),
         _hover: {
             backgroundColor,
             transform: 'scale(1.03)',
@@ -37,7 +38,7 @@ const primary = variant('#000000', '#FFFFFF');
 const secondary = variant('#F1F3F5', 'text.primary');
 const danger = variant('accent.red', '#FFFFFF');
 const tertiary = variant('rgba(0, 0, 0, 0.24)', '#FFFFFF');
-const flat = variant('transparent', 'text.primary');
+const flat = variant('transparent', 'text.primary', true);
 
 export default {
     primary,

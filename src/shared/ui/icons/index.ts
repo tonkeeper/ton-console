@@ -28,3 +28,4 @@ export { SearchIcon24 } from './SearchIcon24';
 export { XMarkCircleIcon16 } from './XMarkCircleIcon16';
 export { SortDescIcon16 } from './SortDescIcon16';
 export { SortAscIcon16 } from './SortAscIcon16';
+export { RefreshIcon16 } from './RefreshIcon16';
