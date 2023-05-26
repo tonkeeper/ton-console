@@ -16,7 +16,6 @@ import {
     InvoicesTablePagination,
     InvoiceStatus,
     InvoiceTableColumn,
-    InvoiceTableFiltration,
     InvoiceTableSort,
     InvoiceTableSortColumn
 } from './interfaces';
@@ -30,7 +29,7 @@ class InvoicesTableStore {
     pageSize = 30;
 
     pagination: InvoicesTablePagination = {
-        filter: null,
+        filter: {},
         sort: {
             direction: 'desc',
             column: 'creation-date'
@@ -45,6 +44,10 @@ class InvoicesTableStore {
 
     get tableContentLength(): number {
         return this.hasNextPage ? this.invoices$.value.length + 1 : this.invoices$.value.length;
+    }
+
+    get isFilterEmpty(): boolean {
+        return !this.pagination.filter.status && !this.pagination.filter.id;
     }
 
     constructor() {
@@ -111,7 +114,9 @@ class InvoicesTableStore {
         offset?: number;
         pageSize?: number;
     }): ReturnType<typeof apiClient.api.getInvoices> {
-        const searchId = this.pagination.filter?.value;
+        const searchId = this.pagination.filter.id;
+        // const filterByStatus = this.pagination.filter.status; TODO
+
         const sortByColumn = mapSortColumnToFieldOrder[this.pagination.sort.column];
         const sortOrder =
             this.pagination.sort.direction === 'asc'
@@ -158,8 +163,8 @@ class InvoicesTableStore {
         }
     );
 
-    setFilter = (filter: InvoiceTableFiltration): void => {
-        this.pagination.filter = filter;
+    setFilterById = (value: string | undefined): void => {
+        this.pagination.filter.id = value;
     };
 
     setSort = (sort: InvoiceTableSort): void => {
@@ -178,10 +183,25 @@ class InvoicesTableStore {
         this.pagination.sort.direction = 'desc';
     };
 
+    toggleFilterByStatus = (status: InvoiceStatus): void => {
+        const statusActive = this.pagination.filter.status?.includes(status);
+        if (statusActive) {
+            this.pagination.filter.status = this.pagination.filter.status?.filter(
+                i => i !== status
+            );
+        } else {
+            this.pagination.filter.status = (this.pagination.filter.status || []).concat(status);
+        }
+    };
+
+    clearFilterByStatus = (): void => {
+        this.pagination.filter.status = undefined;
+    };
+
     clearState(): void {
         this.invoices$.clear();
         this.pagination = {
-            filter: null,
+            filter: {},
             sort: {
                 direction: 'desc',
                 column: 'creation-date'

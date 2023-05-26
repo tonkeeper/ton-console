@@ -49,7 +49,7 @@ export const InvoicesTableStructure = observer(
             } else if (!invoicesTableStore.invoices$.value.length) {
                 body = (
                     <EmptyTable>
-                        {invoicesTableStore.pagination.filter?.value
+                        {!invoicesTableStore.isFilterEmpty
                             ? 'Nothing found. Try changing your search inputs.'
                             : 'This is where you’ll see your invoices'}
                     </EmptyTable>

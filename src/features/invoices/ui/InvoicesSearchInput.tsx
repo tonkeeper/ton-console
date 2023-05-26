@@ -20,9 +20,9 @@ const InvoicesSearchInput: FunctionComponent<ComponentProps<typeof InputGroup>> 
 
     useEffect(() => {
         if (debouncedValue) {
-            invoicesTableStore.setFilter({ column: 'id', value: debouncedValue });
+            invoicesTableStore.setFilterById(debouncedValue);
         } else {
-            invoicesTableStore.setFilter(null);
+            invoicesTableStore.setFilterById(undefined);
         }
     }, [debouncedValue]);
 

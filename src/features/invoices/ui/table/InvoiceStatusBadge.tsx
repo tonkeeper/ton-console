@@ -2,7 +2,7 @@ import { ComponentProps, FunctionComponent } from 'react';
 import { Badge } from '@chakra-ui/react';
 import { InvoiceStatus } from '../../models';
 
-const badges: Record<InvoiceStatus, { color: string; label: string }> = {
+export const invoiceBadges: Record<InvoiceStatus, { color: string; label: string }> = {
     success: {
         color: 'badge.success',
         label: 'Paid'
@@ -24,7 +24,7 @@ const badges: Record<InvoiceStatus, { color: string; label: string }> = {
 export const InvoiceStatusBadge: FunctionComponent<
     ComponentProps<typeof Badge> & { status: InvoiceStatus }
 > = ({ status, ...rest }) => {
-    const badge = badges[status];
+    const badge = invoiceBadges[status];
 
     return (
         <Badge bgColor={badge.color} {...rest}>
