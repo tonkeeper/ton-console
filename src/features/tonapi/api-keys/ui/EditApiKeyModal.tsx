@@ -1,11 +1,6 @@
 import { FunctionComponent, useCallback, useEffect } from 'react';
 import {
     Button,
-    chakra,
-    FormControl,
-    FormErrorMessage,
-    FormLabel,
-    Input,
     Modal,
     ModalBody,
     ModalCloseButton,
@@ -17,6 +12,7 @@ import {
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
 import { ApiKey, apiKeysStore } from '../model';
+import { ApiKeyForm } from './ApiKeyForm';
 
 const EditApiKeyModal: FunctionComponent<{
     isOpen: boolean;
@@ -26,10 +22,8 @@ const EditApiKeyModal: FunctionComponent<{
     const formId = 'create-api-key-form';
 
     const {
-        handleSubmit,
-        register,
         reset,
-        formState: { errors, isDirty }
+        formState: { isDirty }
     } = useForm<{ name: string }>();
 
     useEffect(() => {
@@ -52,24 +46,9 @@ const EditApiKeyModal: FunctionComponent<{
                 <ModalHeader>{apiKey?.name}</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <chakra.form id={formId} w="100%" onSubmit={handleSubmit(onSubmit)} noValidate>
-                        <FormControl isInvalid={!!errors.name} isRequired>
-                            <FormLabel htmlFor="name">Name</FormLabel>
-                            <Input
-                                autoComplete="off"
-                                id="name"
-                                placeholder="Name"
-                                {...register('name', {
-                                    required: 'This is required',
-                                    minLength: { value: 3, message: 'Minimum length should be 3' },
-                                    maxLength: { value: 64, message: 'Maximum length is 64' }
-                                })}
-                            />
-                            <FormErrorMessage>
-                                {errors.name && errors.name.message}
-                            </FormErrorMessage>
-                        </FormControl>
-                    </chakra.form>
+                    {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                    {/* @ts-ignore TODO */}
+                    <ApiKeyForm onSubmit={onSubmit} id={formId} defaultValues={apiKey} />
                 </ModalBody>
 
                 <ModalFooter gap="3">
