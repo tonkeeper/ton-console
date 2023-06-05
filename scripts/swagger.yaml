@@ -1574,6 +1574,8 @@ components:
       required:
         - id
         - app_id
+        - app_name
+        - app_description
         - amount
         - life_time
         - subtract_fee_from_amount
@@ -1589,6 +1591,12 @@ components:
           type: integer
           format: int64
           example: 4177275498
+        app_name:
+          type: string
+          example: "My app"
+        app_description:
+          type: string
+          example: "App description"
         amount:
           type: integer
           format: int64
@@ -1618,6 +1626,9 @@ components:
           type: string
           example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
         date_paid:
+          type: string
+          example: "2023-03-23"
+        date_cancel:
           type: string
           example: "2023-03-23"
         date_create:

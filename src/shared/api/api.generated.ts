@@ -232,6 +232,10 @@ export interface DTOInvoicesInvoice {
      * @example 4177275498
      */
     app_id: number;
+    /** @example "My app" */
+    app_name: string;
+    /** @example "App description" */
+    app_description: string;
     /**
      * @format int64
      * @example 1000000000
@@ -254,6 +258,8 @@ export interface DTOInvoicesInvoice {
     paid_address?: string;
     /** @example "2023-03-23" */
     date_paid?: string;
+    /** @example "2023-03-23" */
+    date_cancel?: string;
     /** @example "2023-03-23" */
     date_create: string;
 }

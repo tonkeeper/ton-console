@@ -1,4 +1,4 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FunctionComponent, useEffect } from 'react';
 import { Box, Flex, Skeleton, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { formatNumber, Span } from 'src/shared';
@@ -7,6 +7,10 @@ import { invoicesAppStore } from 'src/features';
 const InvoicesStats: FunctionComponent<ComponentProps<typeof Box>> = props => {
     const isResolved = invoicesAppStore.statistics$.isResolved;
     const stats = invoicesAppStore.statistics$.value!;
+
+    useEffect(() => {
+        invoicesAppStore.fetchInvoicesStatistics();
+    }, []);
 
     return (
         <Box {...props}>
