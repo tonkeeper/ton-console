@@ -1,11 +1,6 @@
 import { FunctionComponent, useCallback, useEffect } from 'react';
 import {
     Button,
-    chakra,
-    FormControl,
-    FormErrorMessage,
-    FormLabel,
-    Input,
     Modal,
     ModalBody,
     ModalCloseButton,
@@ -15,8 +10,9 @@ import {
     ModalOverlay
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { useForm } from 'react-hook-form';
-import { ApiKey, apiKeysStore } from '../model';
+import { FormProvider, useForm } from 'react-hook-form';
+import { ApiKey, apiKeysStore, CreateApiKeyForm } from '../model';
+import { ApiKeyForm, toApiKeyFormDefaultValues } from './ApiKeyForm';
 
 const EditApiKeyModal: FunctionComponent<{
     isOpen: boolean;
@@ -25,19 +21,19 @@ const EditApiKeyModal: FunctionComponent<{
 }> = ({ apiKey, ...rest }) => {
     const formId = 'create-api-key-form';
 
-    const {
-        handleSubmit,
-        register,
-        reset,
-        formState: { errors, isDirty }
-    } = useForm<{ name: string }>();
+    const methods = useForm<CreateApiKeyForm>({ defaultValues: toApiKeyFormDefaultValues(apiKey) });
 
     useEffect(() => {
-        reset({ name: apiKey?.name });
+        reset(toApiKeyFormDefaultValues(apiKey));
     }, [apiKey]);
 
+    const {
+        reset,
+        formState: { isDirty }
+    } = methods;
+
     const onSubmit = useCallback(
-        (form: { name: string }): void => {
+        (form: CreateApiKeyForm): void => {
             if (apiKey) {
                 apiKeysStore.editApiKey({ id: apiKey.id, ...form }).then(rest.onClose);
             }
@@ -52,24 +48,9 @@ const EditApiKeyModal: FunctionComponent<{
                 <ModalHeader>{apiKey?.name}</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <chakra.form id={formId} w="100%" onSubmit={handleSubmit(onSubmit)} noValidate>
-                        <FormControl isInvalid={!!errors.name} isRequired>
-                            <FormLabel htmlFor="name">Name</FormLabel>
-                            <Input
-                                autoComplete="off"
-                                id="name"
-                                placeholder="Name"
-                                {...register('name', {
-                                    required: 'This is required',
-                                    minLength: { value: 3, message: 'Minimum length should be 3' },
-                                    maxLength: { value: 64, message: 'Maximum length is 64' }
-                                })}
-                            />
-                            <FormErrorMessage>
-                                {errors.name && errors.name.message}
-                            </FormErrorMessage>
-                        </FormControl>
-                    </chakra.form>
+                    <FormProvider {...methods}>
+                        <ApiKeyForm onSubmit={onSubmit} id={formId} />
+                    </FormProvider>
                 </ModalBody>
 
                 <ModalFooter gap="3">
