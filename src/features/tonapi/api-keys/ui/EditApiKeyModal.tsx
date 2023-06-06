@@ -10,9 +10,9 @@ import {
     ModalOverlay
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { useForm } from 'react-hook-form';
-import { ApiKey, apiKeysStore } from '../model';
-import { ApiKeyForm } from './ApiKeyForm';
+import { FormProvider, useForm } from 'react-hook-form';
+import { ApiKey, apiKeysStore, CreateApiKeyForm } from '../model';
+import { ApiKeyForm, toApiKeyFormDefaultValues } from './ApiKeyForm';
 
 const EditApiKeyModal: FunctionComponent<{
     isOpen: boolean;
@@ -21,17 +21,19 @@ const EditApiKeyModal: FunctionComponent<{
 }> = ({ apiKey, ...rest }) => {
     const formId = 'create-api-key-form';
 
+    const methods = useForm<CreateApiKeyForm>({ defaultValues: toApiKeyFormDefaultValues(apiKey) });
+
+    useEffect(() => {
+        reset(toApiKeyFormDefaultValues(apiKey));
+    }, [apiKey]);
+
     const {
         reset,
         formState: { isDirty }
-    } = useForm<{ name: string }>();
-
-    useEffect(() => {
-        reset({ name: apiKey?.name });
-    }, [apiKey]);
+    } = methods;
 
     const onSubmit = useCallback(
-        (form: { name: string }): void => {
+        (form: CreateApiKeyForm): void => {
             if (apiKey) {
                 apiKeysStore.editApiKey({ id: apiKey.id, ...form }).then(rest.onClose);
             }
@@ -46,9 +48,9 @@ const EditApiKeyModal: FunctionComponent<{
                 <ModalHeader>{apiKey?.name}</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                    {/* @ts-ignore TODO */}
-                    <ApiKeyForm onSubmit={onSubmit} id={formId} defaultValues={apiKey} />
+                    <FormProvider {...methods}>
+                        <ApiKeyForm onSubmit={onSubmit} id={formId} />
+                    </FormProvider>
                 </ModalBody>
 
                 <ModalFooter gap="3">

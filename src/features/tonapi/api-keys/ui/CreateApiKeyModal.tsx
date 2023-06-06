@@ -10,14 +10,14 @@ import {
     ModalOverlay
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { apiKeysStore } from '../model/api-keys.store';
+import { apiKeysStore, CreateApiKeyForm } from '../model';
 import { ApiKeyForm } from './ApiKeyForm';
 
 const CreateApiKeyModal: FunctionComponent<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'create-api-key-form';
 
     const onSubmit = useCallback(
-        (form: { name: string }): void => {
+        (form: CreateApiKeyForm): void => {
             apiKeysStore.createApiKey(form).then(props.onClose);
         },
         [props.onClose]

@@ -15,6 +15,7 @@ import { Controller, SubmitHandler, useForm, useFormContext } from 'react-hook-f
 import { isNumber, mergeRefs, Span, toBinaryRadio } from 'src/shared';
 import { useIMask } from 'react-imask';
 import { FormState } from 'react-hook-form/dist/types/form';
+import { CreateApiKeyForm } from '../model';
 
 type ApiKeyFormWithLimit = {
     name: string;
@@ -27,16 +28,20 @@ type ApiKeyFormWithoutLimit = {
     useIPLimit: false;
 };
 
-type ApiKeyFormInternal = ApiKeyFormWithLimit | ApiKeyFormWithoutLimit;
+export type ApiKeyFormInternal = ApiKeyFormWithLimit | ApiKeyFormWithoutLimit;
 
 export const ApiKeyForm: FunctionComponent<
     StyleProps & {
         id?: string;
-        onSubmit: SubmitHandler<ApiKeyFormInternal>;
-        defaultValues?: ApiKeyFormInternal;
+        onSubmit: SubmitHandler<CreateApiKeyForm>;
+        defaultValues?: CreateApiKeyForm;
         disableDefaultFocus?: boolean;
     }
 > = ({ id, onSubmit, defaultValues, disableDefaultFocus, ...rest }) => {
+    const submitHandler = (form: ApiKeyFormInternal): void => {
+        onSubmit({ name: form.name, limitRps: form.useIPLimit ? Number(form.ipLimitValue) : null });
+    };
+
     const context = useFormContext<ApiKeyFormInternal>();
     let {
         handleSubmit,
@@ -46,8 +51,11 @@ export const ApiKeyForm: FunctionComponent<
         control,
         resetField,
         watch,
+        getFieldState,
         formState: { errors }
-    } = useForm<ApiKeyFormInternal>({ defaultValues });
+    } = useForm<ApiKeyFormInternal>({
+        defaultValues: toApiKeyFormDefaultValues(defaultValues)
+    });
 
     if (context) {
         ({
@@ -58,6 +66,7 @@ export const ApiKeyForm: FunctionComponent<
             control,
             resetField,
             watch,
+            getFieldState,
             formState: { errors }
         } = context);
     }
@@ -69,14 +78,16 @@ export const ApiKeyForm: FunctionComponent<
     }, [disableDefaultFocus, setFocus]);
 
     const useIPLimit = watch('useIPLimit');
+    const { isDirty: useIPLimitDirty } = getFieldState('useIPLimit');
+
     useEffect(() => {
         if (!useIPLimit) {
             unregister('ipLimitValue');
             resetField('ipLimitValue');
-        } else {
+        } else if (useIPLimitDirty) {
             setFocus('ipLimitValue');
         }
-    }, [useIPLimit]);
+    }, [useIPLimit, useIPLimitDirty]);
 
     const { ref } = useIMask({
         mask: Number,
@@ -134,7 +145,7 @@ export const ApiKeyForm: FunctionComponent<
     }
 
     return (
-        <chakra.form id={id} w="100%" onSubmit={handleSubmit(onSubmit)} noValidate {...rest}>
+        <chakra.form id={id} w="100%" onSubmit={handleSubmit(submitHandler)} noValidate {...rest}>
             <FormControl mb="30px" isInvalid={!!errors.name} isRequired>
                 <FormLabel htmlFor="name">Name</FormLabel>
                 <Input
@@ -189,3 +200,14 @@ export const ApiKeyForm: FunctionComponent<
         </chakra.form>
     );
 };
+
+export function toApiKeyFormDefaultValues(
+    createApiKeyForm?: CreateApiKeyForm
+): Partial<ApiKeyFormInternal> {
+    return {
+        name: createApiKeyForm?.name,
+        ...(createApiKeyForm?.limitRps != null
+            ? { useIPLimit: true, ipLimitValue: createApiKeyForm.limitRps }
+            : { useIPLimit: false })
+    };
+}
