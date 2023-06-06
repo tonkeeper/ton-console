@@ -9,7 +9,7 @@ export const RegisterApp: FunctionComponent = () => {
             <Box maxW="800px" px="6">
                 <H4 mb="1">Tonkeeper Messages</H4>
                 <Text textStyle="body2" mb="5" color="text.secondary">
-                    Interact with users of your dapp through push messages inside Tonkinper — an
+                    Interact with users of your dapp through push messages inside Tonkeeper — an
                     effective way to increase customer engagement and retention.&nbsp;
                     <Link color="accent.blue" href="https://docs.tonconsole.com/" isExternal>
                         Learn more
