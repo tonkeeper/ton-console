@@ -8,7 +8,7 @@ export default definePartsStyle({
         height: '40px',
         right: '-52px',
         top: '12px',
-        background: 'rgba(0, 0, 0, 0.4)',
+        background: 'background.overlay',
         color: 'icon.contrast',
         backdropFilter: 'blur(16px)',
         borderRadius: '100%',
@@ -17,10 +17,10 @@ export default definePartsStyle({
             height: '14px'
         },
         _hover: {
-            transform: 'scale(1.03)'
+            background: 'background.overlayDark'
         },
         _active: {
-            transform: 'scale(0.97)'
+            background: 'background.overlay'
         }
     },
     dialog: {

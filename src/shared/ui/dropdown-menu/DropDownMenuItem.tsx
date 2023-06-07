@@ -18,14 +18,10 @@ const MenuItemButton = chakra(Button, {
         boxShadow: 'none',
         transition: '0.2s',
         _hover: {
-            backgroundColor: 'transparent',
-            transform: 'scale(1.03)',
+            backgroundColor: 'button.secondary.backgroundHover',
             _disabled: {
                 cursor: 'default'
             }
-        },
-        _active: {
-            transform: 'scale(0.97)'
         },
         _focus: {
             transform: 'none',

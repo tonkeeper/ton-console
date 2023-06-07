@@ -10,6 +10,7 @@ const colors = {
         content: '#FFFFFF',
         contentTint: '#F1F3F5',
         overlay: 'rgba(0, 0, 0, 0.4)',
+        overlayDark: 'rgba(0, 0, 0, 0.56)',
         placeholderDark: 'rgba(0, 0, 0, 0.08)',
         placeholderLight: 'rgba(255, 255, 255, 0.08)'
     },

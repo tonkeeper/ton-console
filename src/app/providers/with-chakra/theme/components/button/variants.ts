@@ -1,6 +1,9 @@
 import { defineStyle } from '@chakra-ui/react';
 import type { SystemStyleInterpolation } from '@chakra-ui/styled-system';
 import textStyles from '../../foundations/textStyles';
+import semanticTokens from '../../foundations/semanticTokens';
+
+const button = semanticTokens.colors.button;
 
 function variant(backgroundColor: string, color: string): SystemStyleInterpolation {
     return defineStyle({
@@ -10,14 +13,15 @@ function variant(backgroundColor: string, color: string): SystemStyleInterpolati
         color,
         _hover: {
             backgroundColor,
-            transform: 'scale(1.03)',
+            opacity: 0.88,
             _disabled: {
                 backgroundColor,
-                transform: 'scale(1)'
+                opacity: 0.48
             }
         },
         _active: {
-            transform: 'scale(0.97)'
+            opacity: 1,
+            backgroundColor
         },
         _disabled: {
             opacity: 0.48
@@ -30,16 +34,24 @@ function variant(backgroundColor: string, color: string): SystemStyleInterpolati
     });
 }
 
-const primary = variant('#000000', '#FFFFFF');
-const secondary = variant('#F1F3F5', 'text.primary');
-const danger = variant('accent.red', '#FFFFFF');
-const tertiary = variant('rgba(0, 0, 0, 0.24)', '#FFFFFF');
-const flat = variant('transparent', 'text.primary');
+const primary = variant(button.primary.background, button.primary.foreground);
+const secondary = {
+    ...variant(button.secondary.background, button.secondary.foreground),
+    _hover: {
+        backgroundColor: button.secondary.backgroundHover,
+        opacity: 1,
+        _disabled: {
+            backgroundColor: button.secondary.background,
+            opacity: 0.48
+        }
+    }
+};
+const danger = variant(button.danger.background, button.danger.foreground);
+const flat = variant(button.flat.background, button.flat.foreground);
 
 export default {
     primary,
     secondary,
     danger,
-    tertiary,
     flat
 };

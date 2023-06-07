@@ -1,6 +1,5 @@
 import {
     Menu,
-    MenuButton,
     MenuItem,
     MenuList,
     Text,
@@ -9,7 +8,7 @@ import {
     Center,
     useDisclosure
 } from '@chakra-ui/react';
-import { ArrowIcon, MenuButtonStyled, TickIcon, Image, PlusIcon16 } from 'src/shared';
+import { ArrowIcon, MenuButtonDefault, TickIcon, Image, PlusIcon16 } from 'src/shared';
 import { ComponentProps, FunctionComponent } from 'react';
 import { observer } from 'mobx-react-lite';
 import { projectsStore } from 'src/entities/project';
@@ -25,7 +24,7 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
     return (
         <Box {...props}>
             <Menu placement="bottom">
-                <MenuButton as={MenuButtonStyled} w="240px" rightIcon={<ArrowIcon />}>
+                <MenuButtonDefault w="240px" rightIcon={<ArrowIcon />}>
                     <HStack spacing="2">
                         {projectsStore.selectedProject.imgUrl ? (
                             <Image
@@ -52,7 +51,7 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
                             {projectsStore.selectedProject.name}
                         </Text>
                     </HStack>
-                </MenuButton>
+                </MenuButtonDefault>
                 <MenuList zIndex={100} w="256px">
                     {projectsStore.projects$.value.map(project => (
                         <MenuItem

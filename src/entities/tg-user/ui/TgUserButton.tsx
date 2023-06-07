@@ -6,13 +6,12 @@ import {
     HStack,
     Image,
     Menu,
-    MenuButton,
     MenuItem,
     MenuList,
     Text,
     useBreakpointValue
 } from '@chakra-ui/react';
-import { ArrowIcon, DisconnectIcon, MenuButtonStyled, TgIcon } from 'src/shared';
+import { ArrowIcon, DisconnectIcon, MenuButtonDefault, TgIcon } from 'src/shared';
 
 export const TgUserButton: FunctionComponent = observer(() => {
     const buttonText = useBreakpointValue({
@@ -23,7 +22,7 @@ export const TgUserButton: FunctionComponent = observer(() => {
     if (tGUserStore.user$.value) {
         return (
             <Menu placement="bottom">
-                <MenuButton as={MenuButtonStyled} maxW="200px" rightIcon={<ArrowIcon />}>
+                <MenuButtonDefault maxW="200px" rightIcon={<ArrowIcon />}>
                     <HStack spacing="2">
                         {tGUserStore.user$.value.imageUrl && (
                             <Image
@@ -37,7 +36,7 @@ export const TgUserButton: FunctionComponent = observer(() => {
                             {tGUserStore.user$.value.firstName} {tGUserStore.user$.value.lastName}
                         </Text>
                     </HStack>
-                </MenuButton>
+                </MenuButtonDefault>
                 <MenuList w="200px">
                     <MenuItem onClick={tGUserStore.logout}>
                         <DisconnectIcon mr="2" />

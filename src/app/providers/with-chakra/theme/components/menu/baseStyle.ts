@@ -19,7 +19,7 @@ export default defineStyle({
             bg: 'background.content'
         },
         _hover: {
-            bg: 'background.contentTint'
+            bg: 'button.secondary.backgroundHover'
         }
     }
 });

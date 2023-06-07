@@ -9,7 +9,7 @@ export const InfoTooltip: FunctionComponent<
     >
 > = ({ children, placement, ...rest }) => {
     return (
-        <TooltipHoverable placement={placement || 'top'} host={<InfoIcon16 {...rest} />}>
+        <TooltipHoverable showAlways placement={placement || 'top'} host={<InfoIcon16 {...rest} />}>
             {children}
         </TooltipHoverable>
     );

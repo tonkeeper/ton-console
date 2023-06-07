@@ -1,6 +1,6 @@
 export * from './icons';
 export * from './typography';
-export { MenuButtonStyled } from './MenuButtonStyled';
+export { MenuButtonDefault } from './MenuButtonDefault';
 export { Overlay } from './Overlay';
 export * from './dropdown-menu';
 export * from './image-input';
@@ -10,3 +10,4 @@ export { CopyPad } from './CopyPad';
 export { ButtonLink } from './ButtonLink';
 export * from './tooltip';
 export { Span } from './Span';
+export { IconButton } from './IconButton';
