@@ -16,10 +16,9 @@ import {
     Spinner
 } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent } from 'react';
-import { CancelIcon24, toDate, VerticalDotsIcon16 } from 'src/shared';
+import { CancelIcon24, toDate, VerticalDotsIcon16, MenuButtonIcon } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { subscriptionsStore } from 'src/widgets';
-import { MenuButtonIcon } from 'src/shared/ui/MenuButtonIcon';
 
 const SubscriptionsTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
     if (subscriptionsStore.subscriptionsLoading) {

@@ -1,6 +1,7 @@
 export * from './icons';
 export * from './typography';
 export { MenuButtonDefault } from './MenuButtonDefault';
+export { MenuButtonIcon } from './MenuButtonIcon';
 export { Overlay } from './Overlay';
 export * from './dropdown-menu';
 export * from './image-input';

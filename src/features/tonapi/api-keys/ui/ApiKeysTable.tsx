@@ -8,12 +8,10 @@ import {
     Tr,
     chakra,
     Flex,
-    MenuButton,
     Text,
     MenuList,
     MenuItem,
     Menu,
-    IconButton,
     Box
 } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent, useCallback, useEffect, useState } from 'react';
@@ -24,7 +22,9 @@ import {
     EditIcon24,
     TickIcon,
     TooltipHoverable,
-    VerticalDotsIcon16
+    VerticalDotsIcon16,
+    IconButton,
+    MenuButtonIcon
 } from 'src/shared';
 import { ApiKey, apiKeysStore } from '../model';
 import { observer } from 'mobx-react-lite';
@@ -105,8 +105,6 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                                                     setCopiedKey(apiKey.id);
                                                     copyToClipboard(apiKey.value);
                                                 }}
-                                                size="fit"
-                                                variant="flat"
                                             />
                                         )}
                                     </Flex>
@@ -117,9 +115,7 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                                             {apiKey.creationDate.toDateString()}
                                         </chakra.span>
                                         <Menu placement="bottom-end">
-                                            <MenuButton>
-                                                <VerticalDotsIcon16 />
-                                            </MenuButton>
+                                            <MenuButtonIcon icon={<VerticalDotsIcon16 />} />
                                             <MenuList w="132px">
                                                 <MenuItem onClick={() => openEditModal(apiKey)}>
                                                     <EditIcon24 mr="2" />
