@@ -79,10 +79,9 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                                     <TooltipHoverable
                                         host={
                                             <Box
-                                                overflow="hidden"
+                                                layerStyle="textEllipse"
                                                 w="fit-content"
                                                 maxW="100%"
-                                                textOverflow="ellipsis"
                                             >
                                                 {apiKey.name}
                                             </Box>
@@ -93,11 +92,7 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                                 </Td>
                                 <Td overflow="hidden" w="100%" maxW="0">
                                     <Flex align="center" gap="1">
-                                        <chakra.span
-                                            flexShrink="1"
-                                            textOverflow="ellipsis"
-                                            overflow="hidden"
-                                        >
+                                        <chakra.span flexShrink="1" layerStyle="textEllipse">
                                             {apiKey.value}
                                         </chakra.span>
                                         {copiedKey !== undefined && copiedKey === apiKey.id ? (
