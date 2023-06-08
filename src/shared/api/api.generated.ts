@@ -975,6 +975,45 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags tonapi_service
+         * @name CheckValidBuyTonApiTier
+         * @summary Check valid but TonAPI tier
+         * @request GET:/api/v1/services/tonapi/tier/valid/buy/{id}
+         * @secure
+         */
+        checkValidBuyTonApiTier: (
+            id: number,
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /**
+                     * is valid
+                     * @example true
+                     */
+                    valid: boolean;
+                    /** @example "there are not enough funds on your balance" */
+                    details?: string;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/tonapi/tier/valid/buy/${id}`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags tonapi_service
          * @name GetTonApiTiers
          * @summary Get active TonAPI tiers
          * @request GET:/api/v1/services/tonapi/tiers

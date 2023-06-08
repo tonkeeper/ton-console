@@ -1,45 +1,47 @@
-import { FunctionComponent, useCallback, useMemo, useState } from 'react';
+import { FunctionComponent, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Center, Grid, GridItem, Spinner, useDisclosure } from '@chakra-ui/react';
 import TonApiPaymentDetailsModal from './TonApiPaymentDetailsModal';
 import { TonApiTier, tonApiTiersStore } from '../model';
 import { TonApiTierCard } from './TonApiTierCard';
-import { balanceStore, ratesStore, RefillModal } from 'src/entities';
+import { RefillModal } from 'src/entities';
 import { ButtonLink, EXTERNAL_LINKS } from 'src/shared';
 
 const TonApiTiersList: FunctionComponent = () => {
-    const [selectedTier, setSelectedTier] = useState<TonApiTier | undefined>(undefined);
+    const [selectedTier, setSelectedTier] = useState<TonApiTier | undefined>();
+    const [canBuyTierLoading, _setCanBuyTierLoading] = useState<number | undefined>();
+    const currentLoadingCanBuyTierId = useRef<number | undefined>();
+
+    const setCanBuyTierLoading = (id: number | undefined): void => {
+        _setCanBuyTierLoading(id);
+        currentLoadingCanBuyTierId.current = id;
+    };
+
     const {
         isOpen: isRefillModalOpen,
         onClose: onRefillModalClose,
         onOpen: onRefillModalOpen
     } = useDisclosure();
 
-    const tonBalance = useMemo(() => {
-        return balanceStore.balances[0] || null;
-    }, [balanceStore.balances]);
+    const onSelectTier = async (tier: TonApiTier): Promise<void> => {
+        setCanBuyTierLoading(tier.id);
+        const canBuy = await tonApiTiersStore.checkCanBuyTier(tier.id);
 
-    const tonRate = ratesStore.rates$.TON.value;
-    const tonRateResolved = ratesStore.rates$.TON.isResolved;
+        if (currentLoadingCanBuyTierId.current !== tier.id) {
+            return;
+        }
 
-    const onSelectTier = useCallback(
-        (tier: TonApiTier) => {
-            if (
-                tonBalance &&
-                tonRateResolved &&
-                tier.price.amount.gt(tonBalance.amount.multipliedBy(tonRate))
-            ) {
-                return onRefillModalOpen();
-            }
+        // wrapped to setTimeout to fix modal and button visual intersection during modal open animation
+        setTimeout(() => setCanBuyTierLoading(undefined), 200);
 
+        if (canBuy) {
             setSelectedTier(tier);
-        },
-        [tonBalance, tonRate, tonRateResolved]
-    );
+        } else {
+            onRefillModalOpen();
+        }
+    };
 
-    const onPaymentModalClose = useCallback(() => {
-        setSelectedTier(undefined);
-    }, []);
+    const onPaymentModalClose = (): void => setSelectedTier(undefined);
 
     if (!tonApiTiersStore.tiers$.isResolved || !tonApiTiersStore.selectedTier$.isResolved) {
         return (
@@ -79,6 +81,7 @@ const TonApiTiersList: FunctionComponent = () => {
                                             isDisabled={
                                                 !!currentTier && currentTier.price.isGT(tier.price)
                                             }
+                                            isLoading={canBuyTierLoading === tier.id}
                                             onClick={() => onSelectTier(tier)}
                                             variant={tier.name === 'Pro' ? 'primary' : 'secondary'}
                                         >
