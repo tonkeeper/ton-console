@@ -3,6 +3,8 @@ Launch a successful business with TON blockchain: manage dapps, tokens and payme
 
 [Try it](https://tonconsole.com/)
 
+![alt text](https://github.com/tonkeeper/ton-console/blob/master/public/og-image.png "")
+
 ## Run locally
 1. `nvm use`
 2`npm i`
