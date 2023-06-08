@@ -29,9 +29,12 @@ const defaultModifiers = [
 
 export const TooltipHoverable: FunctionComponent<
     PropsWithChildren<
-        { host: ReactElement | string; showAlways?: boolean } & ComponentProps<typeof Popover>
+        {
+            host: ReactElement | string;
+            canBeShown?: boolean;
+        } & ComponentProps<typeof Popover>
     >
-> = ({ host, showAlways, children, ...rest }) => {
+> = ({ host, canBeShown, children, ...rest }) => {
     const { ref, isTruncated } = useIsTextTruncated();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -64,7 +67,11 @@ export const TooltipHoverable: FunctionComponent<
         });
     }, [hostWithRef, onOpen, onClose]);
 
-    return isTruncated || showAlways ? (
+    if (canBeShown === false) {
+        return <>{host}</>;
+    }
+
+    return isTruncated || canBeShown ? (
         <Popover autoFocus={false} isOpen={isOpenDebounced} modifiers={defaultModifiers} {...rest}>
             <PopoverTrigger>{hostWithTrigger}</PopoverTrigger>
             <PopoverContent

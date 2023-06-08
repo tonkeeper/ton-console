@@ -49,7 +49,7 @@ const EditApiKeyModal: FunctionComponent<{
         <Modal scrollBehavior="inside" {...rest}>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>{apiKey?.name}</ModalHeader>
+                <ModalHeader>Edit API Key</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
                     <chakra.form id={formId} w="100%" onSubmit={handleSubmit(onSubmit)} noValidate>

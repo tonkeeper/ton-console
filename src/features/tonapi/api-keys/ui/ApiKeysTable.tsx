@@ -86,6 +86,8 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                                                 {apiKey.name}
                                             </Box>
                                         }
+                                        offset={[-16, 8]}
+                                        placement="bottom-start"
                                     >
                                         {apiKey.name}
                                     </TooltipHoverable>

@@ -10,7 +10,9 @@ export default defineStyle({
         minWidth: 'unset'
     },
     item: {
-        p: 2,
+        pl: 2,
+        py: 2,
+        pr: 3,
         apply: 'textStyles.label2',
         color: 'text.primary',
         borderRadius: 'md',
