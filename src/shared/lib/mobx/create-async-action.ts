@@ -1,7 +1,7 @@
 import { makeObservable, observable } from 'mobx';
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export function createAsyncAction<T extends (...args: any[]) => Promise<void>>(
+export function createAsyncAction<R, T extends (...args: any[]) => Promise<R>>(
     action: T,
     onError?: (e: unknown) => void
 ): T & { isLoading: boolean; error: unknown } {
@@ -10,7 +10,7 @@ export function createAsyncAction<T extends (...args: any[]) => Promise<void>>(
         fn.isLoading = true;
 
         try {
-            await action(...args);
+            return await action(...args);
         } catch (e) {
             fn.error = e;
             onError?.(e);
