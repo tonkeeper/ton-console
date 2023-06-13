@@ -13,6 +13,7 @@ import { observer } from 'mobx-react-lite';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ApiKey, apiKeysStore, CreateApiKeyForm } from '../model';
 import { ApiKeyForm, toApiKeyFormDefaultValues } from './ApiKeyForm';
+import { tonApiTiersStore } from '../../tier';
 
 const EditApiKeyModal: FunctionComponent<{
     isOpen: boolean;
@@ -41,6 +42,8 @@ const EditApiKeyModal: FunctionComponent<{
         [apiKey, rest.onClose]
     );
 
+    const maxLimit = tonApiTiersStore.selectedTier$.value?.description.requestsPerSecondLimit || 1;
+
     return (
         <Modal scrollBehavior="inside" {...rest}>
             <ModalOverlay />
@@ -49,7 +52,7 @@ const EditApiKeyModal: FunctionComponent<{
                 <ModalCloseButton />
                 <ModalBody>
                     <FormProvider {...methods}>
-                        <ApiKeyForm onSubmit={onSubmit} id={formId} />
+                        <ApiKeyForm onSubmit={onSubmit} id={formId} maxLimit={maxLimit} />
                     </FormProvider>
                 </ModalBody>
 

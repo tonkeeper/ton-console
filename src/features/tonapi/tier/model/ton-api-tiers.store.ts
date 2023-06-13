@@ -8,7 +8,8 @@ import {
     DTOAppTier,
     DTOCharge,
     createImmediateReaction,
-    UsdCurrencyAmount
+    UsdCurrencyAmount,
+    createAsyncAction
 } from 'src/shared';
 import { TonApiPayment, TonApiTier } from './interfaces';
 import { projectsStore } from 'src/entities';
@@ -89,6 +90,19 @@ class TonApiTiersStore {
             }
         }
     );
+
+    checkCanBuyTier = createAsyncAction(async (tierId: number) => {
+        try {
+            const result = await apiClient.api.checkValidBuyTonApiTier(tierId, {
+                project_id: projectsStore.selectedProject!.id
+            });
+
+            return result.data.valid;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
+    });
 
     clearState(): void {
         this.tiers$.clear();

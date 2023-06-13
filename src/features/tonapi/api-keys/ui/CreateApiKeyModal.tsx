@@ -12,6 +12,7 @@ import {
 import { observer } from 'mobx-react-lite';
 import { apiKeysStore, CreateApiKeyForm } from '../model';
 import { ApiKeyForm } from './ApiKeyForm';
+import { tonApiTiersStore } from '../../tier';
 
 const CreateApiKeyModal: FunctionComponent<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'create-api-key-form';
@@ -23,6 +24,8 @@ const CreateApiKeyModal: FunctionComponent<{ isOpen: boolean; onClose: () => voi
         [props.onClose]
     );
 
+    const maxLimit = tonApiTiersStore.selectedTier$.value?.description.requestsPerSecondLimit || 1;
+
     return (
         <Modal scrollBehavior="inside" {...props}>
             <ModalOverlay />
@@ -30,7 +33,7 @@ const CreateApiKeyModal: FunctionComponent<{ isOpen: boolean; onClose: () => voi
                 <ModalHeader>New API key</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <ApiKeyForm id={formId} onSubmit={onSubmit} />
+                    <ApiKeyForm id={formId} maxLimit={maxLimit} onSubmit={onSubmit} />
                 </ModalBody>
 
                 <ModalFooter gap="3">

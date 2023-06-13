@@ -318,6 +318,26 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/tier/valid/buy/{id}:
+    get:
+      summary: "Check valid but TonAPI tier"
+      operationId: checkValidBuyTonApiTier
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - tonapi_service
+      parameters:
+        - $ref: '#/components/parameters/tierID'
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/TonApiCheckValidBuyTier'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /api/v1/services/tonapi/tiers:
     get:
       summary: "Get active TonAPI tiers"
@@ -886,6 +906,14 @@ components:
       schema:
         type: string
         example: "60ffb075"
+    tierID:
+      description: Tier ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+        example: 1
     queryProjectID:
       description: Project ID
       in: query
@@ -1782,6 +1810,22 @@ components:
             properties:
               tier:
                 $ref: '#/components/schemas/AppTier'
+    TonApiCheckValidBuyTier:
+      description: "Valid buy tier"
+      content:
+        application/json:
+          schema:
+            required:
+              - valid
+            type: object
+            properties:
+              valid:
+                type: boolean
+                description: "is valid"
+                example: true
+              details:
+                type: string
+                example: "there are not enough funds on your balance"
     ProjectCreated:
       description: "Project has been created"
       content:
