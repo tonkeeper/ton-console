@@ -33,11 +33,12 @@ export type ApiKeyFormInternal = ApiKeyFormWithLimit | ApiKeyFormWithoutLimit;
 export const ApiKeyForm: FunctionComponent<
     StyleProps & {
         id?: string;
+        maxLimit: number;
         onSubmit: SubmitHandler<CreateApiKeyForm>;
         defaultValues?: CreateApiKeyForm;
         disableDefaultFocus?: boolean;
     }
-> = ({ id, onSubmit, defaultValues, disableDefaultFocus, ...rest }) => {
+> = ({ id, onSubmit, defaultValues, disableDefaultFocus, maxLimit, ...rest }) => {
     const submitHandler = (form: ApiKeyFormInternal): void => {
         onSubmit({ name: form.name, limitRps: form.useIPLimit ? Number(form.ipLimitValue) : null });
     };
@@ -97,7 +98,7 @@ export const ApiKeyForm: FunctionComponent<
         radix: '.',
         mapToRadix: [','],
         min: 0,
-        max: 50
+        max: maxLimit
     });
 
     let limitInput;
@@ -126,7 +127,7 @@ export const ApiKeyForm: FunctionComponent<
                         <Span textStyle="label2">Request Per Second</Span>
                     </FormLabel>
                     <Box textStyle="body2" mr="4" color="text.secondary">
-                        min - 0.1, max - 50
+                        min - 0.1, max - {maxLimit}
                     </Box>
                     <Input
                         ref={mergeRefs(ref, hookFromRef)}
