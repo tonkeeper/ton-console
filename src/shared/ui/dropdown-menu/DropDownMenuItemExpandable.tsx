@@ -81,38 +81,30 @@ export const DropDownMenuItemExpandable: FunctionComponent<
     return (
         <Accordion allowToggle index={index} reduceMotion={!shouldAnimate}>
             <AccordionItem border="none">
-                {({ isExpanded }) => (
-                    <>
-                        <AccordionButton
-                            textStyle={props.layer ? 'body2' : 'label2'}
-                            justifyContent="space-between"
-                            gap="3"
-                            display="flex"
-                            pr="3"
-                            pl={props.layer ? props.layer * 16 : 3}
-                            py="2" /*Chakra UI bug workaround*/
-                            color="text.primary"
-                            fontSize="14px"
-                            borderRadius="md"
-                            _hover={_hover}
-                            transition=""
-                            onClick={onToggle}
-                        >
-                            {props.leftIcon}
-                            <Box textAlign="left" wordBreak="break-all" noOfLines={1}>
-                                {props.content}
-                            </Box>
-                            <ArrowIcon
-                                ml="auto"
-                                transform={`rotate(${isExpanded ? '180deg' : 0})`}
-                                transition="transform 0.1s ease-in-out"
-                            />
-                        </AccordionButton>
-                        <AccordionPanel textStyle="body2" p={0} pb={4}>
-                            {children}
-                        </AccordionPanel>
-                    </>
-                )}
+                <AccordionButton
+                    textStyle={props.layer ? 'body2' : 'label2'}
+                    justifyContent="space-between"
+                    gap="3"
+                    display="flex"
+                    pr="3"
+                    pl={props.layer ? props.layer * 16 : 3}
+                    py="2" /*Chakra UI bug workaround*/
+                    color="text.primary"
+                    fontSize="14px"
+                    borderRadius="md"
+                    _hover={_hover}
+                    transition=""
+                    onClick={onToggle}
+                >
+                    {props.leftIcon}
+                    <Box textAlign="left" wordBreak="break-all" noOfLines={1}>
+                        {props.content}
+                    </Box>
+                    <ArrowIcon ml="auto" />
+                </AccordionButton>
+                <AccordionPanel textStyle="body2" p={0} pb={4}>
+                    {children}
+                </AccordionPanel>
             </AccordionItem>
         </Accordion>
     );

@@ -22,7 +22,7 @@ export const TgUserButton: FunctionComponent = observer(() => {
     if (tGUserStore.user$.value) {
         return (
             <Menu placement="bottom">
-                <MenuButtonDefault maxW="200px" rightIcon={<ArrowIcon />}>
+                <MenuButtonDefault w="200px" rightIcon={<ArrowIcon />}>
                     <HStack spacing="2">
                         {tGUserStore.user$.value.imageUrl && (
                             <Image
@@ -37,7 +37,7 @@ export const TgUserButton: FunctionComponent = observer(() => {
                         </Text>
                     </HStack>
                 </MenuButtonDefault>
-                <MenuList w="200px">
+                <MenuList w="216px">
                     <MenuItem onClick={tGUserStore.logout}>
                         <DisconnectIcon mr="2" />
                         <Text textStyle="label2">Disconnect</Text>
