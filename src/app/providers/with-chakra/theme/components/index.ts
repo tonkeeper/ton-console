@@ -11,6 +11,7 @@ import Card from './card';
 import Divider from './divider';
 import Table from './table';
 import Popover from './popover';
+import Radio from './radio';
 
 export default {
     Button,
@@ -25,5 +26,6 @@ export default {
     Card,
     Divider,
     Table,
-    Popover
+    Popover,
+    Radio
 };

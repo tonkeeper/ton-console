@@ -31,7 +31,7 @@ class TGUserStore {
         await apiClient.api.authViaTg(tgOAuthResponse);
 
         await projectsStore.fetchProjects(); // TODO вынести в стор-фасад для авторизации
-        if (projectsStore.projects$.value.length) {
+        if (projectsStore.projects$.value.length && !projectsStore.selectedProject) {
             projectsStore.selectProject(projectsStore.projects$.value[0].id);
         }
 
