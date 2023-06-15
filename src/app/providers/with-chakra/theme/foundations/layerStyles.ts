@@ -14,5 +14,13 @@ export default {
         '::-webkit-scrollbar-thumb:hover': {
             background: 'scrollbar.hover'
         }
+    },
+    textEllipse: {
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        _after: {
+            content: '""',
+            display: 'block'
+        }
     }
 };

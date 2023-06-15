@@ -16,6 +16,7 @@ import {
     PopoverTrigger,
     useDisclosure
 } from '@chakra-ui/react';
+import { useIsTextTruncated } from 'src/shared';
 
 const defaultModifiers = [
     {
@@ -27,8 +28,14 @@ const defaultModifiers = [
 ];
 
 export const TooltipHoverable: FunctionComponent<
-    PropsWithChildren<{ host: ReactElement | string } & ComponentProps<typeof Popover>>
-> = ({ host, children, ...rest }) => {
+    PropsWithChildren<
+        {
+            host: ReactElement | string;
+            canBeShown?: boolean;
+        } & ComponentProps<typeof Popover>
+    >
+> = ({ host, canBeShown, children, ...rest }) => {
+    const { ref, isTruncated } = useIsTextTruncated();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [isOpenDebounced, setIsOpenDebounced] = useState(false);
@@ -45,16 +52,26 @@ export const TooltipHoverable: FunctionComponent<
         };
     }, [isOpen]);
 
-    const hostWithTrigger = useMemo(() => {
+    const hostWithRef = useMemo(() => {
         const element = isValidElement(host) ? host : <span>{host}</span>;
 
         return cloneElement(element, {
+            ref
+        });
+    }, [host, ref]);
+
+    const hostWithTrigger = useMemo(() => {
+        return cloneElement(hostWithRef, {
             onMouseLeave: onClose,
             onMouseEnter: onOpen
         });
-    }, [host, onOpen, onClose]);
+    }, [hostWithRef, onOpen, onClose]);
 
-    return (
+    if (canBeShown === false) {
+        return <>{host}</>;
+    }
+
+    return isTruncated || canBeShown ? (
         <Popover autoFocus={false} isOpen={isOpenDebounced} modifiers={defaultModifiers} {...rest}>
             <PopoverTrigger>{hostWithTrigger}</PopoverTrigger>
             <PopoverContent
@@ -74,5 +91,7 @@ export const TooltipHoverable: FunctionComponent<
                 <PopoverArrow />
             </PopoverContent>
         </Popover>
+    ) : (
+        hostWithRef
     );
 };
