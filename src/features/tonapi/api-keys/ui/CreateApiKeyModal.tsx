@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback } from 'react';
+import { FunctionComponent, useCallback, useEffect } from 'react';
 import {
     Button,
     Modal,
@@ -13,9 +13,17 @@ import { observer } from 'mobx-react-lite';
 import { apiKeysStore, CreateApiKeyForm } from '../model';
 import { ApiKeyForm } from './ApiKeyForm';
 import { tonApiTiersStore } from '../../tier';
+import { FormProvider, useForm } from 'react-hook-form';
 
 const CreateApiKeyModal: FunctionComponent<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'create-api-key-form';
+
+    const methods = useForm<CreateApiKeyForm>();
+
+    const {
+        reset,
+        formState: { isDirty }
+    } = methods;
 
     const onSubmit = useCallback(
         (form: CreateApiKeyForm): void => {
@@ -23,6 +31,12 @@ const CreateApiKeyModal: FunctionComponent<{ isOpen: boolean; onClose: () => voi
         },
         [props.onClose]
     );
+
+    useEffect(() => {
+        if (!props.isOpen) {
+            setTimeout(reset, 200);
+        }
+    }, [reset, props.isOpen]);
 
     const maxLimit = tonApiTiersStore.selectedTier$.value?.description.requestsPerSecondLimit || 1;
 
@@ -33,7 +47,9 @@ const CreateApiKeyModal: FunctionComponent<{ isOpen: boolean; onClose: () => voi
                 <ModalHeader>New API key</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <ApiKeyForm id={formId} maxLimit={maxLimit} onSubmit={onSubmit} />
+                    <FormProvider {...methods}>
+                        <ApiKeyForm id={formId} maxLimit={maxLimit} onSubmit={onSubmit} />
+                    </FormProvider>
                 </ModalBody>
 
                 <ModalFooter gap="3">
@@ -43,6 +59,7 @@ const CreateApiKeyModal: FunctionComponent<{ isOpen: boolean; onClose: () => voi
                     <Button
                         flex={1}
                         form={formId}
+                        isDisabled={!isDirty}
                         isLoading={apiKeysStore.createApiKey.isLoading}
                         type="submit"
                         variant="primary"

@@ -3,15 +3,6 @@ import { Pad } from './Pad';
 import { Text, Tooltip, useClipboard } from '@chakra-ui/react';
 import { CopyIcon24 } from './icons/CopyIcon24';
 
-const padAnimation = {
-    transition: '0.15s ease-in-out',
-    _hover: {
-        transform: 'scale(1.03)'
-    },
-    _active: {
-        transform: 'scale(0.98)'
-    }
-};
 export const CopyPad: FunctionComponent<ComponentProps<typeof Pad> & { text: string }> = ({
     text,
     ...rest
@@ -29,7 +20,17 @@ export const CopyPad: FunctionComponent<ComponentProps<typeof Pad> & { text: str
                 gap="7"
                 alignItems="center"
                 onClick={onCopy}
-                {...padAnimation}
+                _hover={{
+                    svg: {
+                        color: 'icon.primary'
+                    }
+                }}
+                sx={{
+                    svg: {
+                        transitionProperty: 'color',
+                        transitionDuration: '200ms'
+                    }
+                }}
                 {...rest}
             >
                 <Text textStyle="body2" color="primary" fontFamily="mono" wordBreak="break-word">

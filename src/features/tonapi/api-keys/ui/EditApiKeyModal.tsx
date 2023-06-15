@@ -48,7 +48,7 @@ const EditApiKeyModal: FunctionComponent<{
         <Modal scrollBehavior="inside" {...rest}>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>{apiKey?.name}</ModalHeader>
+                <ModalHeader>Edit API Key</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
                     <FormProvider {...methods}>

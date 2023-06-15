@@ -1,6 +1,6 @@
-import { ComponentProps, FunctionComponent } from 'react';
-import { Box, chakra } from '@chakra-ui/react';
+import { ComponentProps } from 'react';
+import { Box, chakra, forwardRef } from '@chakra-ui/react';
 
-export const Span: FunctionComponent<ComponentProps<typeof Box>> = props => {
-    return <chakra.span {...props} />;
-};
+export const Span = forwardRef<ComponentProps<typeof Box>, typeof Box>((props, ref) => (
+    <chakra.span ref={ref} {...props} />
+));
