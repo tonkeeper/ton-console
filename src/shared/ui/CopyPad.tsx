@@ -26,17 +26,21 @@ export const CopyPad: FunctionComponent<
                 opacity={isLoading ? '0.48' : '1'}
                 onClick={isLoading ? () => {} : onCopy}
                 wordBreak="break-word"
-                _hover={{
-                    svg: {
-                        color: 'icon.primary'
+                _hover={
+                    !isLoading && {
+                        svg: {
+                            color: 'icon.primary'
+                        }
                     }
-                }}
-                sx={{
-                    svg: {
-                        transitionProperty: 'color',
-                        transitionDuration: '200ms'
+                }
+                sx={
+                    !isLoading && {
+                        svg: {
+                            transitionProperty: 'color',
+                            transitionDuration: '200ms'
+                        }
                     }
-                }}
+                }
                 {...rest}
             >
                 {isLoading ? (

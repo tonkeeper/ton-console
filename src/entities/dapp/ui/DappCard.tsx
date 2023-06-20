@@ -10,7 +10,7 @@ import {
     Text,
     useDisclosure
 } from '@chakra-ui/react';
-import { DeleteIcon24, Image, VerticalDotsIcon16 } from 'src/shared';
+import { DeleteIcon24, IconButton, Image, VerticalDotsIcon16 } from 'src/shared';
 import { Dapp, dappStore } from 'src/entities';
 import { ConfirmDappDeleteModal } from './ConfirmDappDeleteModal';
 import { observer } from 'mobx-react-lite';
@@ -57,9 +57,13 @@ const DappCard: FunctionComponent<
                     </Box>
                     {withMenu && (
                         <Menu placement="bottom-end">
-                            <MenuButton alignSelf="flex-start" h="4">
-                                <VerticalDotsIcon16 />
-                            </MenuButton>
+                            <MenuButton
+                                as={IconButton}
+                                alignSelf="flex-start"
+                                h="4"
+                                aria-label="options"
+                                icon={<VerticalDotsIcon16 />}
+                            />
                             <MenuList w="132px">
                                 <MenuItem onClick={onOpen}>
                                     <DeleteIcon24 mr="2" />
