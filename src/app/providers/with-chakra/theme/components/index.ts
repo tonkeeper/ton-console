@@ -14,6 +14,7 @@ import Popover from './popover';
 import Tooltip from './tooltip';
 import Tabs from './tabs';
 import Code from './code';
+import Radio from './radio';
 
 export default {
     Button,
@@ -31,5 +32,6 @@ export default {
     Popover,
     Tooltip,
     Tabs,
-    Code
+    Code,
+    Radio
 };

@@ -15,8 +15,8 @@ export const Header: FunctionComponent<ComponentProps<typeof Flex>> = props => {
             bgColor="background.content"
             {...props}
         >
-            <Logo />
-            <SelectProject ml="100px" mr="auto" />
+            <Logo w={{ md: '240px' }} mr="4" />
+            <SelectProject mr="auto" />
             <TgUserButton />
         </Flex>
     );

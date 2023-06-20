@@ -2,12 +2,14 @@ import { FunctionComponent } from 'react';
 
 import { withProviders } from './providers';
 import Routing from 'src/pages';
-import { AppInitialization } from 'src/processes';
+import { AppInitialization, ApplyQueryParams } from 'src/processes';
 
 const App: FunctionComponent<void> = () => {
     return (
         <AppInitialization>
-            <Routing />
+            <ApplyQueryParams>
+                <Routing />
+            </ApplyQueryParams>
         </AppInitialization>
     );
 };

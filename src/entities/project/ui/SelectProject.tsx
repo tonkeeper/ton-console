@@ -1,6 +1,5 @@
 import {
     Menu,
-    MenuButton,
     MenuItem,
     MenuList,
     Text,
@@ -9,10 +8,19 @@ import {
     Center,
     useDisclosure
 } from '@chakra-ui/react';
-import { ArrowIcon, MenuButtonStyled, TickIcon, Image, PlusIcon16 } from 'src/shared';
+import {
+    ArrowIcon,
+    MenuButtonDefault,
+    TickIcon,
+    Image,
+    PlusIcon16,
+    TooltipHoverable,
+    Span,
+    useIsTextTruncated
+} from 'src/shared';
 import { ComponentProps, FunctionComponent } from 'react';
 import { observer } from 'mobx-react-lite';
-import { projectsStore } from 'src/entities/project';
+import { Project, projectsStore } from 'src/entities/project';
 import { CreateProjectModal } from './CreateProjectModal';
 
 const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
@@ -25,7 +33,7 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
     return (
         <Box {...props}>
             <Menu placement="bottom">
-                <MenuButton as={MenuButtonStyled} w="240px" rightIcon={<ArrowIcon />}>
+                <MenuButtonDefault w="240px" rightIcon={<ArrowIcon />}>
                     <HStack spacing="2">
                         {projectsStore.selectedProject.imgUrl ? (
                             <Image
@@ -52,42 +60,10 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
                             {projectsStore.selectedProject.name}
                         </Text>
                     </HStack>
-                </MenuButton>
+                </MenuButtonDefault>
                 <MenuList zIndex={100} w="256px">
                     {projectsStore.projects$.value.map(project => (
-                        <MenuItem
-                            key={project.id}
-                            onClick={() => projectsStore.selectProject(project.id)}
-                        >
-                            {project.imgUrl ? (
-                                <Image
-                                    w="7"
-                                    minW="7"
-                                    h="7"
-                                    mr="2"
-                                    borderRadius="sm"
-                                    src={project.imgUrl}
-                                />
-                            ) : (
-                                <Center
-                                    w="7"
-                                    minW="7"
-                                    h="7"
-                                    mr="2"
-                                    color="constant.white"
-                                    bg={project.fallbackBackground}
-                                    borderRadius="sm"
-                                >
-                                    {project.name[0]}
-                                </Center>
-                            )}
-                            <Text textStyle="label2" color="text.primary" noOfLines={1}>
-                                {project.name}
-                            </Text>
-                            {project.id === projectsStore.selectedProject!.id && (
-                                <TickIcon ml="auto" />
-                            )}
-                        </MenuItem>
+                        <SelectProjectItem project={project} key={project.id} />
                     ))}
                     <MenuItem onClick={onOpen}>
                         <Center
@@ -110,5 +86,47 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
         </Box>
     );
 };
+
+const SelectProjectItem = observer<{ project: Project }>(({ project }) => {
+    const { ref, isTruncated } = useIsTextTruncated();
+    return (
+        <TooltipHoverable
+            key={project.id}
+            placement="right"
+            canBeShown={isTruncated}
+            host={
+                <MenuItem onClick={() => projectsStore.selectProject(project.id)}>
+                    {project.imgUrl ? (
+                        <Image w="7" minW="7" h="7" mr="2" borderRadius="sm" src={project.imgUrl} />
+                    ) : (
+                        <Center
+                            w="7"
+                            minW="7"
+                            h="7"
+                            mr="2"
+                            color="constant.white"
+                            bg={project.fallbackBackground}
+                            borderRadius="sm"
+                        >
+                            {project.name[0]}
+                        </Center>
+                    )}
+                    <Span
+                        ref={ref}
+                        textStyle="label2"
+                        color="text.primary"
+                        layerStyle="textEllipse"
+                        whiteSpace="nowrap"
+                    >
+                        {project.name}
+                    </Span>
+                    {project.id === projectsStore.selectedProject!.id && <TickIcon ml="auto" />}
+                </MenuItem>
+            }
+        >
+            {project.name}
+        </TooltipHoverable>
+    );
+});
 
 export const SelectProject = observer(SelectProject_);

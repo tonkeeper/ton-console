@@ -36,7 +36,7 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
                 <ModalHeader>
                     <H4 mb="1">Payment Details</H4>
                     <Text textStyle="body2" color="text.secondary">
-                        Upgrade to TON API Pro Plan
+                        Upgrade to TON API {tier?.name} Plan
                     </Text>
                 </ModalHeader>
                 <ModalCloseButton />

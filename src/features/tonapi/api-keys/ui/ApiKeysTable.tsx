@@ -8,12 +8,10 @@ import {
     Tr,
     chakra,
     Flex,
-    MenuButton,
     Text,
     MenuList,
     MenuItem,
     Menu,
-    IconButton,
     Box
 } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent, useCallback, useEffect, useState } from 'react';
@@ -24,7 +22,9 @@ import {
     EditIcon24,
     TickIcon,
     TooltipHoverable,
-    VerticalDotsIcon16
+    VerticalDotsIcon16,
+    IconButton,
+    MenuButtonIcon
 } from 'src/shared';
 import { ApiKey, apiKeysStore } from '../model';
 import { observer } from 'mobx-react-lite';
@@ -67,6 +67,7 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                         <Tr>
                             <Th>Name</Th>
                             <Th>API Key</Th>
+                            <Th>Limit</Th>
                             <Th w="100%" textAlign="right">
                                 <chakra.span pr="34px">Created</chakra.span>
                             </Th>
@@ -79,25 +80,22 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                                     <TooltipHoverable
                                         host={
                                             <Box
-                                                overflow="hidden"
+                                                layerStyle="textEllipse"
                                                 w="fit-content"
                                                 maxW="100%"
-                                                textOverflow="ellipsis"
                                             >
                                                 {apiKey.name}
                                             </Box>
                                         }
+                                        offset={[-16, 8]}
+                                        placement="bottom-start"
                                     >
                                         {apiKey.name}
                                     </TooltipHoverable>
                                 </Td>
                                 <Td overflow="hidden" w="100%" maxW="0">
                                     <Flex align="center" gap="1">
-                                        <chakra.span
-                                            flexShrink="1"
-                                            textOverflow="ellipsis"
-                                            overflow="hidden"
-                                        >
+                                        <chakra.span flexShrink="1" layerStyle="textEllipse">
                                             {apiKey.value}
                                         </chakra.span>
                                         {copiedKey !== undefined && copiedKey === apiKey.id ? (
@@ -110,11 +108,14 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                                                     setCopiedKey(apiKey.id);
                                                     copyToClipboard(apiKey.value);
                                                 }}
-                                                size="fit"
-                                                variant="flat"
                                             />
                                         )}
                                     </Flex>
+                                </Td>
+                                <Td>
+                                    {apiKey.limitRps === null
+                                        ? 'Unlimited'
+                                        : `IP - ${apiKey.limitRps} RPS`}
                                 </Td>
                                 <Td>
                                     <Flex align="center" justify="flex-end" gap="4">
@@ -122,9 +123,7 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                                             {apiKey.creationDate.toDateString()}
                                         </chakra.span>
                                         <Menu placement="bottom-end">
-                                            <MenuButton>
-                                                <VerticalDotsIcon16 />
-                                            </MenuButton>
+                                            <MenuButtonIcon icon={<VerticalDotsIcon16 />} />
                                             <MenuList w="132px">
                                                 <MenuItem onClick={() => openEditModal(apiKey)}>
                                                     <EditIcon24 mr="2" />

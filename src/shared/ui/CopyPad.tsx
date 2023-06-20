@@ -3,15 +3,6 @@ import { Pad } from './Pad';
 import { Spinner, Text, Tooltip, useClipboard } from '@chakra-ui/react';
 import { CopyIcon24 } from './icons/CopyIcon24';
 
-const padAnimation = {
-    transition: '0.15s ease-in-out',
-    _hover: {
-        transform: 'scale(1.01)'
-    },
-    _active: {
-        transform: 'scale(0.99)'
-    }
-};
 export const CopyPad: FunctionComponent<
     ComponentProps<typeof Pad> & {
         text: string;
@@ -35,7 +26,17 @@ export const CopyPad: FunctionComponent<
                 opacity={isLoading ? '0.48' : '1'}
                 onClick={isLoading ? () => {} : onCopy}
                 wordBreak="break-word"
-                {...(!isLoading && padAnimation)}
+                _hover={{
+                    svg: {
+                        color: 'icon.primary'
+                    }
+                }}
+                sx={{
+                    svg: {
+                        transitionProperty: 'color',
+                        transitionDuration: '200ms'
+                    }
+                }}
                 {...rest}
             >
                 {isLoading ? (

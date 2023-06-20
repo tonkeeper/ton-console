@@ -8,7 +8,6 @@ import {
     Tr,
     chakra,
     Flex,
-    MenuButton,
     Text,
     MenuList,
     MenuItem,
@@ -17,7 +16,7 @@ import {
     Spinner
 } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent } from 'react';
-import { CancelIcon24, toDate, VerticalDotsIcon16 } from 'src/shared';
+import { CancelIcon24, toDate, VerticalDotsIcon16, MenuButtonIcon } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { subscriptionsStore } from 'src/widgets';
 
@@ -61,9 +60,10 @@ const SubscriptionsTable: FunctionComponent<ComponentProps<typeof TableContainer
                                         {subscription.price.stringCurrencyAmount}
                                     </chakra.span>
                                     <Menu placement="bottom-end">
-                                        <MenuButton>
-                                            <VerticalDotsIcon16 />
-                                        </MenuButton>
+                                        <MenuButtonIcon
+                                            aria-label="options"
+                                            icon={<VerticalDotsIcon16 />}
+                                        />
                                         <MenuList w="132px">
                                             <MenuItem onClick={subscription.onCancel}>
                                                 <CancelIcon24 mr="2" />
