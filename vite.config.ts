@@ -6,6 +6,7 @@ import mkcert from 'vite-plugin-mkcert';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { createHtmlPlugin } from 'vite-plugin-html';
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 
 export default ({ mode }) => {
     const { VITE_TG_OAUTH_BOT_NAME, VITE_BASE_PROXY_URL, VITE_CD_CHECK_STRING, VITE_GTM_ID } =
@@ -61,6 +62,18 @@ export default ({ mode }) => {
                         Connection: 'keep-alive'
                     }
                 }
+            }
+        },
+        optimizeDeps: {
+            esbuildOptions: {
+                define: {
+                    global: 'globalThis'
+                },
+                plugins: [
+                    NodeGlobalsPolyfillPlugin({
+                        buffer: true
+                    })
+                ]
             }
         },
         test: {
