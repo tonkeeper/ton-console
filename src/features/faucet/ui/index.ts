@@ -1,1 +1,1 @@
-export { FaucetForm } from './FaucetForm';
+export { FaucetForm, type FaucetFormInternal } from './FaucetForm';
