@@ -26,11 +26,11 @@ export const FaucetForm: FunctionComponent<
     StyleProps & {
         id?: string;
         tonLimit?: TonCurrencyAmount;
-        tonLimitLoading: boolean;
         onSubmit: SubmitHandler<RequestFaucetForm>;
         disableDefaultFocus?: boolean;
+        isDisabled?: boolean;
     }
-> = ({ id, onSubmit, disableDefaultFocus, tonLimit, ...rest }) => {
+> = ({ id, onSubmit, disableDefaultFocus, tonLimit, isDisabled, ...rest }) => {
     const submitHandler = (form: FaucetFormInternal): void => {
         onSubmit({
             amount: TonCurrencyAmount.fromRelativeAmount(form.tonAmount),
@@ -78,60 +78,70 @@ export const FaucetForm: FunctionComponent<
                 return 'Wrong amount format';
             }
 
-            if (Number(value) <= 0) {
-                return 'Amount must be greater than 0';
+            if (Number(value) < 0.01) {
+                return 'Amount must be greater than 0.01';
+            }
+
+            if (!tonLimit) {
+                return 'Wait until total supply will be loaded';
+            }
+
+            if (tonLimit.amount.lt(value)) {
+                return `Not enough testnet coins supply. Max is ${tonLimit.amount.toNumber()}`;
             }
         }
     });
 
     return (
         <chakra.form id={id} onSubmit={handleSubmit(submitHandler)} noValidate {...rest}>
-            <FormControl mb="4" isInvalid={!!errors.tonAmount} isRequired>
-                <FormLabel htmlFor="tonAmount">Amount</FormLabel>
-                <InputGroup>
+            <fieldset disabled={isDisabled}>
+                <FormControl mb="4" isInvalid={!!errors.tonAmount} isRequired>
+                    <FormLabel htmlFor="tonAmount">Amount</FormLabel>
+                    <InputGroup>
+                        <Input
+                            ref={mergeRefs(maskRef, hookFormRef)}
+                            pr="130px"
+                            autoComplete="off"
+                            id="tonAmount"
+                            placeholder="1"
+                            {...registerAmountRest}
+                        />
+                        <InputRightElement w="130px">
+                            <Span textStyle="body2" color="text.secondary">
+                                TON (testnet)
+                            </Span>
+                        </InputRightElement>
+                    </InputGroup>
+                    <FormErrorMessage pos="static">
+                        {errors.tonAmount && errors.tonAmount.message}
+                    </FormErrorMessage>
+                    <Flex textStyle="body3" gap="1" mt={errors.tonAmount?.message ? '1' : '2'}>
+                        <Span color="text.secondary">Max.available for buy:</Span>
+                        <Skeleton minW="80px" h="18px" isLoaded={!!tonLimit}>
+                            {tonLimit?.stringCurrencyAmount}&nbsp;(testnet)
+                        </Skeleton>
+                    </Flex>
+                </FormControl>
+                <FormControl mb="0" isInvalid={!!errors.address} isRequired>
+                    <FormLabel htmlFor="address">Recipient testnet address</FormLabel>
                     <Input
-                        ref={mergeRefs(maskRef, hookFormRef)}
-                        pr="130px"
                         autoComplete="off"
-                        id="tonAmount"
-                        placeholder="1"
-                        {...registerAmountRest}
-                    />
-                    <InputRightElement w="130px">
-                        <Span textStyle="body2" color="text.secondary">
-                            TON (testnet)
-                        </Span>
-                    </InputRightElement>
-                </InputGroup>
-                <FormErrorMessage pos="static">
-                    {errors.tonAmount && errors.tonAmount.message}
-                </FormErrorMessage>
-                <Flex textStyle="body3" gap="1" mt={errors.tonAmount?.message ? '1' : '2'}>
-                    <Span color="text.secondary">Max.available for buy:</Span>
-                    <Skeleton minW="80px" h="18px" isLoaded={!!tonLimit}>
-                        {tonLimit?.stringCurrencyAmount}&nbsp;(testnet)
-                    </Skeleton>
-                </Flex>
-            </FormControl>
-            <FormControl mb="0" isInvalid={!!errors.address} isRequired>
-                <FormLabel htmlFor="address">Recipient testnet address</FormLabel>
-                <Input
-                    autoComplete="off"
-                    id="address"
-                    placeholder="EQ..."
-                    {...register('address', {
-                        required: 'This is required',
-                        validate: value => {
-                            if (!isAddersValid(value)) {
-                                return 'Wrong address';
+                        id="address"
+                        placeholder="EQ..."
+                        {...register('address', {
+                            required: 'This is required',
+                            validate: value => {
+                                if (!isAddersValid(value)) {
+                                    return 'Wrong address';
+                                }
                             }
-                        }
-                    })}
-                />
-                <FormErrorMessage pos="static">
-                    {errors.address && errors.address.message}
-                </FormErrorMessage>
-            </FormControl>
+                        })}
+                    />
+                    <FormErrorMessage pos="static">
+                        {errors.address && errors.address.message}
+                    </FormErrorMessage>
+                </FormControl>
+            </fieldset>
         </chakra.form>
     );
 };
