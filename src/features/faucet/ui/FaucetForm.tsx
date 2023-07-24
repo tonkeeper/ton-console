@@ -127,11 +127,13 @@ export const FaucetForm: FunctionComponent<
                     <Input
                         autoComplete="off"
                         id="address"
-                        placeholder="EQ..."
+                        placeholder="Address"
                         {...register('address', {
                             required: 'This is required',
                             validate: value => {
-                                if (!isAddersValid(value)) {
+                                if (
+                                    !isAddersValid(value, { acceptTestnet: true, acceptRaw: true })
+                                ) {
                                     return 'Wrong address';
                                 }
                             }

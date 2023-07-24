@@ -2,7 +2,7 @@ import { Address } from 'ton-core';
 
 export function isAddersValid(
     address: string,
-    options?: { acceptTestnet: boolean; acceptRaw: boolean; acceptMasterchain: boolean }
+    options?: { acceptTestnet?: boolean; acceptRaw?: boolean; acceptMasterchain?: boolean }
 ): boolean {
     try {
         if (address.includes(':') && !options?.acceptRaw) {

@@ -52,7 +52,7 @@ const FaucetPage: FunctionComponent = () => {
 
     return (
         <Overlay h="fit-content">
-            <H4 mb="5">Testnet assets</H4>
+            <H4 mb="5">Testnet Assets</H4>
             <Divider w="auto" mb="4" mx="-6" />
             <FormProvider {...methods}>
                 <FaucetForm
