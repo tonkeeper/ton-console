@@ -871,6 +871,55 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  
+  /api/v1/services/testnet/available:
+    get:
+      summary: "Check available coins"
+      operationId: getTestnetAvailable
+      security:
+        - JWTAuth: [ "common" ]
+      tags:
+        - testnet_service
+      responses:
+        '200':
+          $ref: '#/components/responses/TestnetAvailable'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/testnet/buy/coins:
+    post:
+      summary: "Buy testnet coins"
+      operationId: buyTestnetCoins
+      security:
+        - JWTAuth: [ "common" ]
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/TestnetBuyCoinsInput"
+      tags:
+        - testnet_service
+      responses:
+        '200':
+          description: "Message hash"
+          content:
+            application/json:
+              schema:
+                required:
+                  - hash
+                type: object
+                properties:
+                  hash:
+                    type: string
+                    example: "546e80bd41ff70ecebe22625f7db3ae48e5a24c175697a8e07899de116bec397"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
 components:
   parameters:
@@ -1265,6 +1314,24 @@ components:
               recipient_address:
                 type: string
                 example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+    TestnetBuyCoinsInput:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - address
+              - coins
+            properties:
+              address:
+                type: string
+                example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+              coins:
+                type: integer
+                format: int64
+                description: "nano ton are expected"
+                example: 1000000000
   
   schemas:
     Ok:
@@ -1823,6 +1890,9 @@ components:
                 type: boolean
                 description: "is valid"
                 example: true
+              unspent_money:
+                type: number
+                example: 0.0
               details:
                 type: string
                 example: "there are not enough funds on your balance"
@@ -2106,6 +2176,24 @@ components:
                   awaiting_payment:
                     type: integer
                     example: 10000
+    
+    TestnetAvailable:
+      description: "Available balance"
+      content:
+        application/json:
+          schema:
+            required:
+              - balance
+              - price_multiplicator
+            type: object
+            properties:
+              balance:
+                type: integer
+                format: int64
+                example: 1000000000
+              price_multiplicator:
+                type: integer
+                example: 20
   
   securitySchemes:
     JWTAuth:

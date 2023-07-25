@@ -998,6 +998,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                      * @example true
                      */
                     valid: boolean;
+                    /** @example 0 */
+                    unspent_money?: number;
                     /** @example "there are not enough funds on your balance" */
                     details?: string;
                 },
@@ -1950,6 +1952,79 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 method: 'GET',
                 query: query,
                 secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags testnet_service
+         * @name GetTestnetAvailable
+         * @summary Check available coins
+         * @request GET:/api/v1/services/testnet/available
+         * @secure
+         */
+        getTestnetAvailable: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    /**
+                     * @format int64
+                     * @example 1000000000
+                     */
+                    balance: number;
+                    /** @example 20 */
+                    price_multiplicator: number;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/testnet/available`,
+                method: 'GET',
+                secure: true,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags testnet_service
+         * @name BuyTestnetCoins
+         * @summary Buy testnet coins
+         * @request POST:/api/v1/services/testnet/buy/coins
+         * @secure
+         */
+        buyTestnetCoins: (
+            query: {
+                /**
+                 * Project ID
+                 * @format int64
+                 */
+                project_id: number;
+            },
+            data: {
+                /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+                address: string;
+                /**
+                 * nano ton are expected
+                 * @format int64
+                 * @example 1000000000
+                 */
+                coins: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @example "546e80bd41ff70ecebe22625f7db3ae48e5a24c175697a8e07899de116bec397" */
+                    hash: string;
+                },
+                DTOError
+            >({
+                path: `/api/v1/services/testnet/buy/coins`,
+                method: 'POST',
+                query: query,
+                body: data,
+                secure: true,
+                format: 'json',
                 ...params
             })
     };

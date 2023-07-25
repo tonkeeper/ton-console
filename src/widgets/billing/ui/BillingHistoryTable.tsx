@@ -74,9 +74,7 @@ const BillingHistoryTable: FunctionComponent<ComponentProps<typeof TableContaine
                                         Refill from{' '}
                                         <Link
                                             color="text.accent"
-                                            href={explorer.generateLinkToAddress(
-                                                historyItem.fromAddress
-                                            )}
+                                            href={explorer.accountLink(historyItem.fromAddress)}
                                             isExternal
                                         >
                                             {shortAddress(historyItem.fromAddress)}
