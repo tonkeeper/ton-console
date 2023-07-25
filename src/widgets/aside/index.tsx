@@ -1,5 +1,6 @@
 import {
     BalanceIcon24,
+    CoinsIcon24,
     DashboardIcon,
     DropDownMenu,
     DropDownMenuItem,
@@ -23,6 +24,9 @@ const Aside: FunctionComponent = () => {
                 <DropDownMenuItem linkTo="api-keys">Api keys and calls</DropDownMenuItem>
                 <DropDownMenuItem linkTo="pricing">Pricing</DropDownMenuItem>
             </DropDownMenuItemExpandable>
+            <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>
+                Testnet Assets
+            </DropDownMenuItem>
             <DropDownMenuItem leftIcon={<BalanceIcon24 />} linkTo="balance">
                 <Flex direction="column">
                     <Text textStyle="label2" color="text.primary">
