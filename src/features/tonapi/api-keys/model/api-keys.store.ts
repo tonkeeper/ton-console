@@ -1,4 +1,4 @@
-import { apiClient, createImmediateReaction, DTOToken, Loadable } from 'src/shared';
+import { apiClient, createImmediateReaction, DTOProjectTonApiToken, Loadable } from 'src/shared';
 import { EditApiKeyForm, ApiKey, CreateApiKeyForm } from './interfaces';
 import { projectsStore } from 'src/entities';
 import { makeAutoObservable } from 'mobx';
@@ -22,7 +22,7 @@ class ApiKeysStore {
     }
 
     fetchApiKeys = this.apiKeys$.createAsyncAction(async () => {
-        const response = await apiClient.api.getTonApiTokens({
+        const response = await apiClient.api.getProjectTonApiTokens({
             project_id: projectsStore.selectedProject!.id
         });
 
@@ -31,7 +31,7 @@ class ApiKeysStore {
 
     createApiKey = this.apiKeys$.createAsyncAction(
         async ({ name, limitRps }: CreateApiKeyForm) => {
-            const response = await apiClient.api.generateTonApiProjectToken(
+            const response = await apiClient.api.generateProjectTonApiToken(
                 { project_id: projectsStore.selectedProject!.id },
                 { name, limit_rps: limitRps }
             );
@@ -52,7 +52,7 @@ class ApiKeysStore {
 
     editApiKey = this.apiKeys$.createAsyncAction(
         async ({ id, name, limitRps }: EditApiKeyForm) => {
-            await apiClient.api.updateTonApiProjectToken(
+            await apiClient.api.updateProjectTonApiToken(
                 id,
                 { project_id: projectsStore.selectedProject!.id },
                 { name, limit_rps: limitRps }
@@ -77,7 +77,7 @@ class ApiKeysStore {
 
     deleteApiKey = this.apiKeys$.createAsyncAction(
         async (id: number) => {
-            await apiClient.api.deleteTonApiProjectToken(id, {
+            await apiClient.api.deleteProjectTonApiToken(id, {
                 project_id: projectsStore.selectedProject!.id
             });
 
@@ -98,7 +98,7 @@ class ApiKeysStore {
     }
 }
 
-function mapApiTokenDTOToApiKey(apiTokenDTO: DTOToken): ApiKey {
+function mapApiTokenDTOToApiKey(apiTokenDTO: DTOProjectTonApiToken): ApiKey {
     return {
         name: apiTokenDTO.name,
         value: apiTokenDTO.token,
