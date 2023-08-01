@@ -10,7 +10,7 @@ const EditProjectPage: FunctionComponent = () => {
     const formId = 'edit-project-form';
 
     const methods = useForm();
-    const { formState, watch } = methods;
+    const { formState } = methods;
 
     const defaultValues = useMemo(
         () => toJS(projectsStore.selectedProject) || undefined,
@@ -33,9 +33,6 @@ const EditProjectPage: FunctionComponent = () => {
         },
         [formState.dirtyFields, projectsStore.selectedProject]
     );
-
-    const icon = watch('icon');
-    console.log(icon);
 
     return (
         <Overlay>
