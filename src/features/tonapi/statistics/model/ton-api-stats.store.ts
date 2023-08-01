@@ -26,7 +26,7 @@ class TonApiStatsStore {
         const end = Math.floor(Date.now() / 1000);
         const halfAnHourPeriod = 60 * 30;
 
-        const response = await apiClient.api.getTonApiTokensStats({
+        const response = await apiClient.api.getProjectTonApiStats({
             project_id: projectsStore.selectedProject!.id,
             start: weekAgo,
             step: halfAnHourPeriod,

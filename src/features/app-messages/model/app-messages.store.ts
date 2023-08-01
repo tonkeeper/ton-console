@@ -60,7 +60,7 @@ class AppMessagesStore {
     });
 
     fetchBalance = this.balance$.createAsyncAction(async () => {
-        const result = await apiClient.api.getMessagesBalance({
+        const result = await apiClient.api.getProjectMessagesBalance({
             project_id: projectsStore.selectedProject!.id
         });
 
@@ -68,7 +68,7 @@ class AppMessagesStore {
     });
 
     fetchStats = this.stats$.createAsyncAction(async () => {
-        const result = await apiClient.api.getMessagesStats({
+        const result = await apiClient.api.getProjectMessagesStats({
             app_id: dappStore.dapps$.value[0].id
         });
 
@@ -100,7 +100,7 @@ class AppMessagesStore {
 
     fetchPaymentsHistory = this.paymentsHistory$.createAsyncAction(async () => {
         const packages = await awaitValueResolved(this.packages$);
-        const history = await apiClient.api.getPushesPaymentsHistory({
+        const history = await apiClient.api.getProjectMessagesPaymentsHistory({
             project_id: projectsStore.selectedProject!.id
         });
 
@@ -110,7 +110,7 @@ class AppMessagesStore {
     });
 
     fetchDappToken = this.dappToken$.createAsyncAction(async () => {
-        const response = await apiClient.api.getMessagesAppToken({
+        const response = await apiClient.api.getProjectMessagesAppToken({
             app_id: dappStore.dapps$.value[0].id
         });
 
@@ -119,7 +119,7 @@ class AppMessagesStore {
 
     regenerateDappToken = this.dappToken$.createAsyncAction(
         async () => {
-            const response = await apiClient.api.regenerateMessagesAppToken({
+            const response = await apiClient.api.regenerateProjectMessagesAppToken({
                 app_id: dappStore.dapps$.value[0].id
             });
 

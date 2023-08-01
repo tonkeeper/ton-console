@@ -24,3 +24,4 @@ export { MessageIcon24 } from './MessageIcon24';
 export { FilledTickIcon18 } from './FilledTickIcon18';
 export { FilledWarnIcon16 } from './FilledWarnIcon16';
 export { ConsoleDocsIcon32 } from './ConsoleDocsIcon32';
+export { CoinsIcon24 } from './CoinsIcon24';
