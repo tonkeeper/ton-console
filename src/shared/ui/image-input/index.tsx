@@ -59,6 +59,11 @@ const ImageInput = forwardRef<
                         }
 
                         if (key === 'value') {
+                            if (fileList && fileList[0]) {
+                                // to make  isDirty = true
+                                (fileList[0] as unknown as { identity: number }).identity =
+                                    fileList[0].size;
+                            }
                             return fileList;
                         }
 

@@ -128,6 +128,11 @@ export interface DTOCharge {
      */
     messages_package_id?: number;
     /**
+     * @format uint32
+     * @example 1
+     */
+    testnet_price_multiplicator?: number;
+    /**
      * @format int64
      * @example 1000000000
      */
@@ -1738,6 +1743,41 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 method: 'POST',
                 query: query,
                 body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags testnet_service
+         * @name GetProjectTestnetPaymentsHistory
+         * @summary Get project testnet payments history
+         * @request GET:/api/v1/services/testnet/payments/history
+         */
+        getProjectTestnetPaymentsHistory: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    history: DTOCharge[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/testnet/payments/history`,
+                method: 'GET',
+                query: query,
                 ...params
             })
     };

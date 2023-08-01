@@ -747,6 +747,25 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/services/testnet/payments/history:
+    get:
+      summary: "Get project testnet payments history"
+      operationId: getProjectTestnetPaymentsHistory
+      tags:
+        - testnet_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/PaymentsHistory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
 components:
   parameters:
@@ -1264,6 +1283,10 @@ components:
           format: uint32
           example: 1
         messages_package_id:
+          type: integer
+          format: uint32
+          example: 1
+        testnet_price_multiplicator:
           type: integer
           format: uint32
           example: 1

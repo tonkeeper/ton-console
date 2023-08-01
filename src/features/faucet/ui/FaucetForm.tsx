@@ -78,8 +78,8 @@ export const FaucetForm: FunctionComponent<
                 return 'Wrong amount format';
             }
 
-            if (Number(value) < 0.01) {
-                return 'Amount must be greater than 0.01';
+            if (Number(value) < 1) {
+                return 'Amount must be greater than 1';
             }
 
             if (!tonLimit) {

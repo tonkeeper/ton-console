@@ -1,28 +1,53 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, untracked } from 'mobx';
 import {
     apiClient,
     createAsyncAction,
+    createEffect,
+    createImmediateReaction,
+    DTOCharge,
     Loadable,
     setIntervalWhenPageOnFocus,
     testnetExplorer,
-    TonCurrencyAmount
+    TonCurrencyAmount,
+    UsdCurrencyAmount
 } from 'src/shared';
-import { RequestFaucetForm } from 'src/features';
 import { createStandaloneToast } from '@chakra-ui/react';
 import { projectsStore } from 'src/entities';
 import type { AxiosError } from 'axios';
+import { FaucetPayment, RequestFaucetForm } from './interfaces';
+import BigNumber from 'bignumber.js';
 
 class FaucetStore {
     tonRate$ = new Loadable<number>(0);
 
     tonSupply$ = new Loadable<TonCurrencyAmount | null>(null);
 
+    paymentsHistory$ = new Loadable<FaucetPayment[]>([]);
+
     latestPurchase: { amount: TonCurrencyAmount; link: string } | null = null;
 
     constructor() {
         makeAutoObservable(this);
 
-        setIntervalWhenPageOnFocus(this.fetchTonSupplyAndRate, 3000);
+        let dispose: (() => void) | undefined;
+
+        createImmediateReaction(
+            () => projectsStore.selectedProject,
+            project => {
+                dispose?.();
+                if (project) {
+                    dispose = setIntervalWhenPageOnFocus(this.fetchTonSupplyAndRate, 5000);
+                }
+            }
+        );
+
+        createEffect(() => {
+            if (this.tonRate$.isResolved && projectsStore.selectedProject) {
+                untracked(this.fetchPaymentsHistory);
+            } else {
+                this.paymentsHistory$.clear();
+            }
+        });
     }
 
     fetchTonSupplyAndRate = this.tonSupply$.createAsyncAction(
@@ -37,6 +62,16 @@ class FaucetStore {
             onError: e => this.tonRate$.setErroredState(e)
         }
     );
+
+    fetchPaymentsHistory = this.paymentsHistory$.createAsyncAction(async () => {
+        const response = await apiClient.api.getProjectTestnetPaymentsHistory({
+            project_id: projectsStore.selectedProject!.id
+        });
+
+        return response.data.history
+            .map(item => mapDTOPaymentToTonApiPayment(this.tonRate$.value, item))
+            .filter(i => !!i) as FaucetPayment[];
+    });
 
     buyAssets = createAsyncAction(
         async (form: RequestFaucetForm) => {
@@ -55,6 +90,8 @@ class FaucetStore {
                 amount: form.amount,
                 link: testnetExplorer.transactionLink(hash)
             };
+
+            this.fetchPaymentsHistory();
 
             const { toast } = createStandaloneToast();
             toast({
@@ -98,4 +135,21 @@ async function fetchTxHash(msgHash: string, attempt = 0): Promise<string> {
     return data.hash;
 }
 
+function mapDTOPaymentToTonApiPayment(tonRate: number, payment: DTOCharge): FaucetPayment | null {
+    const tonAmount = new TonCurrencyAmount(payment.amount);
+
+    return {
+        id: payment.id,
+        date: new Date(payment.date_create),
+        amount: tonAmount,
+        boughtAmount: new TonCurrencyAmount(
+            new BigNumber(payment.amount).multipliedBy(
+                payment.testnet_price_multiplicator || tonRate
+            )
+        ),
+        amountUsdEquivalent: new UsdCurrencyAmount(
+            tonAmount.amount.multipliedBy(payment.exchange_rate)
+        )
+    };
+}
 export const faucetStore = new FaucetStore();
