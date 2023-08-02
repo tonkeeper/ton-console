@@ -127,7 +127,11 @@ class ProjectsStore {
             const request: Parameters<typeof apiClient.api.updateProject>[1] = {};
 
             if ('icon' in form) {
-                request.image = form.icon || null;
+                if (form.icon) {
+                    request.image = form.icon || null;
+                } else {
+                    request.remove_image = true;
+                }
             }
 
             if ('name' in form) {

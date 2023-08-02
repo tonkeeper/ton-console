@@ -60,7 +60,7 @@ export interface DTOUser {
 
 export interface DTOTier {
     /**
-     * @format int64
+     * @format uint32
      * @example 1
      */
     id: number;
@@ -79,7 +79,7 @@ export interface DTOTier {
 
 export interface DTOAppTier {
     /**
-     * @format int64
+     * @format uint32
      * @example 1
      */
     id: number;
@@ -94,10 +94,16 @@ export interface DTOAppTier {
     /** @example 10 */
     entity_per_conn: number;
     capabilities: string[];
-    /** @example "2023-04-23" */
-    next_payment?: string;
-    /** @example "2023-03-23" */
-    date_create: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    next_payment?: number;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 export interface DTODeposit {
@@ -105,8 +111,11 @@ export interface DTODeposit {
     deposit_address: string;
     /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
     source_address: string;
-    /** @example "2023-03-23" */
-    income_date: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    income_date: number;
     /**
      * @format int64
      * @example 1000000000
@@ -118,15 +127,20 @@ export interface DTOCharge {
     /** @example "742af494-e2cd-441f-98e8-ac6075280eff" */
     id: string;
     /**
-     * @format int64
+     * @format uint32
      * @example 1
      */
     tier_id?: number;
     /**
-     * @format int64
+     * @format uint32
      * @example 1
      */
     messages_package_id?: number;
+    /**
+     * @format uint32
+     * @example 1
+     */
+    testnet_price_multiplicator?: number;
     /**
      * @format int64
      * @example 1000000000
@@ -134,8 +148,11 @@ export interface DTOCharge {
     amount: number;
     /** @example 2.25 */
     exchange_rate: number;
-    /** @example "2023-03-23" */
-    date_create: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 export interface DTOBalance {
@@ -150,7 +167,7 @@ export interface DTOBalance {
 
 export interface DTOProject {
     /**
-     * @format int64
+     * @format uint32
      * @example 1
      */
     id: number;
@@ -158,11 +175,14 @@ export interface DTOProject {
     name: string;
     /** @example "https://tonapi.io/static/test.png" */
     avatar?: string;
-    /** @example "2023-03-23" */
-    date_create: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
-export interface DTOToken {
+export interface DTOProjectTonApiToken {
     /**
      * @format int64
      * @example 1
@@ -174,8 +194,11 @@ export interface DTOToken {
     limit_rps?: number;
     /** @example "AE5TZRWIIOR2O2YAAAAGFP2HEWFZJYBP222A567CBF6JIL7S4RIZSCOAZRZOEW7AKMRICGQ" */
     token: string;
-    /** @example "2023-03-23" */
-    date_create: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 export interface DTOStats {
@@ -192,7 +215,7 @@ export interface DTOStats {
 
 export interface DTOMessagesPackage {
     /**
-     * @format int64
+     * @format uint32
      * @example 1
      */
     id: number;
@@ -206,7 +229,7 @@ export interface DTOMessagesPackage {
 
 export interface DTOMessagesApp {
     /**
-     * @format int64
+     * @format uint32
      * @example 3652012454
      */
     id: number;
@@ -214,131 +237,27 @@ export interface DTOMessagesApp {
     name: string;
     /** @example "https://my_dapp.io/avatar.png" */
     image?: string;
-    /** @example 1647024163 */
+    /**
+     * @format uint32
+     * @example 1647024163
+     */
     project_id: number;
     /** @example "https://my_dapp.io" */
     url: string;
     /** @example true */
     verify: boolean;
-    /** @example "2023-03-23" */
-    date_create: string;
-}
-
-export interface DTOInvoicesInvoice {
-    /** @example "60ffb075" */
-    id: string;
     /**
      * @format int64
-     * @example 4177275498
+     * @example 1690889913000
      */
-    app_id: number;
-    /** @example "My app" */
-    app_name: string;
-    /** @example "App description" */
-    app_description: string;
-    /**
-     * @format int64
-     * @example 1000000000
-     */
-    amount: number;
-    /**
-     * @format int64
-     * @example 100
-     */
-    life_time: number;
-    /** @example false */
-    subtract_fee_from_amount: boolean;
-    /** @example "Test description" */
-    description: string;
-    /** @example "pending_status" */
-    status: DTOInvoicesInvoiceStatus;
-    /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-    recipient_address: string;
-    /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-    paid_address?: string;
-    /** @example "2023-03-23" */
-    date_paid?: string;
-    /** @example "2023-03-23" */
-    date_cancel?: string;
-    /** @example "2023-03-23" */
-    date_create: string;
-}
-
-export interface DTOInvoicesApp {
-    /**
-     * @format int64
-     * @example 4177275498
-     */
-    id: number;
-    /**
-     * @format int64
-     * @example 4268870487
-     */
-    project_id: number;
-    /** @example "Test name" */
-    name: string;
-    /** @example "Test description" */
-    description: string;
-    /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-    recipient_address: string;
-    /** @example "2023-03-23" */
-    date_create: string;
+    date_create: number;
 }
 
 /** backend error code */
 export enum DTOErrorCode {
-    DTOErrorUnknown = 1,
-    DTOErrorInternal = 2,
-    DTOErrorBadRequest = 3,
-    DTOErrorCheckPayload = 4,
-    DTOErrorVerificationProof = 5,
-    DTOErrorVerificationTg = 6,
-    DTOErrorAuthUser = 7,
-    DTOErrorBannedUser = 8,
-    DTOErrorLogoutUser = 9,
-    DTOErrorCreateProject = 10,
-    DTOErrorGetProject = 11,
-    DTOErrorUpdateProject = 12,
-    DTOErrorDeleteProject = 13,
-    DTOErrorProjectWithoutTier = 14,
-    DTOErrorUpdateTier = 15,
-    DTOErrorGetTiers = 16,
-    DTOErrorAlreadySelectedTier = 17,
-    DTOErrorDownGradeTier = 18,
-    DTOErrorInsufficientFunds = 19
-}
-
-/** @example "pending_status" */
-export enum DTOInvoicesInvoiceStatus {
-    DTOPendingStatus = 'pending_status',
-    DTOSuccessStatus = 'success_status',
-    DTOCancelStatus = 'cancel_status',
-    DTOExpiredStatus = 'expired_status'
-}
-
-/**
- * Field
- * @example "id"
- */
-export enum DTOGetInvoicesParamsFieldOrder {
-    DTOId = 'id',
-    DTOAmount = 'amount',
-    DTOStatus = 'status',
-    DTOLifeTime = 'life_time',
-    DTODescription = 'description',
-    DTORecipientAddress = 'recipient_address',
-    DTOPaidAddress = 'paid_address',
-    DTODateCreate = 'date_create',
-    DTODatePaid = 'date_paid'
-}
-
-/**
- * Type order
- * @example "desc"
- */
-export enum DTOGetInvoicesParamsTypeOrder {
-    DTOAsc = 'asc',
-    DTODesc = 'desc'
+    DTOValue1 = 1,
+    DTOValue2 = 2,
+    DTOValue3 = 3
 }
 
 import axios, {
@@ -501,6 +420,96 @@ export class HttpClient<SecurityDataType = unknown> {
  * @contact Support <contact@tonaps.org>
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+    ready = {
+        /**
+         * No description
+         *
+         * @tags system
+         * @name PingReadyGet
+         * @request GET:/ready
+         */
+        pingReadyGet: (params: RequestParams = {}) =>
+            this.request<
+                void,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/ready`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags system
+         * @name PingReadyHead
+         * @request HEAD:/ready
+         */
+        pingReadyHead: (params: RequestParams = {}) =>
+            this.request<
+                void,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/ready`,
+                method: 'HEAD',
+                ...params
+            })
+    };
+    alive = {
+        /**
+         * No description
+         *
+         * @tags system
+         * @name PingAliveGet
+         * @request GET:/alive
+         */
+        pingAliveGet: (params: RequestParams = {}) =>
+            this.request<
+                void,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/alive`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags system
+         * @name PingAliveHead
+         * @request HEAD:/alive
+         */
+        pingAliveHead: (params: RequestParams = {}) =>
+            this.request<
+                void,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/alive`,
+                method: 'HEAD',
+                ...params
+            })
+    };
     api = {
         /**
          * @description The token is recorded in the database and in the user's cookies.  If the user logs in under different browsers, then each authorization will have its own token.
@@ -519,9 +528,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 id: number;
                 /** @example "Test" */
                 first_name?: string;
-                /** @example "Testov" */
+                /** @example "Test" */
+                last_name?: string;
+                /** @example "https://test_image.png" */
                 photo_url?: string;
-                /** @example "testov" */
+                /** @example "test" */
                 username?: string;
                 /** @example "cd0e201bf7328535343301f428e51f01084a3e2a3822f4843d86b540bbebfe15" */
                 hash: string;
@@ -533,10 +544,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             params: RequestParams = {}
         ) =>
-            this.request<DTOOk, DTOError>({
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
                 path: `/api/v1/auth/tg`,
                 method: 'POST',
                 body: data,
+                format: 'json',
                 ...params
             }),
 
@@ -554,7 +574,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                     /** @example "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa" */
                     payload: string;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/auth/proof/payload`,
                 method: 'POST',
@@ -588,10 +613,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             params: RequestParams = {}
         ) =>
-            this.request<DTOOk, DTOError>({
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
                 path: `/api/v1/auth/proof/check`,
                 method: 'POST',
                 body: data,
+                format: 'json',
                 ...params
             }),
 
@@ -602,13 +636,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @name AccountLogout
          * @summary Logout from the system
          * @request POST:/api/v1/account/logout
-         * @secure
          */
         accountLogout: (params: RequestParams = {}) =>
-            this.request<DTOOk, DTOError>({
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
                 path: `/api/v1/account/logout`,
                 method: 'POST',
-                secure: true,
+                format: 'json',
                 ...params
             }),
 
@@ -619,7 +660,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @name CreateProject
          * @summary Create project
          * @request POST:/api/v1/project
-         * @secure
          */
         createProject: (
             data: {
@@ -634,12 +674,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 {
                     project: DTOProject;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/project`,
                 method: 'POST',
                 body: data,
-                secure: true,
                 type: ContentType.FormData,
                 ...params
             }),
@@ -651,18 +695,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @name GetProjects
          * @summary Get user's project
          * @request GET:/api/v1/projects
-         * @secure
          */
         getProjects: (params: RequestParams = {}) =>
             this.request<
                 {
                     items: DTOProject[];
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/projects`,
                 method: 'GET',
-                secure: true,
                 ...params
             }),
 
@@ -673,18 +720,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @name UpdateProject
          * @summary Update user project
          * @request PATCH:/api/v1/project/{id}
-         * @secure
          */
         updateProject: (
             id: number,
             data: {
                 /** @example "Test Project" */
                 name?: string;
-                /**
-                 * If you want to delete a avatar, put null in the image field.
-                 * @format binary
-                 */
-                image?: File | null;
+                /** @format binary */
+                image?: File;
+                /** @default false */
+                remove_image?: boolean;
             },
             params: RequestParams = {}
         ) =>
@@ -692,12 +737,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 {
                     project: DTOProject;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/project/${id}`,
                 method: 'PATCH',
                 body: data,
-                secure: true,
                 type: ContentType.FormData,
                 ...params
             }),
@@ -709,13 +758,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @name DeleteProject
          * @summary Delete user project
          * @request DELETE:/api/v1/project/{id}
-         * @secure
          */
         deleteProject: (id: number, params: RequestParams = {}) =>
-            this.request<DTOOk, DTOError>({
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
                 path: `/api/v1/project/${id}`,
                 method: 'DELETE',
-                secure: true,
                 ...params
             }),
 
@@ -726,7 +781,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @name GetDepositAddress
          * @summary Get project deposit address
          * @request GET:/api/v1/project/{id}/deposit/address
-         * @secure
          */
         getDepositAddress: (id: number, params: RequestParams = {}) =>
             this.request<
@@ -734,11 +788,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                     /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
                     ton_deposit_wallet: string;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/project/${id}/deposit/address`,
                 method: 'GET',
-                secure: true,
                 ...params
             }),
 
@@ -749,7 +807,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @name GetProjectDepositsHistory
          * @summary Get project deposits history
          * @request GET:/api/v1/project/{id}/deposits/history
-         * @secure
          */
         getProjectDepositsHistory: (id: number, params: RequestParams = {}) =>
             this.request<
@@ -757,11 +814,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                     balance: DTOBalance;
                     history: DTODeposit[];
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/project/${id}/deposits/history`,
                 method: 'GET',
-                secure: true,
                 ...params
             }),
 
@@ -769,16 +830,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags tonapi_service
-         * @name GetTonApiTokens
-         * @summary Get TonAPI tokens
+         * @name GetProjectTonApiTokens
+         * @summary Get project TonAPI tokens
          * @request GET:/api/v1/services/tonapi/tokens
-         * @secure
          */
-        getTonApiTokens: (
+        getProjectTonApiTokens: (
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
@@ -786,14 +846,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 {
-                    items: DTOToken[];
+                    items: DTOProjectTonApiToken[];
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/tonapi/tokens`,
                 method: 'GET',
                 query: query,
-                secure: true,
                 ...params
             }),
 
@@ -801,16 +865,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags tonapi_service
-         * @name GenerateTonApiProjectToken
-         * @summary Generate TonAPI project token
+         * @name GenerateProjectTonApiToken
+         * @summary Generate project TonAPI token
          * @request POST:/api/v1/services/tonapi/generate/token
-         * @secure
          */
-        generateTonApiProjectToken: (
+        generateProjectTonApiToken: (
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
@@ -824,15 +887,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 {
-                    token: DTOToken;
+                    token: DTOProjectTonApiToken;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/tonapi/generate/token`,
                 method: 'POST',
                 query: query,
                 body: data,
-                secure: true,
                 ...params
             }),
 
@@ -840,17 +907,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags tonapi_service
-         * @name UpdateTonApiProjectToken
-         * @summary Update TonAPI project token
+         * @name UpdateProjectTonApiToken
+         * @summary Update project TonAPI token
          * @request PATCH:/api/v1/services/tonapi/token/{id}
-         * @secure
          */
-        updateTonApiProjectToken: (
+        updateProjectTonApiToken: (
             id: number,
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
@@ -862,12 +928,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             params: RequestParams = {}
         ) =>
-            this.request<DTOOk, DTOError>({
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
                 path: `/api/v1/services/tonapi/token/${id}`,
                 method: 'PATCH',
                 query: query,
                 body: data,
-                secure: true,
                 ...params
             }),
 
@@ -875,27 +948,33 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags tonapi_service
-         * @name DeleteTonApiProjectToken
-         * @summary Delete TonAPI project token
+         * @name DeleteProjectTonApiToken
+         * @summary Delete project TonAPI token
          * @request DELETE:/api/v1/services/tonapi/token/{id}
-         * @secure
          */
-        deleteTonApiProjectToken: (
+        deleteProjectTonApiToken: (
             id: number,
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
             params: RequestParams = {}
         ) =>
-            this.request<DTOOk, DTOError>({
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
                 path: `/api/v1/services/tonapi/token/${id}`,
                 method: 'DELETE',
                 query: query,
-                secure: true,
                 ...params
             }),
 
@@ -903,16 +982,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags tonapi_service
-         * @name GetTonApiProjectTier
+         * @name GetProjectTonApiTier
          * @summary Get project TonAPI tier
          * @request GET:/api/v1/services/tonapi/tier
-         * @secure
          */
-        getTonApiProjectTier: (
+        getProjectTonApiTier: (
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
@@ -922,12 +1000,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 {
                     tier: DTOAppTier;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/tonapi/tier`,
                 method: 'GET',
                 query: query,
-                secure: true,
                 ...params
             }),
 
@@ -935,25 +1017,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags tonapi_service
-         * @name UpdateTonApiTier
-         * @summary Update TonAPI tier for project
+         * @name UpdateProjectTonApiTier
+         * @summary Update project TonAPI tier
          * @request PATCH:/api/v1/services/tonapi/tier
-         * @secure
          */
-        updateTonApiTier: (
+        updateProjectTonApiTier: (
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
             data: {
                 /**
-                 * @format int64
+                 * @format uint32
                  * @example 1
                  */
-                tier_id?: number;
+                tier_id: number;
             },
             params: RequestParams = {}
         ) =>
@@ -961,13 +1042,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 {
                     tier: DTOAppTier;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/tonapi/tier`,
                 method: 'PATCH',
                 query: query,
                 body: data,
-                secure: true,
                 ...params
             }),
 
@@ -975,17 +1060,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags tonapi_service
-         * @name CheckValidBuyTonApiTier
-         * @summary Check valid but TonAPI tier
+         * @name ValidChangeTonApiTier
+         * @summary Valid change TonAPI tier for project
          * @request GET:/api/v1/services/tonapi/tier/valid/buy/{id}
-         * @secure
          */
-        checkValidBuyTonApiTier: (
+        validChangeTonApiTier: (
             id: number,
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
@@ -1003,12 +1087,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                     /** @example "there are not enough funds on your balance" */
                     details?: string;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/tonapi/tier/valid/buy/${id}`,
                 method: 'GET',
                 query: query,
-                secure: true,
                 ...params
             }),
 
@@ -1019,18 +1107,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @name GetTonApiTiers
          * @summary Get active TonAPI tiers
          * @request GET:/api/v1/services/tonapi/tiers
-         * @secure
          */
         getTonApiTiers: (params: RequestParams = {}) =>
             this.request<
                 {
                     items: DTOTier[];
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/tonapi/tiers`,
                 method: 'GET',
-                secure: true,
                 ...params
             }),
 
@@ -1038,16 +1129,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags tonapi_service
-         * @name GetTonApiPaymentsHistory
-         * @summary Get TonAPI payments history
+         * @name GetProjectTonApiPaymentsHistory
+         * @summary Get project TonAPI payments history
          * @request GET:/api/v1/services/tonapi/payments/history
-         * @secure
          */
-        getTonApiPaymentsHistory: (
+        getProjectTonApiPaymentsHistory: (
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
@@ -1057,29 +1147,32 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 {
                     history: DTOCharge[];
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/tonapi/payments/history`,
                 method: 'GET',
                 query: query,
-                secure: true,
                 ...params
             }),
 
         /**
-         * @description To filter the stats, are expected  start and end query parameters in unix format, where end is the day closer to the current one, for example start=1675958400&end=1676908800,
+         * @description To filter the stats, are expected start and end query parameters in unix format, where end is the day closer to the current one, for example start=1675958400&end=1676908800,
          *
          * @tags tonapi_service
-         * @name GetTonApiTokensStats
-         * @summary Get TonAPI stats by tokens
+         * @name GetProjectTonApiStats
+         * @summary Get project TonAPI stats
          * @request GET:/api/v1/services/tonapi/stats
-         * @secure
          */
-        getTonApiTokensStats: (
+        getProjectTonApiStats: (
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
                 /**
@@ -1095,6 +1188,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 /**
                  * Step
                  * @format int64
+                 * @default 0
                  */
                 step?: number;
                 /**
@@ -1107,14 +1201,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 {
-                    stats: DTOStats;
+                    /** @example {} */
+                    stats: any;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/tonapi/stats`,
                 method: 'GET',
                 query: query,
-                secure: true,
                 ...params
             }),
 
@@ -1125,18 +1224,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @name GetMessagesPackages
          * @summary Get messages packages
          * @request GET:/api/v1/services/messages/packages
-         * @secure
          */
         getMessagesPackages: (params: RequestParams = {}) =>
             this.request<
                 {
                     items: DTOMessagesPackage[];
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/messages/packages`,
                 method: 'GET',
-                secure: true,
                 ...params
             }),
 
@@ -1147,31 +1249,37 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @name BuyMessagesPackage
          * @summary Buy messages package
          * @request POST:/api/v1/services/messages/package
-         * @secure
          */
         buyMessagesPackage: (
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
             data: {
                 /**
-                 * @format int64
+                 * @format uint32
                  * @example 1
                  */
                 id: number;
             },
             params: RequestParams = {}
         ) =>
-            this.request<DTOOk, DTOError>({
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
                 path: `/api/v1/services/messages/package`,
                 method: 'POST',
                 query: query,
                 body: data,
-                secure: true,
                 ...params
             }),
 
@@ -1179,16 +1287,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags messages_service
-         * @name GetPushesPaymentsHistory
-         * @summary Get messages payments history
+         * @name GetProjectMessagesPaymentsHistory
+         * @summary Get project messages payments history
          * @request GET:/api/v1/services/messages/payments/history
-         * @secure
          */
-        getPushesPaymentsHistory: (
+        getProjectMessagesPaymentsHistory: (
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
@@ -1198,12 +1305,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 {
                     history: DTOCharge[];
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/messages/payments/history`,
                 method: 'GET',
                 query: query,
-                secure: true,
                 ...params
             }),
 
@@ -1211,16 +1322,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags messages_service
-         * @name CreateMessagesApp
-         * @summary Create messages app
+         * @name CreateProjectMessagesApp
+         * @summary Create project messages app
          * @request POST:/api/v1/services/messages/app
-         * @secure
          */
-        createMessagesApp: (
+        createProjectMessagesApp: (
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
@@ -1228,7 +1338,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 /** @example "https://my_dapp.io" */
                 url: string;
                 /** @example "My dapp" */
-                name?: string;
+                name: string;
                 /** @example "https://my_dapp.io/avatar.png" */
                 image?: string;
             },
@@ -1244,13 +1354,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                      */
                     valid_until: number;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/messages/app`,
                 method: 'POST',
                 query: query,
                 body: data,
-                secure: true,
                 ...params
             }),
 
@@ -1258,26 +1372,32 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags messages_service
-         * @name DeleteMessagesApp
-         * @summary Delete messages app
+         * @name DeleteProjectMessagesApp
+         * @summary Delete project messages app
          * @request DELETE:/api/v1/services/messages/app
-         * @secure
          */
-        deleteMessagesApp: (
+        deleteProjectMessagesApp: (
             query: {
                 /**
                  * App ID
-                 * @format int64
+                 * @format uint32
                  */
                 app_id: number;
             },
             params: RequestParams = {}
         ) =>
-            this.request<DTOOk, DTOError>({
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
                 path: `/api/v1/services/messages/app`,
                 method: 'DELETE',
                 query: query,
-                secure: true,
                 ...params
             }),
 
@@ -1285,16 +1405,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags messages_service
-         * @name VerifyMessagesApp
-         * @summary Verify messages app
+         * @name VerifyProjectMessagesApp
+         * @summary Verify project messages app
          * @request POST:/api/v1/services/messages/app/verify
-         * @secure
          */
-        verifyMessagesApp: (
+        verifyProjectMessagesApp: (
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
@@ -1304,12 +1423,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             params: RequestParams = {}
         ) =>
-            this.request<DTOOk, DTOError>({
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
                 path: `/api/v1/services/messages/app/verify`,
                 method: 'POST',
                 query: query,
                 body: data,
-                secure: true,
                 ...params
             }),
 
@@ -1317,16 +1443,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags messages_service
-         * @name GetMessagesApps
-         * @summary Get messages apps
+         * @name GetProjectMessagesApps
+         * @summary Get project messages apps
          * @request GET:/api/v1/services/messages/apps
-         * @secure
          */
-        getMessagesApps: (
+        getProjectMessagesApps: (
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
@@ -1336,12 +1461,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 {
                     items: DTOMessagesApp[];
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/messages/apps`,
                 method: 'GET',
                 query: query,
-                secure: true,
                 ...params
             }),
 
@@ -1349,16 +1478,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags messages_service
-         * @name GetMessagesBalance
-         * @summary Get messages balance
+         * @name GetProjectMessagesBalance
+         * @summary Get project messages balance
          * @request GET:/api/v1/services/messages/balance
-         * @secure
          */
-        getMessagesBalance: (
+        getProjectMessagesBalance: (
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
@@ -1366,15 +1494,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 {
-                    /** @example 100 */
+                    /**
+                     * @format int32
+                     * @example 100
+                     */
                     balance: number;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/messages/balance`,
                 method: 'GET',
                 query: query,
-                secure: true,
                 ...params
             }),
 
@@ -1382,16 +1517,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags messages_service
-         * @name GetMessagesAppToken
-         * @summary Get messages app token
+         * @name GetProjectMessagesAppToken
+         * @summary Get project messages app token
          * @request GET:/api/v1/services/messages/token
-         * @secure
          */
-        getMessagesAppToken: (
+        getProjectMessagesAppToken: (
             query: {
                 /**
                  * App ID
-                 * @format int64
+                 * @format uint32
                  */
                 app_id: number;
             },
@@ -1402,12 +1536,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                     /** @example "TC-PUSHES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA==" */
                     token: string;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/messages/token`,
                 method: 'GET',
                 query: query,
-                secure: true,
                 ...params
             }),
 
@@ -1415,16 +1553,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags messages_service
-         * @name RegenerateMessagesAppToken
-         * @summary Regenerate messages app token
+         * @name RegenerateProjectMessagesAppToken
+         * @summary Regenerate project messages app token
          * @request PATCH:/api/v1/services/messages/token
-         * @secure
          */
-        regenerateMessagesAppToken: (
+        regenerateProjectMessagesAppToken: (
             query: {
                 /**
                  * App ID
-                 * @format int64
+                 * @format uint32
                  */
                 app_id: number;
             },
@@ -1435,12 +1572,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                     /** @example "TC-PUSHES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA==" */
                     token: string;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/messages/token`,
                 method: 'PATCH',
                 query: query,
-                secure: true,
                 ...params
             }),
 
@@ -1448,16 +1589,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags messages_service
-         * @name GetMessagesStats
-         * @summary Get messages stats
+         * @name GetProjectMessagesStats
+         * @summary Get project messages stats
          * @request GET:/api/v1/services/messages/stats
-         * @secure
          */
-        getMessagesStats: (
+        getProjectMessagesStats: (
             query: {
                 /**
                  * App ID
-                 * @format int64
+                 * @format uint32
                  */
                 app_id: number;
             },
@@ -1466,22 +1606,38 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             this.request<
                 {
                     stats: {
-                        /** @example 10000 */
+                        /**
+                         * @format uint32
+                         * @example 10000
+                         */
                         users: number;
-                        /** @example 100 */
+                        /**
+                         * @format int64
+                         * @example 100
+                         */
                         sent_in_week: number;
-                        /** @example 100 */
+                        /**
+                         * @format uint32
+                         * @example 100
+                         */
                         enable_notifications: number;
-                        /** @example 100 */
+                        /**
+                         * @format int32
+                         * @example 100
+                         */
                         available_messages: number;
                     };
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/messages/stats`,
                 method: 'GET',
                 query: query,
-                secure: true,
                 ...params
             }),
 
@@ -1489,12 +1645,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags messages_service
-         * @name SendMessagesPush
-         * @summary Send messages push
+         * @name SendProjectMessagesPush
+         * @summary Send project messages push
          * @request POST:/api/v1/services/messages/push
          * @secure
          */
-        sendMessagesPush: (
+        sendProjectMessagesPush: (
             data: {
                 /** @example "Test title" */
                 title?: string;
@@ -1518,7 +1674,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                     /** @example 1000 */
                     success_delivery: number;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/messages/push`,
                 method: 'POST',
@@ -1530,456 +1691,34 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags invoices_service
-         * @name CreateInvoicesApp
-         * @summary Create invoices app
-         * @request POST:/api/v1/services/invoices/app
-         * @secure
-         */
-        createInvoicesApp: (
-            query: {
-                /**
-                 * Project ID
-                 * @format int64
-                 */
-                project_id: number;
-            },
-            data: {
-                /** @example "Test name" */
-                name: string;
-                /** @example "Test description" */
-                description?: string;
-                /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-                recipient_address: string;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    app: DTOInvoicesApp;
-                },
-                DTOError
-            >({
-                path: `/api/v1/services/invoices/app`,
-                method: 'POST',
-                query: query,
-                body: data,
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags invoices_service
-         * @name GetInvoicesApp
-         * @summary Get invoices app by project id
-         * @request GET:/api/v1/services/invoices/app
-         * @secure
-         */
-        getInvoicesApp: (
-            query: {
-                /**
-                 * Project ID
-                 * @format int64
-                 */
-                project_id: number;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    app?: DTOInvoicesApp;
-                },
-                DTOError
-            >({
-                path: `/api/v1/services/invoices/app`,
-                method: 'GET',
-                query: query,
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags invoices_service
-         * @name UpdateInvoicesApp
-         * @summary Update invoices app
-         * @request PATCH:/api/v1/services/invoices/app/{id}
-         * @secure
-         */
-        updateInvoicesApp: (
-            id: number,
-            data: {
-                /** @example "Test name" */
-                name?: string;
-                /** @example "Test description" */
-                description?: string;
-                /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-                recipient_address?: string;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    app?: DTOInvoicesApp;
-                },
-                DTOError
-            >({
-                path: `/api/v1/services/invoices/app/${id}`,
-                method: 'PATCH',
-                body: data,
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags invoices_service
-         * @name DeleteInvoicesApp
-         * @summary Delete invoices app
-         * @request DELETE:/api/v1/services/invoices/app/{id}
-         * @secure
-         */
-        deleteInvoicesApp: (id: number, params: RequestParams = {}) =>
-            this.request<DTOOk, DTOError>({
-                path: `/api/v1/services/invoices/app/${id}`,
-                method: 'DELETE',
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags invoices_service
-         * @name GetInvoicesAppToken
-         * @summary Get invoices app token
-         * @request GET:/api/v1/services/invoices/token
-         * @secure
-         */
-        getInvoicesAppToken: (
-            query: {
-                /**
-                 * App ID
-                 * @format int64
-                 */
-                app_id: number;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    /** @example "TC-INVOICES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA==" */
-                    token: string;
-                },
-                DTOError
-            >({
-                path: `/api/v1/services/invoices/token`,
-                method: 'GET',
-                query: query,
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags invoices_service
-         * @name RegenerateInvoicesAppToken
-         * @summary Regenerate invoices app token
-         * @request PATCH:/api/v1/services/invoices/token
-         * @secure
-         */
-        regenerateInvoicesAppToken: (
-            query: {
-                /**
-                 * App ID
-                 * @format int64
-                 */
-                app_id: number;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    /** @example "TC-INVOICES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA==" */
-                    token: string;
-                },
-                DTOError
-            >({
-                path: `/api/v1/services/invoices/token`,
-                method: 'PATCH',
-                query: query,
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags invoices_service
-         * @name CreateInvoicesInvoice
-         * @summary Create invoices invoice
-         * @request POST:/api/v1/services/invoices/invoice
-         * @secure
-         */
-        createInvoicesInvoice: (
-            query: {
-                /**
-                 * App ID
-                 * @format int64
-                 */
-                app_id: number;
-            },
-            data: {
-                /**
-                 * nano ton are expected
-                 * @format int64
-                 * @example 1000000000
-                 */
-                amount: number;
-                /**
-                 * seconds are expected
-                 * @format int64
-                 * @example 100
-                 */
-                life_time: number;
-                /** @example "Test description" */
-                description?: string;
-                /** @example false */
-                subtract_fee_from_amount?: boolean;
-                /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-                recipient_address: string;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    invoice: DTOInvoicesInvoice;
-                },
-                DTOError
-            >({
-                path: `/api/v1/services/invoices/invoice`,
-                method: 'POST',
-                query: query,
-                body: data,
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags invoices_service
-         * @name GetInvoices
-         * @summary Get invoices
-         * @request GET:/api/v1/services/invoices
-         * @secure
-         */
-        getInvoices: (
-            query: {
-                /**
-                 * App ID
-                 * @format int64
-                 */
-                app_id: number;
-                /**
-                 * Limit
-                 * @maxLength 50
-                 * @example 50
-                 */
-                limit?: number;
-                /**
-                 * Offset
-                 * @example 100
-                 */
-                offset?: number;
-                /**
-                 * Field
-                 * @example "id"
-                 */
-                field_order?: DTOGetInvoicesParamsFieldOrder;
-                /**
-                 * Type order
-                 * @example "desc"
-                 */
-                type_order?: DTOGetInvoicesParamsTypeOrder;
-                /**
-                 * Search ID
-                 * @minLength 2
-                 */
-                search_id?: string;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    items: DTOInvoicesInvoice[];
-                    /**
-                     * @format int64
-                     * @example 1000
-                     */
-                    count: number;
-                },
-                DTOError
-            >({
-                path: `/api/v1/services/invoices`,
-                method: 'GET',
-                query: query,
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags invoices_service
-         * @name GetInvoicesInvoice
-         * @summary Get invoices invoice
-         * @request GET:/api/v1/services/invoices/{id}
-         * @secure
-         */
-        getInvoicesInvoice: (id: string, params: RequestParams = {}) =>
-            this.request<
-                {
-                    invoice: DTOInvoicesInvoice;
-                },
-                DTOError
-            >({
-                path: `/api/v1/services/invoices/${id}`,
-                method: 'GET',
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags invoices_service
-         * @name UpdateInvoicesInvoice
-         * @summary Update invoices invoice
-         * @request PATCH:/api/v1/services/invoices/{id}
-         * @secure
-         */
-        updateInvoicesInvoice: (
-            id: string,
-            query: {
-                /**
-                 * App ID
-                 * @format int64
-                 */
-                app_id: number;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    invoice: DTOInvoicesInvoice;
-                },
-                DTOError
-            >({
-                path: `/api/v1/services/invoices/${id}`,
-                method: 'PATCH',
-                query: query,
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags invoices_service
-         * @name GetServiceInvoicesFee
-         * @summary Get service invoices fee
-         * @request GET:/api/v1/services/invoices/fee
-         * @secure
-         */
-        getServiceInvoicesFee: (params: RequestParams = {}) =>
-            this.request<
-                {
-                    /**
-                     * percent
-                     * @example 1
-                     */
-                    fee: number;
-                },
-                DTOError
-            >({
-                path: `/api/v1/services/invoices/fee`,
-                method: 'GET',
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags invoices_service
-         * @name GetInvoicesStats
-         * @summary Get invoices stats
-         * @request GET:/api/v1/services/invoices/stats
-         * @secure
-         */
-        getInvoicesStats: (
-            query: {
-                /**
-                 * App ID
-                 * @format int64
-                 */
-                app_id: number;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    stats: {
-                        /** @example 10000 */
-                        total: number;
-                        /** @example 10000 */
-                        success_total: number;
-                        /** @example 10000 */
-                        success_in_week: number;
-                        /** @example 10000 */
-                        awaiting_payment: number;
-                    };
-                },
-                DTOError
-            >({
-                path: `/api/v1/services/invoices/stats`,
-                method: 'GET',
-                query: query,
-                secure: true,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
          * @tags testnet_service
          * @name GetTestnetAvailable
          * @summary Check available coins
          * @request GET:/api/v1/services/testnet/available
-         * @secure
          */
         getTestnetAvailable: (params: RequestParams = {}) =>
             this.request<
                 {
                     /**
-                     * @format int64
+                     * @format uint64
                      * @example 1000000000
                      */
                     balance: number;
-                    /** @example 20 */
+                    /**
+                     * @format int32
+                     * @example 20
+                     */
                     price_multiplicator: number;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/testnet/available`,
                 method: 'GET',
-                secure: true,
                 ...params
             }),
 
@@ -1990,13 +1729,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @name BuyTestnetCoins
          * @summary Buy testnet coins
          * @request POST:/api/v1/services/testnet/buy/coins
-         * @secure
          */
         buyTestnetCoins: (
             query: {
                 /**
                  * Project ID
-                 * @format int64
+                 * @format uint32
                  */
                 project_id: number;
             },
@@ -2017,14 +1755,52 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                     /** @example "546e80bd41ff70ecebe22625f7db3ae48e5a24c175697a8e07899de116bec397" */
                     hash: string;
                 },
-                DTOError
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
             >({
                 path: `/api/v1/services/testnet/buy/coins`,
                 method: 'POST',
                 query: query,
                 body: data,
-                secure: true,
-                format: 'json',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags testnet_service
+         * @name GetProjectTestnetPaymentsHistory
+         * @summary Get project testnet payments history
+         * @request GET:/api/v1/services/testnet/payments/history
+         */
+        getProjectTestnetPaymentsHistory: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    history: DTOCharge[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/testnet/payments/history`,
+                method: 'GET',
+                query: query,
                 ...params
             })
     };

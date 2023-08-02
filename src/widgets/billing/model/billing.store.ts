@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx';
 import { createAsyncAction } from 'src/shared';
-import { TonApiPayment, tonApiTiersStore } from 'src/features';
+import { FaucetPayment, faucetStore, TonApiPayment, tonApiTiersStore } from 'src/features';
 import {
     BillingHistory,
     BillingHistoryPaymentItem,
@@ -27,11 +27,15 @@ class BillingStore {
     }
 
     private get paymentsHistory(): Payment[] {
-        return tonApiTiersStore.paymentsHistory$.value.map(mapTonapiPaymentToPayment);
+        return tonApiTiersStore.paymentsHistory$.value
+            .map(mapTonapiPaymentToPayment)
+            .concat(faucetStore.paymentsHistory$.value.map(mapFaucetPaymentToPayment));
     }
 
     private get paymentsHistoryLoading(): boolean {
-        return tonApiTiersStore.paymentsHistory$.isLoading;
+        return (
+            tonApiTiersStore.paymentsHistory$.isLoading || faucetStore.paymentsHistory$.isLoading
+        );
     }
 
     constructor() {
@@ -39,7 +43,11 @@ class BillingStore {
     }
 
     fetchBillingHistory = createAsyncAction(async () => {
-        await Promise.all([balanceStore.fetchPortfolio(), tonApiTiersStore.fetchPaymentsHistory()]);
+        await Promise.all([
+            balanceStore.fetchPortfolio(),
+            tonApiTiersStore.fetchPaymentsHistory(),
+            faucetStore.fetchPaymentsHistory()
+        ]);
     });
 }
 
@@ -47,6 +55,16 @@ function mapTonapiPaymentToPayment(payment: TonApiPayment): Payment {
     return {
         id: `tonapi-${payment.id}`,
         name: `TON API «${payment.tier.name}»`,
+        date: payment.date,
+        amount: payment.amount,
+        amountUsdEquivalent: payment.amountUsdEquivalent
+    };
+}
+
+function mapFaucetPaymentToPayment(payment: FaucetPayment): Payment {
+    return {
+        id: `faucet-${payment.id}`,
+        name: `Bought ${payment.boughtAmount.stringAmount} testnet TON`,
         date: payment.date,
         amount: payment.amount,
         amountUsdEquivalent: payment.amountUsdEquivalent

@@ -2,7 +2,7 @@ class Explorer {
     constructor(private readonly baseUrl: string) {}
 
     public accountLink(userFriendlyAddress: string): string {
-        return `${this.baseUrl}/account/${userFriendlyAddress}`;
+        return `${this.baseUrl}/${userFriendlyAddress}`;
     }
 
     public transactionLink(hash: string): string {
