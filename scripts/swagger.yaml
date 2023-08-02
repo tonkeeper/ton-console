@@ -689,12 +689,8 @@ paths:
       operationId: sendProjectMessagesPush
       tags:
         - messages_service
-      parameters:
-        - in: header
-          name: Authorization
-          required: true
-          schema:
-            type: string
+      security:
+        - BearerAuth: [ ]
       requestBody:
         $ref: "#/components/requestBodies/ProjectMessagesSendPush"
       responses:
@@ -768,6 +764,10 @@ paths:
           $ref: '#/components/responses/InternalError'
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
   parameters:
     tokenID:
       description: Token ID
@@ -1241,11 +1241,13 @@ components:
             type: string
             example: [ "mempool" ]
         next_payment:
-          type: string
-          example: "2023-04-23"
+          type: integer
+          format: int64
+          example: 1690889913000
         date_create:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
     Deposit:
       type: object
       required:
@@ -1261,8 +1263,9 @@ components:
           type: string
           example: "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR"
         income_date:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
         amount:
           type: integer
           format: int64
@@ -1298,8 +1301,9 @@ components:
           type: number
           example: 2.25
         date_create:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
     Balance:
       type: object
       required:
@@ -1331,8 +1335,9 @@ components:
           type: string
           example: "https://tonapi.io/static/test.png"
         date_create:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
     ProjectTonApiToken:
       type: object
       required:
@@ -1355,8 +1360,9 @@ components:
           type: string
           example: "AE5TZRWIIOR2O2YAAAAGFP2HEWFZJYBP222A567CBF6JIL7S4RIZSCOAZRZOEW7AKMRICGQ"
         date_create:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
     Stats:
       type: object
       required:
@@ -1440,8 +1446,9 @@ components:
           type: boolean
           example: true
         date_create:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
   
   responses:
     NotFound:

@@ -94,10 +94,16 @@ export interface DTOAppTier {
     /** @example 10 */
     entity_per_conn: number;
     capabilities: string[];
-    /** @example "2023-04-23" */
-    next_payment?: string;
-    /** @example "2023-03-23" */
-    date_create: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    next_payment?: number;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 export interface DTODeposit {
@@ -105,8 +111,11 @@ export interface DTODeposit {
     deposit_address: string;
     /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
     source_address: string;
-    /** @example "2023-03-23" */
-    income_date: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    income_date: number;
     /**
      * @format int64
      * @example 1000000000
@@ -139,8 +148,11 @@ export interface DTOCharge {
     amount: number;
     /** @example 2.25 */
     exchange_rate: number;
-    /** @example "2023-03-23" */
-    date_create: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 export interface DTOBalance {
@@ -163,8 +175,11 @@ export interface DTOProject {
     name: string;
     /** @example "https://tonapi.io/static/test.png" */
     avatar?: string;
-    /** @example "2023-03-23" */
-    date_create: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 export interface DTOProjectTonApiToken {
@@ -179,8 +194,11 @@ export interface DTOProjectTonApiToken {
     limit_rps?: number;
     /** @example "AE5TZRWIIOR2O2YAAAAGFP2HEWFZJYBP222A567CBF6JIL7S4RIZSCOAZRZOEW7AKMRICGQ" */
     token: string;
-    /** @example "2023-03-23" */
-    date_create: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 export interface DTOStats {
@@ -228,8 +246,11 @@ export interface DTOMessagesApp {
     url: string;
     /** @example true */
     verify: boolean;
-    /** @example "2023-03-23" */
-    date_create: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 /** backend error code */
@@ -1627,6 +1648,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @name SendProjectMessagesPush
          * @summary Send project messages push
          * @request POST:/api/v1/services/messages/push
+         * @secure
          */
         sendProjectMessagesPush: (
             data: {
@@ -1662,6 +1684,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/v1/services/messages/push`,
                 method: 'POST',
                 body: data,
+                secure: true,
                 ...params
             }),
 
