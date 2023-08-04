@@ -67,11 +67,11 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                             isLoading={!appMessagesStore.dappToken$.isResolved}
                             whiteSpace="pre-wrap"
                             text={`curl -X POST 
-    https://tonconsole.com/api/v1/messages/push
+    https://tonconsole.com/api/v1/services/messages/push
     -H 'Content-Type: application/json'
-    -H 'Authorization: ${appMessagesStore.dappToken$.value}'
+    -H 'Authorization: Bearer ${appMessagesStore.dappToken$.value}'
     -d 
-    '{"title": "my_title", "message": "my_message", "address": "EQ...ER", "link": "http://my_dapp.com/event"}'`}
+    '{"message": "my_message", "address": "EQ...ER", "link": "http://my_dapp.com/event"}'`}
                             iconAlign="start"
                             mb="3"
                         />
@@ -80,9 +80,6 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                             <UnorderedList listStyleType={'"-"'} spacing="1">
                                 <ListItem pl="1">
                                     <Code>address</Code> is user&apos;s wallet address
-                                </ListItem>
-                                <ListItem pl="1">
-                                    <Code>title</Code> is push title Tonkeeper dApp Browser
                                 </ListItem>
                                 <ListItem pl="1">
                                     <Code>message</Code> is call to action message for user
@@ -102,20 +99,17 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                             isLoading={!appMessagesStore.dappToken$.isResolved}
                             whiteSpace="pre-wrap"
                             text={`curl -X POST 
-    https://tonconsole.com/api/v1/messages/push
+    https://tonconsole.com/api/v1/services/messages/push
     -H 'Content-Type: application/json'
-    -H 'Authorization: ${appMessagesStore.dappToken$.value}'
+    -H 'Authorization: Bearer ${appMessagesStore.dappToken$.value}'
     -d 
-    '{"title": "my_title", "message": "my_message", "link": "http://my_dapp.com/event"}'`}
+    '{"message": "my_message", "link": "http://my_dapp.com/event"}'`}
                             iconAlign="start"
                             mb="3"
                         />
                         <Box textStyle="body2" color="text.secondary">
                             <Box mb="1">Where body have properties:</Box>
                             <UnorderedList listStyleType={'"-"'} spacing="1">
-                                <ListItem pl="1">
-                                    <Code>title</Code> is push title Tonkeeper dApp Browser
-                                </ListItem>
                                 <ListItem pl="1">
                                     <Code>message</Code> is call to action message for user
                                 </ListItem>
