@@ -18,7 +18,7 @@ export const DappVerification: FunctionComponent<
     return (
         <Box {...rest}>
             <Text textStyle="label1" mb="3" color="text.primary">
-                Verify the app
+                Verify the dApp
             </Text>
             <Text textStyle="body2" mb="2" color="text.secondary">
                 We need you to verify ownership of domain {pendingDapp.url}. Please follow the steps
