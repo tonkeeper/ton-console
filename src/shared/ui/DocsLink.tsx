@@ -2,10 +2,9 @@ import { ComponentProps, FunctionComponent, PropsWithChildren, useId } from 'rea
 import { Box, Card, CardBody, Link, Text } from '@chakra-ui/react';
 import { ArrowIcon, ConsoleDocsIcon32, EXTERNAL_LINKS } from 'src/shared';
 
-export const DocsLink: FunctionComponent<PropsWithChildren<ComponentProps<typeof Card>>> = ({
-    children,
-    ...rest
-}) => {
+export const DocsLink: FunctionComponent<
+    PropsWithChildren<ComponentProps<typeof Card> & { href?: string }>
+> = ({ children, ...rest }) => {
     const arrowId = useId();
 
     return (

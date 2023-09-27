@@ -15,7 +15,11 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 import { CopyPad, DocsLink } from 'src/shared';
-import { appMessagesStore, MessagesTokenRegenerateConfirmation } from 'src/features';
+import {
+    APP_MESSAGES_LINKS,
+    appMessagesStore,
+    MessagesTokenRegenerateConfirmation
+} from 'src/features';
 import { observer } from 'mobx-react-lite';
 
 const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props => {
@@ -122,7 +126,7 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                     </TabPanel>
                 </TabPanels>
             </Tabs>
-            <DocsLink mb="1" mx="6" />
+            <DocsLink href={APP_MESSAGES_LINKS.USAGE} mb="1" mx="6" />
         </Box>
     );
 };
