@@ -57,6 +57,16 @@ export const TonApiTierCard: FunctionComponent<
                         <ListIcon as={TickIcon} color="accent.green" />
                         <Text textStyle="body2" color="text.primary">
                             {tier.description.requestsPerSecondLimit} requests per second
+                            {tier.price.amount.isZero() && (
+                                <>
+                                    &nbsp;
+                                    <InfoTooltip>
+                                        {tier.description.requestsPerSecondLimit} request per second
+                                        for requests with free api token, 0.25 requests per second
+                                        for requests without api token
+                                    </InfoTooltip>
+                                </>
+                            )}
                         </Text>
                     </ListItem>
                     <ListItem display="flex">

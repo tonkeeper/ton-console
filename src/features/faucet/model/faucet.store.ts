@@ -5,6 +5,7 @@ import {
     createEffect,
     createImmediateReaction,
     DTOCharge,
+    hasProperty,
     Loadable,
     setIntervalWhenPageOnFocus,
     testnetExplorer,
@@ -16,6 +17,7 @@ import { projectsStore } from 'src/entities';
 import type { AxiosError } from 'axios';
 import { FaucetPayment, RequestFaucetForm } from './interfaces';
 import BigNumber from 'bignumber.js';
+import { TonapiTestnet } from 'src/shared/api/tonapi';
 
 class FaucetStore {
     tonRate$ = new Loadable<number>(0);
@@ -36,6 +38,7 @@ class FaucetStore {
             project => {
                 dispose?.();
                 if (project) {
+                    this.fetchTonSupplyAndRate();
                     dispose = setIntervalWhenPageOnFocus(this.fetchTonSupplyAndRate, 5000);
                 }
             }
@@ -120,19 +123,19 @@ class FaucetStore {
 }
 
 async function fetchTxHash(msgHash: string, attempt = 0): Promise<string> {
-    const response = await fetch(
-        `${import.meta.env.VITE_TONAPI_TESTNET_BASE_URL}blockchain/messages/${msgHash}/transaction`
-    );
-
-    const data = await response.json();
-    if (data.error === 'transaction not found') {
-        if (attempt > 20) {
-            throw new Error('Tx not found');
+    try {
+        return await TonapiTestnet.getTransactionHashByMessage(msgHash);
+    } catch (e) {
+        if (hasProperty(e, 'message') && e.message === 'transaction not found') {
+            if (attempt > 20) {
+                throw new Error('Tx not found');
+            }
+            await new Promise(r => setTimeout(r, 1500));
+            return fetchTxHash(msgHash);
         }
-        await new Promise(r => setTimeout(r, 1000));
-        return fetchTxHash(msgHash);
+
+        throw e;
     }
-    return data.hash;
 }
 
 function mapDTOPaymentToTonApiPayment(tonRate: number, payment: DTOCharge): FaucetPayment | null {
