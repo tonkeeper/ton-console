@@ -9,3 +9,4 @@ export {
     serializeLoadableState,
     deserializeLoadableState
 } from './serialize';
+export { awaitValueResolved } from './await-value-resolved';

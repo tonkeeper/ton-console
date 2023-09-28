@@ -5,6 +5,7 @@ import {
     DropDownMenu,
     DropDownMenuItem,
     DropDownMenuItemExpandable,
+    MessageIcon24,
     SettingsIcon,
     TextWithSkeleton,
     TonapiIcon
@@ -24,6 +25,9 @@ const Aside: FunctionComponent = () => {
                 <DropDownMenuItem linkTo="api-keys">Api keys and calls</DropDownMenuItem>
                 <DropDownMenuItem linkTo="pricing">Pricing</DropDownMenuItem>
             </DropDownMenuItemExpandable>
+            <DropDownMenuItem linkTo="tonkeeper-messages" leftIcon={<MessageIcon24 />}>
+                Tonkeeper Messages
+            </DropDownMenuItem>
             <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>
                 Testnet Assets
             </DropDownMenuItem>

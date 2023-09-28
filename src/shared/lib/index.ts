@@ -8,6 +8,7 @@ export * from './format';
 export * from './css';
 export * from './object';
 export * from './currency';
+export * from './url';
 export * from './react';
 export * from './validators';
 export * from './form';

@@ -11,6 +11,9 @@ import Card from './card';
 import Divider from './divider';
 import Table from './table';
 import Popover from './popover';
+import Tooltip from './tooltip';
+import Tabs from './tabs';
+import Code from './code';
 import Radio from './radio';
 
 export default {
@@ -27,5 +30,8 @@ export default {
     Divider,
     Table,
     Popover,
+    Tooltip,
+    Tabs,
+    Code,
     Radio
 };
