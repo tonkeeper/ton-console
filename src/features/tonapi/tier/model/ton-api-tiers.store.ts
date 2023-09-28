@@ -31,6 +31,7 @@ class TonApiTiersStore {
             () => projectsStore.selectedProject,
             project => {
                 this.selectedTier$.clear();
+                this.paymentsHistory$.clear();
 
                 if (project) {
                     this.fetchSelectedTier();

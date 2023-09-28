@@ -1,12 +1,15 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Pad } from './Pad';
-import { Text, Tooltip, useClipboard } from '@chakra-ui/react';
+import { Spinner, Text, Tooltip, useClipboard } from '@chakra-ui/react';
 import { CopyIcon24 } from './icons/CopyIcon24';
 
-export const CopyPad: FunctionComponent<ComponentProps<typeof Pad> & { text: string }> = ({
-    text,
-    ...rest
-}) => {
+export const CopyPad: FunctionComponent<
+    ComponentProps<typeof Pad> & {
+        text: string;
+        iconAlign?: 'start' | 'center';
+        isLoading?: boolean;
+    }
+> = ({ text, iconAlign, isLoading, ...rest }) => {
     const { hasCopied, onCopy } = useClipboard(text);
 
     return (
@@ -16,28 +19,39 @@ export const CopyPad: FunctionComponent<ComponentProps<typeof Pad> & { text: str
                 px="4"
                 pr="2.5"
                 display="flex"
-                cursor="pointer"
+                cursor={isLoading ? 'default' : 'pointer'}
                 gap="7"
                 alignItems="center"
-                onClick={onCopy}
-                _hover={{
-                    svg: {
-                        color: 'icon.primary'
+                justifyContent="space-between"
+                opacity={isLoading ? '0.48' : '1'}
+                onClick={isLoading ? () => {} : onCopy}
+                wordBreak="break-word"
+                _hover={
+                    !isLoading && {
+                        svg: {
+                            color: 'icon.primary'
+                        }
                     }
-                }}
-                sx={{
-                    svg: {
-                        transitionProperty: 'color',
-                        transitionDuration: '200ms'
+                }
+                sx={
+                    !isLoading && {
+                        svg: {
+                            transitionProperty: 'color',
+                            transitionDuration: '200ms'
+                        }
                     }
-                }}
+                }
                 {...rest}
             >
-                <Text textStyle="body2" color="primary" fontFamily="mono" wordBreak="break-word">
-                    {text}
-                </Text>
+                {isLoading ? (
+                    <Spinner mx="auto" size="sm" />
+                ) : (
+                    <Text textStyle="body2" color="primary" fontFamily="mono">
+                        {text}
+                    </Text>
+                )}
 
-                <CopyIcon24 />
+                <CopyIcon24 alignSelf={iconAlign === 'start' ? 'flex-start' : 'center'} />
             </Pad>
         </Tooltip>
     );

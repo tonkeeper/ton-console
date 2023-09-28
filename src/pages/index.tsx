@@ -13,6 +13,7 @@ const LandingPage = lazy(() => import('./landing'));
 const CreateFirstProjectPage = lazy(() => import('./create-first-project'));
 const BalancePage = lazy(() => import('./balance'));
 const DashboardPage = lazy(() => import('./dashboard'));
+const AppMessagesPage = lazy(() => import('./app-messages'));
 const FaucetPage = lazy(() => import('./faucet'));
 
 const Routing: FunctionComponent = () => {
@@ -82,6 +83,14 @@ const Routing: FunctionComponent = () => {
                     }
                 />
                 <Route path="tonapi">{TonapiRouting}</Route>
+                <Route
+                    path="tonkeeper-messages"
+                    element={
+                        <Suspense>
+                            <AppMessagesPage />
+                        </Suspense>
+                    }
+                />
                 <Route
                     path="balance"
                     element={

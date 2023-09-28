@@ -6,6 +6,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:staging": "tsc && vite build --mode staging",
+    "build:staging2": "tsc && vite build --mode staging2",
     "preview": "vite preview",
     "test": "vitest",
     "lint": "eslint ./",

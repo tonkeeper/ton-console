@@ -1,5 +1,5 @@
 import { ComponentProps, FunctionComponent, PropsWithChildren, useState } from 'react';
-import { Skeleton, Text } from '@chakra-ui/react';
+import { Box, Skeleton, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { Amount, CRYPTO_CURRENCY, getWindow, subtractPixels } from 'src/shared';
 import { ratesStore } from 'src/entities/rates';
@@ -32,7 +32,7 @@ const CurrencyRate: FunctionComponent<
     contentUnderSkeleton,
     ...rest
 }) => {
-    const sign = leftSign === undefined ? '$' : leftSign;
+    const sign = leftSign === undefined ? '' : leftSign;
     const precisionWithFallback = precision === undefined ? 2 : precision;
     const [skeletonHeight, setSkeletonHeight] = useState('30px');
     const rate$ = ratesStore.rates$[currency as CRYPTO_CURRENCY];
@@ -58,7 +58,7 @@ const CurrencyRate: FunctionComponent<
     });
 
     return (
-        <Text ref={ref} alignItems="center" display="flex" {...rest}>
+        <Text ref={ref} as={Box} alignItems="center" display="flex" {...rest}>
             {amountLoading || !rate$.isResolved || (rate$.isLoading && showSkeletonOnUpdate) ? (
                 <Skeleton display="inline-block" w={skeletonWidth || '40px'} h={skeletonHeight} />
             ) : value.get() !== undefined ? (
