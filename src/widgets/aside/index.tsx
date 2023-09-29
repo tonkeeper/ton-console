@@ -7,6 +7,7 @@ import {
     DropDownMenuItemExpandable,
     MessageIcon24,
     SettingsIcon,
+    StatsIcon24,
     TextWithSkeleton,
     TonapiIcon
 } from 'src/shared';
@@ -28,6 +29,15 @@ const Aside: FunctionComponent = () => {
             <DropDownMenuItem linkTo="tonkeeper-messages" leftIcon={<MessageIcon24 />}>
                 Tonkeeper Messages
             </DropDownMenuItem>
+            <DropDownMenuItemExpandable
+                leftIcon={<StatsIcon24 />}
+                content="TON Analytics"
+                linkTo="analytics"
+            >
+                <DropDownMenuItem linkTo="history">History</DropDownMenuItem>
+                <DropDownMenuItem linkTo="graph">Graph</DropDownMenuItem>
+                <DropDownMenuItem linkTo="query">Query</DropDownMenuItem>
+            </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>
                 Testnet Assets
             </DropDownMenuItem>

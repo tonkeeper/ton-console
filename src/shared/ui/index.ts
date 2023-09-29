@@ -15,3 +15,4 @@ export { Span } from './Span';
 export * from './checkbox';
 export { DocsLink } from './DocsLink';
 export { IconButton } from './IconButton';
+export { CodeArea } from './code-area';

@@ -8,6 +8,7 @@ import { observer } from 'mobx-react-lite';
 import SettingsRouting from 'src/pages/settings';
 import { LayoutSolid } from 'src/pages/layouts/LayoutSolid';
 import { LayoutWithAside } from 'src/pages/layouts/LayoutWithAside';
+import AnalyticsRouting from 'src/pages/analytics';
 
 const LandingPage = lazy(() => import('./landing'));
 const CreateFirstProjectPage = lazy(() => import('./create-first-project'));
@@ -107,6 +108,7 @@ const Routing: FunctionComponent = () => {
                         </Suspense>
                     }
                 />
+                <Route path="analytics">{AnalyticsRouting}</Route>
                 <Route path="settings">{SettingsRouting}</Route>
                 <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="*" element={<Navigate to="dashboard" replace />} />
