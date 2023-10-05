@@ -1,4 +1,4 @@
-import { apiClient, createImmediateReaction, DTOToken, Loadable } from 'src/shared';
+import { apiClient, createImmediateReaction, DTOProjectTonApiToken, Loadable } from 'src/shared';
 import { EditApiKeyForm, ApiKey, CreateApiKeyForm } from './interfaces';
 import { projectsStore } from 'src/entities';
 import { makeAutoObservable } from 'mobx';
@@ -22,7 +22,7 @@ class ApiKeysStore {
     }
 
     fetchApiKeys = this.apiKeys$.createAsyncAction(async () => {
-        const response = await apiClient.api.getTonApiTokens({
+        const response = await apiClient.api.getProjectTonApiTokens({
             project_id: projectsStore.selectedProject!.id
         });
 
@@ -30,10 +30,10 @@ class ApiKeysStore {
     });
 
     createApiKey = this.apiKeys$.createAsyncAction(
-        async (form: CreateApiKeyForm) => {
-            const response = await apiClient.api.generateTonApiProjectToken(
+        async ({ name, limitRps }: CreateApiKeyForm) => {
+            const response = await apiClient.api.generateProjectTonApiToken(
                 { project_id: projectsStore.selectedProject!.id },
-                form
+                { name, limit_rps: limitRps }
             );
 
             if (response.data.token) {
@@ -51,17 +51,18 @@ class ApiKeysStore {
     );
 
     editApiKey = this.apiKeys$.createAsyncAction(
-        async ({ id, name }: EditApiKeyForm) => {
-            await apiClient.api.updateTonApiProjectToken(
+        async ({ id, name, limitRps }: EditApiKeyForm) => {
+            await apiClient.api.updateProjectTonApiToken(
                 id,
                 { project_id: projectsStore.selectedProject!.id },
-                { name }
+                { name, limit_rps: limitRps }
             );
 
             const key = this.apiKeys$.value.find(item => item.id === id);
 
             if (key) {
                 key.name = name;
+                key.limitRps = limitRps;
             }
         },
         {
@@ -76,7 +77,7 @@ class ApiKeysStore {
 
     deleteApiKey = this.apiKeys$.createAsyncAction(
         async (id: number) => {
-            await apiClient.api.deleteTonApiProjectToken(id, {
+            await apiClient.api.deleteProjectTonApiToken(id, {
                 project_id: projectsStore.selectedProject!.id
             });
 
@@ -97,11 +98,12 @@ class ApiKeysStore {
     }
 }
 
-function mapApiTokenDTOToApiKey(apiTokenDTO: DTOToken): ApiKey {
+function mapApiTokenDTOToApiKey(apiTokenDTO: DTOProjectTonApiToken): ApiKey {
     return {
         name: apiTokenDTO.name,
         value: apiTokenDTO.token,
         creationDate: new Date(apiTokenDTO.date_create),
+        limitRps: apiTokenDTO.limit_rps || null,
         id: apiTokenDTO.id
     };
 }

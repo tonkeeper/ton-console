@@ -1,7 +1,7 @@
 import { TokenCurrencyAmount } from './token-currency-amount';
 import { CURRENCY } from './CURRENCY';
 import BigNumber from 'bignumber.js';
-import { toWei } from 'src/shared';
+import { toWei } from '../blockchain';
 
 export class TonCurrencyAmount extends TokenCurrencyAmount {
     static fromRelativeAmount(amount: number | string | BigNumber): TonCurrencyAmount {

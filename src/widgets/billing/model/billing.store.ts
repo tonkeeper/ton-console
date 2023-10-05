@@ -4,7 +4,9 @@ import {
     appMessagesStore,
     TonApiPayment,
     tonApiTiersStore,
-    AppMessagesPayment
+    AppMessagesPayment,
+    FaucetPayment,
+    faucetStore
 } from 'src/features';
 import {
     BillingHistory,
@@ -34,13 +36,15 @@ class BillingStore {
     private get paymentsHistory(): Payment[] {
         return tonApiTiersStore.paymentsHistory$.value
             .map(mapTonapiPaymentToPayment)
-            .concat(appMessagesStore.paymentsHistory$.value.map(mapAppmessagesPaymentToPayment));
+            .concat(appMessagesStore.paymentsHistory$.value.map(mapAppmessagesPaymentToPayment))
+            .concat(faucetStore.paymentsHistory$.value.map(mapFaucetPaymentToPayment));
     }
 
     private get paymentsHistoryLoading(): boolean {
         return (
             tonApiTiersStore.paymentsHistory$.isLoading ||
-            appMessagesStore.paymentsHistory$.isLoading
+            appMessagesStore.paymentsHistory$.isLoading ||
+            faucetStore.paymentsHistory$.isLoading
         );
     }
 
@@ -52,7 +56,8 @@ class BillingStore {
         await Promise.all([
             balanceStore.fetchPortfolio(),
             tonApiTiersStore.fetchPaymentsHistory(),
-            appMessagesStore.fetchPaymentsHistory()
+            appMessagesStore.fetchPaymentsHistory(),
+            faucetStore.fetchPaymentsHistory()
         ]);
     });
 }
@@ -71,6 +76,16 @@ function mapAppmessagesPaymentToPayment(payment: AppMessagesPayment): Payment {
     return {
         id: `app messages-${payment.id}`,
         name: `messages package «${payment.package.name}»`,
+        date: payment.date,
+        amount: payment.amount,
+        amountUsdEquivalent: payment.amountUsdEquivalent
+    };
+}
+
+function mapFaucetPaymentToPayment(payment: FaucetPayment): Payment {
+    return {
+        id: `faucet-${payment.id}`,
+        name: `Bought ${payment.boughtAmount.stringAmount} testnet TON`,
         date: payment.date,
         amount: payment.amount,
         amountUsdEquivalent: payment.amountUsdEquivalent

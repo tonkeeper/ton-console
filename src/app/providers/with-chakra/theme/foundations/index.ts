@@ -5,6 +5,7 @@ import radii from './radius';
 import shadows from './shadows';
 import space from './spacing';
 import textStyles from './textStyles';
+import semanticTokens from './semanticTokens';
 
 export default {
     space,
@@ -13,5 +14,6 @@ export default {
     radii,
     shadows,
     borders,
-    layerStyles
+    layerStyles,
+    semanticTokens
 };

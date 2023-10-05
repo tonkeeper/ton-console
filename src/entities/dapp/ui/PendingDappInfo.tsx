@@ -22,7 +22,7 @@ export const PendingDappInfo: FunctionComponent<
     return (
         <Box {...rest}>
             <Text textStyle="label1" mb="3" color="text.primary">
-                Given app
+                Given dApp
             </Text>
             <DappCard maxW="600px" mb="4" dapp={pendingDapp} />
             <Button onClick={onOpen} variant="secondary">

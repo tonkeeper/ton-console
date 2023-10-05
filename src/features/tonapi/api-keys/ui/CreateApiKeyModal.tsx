@@ -1,11 +1,6 @@
-import { FunctionComponent, useCallback } from 'react';
+import { FunctionComponent, useCallback, useEffect } from 'react';
 import {
     Button,
-    chakra,
-    FormControl,
-    FormErrorMessage,
-    FormLabel,
-    Input,
     Modal,
     ModalBody,
     ModalCloseButton,
@@ -15,24 +10,35 @@ import {
     ModalOverlay
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { useForm } from 'react-hook-form';
-import { apiKeysStore } from '../model/api-keys.store';
+import { apiKeysStore, CreateApiKeyForm } from '../model';
+import { ApiKeyForm } from './ApiKeyForm';
+import { tonApiTiersStore } from '../../tier';
+import { FormProvider, useForm } from 'react-hook-form';
 
 const CreateApiKeyModal: FunctionComponent<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'create-api-key-form';
 
+    const methods = useForm<CreateApiKeyForm>();
+
     const {
-        handleSubmit,
-        register,
-        formState: { errors }
-    } = useForm<{ name: string }>();
+        reset,
+        formState: { isDirty }
+    } = methods;
 
     const onSubmit = useCallback(
-        (form: { name: string }): void => {
+        (form: CreateApiKeyForm): void => {
             apiKeysStore.createApiKey(form).then(props.onClose);
         },
         [props.onClose]
     );
+
+    useEffect(() => {
+        if (!props.isOpen) {
+            setTimeout(reset, 200);
+        }
+    }, [reset, props.isOpen]);
+
+    const maxLimit = tonApiTiersStore.selectedTier$.value?.description.requestsPerSecondLimit || 1;
 
     return (
         <Modal scrollBehavior="inside" {...props}>
@@ -41,24 +47,9 @@ const CreateApiKeyModal: FunctionComponent<{ isOpen: boolean; onClose: () => voi
                 <ModalHeader>New API key</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <chakra.form id={formId} w="100%" onSubmit={handleSubmit(onSubmit)} noValidate>
-                        <FormControl isInvalid={!!errors.name} isRequired>
-                            <FormLabel htmlFor="name">Name</FormLabel>
-                            <Input
-                                autoComplete="off"
-                                id="name"
-                                placeholder="Name"
-                                {...register('name', {
-                                    required: 'This is required',
-                                    minLength: { value: 3, message: 'Minimum length should be 3' },
-                                    maxLength: { value: 64, message: 'Maximum length is 64' }
-                                })}
-                            />
-                            <FormErrorMessage>
-                                {errors.name && errors.name.message}
-                            </FormErrorMessage>
-                        </FormControl>
-                    </chakra.form>
+                    <FormProvider {...methods}>
+                        <ApiKeyForm id={formId} maxLimit={maxLimit} onSubmit={onSubmit} />
+                    </FormProvider>
                 </ModalBody>
 
                 <ModalFooter gap="3">
@@ -68,6 +59,7 @@ const CreateApiKeyModal: FunctionComponent<{ isOpen: boolean; onClose: () => voi
                     <Button
                         flex={1}
                         form={formId}
+                        isDisabled={!isDirty}
                         isLoading={apiKeysStore.createApiKey.isLoading}
                         type="submit"
                         variant="primary"

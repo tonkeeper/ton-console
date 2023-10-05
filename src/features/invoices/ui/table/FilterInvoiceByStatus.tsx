@@ -6,13 +6,12 @@ import {
     Checkbox,
     Flex,
     Menu,
-    MenuButton,
     MenuItem,
     MenuList,
     useDisclosure
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { ArrowIcon, MenuButtonStyled, Span, TickIcon } from 'src/shared';
+import { ArrowIcon, MenuButtonDefault, Span, TickIcon } from 'src/shared';
 import { invoicesTableStore, InvoiceStatus } from '../../models';
 import { invoiceBadges } from './InvoiceStatusBadge';
 
@@ -28,14 +27,7 @@ const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = pro
             placement="bottom-start"
             {...props}
         >
-            <MenuButton
-                as={MenuButtonStyled}
-                w="fit-content"
-                h="fit-content"
-                px="4"
-                py="3"
-                rightIcon={<ArrowIcon />}
-            >
+            <MenuButtonDefault rightIcon={<ArrowIcon />}>
                 <Flex textStyle="label2" gap="2">
                     Filter by status{' '}
                     {!!invoicesTableStore.pagination.filter.status?.length && (
@@ -51,7 +43,7 @@ const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = pro
                         </Center>
                     )}
                 </Flex>
-            </MenuButton>
+            </MenuButtonDefault>
             <MenuList zIndex={100} w="240px">
                 <Flex justify="space-between" mb="2" pt="2" px="1" color="text.secondary">
                     <Span textStyle="label2">Display only</Span>

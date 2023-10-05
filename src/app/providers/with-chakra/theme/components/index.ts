@@ -17,6 +17,7 @@ import Tooltip from './tooltip';
 import Tabs from './tabs';
 import Code from './code';
 import Badge from './badge';
+import Radio from './radio';
 
 export default {
     Button,
@@ -37,5 +38,6 @@ export default {
     Tooltip,
     Tabs,
     Code,
-    Badge
+    Badge,
+    Radio
 };

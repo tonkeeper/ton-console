@@ -10,7 +10,7 @@ import {
     Text,
     useDisclosure
 } from '@chakra-ui/react';
-import { DeleteIcon24, Image, VerticalDotsIcon16 } from 'src/shared';
+import { DeleteIcon24, IconButton, Image, VerticalDotsIcon16 } from 'src/shared';
 import { Dapp, dappStore } from 'src/entities';
 import { ConfirmDappDeleteModal } from './ConfirmDappDeleteModal';
 import { observer } from 'mobx-react-lite';
@@ -32,22 +32,38 @@ const DappCard: FunctionComponent<
 
     return (
         <>
-            <Card w="fit-content" {...rest}>
+            <Card w="fit-content" maxW="100%" {...rest}>
                 <CardBody alignItems="center" gap="3" display="flex" px="4" py="4">
                     <Image borderRadius="sm" w="12" h="12" minW="12" src={dapp.image} />
                     <Box>
-                        <Text textStyle="label2" mb="2" color="text.primary" fontFamily="mono">
+                        <Text
+                            textStyle="label2"
+                            mb="2"
+                            color="text.primary"
+                            fontFamily="mono"
+                            wordBreak="break-word"
+                            noOfLines={1}
+                        >
                             {dapp.url}
                         </Text>
-                        <Text textStyle="label2" color="text.secondary" noOfLines={1}>
+                        <Text
+                            textStyle="label2"
+                            color="text.secondary"
+                            wordBreak="break-word"
+                            noOfLines={1}
+                        >
                             {dapp.name}
                         </Text>
                     </Box>
                     {withMenu && (
                         <Menu placement="bottom-end">
-                            <MenuButton alignSelf="flex-start" h="4">
-                                <VerticalDotsIcon16 />
-                            </MenuButton>
+                            <MenuButton
+                                as={IconButton}
+                                alignSelf="flex-start"
+                                h="4"
+                                aria-label="options"
+                                icon={<VerticalDotsIcon16 />}
+                            />
                             <MenuList w="132px">
                                 <MenuItem onClick={onOpen}>
                                     <DeleteIcon24 mr="2" />

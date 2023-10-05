@@ -7,12 +7,14 @@ import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
+import inject from '@rollup/plugin-inject';
 
 export default ({ mode }) => {
-    const { VITE_TG_OAUTH_BOT_NAME, VITE_BASE_PROXY_URL, VITE_CD_CHECK_STRING } = loadEnv(
-        mode,
-        process.cwd()
-    );
+    const { VITE_TG_OAUTH_BOT_NAME, VITE_BASE_PROXY_URL, VITE_CD_CHECK_STRING, VITE_GTM_ID } =
+        loadEnv(mode, process.cwd());
+
+    const tgScript = makeTgAuthScript(VITE_TG_OAUTH_BOT_NAME);
+    const gtmScrip = mode === 'production' ? makeGtmScript(VITE_GTM_ID) : '';
 
     return defineConfig({
         plugins: [
@@ -23,7 +25,7 @@ export default ({ mode }) => {
                 entry: '/src/main.tsx',
                 inject: {
                     data: {
-                        injectScript: `<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="${VITE_TG_OAUTH_BOT_NAME}" data-userpic="false" data-request-access="write" onload="setTimeout(document.getElementById('telegram-login-${VITE_TG_OAUTH_BOT_NAME}').style.display = 'none')"></script>`
+                        injectScript: tgScript + gtmScrip
                     },
                     tags: [
                         {
@@ -75,6 +77,11 @@ export default ({ mode }) => {
                 ]
             }
         },
+        build: {
+            rollupOptions: {
+                plugins: [inject({ Buffer: ['buffer', 'Buffer'] })]
+            }
+        },
         test: {
             globals: true,
             environment: 'jsdom',
@@ -85,3 +92,11 @@ export default ({ mode }) => {
         }
     });
 };
+
+function makeTgAuthScript(botName) {
+    return `<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="${botName}" data-userpic="false" data-request-access="write" onload="setTimeout(document.getElementById('telegram-login-${botName}').style.display = 'none')"></script>`;
+}
+
+function makeGtmScript(gtmId) {
+    return `<script async src="https://www.googletagmanager.com/gtag/js?id=${gtmId}"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","${gtmId}");</script>`;
+}

@@ -15,7 +15,11 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 import { CopyPad, DocsLink } from 'src/shared';
-import { appMessagesStore, MessagesTokenRegenerateConfirmation } from 'src/features';
+import {
+    APP_MESSAGES_LINKS,
+    appMessagesStore,
+    MessagesTokenRegenerateConfirmation
+} from 'src/features';
 import { observer } from 'mobx-react-lite';
 
 const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props => {
@@ -45,10 +49,11 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                     <MessagesTokenRegenerateConfirmation isOpen={isOpen} onClose={onClose} />
                 </Flex>
                 <Text textStyle="body2" mb="4" color="text.secondary">
-                    This is a service to service authorisation token. The service have token-based
-                    authentication, is a type of authentication that generates encrypted security
-                    tokens. To authorise your request, you have to call service URL&apos;s with
-                    token in the path. Keep token secret.
+                    This token provides access to messages API, is should be used from backend side
+                    and never exposed into client side of the project.
+                    <br />
+                    To send push notification please add Authorization header with token to your
+                    push API request.
                 </Text>
             </Box>
             <Tabs mb="4">
@@ -63,12 +68,14 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                             Posting a message for user by wallet address with Curl:
                         </Text>
                         <CopyPad
+                            isLoading={!appMessagesStore.dappToken$.isResolved}
                             whiteSpace="pre-wrap"
-                            text={`curl -X POST
-    https://api.tonconsole.com/v1/pushes/123123123123123/push
+                            text={`curl -X POST 
+    https://tonconsole.com/api/v1/services/messages/push
     -H 'Content-Type: application/json'
+    -H 'Authorization: Bearer ${appMessagesStore.dappToken$.value}'
     -d 
-    '{"address":"EQ...ER","message":"My Message", link: "http://my-dapp.com/event"}'`}
+    '{"message": "my_message", "address": "EQ...ER", "link": "http://my_dapp.com/event"}'`}
                             iconAlign="start"
                             mb="3"
                         />
@@ -76,13 +83,13 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                             <Box mb="1">Where body have properties:</Box>
                             <UnorderedList listStyleType={'"-"'} spacing="1">
                                 <ListItem pl="1">
-                                    <Code>address</Code> is user wallet address
+                                    <Code>address</Code> is user&apos;s wallet address
                                 </ListItem>
                                 <ListItem pl="1">
-                                    <Code>message</Code> call to action message for user
+                                    <Code>message</Code> is call to action message for user
                                 </ListItem>
                                 <ListItem pl="1">
-                                    <Code>link</Code> link for user action, the link will open in
+                                    <Code>link</Code> for user action, the link will be opened in
                                     Tonkeeper dApp Browser
                                 </ListItem>
                             </UnorderedList>
@@ -93,12 +100,14 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                             Posting a message for all users with allow notifications with Curl:
                         </Text>
                         <CopyPad
+                            isLoading={!appMessagesStore.dappToken$.isResolved}
                             whiteSpace="pre-wrap"
                             text={`curl -X POST 
-    https://api.tonconsole.com/v1/pushes/123123123123123/push
+    https://tonconsole.com/api/v1/services/messages/push
     -H 'Content-Type: application/json'
+    -H 'Authorization: Bearer ${appMessagesStore.dappToken$.value}'
     -d 
-    '{"message":"My Message", link: "http://my-dapp.com/event"}'`}
+    '{"message": "my_message", "link": "http://my_dapp.com/event"}'`}
                             iconAlign="start"
                             mb="3"
                         />
@@ -106,10 +115,10 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                             <Box mb="1">Where body have properties:</Box>
                             <UnorderedList listStyleType={'"-"'} spacing="1">
                                 <ListItem pl="1">
-                                    <Code>message</Code> call to action message for user
+                                    <Code>message</Code> is call to action message for user
                                 </ListItem>
                                 <ListItem pl="1">
-                                    <Code>link</Code> link for user action, the link will open in
+                                    <Code>link</Code> for user action, the link will be opened in
                                     Tonkeeper dApp Browser
                                 </ListItem>
                             </UnorderedList>
@@ -117,7 +126,7 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                     </TabPanel>
                 </TabPanels>
             </Tabs>
-            <DocsLink mb="1" mx="6" />
+            <DocsLink href={APP_MESSAGES_LINKS.USAGE} mb="1" mx="6" />
         </Box>
     );
 };

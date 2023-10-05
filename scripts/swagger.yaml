@@ -10,6 +10,87 @@ servers:
   - url: "http://localhost:8888"
 
 paths:
+  /ready:
+    get:
+      operationId: pingReadyGet
+      tags:
+        - system
+      responses:
+        '200':
+          description: "Ok"
+        '500':
+          $ref: '#/components/responses/InternalError'
+    head:
+      operationId: pingReadyHead
+      tags:
+        - system
+      responses:
+        '200':
+          description: "Ok"
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /alive:
+    get:
+      operationId: pingAliveGet
+      tags:
+        - system
+      responses:
+        '200':
+          description: "Ok"
+        '500':
+          $ref: '#/components/responses/InternalError'
+    head:
+      operationId: pingAliveHead
+      tags:
+        - system
+      responses:
+        '200':
+          description: "Ok"
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
+  /api/v1/admin/project/{id}/balance:
+    get:
+      summary: "Private method: Get project balance"
+      operationId: adminGetProjectBalance
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/projectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProjectBalance'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/admin/project/{id}/charge:
+    post:
+      summary: "Private method: Charge project"
+      description: "Private method"
+      operationId: adminChargeProject
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/projectID'
+      requestBody:
+        $ref: "#/components/requestBodies/ProjectCharge"
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
   /api/v1/auth/tg:
     post:
       summary: "Auth via telegram"
@@ -19,12 +100,23 @@ paths:
       tags:
         - auth
       requestBody:
-        $ref: "#/components/requestBodies/TgAuthInput"
+        $ref: "#/components/requestBodies/TgAuth"
       responses:
         '200':
-          $ref: '#/components/responses/Ok'
+          description: "Ok"
+          headers:
+            Set-Cookie:
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -37,9 +129,11 @@ paths:
         - auth
       responses:
         '200':
-          $ref: '#/components/responses/GeneratePayload'
+          $ref: '#/components/responses/GeneratedPayload'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -53,12 +147,23 @@ paths:
       tags:
         - auth
       requestBody:
-        $ref: "#/components/requestBodies/TonProofInput"
+        $ref: "#/components/requestBodies/TonProof"
       responses:
         '200':
-          $ref: '#/components/responses/Ok'
+          description: "Ok"
+          headers:
+            Set-Cookie:
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -69,15 +174,24 @@ paths:
       summary: "Logout from the system"
       description: "After logout, the user's token is deleted"
       operationId: accountLogout
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - account
       responses:
         '200':
-          $ref: '#/components/responses/Ok'
+          description: "Ok"
+          headers:
+            Set-Cookie:
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -87,17 +201,17 @@ paths:
     post:
       summary: "Create project"
       operationId: createProject
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - project
       requestBody:
-        $ref: "#/components/requestBodies/ProjectInputCreate"
+        $ref: "#/components/requestBodies/ProjectCreate"
       responses:
         '201':
-          $ref: '#/components/responses/ProjectCreated'
+          $ref: '#/components/responses/ProjectRes'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -106,8 +220,6 @@ paths:
     get:
       summary: "Get user's project"
       operationId: getProjects
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - project
       responses:
@@ -115,6 +227,8 @@ paths:
           $ref: '#/components/responses/Projects'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -124,19 +238,19 @@ paths:
       summary: "Update user project"
       description: "You need to pass only those fields that need to be changed."
       operationId: updateProject
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - project
       parameters:
         - $ref: '#/components/parameters/projectID'
       requestBody:
-        $ref: "#/components/requestBodies/ProjectInputUpdate"
+        $ref: "#/components/requestBodies/ProjectUpdate"
       responses:
         '200':
-          $ref: '#/components/responses/ProjectUpdated'
+          $ref: '#/components/responses/ProjectRes'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -144,8 +258,6 @@ paths:
     delete:
       summary: "Delete user project"
       operationId: deleteProject
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - project
       parameters:
@@ -155,6 +267,8 @@ paths:
           $ref: '#/components/responses/Ok'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -163,8 +277,6 @@ paths:
     get:
       summary: "Get project deposit address"
       operationId: getDepositAddress
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - project
       parameters:
@@ -174,6 +286,8 @@ paths:
           $ref: '#/components/responses/DepositWallet'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -182,8 +296,6 @@ paths:
     get:
       summary: "Get project deposits history"
       operationId: getProjectDepositsHistory
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - project
       parameters:
@@ -193,6 +305,28 @@ paths:
           $ref: '#/components/responses/DepositsHistory'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/project/{id}/promocode/{promo_code}:
+    post:
+      summary: "Crediting funds with a promo code"
+      operationId: promoCodeDepositProject
+      tags:
+        - project
+      parameters:
+        - $ref: '#/components/parameters/projectID'
+        - $ref: '#/components/parameters/promoCode'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -200,54 +334,52 @@ paths:
 
   /api/v1/services/tonapi/tokens:
     get:
-      summary: "Get TonAPI tokens"
-      operationId: getTonApiTokens
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Get project TonAPI tokens"
+      operationId: getProjectTonApiTokens
       tags:
         - tonapi_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       responses:
         '200':
-          $ref: '#/components/responses/TonApiTokens'
+          $ref: '#/components/responses/ProjectTonApiTokens'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/tonapi/generate/token:
     post:
-      summary: "Generate TonAPI project token"
-      operationId: generateTonAPIProjectToken
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Generate project TonAPI token"
+      operationId: generateProjectTonApiToken
       tags:
         - tonapi_service
       requestBody:
-        $ref: "#/components/requestBodies/TokenInput"
+        $ref: "#/components/requestBodies/ProjectTonApiTokenReq"
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       responses:
         '201':
-          $ref: '#/components/responses/TokenCreated'
+          $ref: '#/components/responses/ProjectTonApiTokenRes'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/tonapi/token/{id}:
     patch:
-      summary: "Update TonAPI project token"
-      operationId: updateTonApiProjectToken
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Update project TonAPI token"
+      operationId: updateProjectTonApiToken
       tags:
         - tonapi_service
       requestBody:
-        $ref: "#/components/requestBodies/TokenInput"
+        $ref: "#/components/requestBodies/ProjectTonApiTokenReq"
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
         - $ref: '#/components/parameters/tokenID'
@@ -256,15 +388,15 @@ paths:
           $ref: '#/components/responses/Ok'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
     delete:
-      summary: "Delete TonAPI project token"
-      operationId: deleteTonAPIProjectToken
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Delete project TonAPI token"
+      operationId: deleteProjectTonApiToken
       tags:
         - tonapi_service
       parameters:
@@ -275,6 +407,8 @@ paths:
           $ref: '#/components/responses/Ok'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -282,38 +416,58 @@ paths:
   /api/v1/services/tonapi/tier:
     get:
       summary: "Get project TonAPI tier"
-      operationId: getTonApiProjectTier
-      security:
-        - JWTAuth: [ "common" ]
+      operationId: getProjectTonApiTier
       tags:
         - tonapi_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       responses:
         '200':
-          $ref: '#/components/responses/TonApiTier'
+          $ref: '#/components/responses/ProjectTonApiTier'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
     patch:
-      summary: "Update TonAPI tier for project"
-      operationId: updateTonApiTier
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Update project TonAPI tier"
+      operationId: updateProjectTonApiTier
       tags:
         - tonapi_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       requestBody:
-        $ref: "#/components/requestBodies/TonApiTierInputUpdate"
+        $ref: "#/components/requestBodies/TonApiProjectTierRes"
       responses:
         '200':
-          $ref: '#/components/responses/TonApiTier'
+          $ref: '#/components/responses/ProjectTonApiTier'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/tier/valid/buy/{id}:
+    get:
+      summary: "Valid change TonAPI tier for project"
+      operationId: validChangeTonApiTier
+      tags:
+        - tonapi_service
+      parameters:
+        - $ref: '#/components/parameters/tierID'
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/ValidChangeTonApiTier'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -322,25 +476,23 @@ paths:
     get:
       summary: "Get active TonAPI tiers"
       operationId: getTonApiTiers
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - tonapi_service
       responses:
         '200':
-          $ref: '#/components/responses/Tiers'
+          $ref: '#/components/responses/TonApiTiers'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/tonapi/payments/history:
     get:
-      summary: "Get TonAPI payments history"
-      operationId: getTonApiPaymentsHistory
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Get project TonAPI payments history"
+      operationId: getProjectTonApiPaymentsHistory
       tags:
         - tonapi_service
       parameters:
@@ -350,18 +502,18 @@ paths:
           $ref: '#/components/responses/PaymentsHistory'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/tonapi/stats:
     get:
-      summary: "Get TonAPI stats by tokens"
-      operationId: getTonApiTokensStats
-      description: "To filter the stats, are expected  start and end query parameters in unix format,
+      summary: "Get project TonAPI stats"
+      operationId: getProjectTonApiStats
+      description: "To filter the stats, are expected start and end query parameters in unix format,
        where end is the day closer to the current one, for example start=1675958400&end=1676908800,"
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - tonapi_service
       parameters:
@@ -372,9 +524,11 @@ paths:
         - $ref: '#/components/parameters/queryDetailed'
       responses:
         '200':
-          $ref: '#/components/responses/TonApiTokensStats'
+          $ref: '#/components/responses/ProjectTonApiStats'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -384,8 +538,6 @@ paths:
     get:
       summary: "Get messages packages"
       operationId: getMessagesPackages
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - messages_service
       responses:
@@ -393,6 +545,8 @@ paths:
           $ref: '#/components/responses/MessagesPackages'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -401,29 +555,27 @@ paths:
     post:
       summary: "Buy messages package"
       operationId: buyMessagesPackage
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - messages_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       requestBody:
-        $ref: "#/components/requestBodies/MessagesBuyPackageInput"
+        $ref: "#/components/requestBodies/ProjectMessagesBuyPackage"
       responses:
         '200':
           $ref: '#/components/responses/Ok'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/messages/payments/history:
     get:
-      summary: "Get messages payments history"
-      operationId: getPushesPaymentsHistory
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Get project messages payments history"
+      operationId: getProjectMessagesPaymentsHistory
       tags:
         - messages_service
       parameters:
@@ -433,36 +585,36 @@ paths:
           $ref: '#/components/responses/PaymentsHistory'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/messages/app:
     post:
-      summary: "Create messages app"
-      operationId: createMessagesApp
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Create project messages app"
+      operationId: createProjectMessagesApp
       tags:
         - messages_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       requestBody:
-        $ref: "#/components/requestBodies/MessagesAppCreateInput"
+        $ref: "#/components/requestBodies/ProjectMessagesApp"
       responses:
         '200':
-          $ref: '#/components/responses/MessagesAppCreated'
+          $ref: '#/components/responses/ProjectMessagesApp'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
     delete:
-      summary: "Delete messages app"
-      operationId: deleteMessagesApp
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Delete project messages app"
+      operationId: deleteProjectMessagesApp
       tags:
         - messages_service
       parameters:
@@ -472,146 +624,319 @@ paths:
           $ref: '#/components/responses/Ok'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/messages/app/verify:
     post:
-      summary: "Verify messages app"
-      operationId: verifyMessagesApp
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Verify project messages app"
+      operationId: verifyProjectMessagesApp
       tags:
         - messages_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       requestBody:
-        $ref: "#/components/requestBodies/MessagesAppVerifyInput"
+        $ref: "#/components/requestBodies/ProjectMessagesAppVerify"
       responses:
         '200':
           $ref: '#/components/responses/Ok'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/messages/apps:
     get:
-      summary: "Get messages apps"
-      operationId: getMessagesApps
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Get project messages apps"
+      operationId: getProjectMessagesApps
       tags:
         - messages_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       responses:
         '200':
-          $ref: '#/components/responses/MessagesApps'
+          $ref: '#/components/responses/ProjectMessagesApps'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/messages/balance:
     get:
-      summary: "Get messages balance"
-      operationId: getMessagesBalance
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Get project messages balance"
+      operationId: getProjectMessagesBalance
       tags:
         - messages_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       responses:
         '200':
-          $ref: '#/components/responses/MessagesBalance'
+          $ref: '#/components/responses/ProjectMessagesBalance'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/messages/token:
     get:
-      summary: "Get messages app token"
-      operationId: getMessagesAppToken
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Get project messages app token"
+      operationId: getProjectMessagesAppToken
       tags:
         - messages_service
       parameters:
         - $ref: '#/components/parameters/queryAppID'
       responses:
         '200':
-          $ref: '#/components/responses/MessagesAppToken'
+          $ref: '#/components/responses/ProjectMessagesAppToken'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
     patch:
-      summary: "Regenerate messages app token"
-      operationId: regenerateMessagesAppToken
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Regenerate project messages app token"
+      operationId: regenerateProjectMessagesAppToken
       tags:
         - messages_service
       parameters:
         - $ref: '#/components/parameters/queryAppID'
       responses:
         '200':
-          $ref: '#/components/responses/MessagesAppToken'
+          $ref: '#/components/responses/ProjectMessagesAppToken'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/messages/stats:
     get:
-      summary: "Get messages stats"
-      operationId: getMessagesStats
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Get project messages stats"
+      operationId: getProjectMessagesStats
       tags:
         - messages_service
       parameters:
         - $ref: '#/components/parameters/queryAppID'
       responses:
         '200':
-          $ref: '#/components/responses/MessagesStats'
+          $ref: '#/components/responses/ProjectMessagesStats'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/messages/push:
     post:
-      summary: "Send messages push"
-      operationId: sendMessagesPush
-      security:
-        - JWTAuth: [ "common" ]
+      summary: "Send project messages push"
+      operationId: sendProjectMessagesPush
       tags:
         - messages_service
-      parameters:
-        - in: header
-          name: Authorization
-          required: true
-          schema:
-            type: string
+      security:
+        - BearerAuth: [ ]
       requestBody:
-        $ref: "#/components/requestBodies/MessagesSendPushInput"
+        $ref: "#/components/requestBodies/ProjectMessagesSendPush"
       responses:
         '200':
           $ref: '#/components/responses/MessagesSuccessDeliveryPush'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v1/services/testnet/available:
+    get:
+      summary: "Check available coins"
+      operationId: getTestnetAvailable
+      tags:
+        - testnet_service
+      responses:
+        '200':
+          $ref: '#/components/responses/TestnetAvailable'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/testnet/buy/coins:
+    post:
+      summary: "Buy testnet coins"
+      operationId: buyTestnetCoins
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/TestnetBuyCoins"
+      tags:
+        - testnet_service
+      responses:
+        '200':
+          $ref: '#/components/responses/MessageHash'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/testnet/payments/history:
+    get:
+      summary: "Get project testnet payments history"
+      operationId: getProjectTestnetPaymentsHistory
+      tags:
+        - testnet_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/PaymentsHistory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
+  /api/v1/services/stats/ddl:
+    get:
+      summary: "Get stats db ddl"
+      operationId: getStatsDDL
+      tags:
+        - stats_service
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsDDL'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/query:
+    post:
+      summary: "Send sql query to stats service"
+      operationId: sendSqlToStats
+      tags:
+        - stats_service
+      requestBody:
+        $ref: "#/components/requestBodies/StatsSQLQuery"
+      responses:
+        '201':
+          $ref: '#/components/responses/StatsSqlResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/query/{id}:
+    get:
+      summary: "Get result by sql query id"
+      operationId: getSqlResultFromStats
+      tags:
+        - stats_service
+      parameters:
+        - $ref: '#/components/parameters/queryID'
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsSqlResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/queries/history:
+    get:
+      summary: "Get sql history queries"
+      operationId: getSqlHistoryFromStats
+      tags:
+        - stats_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+        - $ref: '#/components/parameters/queryOffset'
+        - $ref: '#/components/parameters/queryLimit'
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsSqlHistory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/cosmos/graph:
+    post:
+      summary: "Get an intersection between accounts"
+      operationId: getGraphFromStats
+      tags:
+        - stats_service
+      parameters:
+        - $ref: '#/components/parameters/queryAddresses'
+        - $ref: '#/components/parameters/queryOnlyBetween'
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsSqlResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/payments/history:
+    get:
+      summary: "Get project stats payments history"
+      operationId: getProjectStatsPaymentsHistory
+      tags:
+        - stats_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/PaymentsHistory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -621,17 +946,15 @@ paths:
     post:
       summary: "Create invoices app"
       operationId: createInvoicesApp
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - invoices_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       requestBody:
-        $ref: "#/components/requestBodies/InvoicesAppCreateInput"
+        $ref: "#/components/requestBodies/InvoicesAppCreate"
       responses:
         '201':
-          $ref: '#/components/responses/InvoicesAppCreated'
+          $ref: '#/components/responses/InvoicesAppResp'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -639,17 +962,15 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
     get:
-      summary: "Get invoices app by project id"
+      summary: "Get invoices app by project"
       operationId: getInvoicesApp
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - invoices_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       responses:
         '200':
-          $ref: '#/components/responses/InvoicesAppGet'
+          $ref: '#/components/responses/InvoicesAppResp'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -660,17 +981,15 @@ paths:
     patch:
       summary: "Update invoices app"
       operationId: updateInvoicesApp
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - invoices_service
       parameters:
         - $ref: '#/components/parameters/appID'
       requestBody:
-        $ref: "#/components/requestBodies/InvoicesAppUpdateInput"
+        $ref: "#/components/requestBodies/InvoicesAppUpdate"
       responses:
         '200':
-          $ref: '#/components/responses/InvoicesAppUpdated'
+          $ref: '#/components/responses/InvoicesAppResp'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -680,8 +999,6 @@ paths:
     delete:
       summary: "Delete invoices app"
       operationId: deleteInvoicesApp
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - invoices_service
       parameters:
@@ -699,8 +1016,6 @@ paths:
     get:
       summary: "Get invoices app token"
       operationId: getInvoicesAppToken
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - invoices_service
       parameters:
@@ -717,8 +1032,6 @@ paths:
     patch:
       summary: "Regenerate invoices app token"
       operationId: regenerateInvoicesAppToken
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - invoices_service
       parameters:
@@ -734,16 +1047,14 @@ paths:
           $ref: '#/components/responses/InternalError'
   /api/v1/services/invoices/invoice:
     post:
-      summary: "Create invoices invoice"
+      summary: "Create invoice"
       operationId: createInvoicesInvoice
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - invoices_service
       parameters:
         - $ref: '#/components/parameters/queryAppID'
       requestBody:
-        $ref: "#/components/requestBodies/InvoicesInvoiceCreateInput"
+        $ref: "#/components/requestBodies/InvoiceCreate"
       responses:
         '201':
           $ref: '#/components/responses/InvoicesInvoiceResponse'
@@ -757,8 +1068,6 @@ paths:
     get:
       summary: "Get invoices"
       operationId: getInvoices
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - invoices_service
       parameters:
@@ -779,10 +1088,8 @@ paths:
           $ref: '#/components/responses/InternalError'
   /api/v1/services/invoices/{id}:
     get:
-      summary: "Get invoices invoice"
+      summary: "Get invoice"
       operationId: getInvoicesInvoice
-      security:
-        - JWTAuth: [ "common" ]
       tags:
         - invoices_service
       parameters:
@@ -797,10 +1104,28 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
     patch:
-      summary: "Update invoices invoice"
+      summary: "Update invoice"
       operationId: updateInvoicesInvoice
-      security:
-        - JWTAuth: [ "common" ]
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/invoiceID'
+        - $ref: '#/components/parameters/queryAppID'
+      requestBody:
+        $ref: "#/components/requestBodies/InvoiceChange"
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesInvoiceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/{id}/cancel:
+    patch:
+      summary: "Cancel invoice"
+      operationId: cancelInvoicesInvoice
       tags:
         - invoices_service
       parameters:
@@ -815,29 +1140,12 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /api/v1/services/invoices/fee:
-    get:
-      summary: "Get service invoices fee"
-      operationId: getServiceInvoicesFee
-      security:
-        - JWTAuth: [ "common" ]
-      tags:
-        - invoices_service
-      responses:
-        '200':
-          $ref: '#/components/responses/InvoicesServiceFee'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
   /api/v1/services/invoices/stats:
     get:
       summary: "Get invoices stats"
       operationId: getInvoicesStats
-      security:
-        - JWTAuth: [ "common" ]
+      parameters:
+        - $ref: '#/components/parameters/queryAppID'
       tags:
         - invoices_service
       responses:
@@ -851,7 +1159,19 @@ paths:
           $ref: '#/components/responses/InternalError'
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
   parameters:
+    queryID:
+      description: Query ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
     tokenID:
       description: Token ID
       in: path
@@ -859,7 +1179,7 @@ components:
       required: true
       schema:
         type: integer
-        format: int64
+        format: uint32
     projectID:
       description: Project ID
       in: path
@@ -867,7 +1187,14 @@ components:
       required: true
       schema:
         type: integer
-        format: int64
+        format: uint32
+    promoCode:
+      description: Promo code
+      in: path
+      name: promo_code
+      required: true
+      schema:
+        type: string
     appID:
       description: App ID
       in: path
@@ -875,7 +1202,16 @@ components:
       required: true
       schema:
         type: integer
-        format: int64
+        format: uint32
+    tierID:
+      description: Tier ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+        format: uint32
+        example: 1
     invoiceID:
       description: Invoice ID
       in: path
@@ -891,7 +1227,15 @@ components:
       required: true
       schema:
         type: integer
-        format: int64
+        format: uint32
+    queryInvoicesSearchID:
+      description: Search ID
+      in: query
+      name: search_id
+      required: false
+      schema:
+        type: string
+        minLength: 2
     queryLimit:
       description: Limit
       in: query
@@ -899,8 +1243,8 @@ components:
       required: false
       schema:
         type: integer
+        default: 100
         example: 50
-        maxLength: 50
     queryOffset:
       description: Offset
       in: query
@@ -938,14 +1282,6 @@ components:
           - asc
           - desc
         example: "desc"
-    queryInvoicesSearchID:
-      description: Search ID
-      in: query
-      name: search_id
-      required: false
-      schema:
-        type: string
-        minLength: 2
     queryAppID:
       description: App ID
       in: query
@@ -953,7 +1289,7 @@ components:
       required: true
       schema:
         type: integer
-        format: int64
+        format: uint32
     queryStartDate:
       description: Start date
       in: query
@@ -977,6 +1313,7 @@ components:
       schema:
         type: integer
         format: int64
+        default: 0
     queryDetailed:
       description: Show more detailed information
       in: query
@@ -984,10 +1321,23 @@ components:
       schema:
         type: boolean
         example: true
-  
+    queryOnlyBetween:
+      in: query
+      name: only_between
+      schema:
+        type: boolean
+        default: false
+    queryAddresses:
+      description: Addresses
+      in: query
+      name: addresses
+      required: true
+      schema:
+        type: string
+        example: "EQ..fz,EQ...fa"
   
   requestBodies:
-    TgAuthInput:
+    TgAuth:
       description: "Data that is expected from Telegram"
       content:
         application/json:
@@ -1005,12 +1355,15 @@ components:
               first_name:
                 type: string
                 example: "Test"
+              last_name:
+                type: string
+                example: "Test"
               photo_url:
                 type: string
-                example: "Testov"
+                example: "https://test_image.png"
               username:
                 type: string
-                example: "testov"
+                example: "test"
               hash:
                 type: string
                 example: "cd0e201bf7328535343301f428e51f01084a3e2a3822f4843d86b540bbebfe15"
@@ -1018,7 +1371,7 @@ components:
                 type: integer
                 format: int64
                 example: 1678275313
-    TokenInput:
+    ProjectTonApiTokenReq:
       description: "Data that is expected"
       content:
         application/json:
@@ -1033,7 +1386,8 @@ components:
               limit_rps:
                 type: number
                 example: 5
-    TonProofInput:
+                nullable: true
+    TonProof:
       description: "Data that is expected from TON Connect"
       content:
         application/json:
@@ -1062,7 +1416,7 @@ components:
                     example: "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa"
                   state_init:
                     type: string
-    ProjectInputCreate:
+    ProjectCreate:
       description: "Data that is expected"
       content:
         multipart/form-data:
@@ -1077,7 +1431,7 @@ components:
               image:
                 type: string
                 format: binary
-    ProjectInputUpdate:
+    ProjectUpdate:
       description: "Data that is expected"
       content:
         multipart/form-data:
@@ -1088,22 +1442,25 @@ components:
                 type: string
                 example: "Test Project"
               image:
-                description: "If you want to delete a avatar, put null in the image field."
                 type: string
-                nullable: true
                 format: binary
-    TonApiTierInputUpdate:
+              remove_image:
+                type: boolean
+                default: false
+    TonApiProjectTierRes:
       description: "Data that is expected"
       content:
         application/json:
           schema:
             type: object
+            required:
+              - tier_id
             properties:
               tier_id:
                 type: integer
-                format: int64
+                format: uint32
                 example: 1
-    MessagesBuyPackageInput:
+    ProjectMessagesBuyPackage:
       description: "Data that is expected"
       content:
         application/json:
@@ -1114,15 +1471,16 @@ components:
             properties:
               id:
                 type: integer
-                format: int64
+                format: uint32
                 example: 1
-    MessagesAppCreateInput:
+    ProjectMessagesApp:
       description: "Data that is expected"
       content:
         application/json:
           schema:
             required:
               - url
+              - name
             type: object
             properties:
               url:
@@ -1134,7 +1492,7 @@ components:
               image:
                 type: string
                 example: "https://my_dapp.io/avatar.png"
-    MessagesAppVerifyInput:
+    ProjectMessagesAppVerify:
       description: "Data that is expected"
       content:
         application/json:
@@ -1146,7 +1504,7 @@ components:
               payload:
                 type: string
                 example: "DkPazejgbwoAAAAAZFNueLGu-1GCWVgvk5Av_1EK2Ml5LzQItlrivLPtTPMsu5A2"
-    MessagesSendPushInput:
+    ProjectMessagesSendPush:
       description: "Data that is expected"
       content:
         application/json:
@@ -1169,7 +1527,63 @@ components:
                 type: string
                 description: "If the address has not been transmitted, then push messages will be sent to all users"
                 example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-    InvoicesAppCreateInput:
+    TestnetBuyCoins:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - address
+              - coins
+            properties:
+              address:
+                type: string
+                example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+              coins:
+                type: integer
+                format: int64
+                description: "nano ton are expected"
+                example: 1000000000
+    ProjectCharge:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - amount
+              - type_of_charge
+              - info
+            properties:
+              amount:
+                type: integer
+                format: int64
+                example: 1000000000
+              type_of_charge:
+                type: string
+                example: ""
+              info:
+                additionalProperties: true
+                example: { "first_key": "1", "second_key": 2 } # map[string]any
+    StatsSQLQuery:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - project_id
+              - query
+            properties:
+              project_id:
+                type: integer
+                format: uint32
+                example: 1647024163
+              query:
+                type: string
+                example: "select id from test"
+    InvoicesAppCreate:
       description: "Data that is expected"
       content:
         application/json:
@@ -1185,10 +1599,14 @@ components:
               description:
                 type: string
                 example: "Test description"
+              webhook:
+                type: string
+                example: "https://mydapp.com/api/handle-invoice-change"
+                nullable: true
               recipient_address:
                 type: string
                 example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-    InvoicesAppUpdateInput:
+    InvoicesAppUpdate:
       description: "Data that is expected"
       content:
         application/json:
@@ -1201,10 +1619,14 @@ components:
               description:
                 type: string
                 example: "Test description"
+              webhook:
+                type: string
+                example: "https://mydapp.com/api/handle-invoice-change"
+                nullable: true
               recipient_address:
                 type: string
                 example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-    InvoicesInvoiceCreateInput:
+    InvoiceCreate:
       description: "Data that is expected"
       content:
         application/json:
@@ -1234,6 +1656,17 @@ components:
               recipient_address:
                 type: string
                 example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+    InvoiceChange:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - refunded_amount
+            properties:
+              refunded_amount:
+                type: number
   
   schemas:
     Ok:
@@ -1256,13 +1689,8 @@ components:
         code:
           type: integer
           description: "backend error code"
-          enum: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ]
-          x-enum-varnames: [ ErrorUnknown, ErrorInternal, ErrorBadRequest,
-                             ErrorCheckPayload, ErrorVerificationProof, ErrorVerificationTg,
-                             ErrorAuthUser, ErrorBannedUser, ErrorLogoutUser, ErrorCreateProject,
-                             ErrorGetProject, ErrorUpdateProject, ErrorDeleteProject,
-                             ErrorProjectWithoutTier, ErrorUpdateTier, ErrorGetTiers, ErrorAlreadySelectedTier,
-                             ErrorDownGradeTier, ErrorInsufficientFunds ]
+          enum: [ 1, 2, 3 ]
+          x-enum-varnames: [ ]
     User:
       type: object
       required:
@@ -1316,7 +1744,7 @@ components:
       properties:
         id:
           type: integer
-          format: int64
+          format: uint32
           example: 1
         name:
           type: string
@@ -1328,6 +1756,7 @@ components:
           type: integer
           example: 5
         capabilities:
+          type: array
           items:
             type: string
             example: [ "mempool" ]
@@ -1351,7 +1780,7 @@ components:
       properties:
         id:
           type: integer
-          format: int64
+          format: uint32
           example: 1
         name:
           type: string
@@ -1369,15 +1798,18 @@ components:
           type: integer
           example: 10
         capabilities:
+          type: array
           items:
             type: string
             example: [ "mempool" ]
         next_payment:
-          type: string
-          example: "2023-04-23"
+          type: integer
+          format: int64
+          example: 1690889913000
         date_create:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
     Deposit:
       type: object
       required:
@@ -1393,8 +1825,9 @@ components:
           type: string
           example: "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR"
         income_date:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
         amount:
           type: integer
           format: int64
@@ -1412,12 +1845,24 @@ components:
           example: "742af494-e2cd-441f-98e8-ac6075280eff"
         tier_id:
           type: integer
-          format: int64
+          format: uint32
           example: 1
         messages_package_id:
           type: integer
-          format: int64
+          format: uint32
           example: 1
+        testnet_price_multiplicator:
+          type: integer
+          format: uint32
+          example: 1
+        stats_spent_time:
+          type: number
+          format: float64
+          example: 7.8
+        stats_price_per_second:
+          type: integer
+          format: uint32
+          example: 1000000
         amount:
           type: integer
           format: int64
@@ -1426,8 +1871,9 @@ components:
           type: number
           example: 2.25
         date_create:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
     Balance:
       type: object
       required:
@@ -1446,11 +1892,12 @@ components:
       required:
         - id
         - name
+        - capabilities
         - date_create
       properties:
         id:
           type: integer
-          format: int64
+          format: uint32
           example: 1
         name:
           type: string
@@ -1458,10 +1905,17 @@ components:
         avatar:
           type: string
           example: "https://tonapi.io/static/test.png"
+        capabilities:
+          type: array
+          items:
+            type: string
+            enum:
+              - invoices
         date_create:
-          type: string
-          example: "2023-03-23"
-    Token:
+          type: integer
+          format: int64
+          example: 1690889913000
+    ProjectTonApiToken:
       type: object
       required:
         - id
@@ -1483,8 +1937,9 @@ components:
           type: string
           example: "AE5TZRWIIOR2O2YAAAAGFP2HEWFZJYBP222A567CBF6JIL7S4RIZSCOAZRZOEW7AKMRICGQ"
         date_create:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
     Stats:
       type: object
       required:
@@ -1526,7 +1981,7 @@ components:
       properties:
         id:
           type: integer
-          format: int64
+          format: uint32
           example: 1
         name:
           type: string
@@ -1549,7 +2004,7 @@ components:
       properties:
         id:
           type: integer
-          format: int64
+          format: uint32
           example: 3652012454
         name:
           type: string
@@ -1559,6 +2014,7 @@ components:
           example: "https://my_dapp.io/avatar.png"
         project_id:
           type: integer
+          format: uint32
           example: 1647024163
         url:
           type: string
@@ -1567,8 +2023,33 @@ components:
           type: boolean
           example: true
         date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
+    StatsSqlResult:
+      type: object
+      required:
+        - id
+        - success
+      properties:
+        id:
           type: string
-          example: "2023-03-23"
+          example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+        url:
+          type: string
+          example: "https://sql.io/123.csv"
+        meta_url:
+          type: string
+          example: "https://sql.io/123_meta.csv"
+        spent_time:
+          type: number
+          example: 1.8
+        success:
+          type: boolean
+          example: true
+        error:
+          type: string
+          example: "invalid something"
     InvoicesInvoice:
       type: object
       required:
@@ -1608,6 +2089,10 @@ components:
         subtract_fee_from_amount:
           type: boolean
           example: false
+        overpayment:
+          type: number
+        refunded_amount:
+          type: number
         description:
           type: string
           example: "Test description"
@@ -1661,9 +2146,13 @@ components:
         recipient_address:
           type: string
           example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+        webhook:
+          type: string
+          example: "https://mydapp.com/api/handle-invoice-change"
         date_create:
           type: string
           example: "2023-03-23"
+  
   
   responses:
     NotFound:
@@ -1671,21 +2160,65 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            type: object
+            required:
+              - error
+              - code
+            properties:
+              error:
+                type: string
+                description: "Error message"
+              code:
+                type: integer
+                description: "backend error code"
     InternalError:
       description: "Something went wrong on server side"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            type: object
+            required:
+              - error
+              - code
+            properties:
+              error:
+                type: string
+                description: "Error message"
+              code:
+                type: integer
+                description: "backend error code"
     BadRequest:
       description: "Something went wrong on client side"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            type: object
+            required:
+              - error
+              - code
+            properties:
+              error:
+                type: string
+                description: "Error message"
+              code:
+                type: integer
+                description: "backend error code"
     UnauthorizedError:
       description: "Access token is missing or invalid"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error
+              - code
+            properties:
+              error:
+                type: string
+                description: "Error message"
+              code:
+                type: integer
+                description: "backend error code"
     Ok:
       description: "Ok"
       content:
@@ -1705,7 +2238,7 @@ components:
                 type: string
                 example: "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR"
     PaymentsHistory:
-      description: "Payments history"
+      description: "Project payments history"
       content:
         application/json:
           schema:
@@ -1717,8 +2250,8 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Charge'
-    TonApiTokensStats:
-      description: "TonApi tokens stats"
+    ProjectTonApiStats:
+      description: "Project TonApi stats"
       content:
         application/json:
           schema:
@@ -1727,7 +2260,8 @@ components:
               - stats
             properties:
               stats:
-                $ref: '#/components/schemas/Stats'
+                additionalProperties: true
+                example: { }
     DepositsHistory:
       description: "Deposits history"
       content:
@@ -1744,8 +2278,8 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Deposit'
-    TokenCreated:
-      description: "Token has been created"
+    ProjectTonApiTokenRes:
+      description: "Project TonAPI token"
       content:
         application/json:
           schema:
@@ -1754,9 +2288,9 @@ components:
               - token
             properties:
               token:
-                $ref: '#/components/schemas/Token'
-    TonApiTokens:
-      description: "TonAPI tokens"
+                $ref: '#/components/schemas/ProjectTonApiToken'
+    ProjectTonApiTokens:
+      description: "Project TonAPI tokens"
       content:
         application/json:
           schema:
@@ -1767,9 +2301,9 @@ components:
               items:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Token'
-    TonApiTier:
-      description: "TonAPI tier"
+                  $ref: '#/components/schemas/ProjectTonApiToken'
+    ProjectTonApiTier:
+      description: "Project TonAPI tier"
       content:
         application/json:
           schema:
@@ -1779,8 +2313,27 @@ components:
             properties:
               tier:
                 $ref: '#/components/schemas/AppTier'
-    ProjectCreated:
-      description: "Project has been created"
+    ValidChangeTonApiTier:
+      description: "Valid change TonAPI tier for project"
+      content:
+        application/json:
+          schema:
+            required:
+              - valid
+            type: object
+            properties:
+              valid:
+                type: boolean
+                description: "is valid"
+                example: true
+              unspent_money:
+                type: number
+                example: 0.0
+              details:
+                type: string
+                example: "there are not enough funds on your balance"
+    ProjectRes:
+      description: "Project"
       content:
         application/json:
           schema:
@@ -1790,18 +2343,7 @@ components:
             properties:
               project:
                 $ref: '#/components/schemas/Project'
-    ProjectUpdated:
-      description: "Project has been updated"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - project
-            properties:
-              project:
-                $ref: '#/components/schemas/Project'
-    GeneratePayload:
+    GeneratedPayload:
       description: "Payload for TON Connect"
       content:
         application/json:
@@ -1813,8 +2355,8 @@ components:
               payload:
                 type: string
                 example: "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa"
-    Tiers:
-      description: "Active tiers"
+    TonApiTiers:
+      description: "Active TonAPI tiers"
       content:
         application/json:
           schema:
@@ -1852,7 +2394,7 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/MessagesPackage'
-    MessagesAppCreated:
+    ProjectMessagesApp:
       description: "Messages app has been created"
       content:
         application/json:
@@ -1869,8 +2411,8 @@ components:
                 type: integer
                 format: int64
                 example: 1683189368
-    MessagesApps:
-      description: "Messages apps"
+    ProjectMessagesApps:
+      description: "Project messages apps"
       content:
         application/json:
           schema:
@@ -1882,8 +2424,8 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/MessagesApp'
-    MessagesBalance:
-      description: "Messages balance"
+    ProjectMessagesBalance:
+      description: "Project messages balance"
       content:
         application/json:
           schema:
@@ -1893,9 +2435,10 @@ components:
             properties:
               balance:
                 type: integer
+                format: int32
                 example: 100
-    MessagesAppToken:
-      description: "Messages app token"
+    ProjectMessagesAppToken:
+      description: "Project messages app token"
       content:
         application/json:
           schema:
@@ -1906,8 +2449,8 @@ components:
               token:
                 type: string
                 example: "TC-PUSHES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA=="
-    MessagesStats:
-      description: "Messages stats"
+    ProjectMessagesStats:
+      description: "Project messages stats"
       content:
         application/json:
           schema:
@@ -1925,15 +2468,19 @@ components:
                 properties:
                   users:
                     type: integer
+                    format: uint32
                     example: 10000
                   sent_in_week:
                     type: integer
+                    format: int64
                     example: 100
                   enable_notifications:
                     type: integer
+                    format: uint32
                     example: 100
                   available_messages:
                     type: integer
+                    format: int32
                     example: 100
     MessagesSuccessDeliveryPush:
       description: "Count of success delivery"
@@ -1947,31 +2494,83 @@ components:
               success_delivery:
                 type: integer
                 example: 1000
-    InvoicesAppCreated:
-      description: "Create invoices app"
+    TestnetAvailable:
+      description: "Available balance"
+      content:
+        application/json:
+          schema:
+            required:
+              - balance
+              - price_multiplicator
+            type: object
+            properties:
+              balance:
+                type: integer
+                format: uint64
+                example: 1000000000
+              price_multiplicator:
+                type: integer
+                format: int32
+                example: 20
+    MessageHash:
+      description: "Message hash"
+      content:
+        application/json:
+          schema:
+            required:
+              - hash
+            type: object
+            properties:
+              hash:
+                type: string
+                example: "546e80bd41ff70ecebe22625f7db3ae48e5a24c175697a8e07899de116bec397"
+    ProjectBalance:
+      description: "Project balance"
+      content:
+        application/json:
+          schema:
+            required:
+              - balance
+            type: object
+            properties:
+              balance:
+                type: integer
+                format: int64
+                example: 1000000000
+    StatsDDL:
+      description: "Stats db ddl"
+      content:
+        application/sql:
+          schema:
+            type: string
+            format: binary
+            example: create table test (...);
+    StatsSqlHistory:
+      description: "History of sql queries"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - items
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatsSqlResult'
+    StatsSqlResult:
+      description: "SQL result"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StatsSqlResult'
+    InvoicesAppResp:
+      description: "Invoices app"
       content:
         application/json:
           schema:
             required:
               - app
-            type: object
-            properties:
-              app:
-                $ref: '#/components/schemas/InvoicesApp'
-    InvoicesAppGet:
-      description: "Get invoices app"
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              app:
-                $ref: '#/components/schemas/InvoicesApp'
-    InvoicesAppUpdated:
-      description: "Update invoices app"
-      content:
-        application/json:
-          schema:
             type: object
             properties:
               app:
@@ -2049,20 +2648,17 @@ components:
                 properties:
                   total:
                     type: integer
+                    format: uint32
                     example: 10000
                   success_total:
                     type: integer
+                    format: uint32
                     example: 10000
                   success_in_week:
                     type: integer
+                    format: uint32
                     example: 10000
                   awaiting_payment:
                     type: integer
+                    format: uint32
                     example: 10000
-  
-  securitySchemes:
-    JWTAuth:
-      description: "JWT token authorization"
-      type: http
-      scheme: bearer
-      bearerFormat: JWT

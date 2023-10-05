@@ -22,6 +22,8 @@ class InvoicesAppStore {
     constructor() {
         makeAutoObservable(this);
 
+        this.feePercent$.value = 0;
+
         createImmediateReaction(
             () => projectsStore.selectedProject,
             project => {
@@ -40,7 +42,6 @@ class InvoicesAppStore {
 
                 if (app) {
                     this.fetchAppToken();
-                    this.fetchFeePercent();
                     this.fetchInvoicesStatistics();
                 }
             }
@@ -110,12 +111,6 @@ class InvoicesAppStore {
         });
 
         return response.data.token;
-    });
-
-    fetchFeePercent = this.feePercent$.createAsyncAction(async () => {
-        const response = await apiClient.api.getServiceInvoicesFee();
-
-        return response.data.fee;
     });
 
     regenerateAppToken = this.appToken$.createAsyncAction(

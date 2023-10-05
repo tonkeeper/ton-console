@@ -11,3 +11,4 @@ export * from './currency';
 export * from './url';
 export * from './validators';
 export * from './react';
+export * from './form';

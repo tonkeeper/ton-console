@@ -47,11 +47,11 @@ class DappStore {
             }
         }
 
-        const response = await apiClient.api.createMessagesApp(
+        const response = await apiClient.api.createProjectMessagesApp(
             {
                 project_id: projectsStore.selectedProject!.id
             },
-            form
+            form as Required<CreateDappForm>
         );
 
         this.pendingDapp = {
@@ -63,7 +63,7 @@ class DappStore {
 
     deleteValidatedDapp = this.dapps$.createAsyncAction(
         async (id: Dapp['id']) => {
-            await apiClient.api.deleteMessagesApp({
+            await apiClient.api.deleteProjectMessagesApp({
                 app_id: id
             });
 
@@ -86,7 +86,7 @@ class DappStore {
                 throw new Error('Dapp to validate is not set');
             }
 
-            await apiClient.api.verifyMessagesApp(
+            await apiClient.api.verifyProjectMessagesApp(
                 {
                     project_id: projectsStore.selectedProject!.id
                 },
@@ -121,7 +121,7 @@ class DappStore {
 }
 
 async function dappsApiRequest(projectId: number): Promise<Dapp[]> {
-    const response = await apiClient.api.getMessagesApps({
+    const response = await apiClient.api.getProjectMessagesApps({
         project_id: projectId
     });
 

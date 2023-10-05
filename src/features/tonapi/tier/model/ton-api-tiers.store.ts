@@ -8,7 +8,8 @@ import {
     DTOAppTier,
     DTOCharge,
     createImmediateReaction,
-    UsdCurrencyAmount
+    UsdCurrencyAmount,
+    createAsyncAction
 } from 'src/shared';
 import { TonApiPayment, TonApiTier } from './interfaces';
 import { projectsStore } from 'src/entities';
@@ -53,7 +54,7 @@ class TonApiTiersStore {
     });
 
     fetchSelectedTier = this.selectedTier$.createAsyncAction(async () => {
-        const response = await apiClient.api.getTonApiProjectTier({
+        const response = await apiClient.api.getProjectTonApiTier({
             project_id: projectsStore.selectedProject!.id
         });
 
@@ -61,7 +62,7 @@ class TonApiTiersStore {
     });
 
     fetchPaymentsHistory = this.paymentsHistory$.createAsyncAction(async () => {
-        const response = await apiClient.api.getTonApiPaymentsHistory({
+        const response = await apiClient.api.getProjectTonApiPaymentsHistory({
             project_id: projectsStore.selectedProject!.id
         });
 
@@ -72,7 +73,7 @@ class TonApiTiersStore {
 
     selectTier = this.selectedTier$.createAsyncAction(
         async (tierId: number) => {
-            const result = await apiClient.api.updateTonApiTier(
+            const result = await apiClient.api.updateProjectTonApiTier(
                 { project_id: projectsStore.selectedProject!.id },
                 {
                     tier_id: tierId
@@ -90,6 +91,19 @@ class TonApiTiersStore {
             }
         }
     );
+
+    checkCanBuyTier = createAsyncAction(async (tierId: number) => {
+        try {
+            const result = await apiClient.api.validChangeTonApiTier(tierId, {
+                project_id: projectsStore.selectedProject!.id
+            });
+
+            return result.data.valid;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
+    });
 
     clearState(): void {
         this.tiers$.clear();
