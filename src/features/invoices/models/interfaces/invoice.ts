@@ -1,4 +1,4 @@
-import { CurrencyAmount } from 'src/shared';
+import { TokenCurrencyAmount } from 'src/shared';
 
 export const InvoiceStatus = {
     pending: 'pending',
@@ -12,12 +12,14 @@ export type InvoiceStatus = keyof typeof InvoiceStatus;
 
 export interface InvoiceCommon {
     id: string;
-    amount: CurrencyAmount;
+    amount: TokenCurrencyAmount;
     validUntil: Date;
     subtractFeeFromAmount: boolean;
     description: string;
     creationDate: Date;
     receiverAddress: string;
+    overpayment?: TokenCurrencyAmount;
+    refundDate?: Date;
 }
 
 export interface InvoiceSuccessful extends InvoiceCommon {

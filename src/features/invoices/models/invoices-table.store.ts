@@ -2,6 +2,7 @@ import { makeAutoObservable, reaction } from 'mobx';
 import {
     apiClient,
     createImmediateReaction,
+    createTransferLink,
     DTOGetInvoicesParamsFieldOrder,
     DTOGetInvoicesParamsTypeOrder,
     DTOInvoicesInvoice,
@@ -246,7 +247,8 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
         id: invoiceDTO.id,
         validUntil: new Date(creationDate.getTime() + invoiceDTO.life_time * 1000),
         description: invoiceDTO.description,
-        receiverAddress: invoiceDTO.recipient_address
+        receiverAddress: invoiceDTO.recipient_address,
+        overpayment: new TonCurrencyAmount(invoiceDTO.amount) // TODO
     };
 
     const status = mapInvoiceDTOStatusToInvoiceStatus[invoiceDTO.status];
@@ -304,5 +306,14 @@ const mapSortColumnToFieldOrder: Record<InvoiceTableSortColumn, DTOGetInvoicesPa
     status: DTOGetInvoicesParamsFieldOrder.DTOStatus,
     'creation-date': DTOGetInvoicesParamsFieldOrder.DTODateCreate
 };
+
+export function createInvoicePaymentLink(invoice: Invoice): string {
+    return createTransferLink({
+        address: invoice.receiverAddress,
+        amount: invoice.amount,
+        text: invoice.id,
+        exp: invoice.validUntil
+    });
+}
 
 export const invoicesTableStore = new InvoicesTableStore();

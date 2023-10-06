@@ -1,20 +1,37 @@
 import BigNumber from 'bignumber.js';
 import { TokenCurrencyAmount } from 'src/shared';
 
-export function createTransferLink(
-    address: string,
-    amount?: string | number | BigNumber | TokenCurrencyAmount
-): string {
-    const link = `https://app.tonkeeper.com/transfer/${address}`;
-    if (!amount) {
-        return link;
+export function createTransferLink(options?: {
+    address?: string;
+    amount?: string | number | BigNumber | TokenCurrencyAmount;
+    text?: string;
+    exp?: Date | number | string;
+}): string {
+    const baseUrl = 'https://app.tonkeeper.com/transfer';
+    const link = new URL(options?.address ? `${baseUrl}/${options.address}` : baseUrl);
+
+    if (options?.amount) {
+        let value: string;
+        if (typeof options.amount === 'object' && 'amount' in options.amount) {
+            value = options.amount.weiAmount.toFixed(0);
+        } else {
+            value = new BigNumber(options.amount).toFixed(0);
+        }
+        link.searchParams.append('amount', value);
     }
 
-    let value: string;
-    if (typeof amount === 'object' && 'amount' in amount) {
-        value = amount.weiAmount.toFixed(0);
-    } else {
-        value = new BigNumber(amount).toFixed(0);
+    if (options?.text) {
+        link.searchParams.append('text', encodeURIComponent(options.text));
     }
-    return `${link}?amount=${value}`;
+
+    if (options?.exp) {
+        link.searchParams.append(
+            'exp',
+            options.exp instanceof Date
+                ? Math.floor(options.exp.getTime() / 1000).toString()
+                : options.exp.toString()
+        );
+    }
+
+    return link.toString();
 }

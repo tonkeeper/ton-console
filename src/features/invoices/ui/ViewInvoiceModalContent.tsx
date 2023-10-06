@@ -11,7 +11,7 @@ import {
     ModalHeader,
     Text
 } from '@chakra-ui/react';
-import { Invoice } from 'src/features';
+import { createInvoicePaymentLink, Invoice } from 'src/features';
 import { CopyPad, CURRENCY, H4, Span, toTimeLeft } from 'src/shared';
 import { CurrencyRate } from 'src/entities';
 import { useCountdown } from 'src/shared/hooks/useCountdown';
@@ -62,7 +62,7 @@ export const ViewInvoiceModalContent: FunctionComponent<{
                 <Text textStyle="label2" mb="2">
                     Link for payment
                 </Text>
-                <CopyPad text={`https://pay.tonconsole.com/${invoice.id}`} />
+                <CopyPad text={createInvoicePaymentLink(invoice)} />
             </ModalBody>
             <ModalFooter gap="3">
                 <Button flex={1} onClick={onClose} variant="secondary">

@@ -79,9 +79,7 @@ export const InvoicesTableStructure = observer(
                                     borderTopLeftRadius="sm"
                                     boxSizing="content-box"
                                 >
-                                    <InvoicesTableColumnLabel pl="32px" column="id">
-                                        ID
-                                    </InvoicesTableColumnLabel>
+                                    ID
                                 </Th>
                                 <Th
                                     pos="sticky"
@@ -97,30 +95,29 @@ export const InvoicesTableStructure = observer(
                                 <Th
                                     pos="sticky"
                                     top="0"
-                                    minW="180px"
+                                    minW="160px"
                                     bg="background.contentTint"
                                     boxSizing="content-box"
                                 >
-                                    <InvoicesTableColumnLabel column="creation-date">
-                                        Creation date
+                                    <InvoicesTableColumnLabel column="amount">
+                                        Amount
                                     </InvoicesTableColumnLabel>
                                 </Th>
                                 <Th
                                     pos="sticky"
                                     top="0"
-                                    minW="240px"
+                                    minW="180px"
                                     bg="background.contentTint"
                                     boxSizing="content-box"
                                 >
-                                    <InvoicesTableColumnLabel column="description">
-                                        Invoice description
+                                    <InvoicesTableColumnLabel column="creation-date">
+                                        Creation Date
                                     </InvoicesTableColumnLabel>
                                 </Th>
                                 <Th
                                     pos="sticky"
                                     top="0"
                                     w="100%"
-                                    textAlign="right"
                                     bg="background.contentTint"
                                     borderTop="1px"
                                     borderTopColor="background.contentTint"
@@ -129,8 +126,8 @@ export const InvoicesTableStructure = observer(
                                     borderTopRightRadius="sm"
                                     boxSizing="content-box"
                                 >
-                                    <InvoicesTableColumnLabel column="amount">
-                                        Amount
+                                    <InvoicesTableColumnLabel column="description">
+                                        Invoice description
                                     </InvoicesTableColumnLabel>
                                 </Th>
                             </Tr>
