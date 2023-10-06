@@ -6,6 +6,7 @@ export type InvoiceTableSortColumn = InvoiceTableColumn;
 export type InvoiceTableFiltration = {
     id?: string;
     status?: InvoiceStatus[];
+    overpayment: boolean;
 };
 
 export type InvoiceTableSortDirection = 'asc' | 'desc';

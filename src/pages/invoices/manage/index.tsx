@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { H4, Overlay } from 'src/shared';
 import {
     CreateInvoiceModal,
+    FilterInvoiceByOverpayment,
     FilterInvoiceByStatus,
     InvoicesProjectInfo,
     InvoicesSearchInput,
@@ -20,9 +21,10 @@ const ManageInvoicesPage: FunctionComponent = () => {
                 <RefreshInvoicesTableButton alignSelf="flex-end" />
             </Flex>
             <InvoicesProjectInfo mb="5" />
-            <Flex gap="4" mb="9">
+            <Flex align="center" gap="4" mb="9">
                 <InvoicesSearchInput w="264px" />
                 <FilterInvoiceByStatus />
+                <FilterInvoiceByOverpayment />
                 <Button h="44px" ml="auto" onClick={onOpen} variant="primary">
                     New Invoice
                 </Button>

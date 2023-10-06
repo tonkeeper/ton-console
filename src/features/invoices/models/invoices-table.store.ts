@@ -5,7 +5,7 @@ import {
     DTOGetInvoicesParamsFieldOrder,
     DTOGetInvoicesParamsTypeOrder,
     DTOInvoicesInvoice,
-    DTOInvoicesInvoiceStatus,
+    DTOInvoiceStatus,
     Loadable,
     TonCurrencyAmount
 } from 'src/shared';
@@ -29,7 +29,9 @@ class InvoicesTableStore {
     pageSize = 30;
 
     pagination: InvoicesTablePagination = {
-        filter: {},
+        filter: {
+            overpayment: false
+        },
         sort: {
             direction: 'desc',
             column: 'creation-date'
@@ -117,7 +119,13 @@ class InvoicesTableStore {
         pageSize?: number;
     }): ReturnType<typeof apiClient.api.getInvoices> {
         const searchId = this.pagination.filter.id;
-        // const filterByStatus = this.pagination.filter.status; TODO
+        let filterByStatus = undefined;
+
+        if (this.pagination.filter.status?.length) {
+            filterByStatus = this.pagination.filter.status.map(
+                i => mapInvoiceStatusToInvoiceDTOStatus[i]
+            );
+        }
 
         const sortByColumn = mapSortColumnToFieldOrder[this.pagination.sort.column];
         const sortOrder =
@@ -131,7 +139,9 @@ class InvoicesTableStore {
             limit: options?.pageSize || this.pageSize,
             ...(searchId && { search_id: searchId }),
             field_order: sortByColumn,
-            type_order: sortOrder
+            type_order: sortOrder,
+            filter_status: filterByStatus,
+            ...(this.pagination.filter.overpayment && { overpayment: true })
         });
     }
 
@@ -143,8 +153,6 @@ class InvoicesTableStore {
                 },
                 {
                     amount: Number(form.amount.stringWeiAmount),
-                    subtract_fee_from_amount: form.subtractFeeFromAmount,
-                    recipient_address: form.receiverAddress,
                     description: form.description,
                     life_time: form.lifeTimeSeconds
                 }
@@ -196,6 +204,10 @@ class InvoicesTableStore {
         }
     };
 
+    toggleFilterByOverpayment = (): void => {
+        this.pagination.filter.overpayment = !this.pagination.filter.overpayment;
+    };
+
     clearFilterByStatus = (): void => {
         this.pagination.filter.status = undefined;
     };
@@ -203,7 +215,9 @@ class InvoicesTableStore {
     clearState(): void {
         this.invoices$.clear();
         this.pagination = {
-            filter: {},
+            filter: {
+                overpayment: false
+            },
             sort: {
                 direction: 'desc',
                 column: 'creation-date'
@@ -214,11 +228,14 @@ class InvoicesTableStore {
 }
 
 const mapInvoiceDTOStatusToInvoiceStatus: Record<DTOInvoicesInvoice['status'], InvoiceStatus> = {
-    [DTOInvoicesInvoiceStatus.DTOSuccessStatus]: 'success',
-    [DTOInvoicesInvoiceStatus.DTOPendingStatus]: 'pending',
-    [DTOInvoicesInvoiceStatus.DTOExpiredStatus]: 'expired',
-    [DTOInvoicesInvoiceStatus.DTOCancelStatus]: 'cancelled'
+    [DTOInvoiceStatus.DTOSuccessStatus]: 'success',
+    [DTOInvoiceStatus.DTOPendingStatus]: 'pending',
+    [DTOInvoiceStatus.DTOExpiredStatus]: 'expired',
+    [DTOInvoiceStatus.DTOCancelStatus]: 'cancelled'
 };
+
+const mapInvoiceStatusToInvoiceDTOStatus: Record<InvoiceStatus, DTOInvoicesInvoice['status']> =
+    Object.fromEntries(Object.entries(mapInvoiceDTOStatusToInvoiceStatus).map(a => a.reverse()));
 
 function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
     const creationDate = new Date(invoiceDTO.date_create);

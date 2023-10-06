@@ -307,8 +307,7 @@ export interface DTOInvoicesInvoice {
     refunded_amount?: number;
     /** @example "Test description" */
     description: string;
-    /** @example "pending_status" */
-    status: DTOInvoicesInvoiceStatus;
+    status: DTOInvoiceStatus;
     /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
     recipient_address: string;
     /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
@@ -344,6 +343,14 @@ export interface DTOInvoicesApp {
     date_create: string;
 }
 
+/** @example "pending_status" */
+export enum DTOInvoiceStatus {
+    DTOPendingStatus = 'pending_status',
+    DTOSuccessStatus = 'success_status',
+    DTOCancelStatus = 'cancel_status',
+    DTOExpiredStatus = 'expired_status'
+}
+
 /** backend error code */
 export enum DTOErrorCode {
     DTOValue1 = 1,
@@ -353,14 +360,6 @@ export enum DTOErrorCode {
 
 export enum DTOProjectCapabilities {
     DTOInvoices = 'invoices'
-}
-
-/** @example "pending_status" */
-export enum DTOInvoicesInvoiceStatus {
-    DTOPendingStatus = 'pending_status',
-    DTOSuccessStatus = 'success_status',
-    DTOCancelStatus = 'cancel_status',
-    DTOExpiredStatus = 'expired_status'
 }
 
 /**
@@ -2470,10 +2469,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 life_time: number;
                 /** @example "Test description" */
                 description?: string;
-                /** @example false */
-                subtract_fee_from_amount?: boolean;
-                /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-                recipient_address: string;
             },
             params: RequestParams = {}
         ) =>
@@ -2536,6 +2531,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @minLength 2
                  */
                 search_id?: string;
+                /** Filter status */
+                filter_status?: DTOInvoiceStatus[];
+                /**
+                 * Overpayment
+                 * @default false
+                 */
+                overpayment?: boolean;
             },
             params: RequestParams = {}
         ) =>

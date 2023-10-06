@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { CreateInvoiceFrom } from './CreateInvoiceFrom';
-import { Invoice, invoicesAppStore } from 'src/features';
+import { Invoice } from 'src/features';
 import { ViewInvoiceModalContent } from './ViewInvoiceModalContent';
 import { invoicesTableStore } from '../models';
 
@@ -22,10 +22,6 @@ const CreateInvoiceModal: FunctionComponent<{
     const [createdInvoice, setCreatedInvoice] = useState<Invoice | null>(null);
 
     const id = useId();
-
-    const defaultValues = {
-        receiverAddress: invoicesAppStore.invoicesApp$.value?.receiverAddress
-    };
 
     const closeHandler = (): void => {
         if (!invoicesTableStore.createInvoice.isLoading) {
@@ -46,7 +42,6 @@ const CreateInvoiceModal: FunctionComponent<{
                     <ModalBody>
                         <CreateInvoiceFrom
                             id={id}
-                            defaultValues={defaultValues}
                             onSubmit={form =>
                                 invoicesTableStore.createInvoice(form).then(setCreatedInvoice)
                             }

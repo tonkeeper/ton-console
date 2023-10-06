@@ -27,7 +27,7 @@ const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = pro
             placement="bottom-start"
             {...props}
         >
-            <MenuButtonDefault rightIcon={<ArrowIcon />}>
+            <MenuButtonDefault px="4" rightIcon={<ArrowIcon />}>
                 <Flex textStyle="label2" gap="2">
                     Filter by status{' '}
                     {!!invoicesTableStore.pagination.filter.status?.length && (
@@ -47,19 +47,21 @@ const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = pro
             <MenuList zIndex={100} w="240px">
                 <Flex justify="space-between" mb="2" pt="2" px="1" color="text.secondary">
                     <Span textStyle="label2">Display only</Span>
-                    <Button
-                        h="fit-content"
-                        p="0"
-                        onClick={() => {
-                            invoicesTableStore.clearFilterByStatus();
-                            onClose();
-                        }}
-                        variant="flat"
-                    >
-                        <Span color="text.secondary" textStyle="body2">
-                            Clear all
-                        </Span>
-                    </Button>
+                    {invoicesTableStore.pagination.filter.status?.length && (
+                        <Button
+                            h="fit-content"
+                            p="0"
+                            onClick={() => {
+                                invoicesTableStore.clearFilterByStatus();
+                                onClose();
+                            }}
+                            variant="flat"
+                        >
+                            <Span color="text.secondary" textStyle="body2">
+                                Clear all
+                            </Span>
+                        </Button>
+                    )}
                 </Flex>
                 {Object.keys(InvoiceStatus).map(status => (
                     <MenuItem

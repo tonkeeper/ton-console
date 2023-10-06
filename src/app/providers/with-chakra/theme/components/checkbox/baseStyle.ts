@@ -5,7 +5,7 @@ export default definePartsStyle({
     label: {
         ...textStyles.body2,
         color: 'text.primary',
-        ml: '3'
+        ml: '2'
     },
     control: {
         h: '18px',
@@ -21,11 +21,17 @@ export default definePartsStyle({
         _hover: {
             borderColor: 'icon.secondary'
         },
+        '> .chakra-icon': {
+            visibility: 'hidden'
+        },
         _checked: {
             bg: 'icon.primary',
             border: 'none',
             _hover: {
                 bg: 'icon.primary'
+            },
+            '> .chakra-icon': {
+                visibility: 'visible'
             }
         },
         borderRadius: 'sm'

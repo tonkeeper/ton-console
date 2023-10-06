@@ -1,13 +1,7 @@
 import { ComponentProps, FunctionComponent, useEffect } from 'react';
-import {
-    IconButton,
-    Input,
-    InputGroup,
-    InputLeftElement,
-    InputRightElement
-} from '@chakra-ui/react';
+import { Input, InputGroup, InputLeftElement, InputRightElement } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { SearchIcon24, useDebounce, XMarkCircleIcon16 } from 'src/shared';
+import { IconButton, SearchIcon24, useDebounce, XMarkCircleIcon16 } from 'src/shared';
 import { useIMask } from 'react-imask';
 import { invoicesTableStore } from 'src/features';
 
@@ -38,8 +32,6 @@ const InvoicesSearchInput: FunctionComponent<ComponentProps<typeof InputGroup>> 
                         aria-label="clear"
                         icon={<XMarkCircleIcon16 />}
                         onClick={() => setValue('')}
-                        size="fit"
-                        variant="flat"
                     />
                 </InputRightElement>
             )}

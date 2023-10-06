@@ -5,6 +5,7 @@ import { invoicesAppStore } from 'src/features';
 import { Center, Spinner } from '@chakra-ui/react';
 import { Route, useNavigate } from 'react-router-dom';
 import { lazy } from '@loadable/component';
+import JoinInvoices from './JoinInvoices';
 
 const ApiDescriptionPage = lazy(() => import('./api-description'));
 const ManageInvoicesPage = lazy(() => import('./manage'));
@@ -18,7 +19,11 @@ const InvoicesPage = observer(() => {
         );
     }
 
-    return <RegisterProject />;
+    if (invoicesAppStore.invoicesServiceAvailable) {
+        return <RegisterProject />;
+    }
+
+    return <JoinInvoices />;
 });
 
 const Index = observer(() => {

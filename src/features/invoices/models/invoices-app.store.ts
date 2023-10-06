@@ -19,6 +19,10 @@ class InvoicesAppStore {
 
     statistics$ = new Loadable<InvoicesStatistics | null>(null);
 
+    get invoicesServiceAvailable(): boolean {
+        return !!projectsStore.selectedProject?.capabilities.invoices;
+    }
+
     constructor() {
         makeAutoObservable(this);
 
@@ -49,15 +53,20 @@ class InvoicesAppStore {
     }
 
     fetchInvoicesApp = this.invoicesApp$.createAsyncAction(async () => {
-        const response = await apiClient.api.getInvoicesApp({
-            project_id: projectsStore.selectedProject!.id
-        });
+        try {
+            const response = await apiClient.api.getInvoicesApp({
+                project_id: projectsStore.selectedProject!.id
+            });
 
-        if (!response.data.app) {
+            if (!response.data.app) {
+                return null;
+            }
+
+            return mapInvoicesAppDTOToInvoicesApp(response.data.app);
+        } catch (e) {
+            console.debug(e);
             return null;
         }
-
-        return mapInvoicesAppDTOToInvoicesApp(response.data.app);
     });
 
     createInvoicesApp = this.invoicesApp$.createAsyncAction(
@@ -68,8 +77,7 @@ class InvoicesAppStore {
                 },
                 {
                     name: form.name,
-                    recipient_address: form.receiverAddress,
-                    description: form.companyDetails
+                    recipient_address: form.receiverAddress
                 }
             );
 
@@ -89,8 +97,7 @@ class InvoicesAppStore {
         async (form: Partial<InvoicesProjectForm> & { id: number }) => {
             const response = await apiClient.api.updateInvoicesApp(form.id, {
                 name: form.name,
-                recipient_address: form.receiverAddress,
-                description: form.companyDetails
+                recipient_address: form.receiverAddress
             });
 
             return mapInvoicesAppDTOToInvoicesApp(response.data.app!);
@@ -133,9 +140,6 @@ class InvoicesAppStore {
 
     fetchInvoicesStatistics = this.statistics$.createAsyncAction(async () => {
         const response = await apiClient.api.getInvoicesStats({
-            // TODO
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
             app_id: this.invoicesApp$.value!.id
         });
 
@@ -157,7 +161,6 @@ function mapInvoicesAppDTOToInvoicesApp(invoicesAppDTO: DTOInvoicesApp): Invoice
     return {
         id: invoicesAppDTO.id,
         name: invoicesAppDTO.name,
-        companyDetails: invoicesAppDTO.description,
         creationDate: new Date(invoicesAppDTO.date_create),
         receiverAddress: toUserFriendlyAddress(invoicesAppDTO.recipient_address)
     };

@@ -83,16 +83,6 @@ export const EditInvoicesProjectForm: FunctionComponent<
                     {formState.errors.receiverAddress && formState.errors.receiverAddress.message}
                 </FormErrorMessage>
             </FormControl>
-            <FormControl>
-                <FormLabel htmlFor="companyDetails">About company</FormLabel>
-                <Textarea
-                    resize="none"
-                    autoComplete="off"
-                    id="companyDetails"
-                    placeholder="Public details about your project and company"
-                    {...register('companyDetails')}
-                />
-            </FormControl>
         </chakra.form>
     );
 };

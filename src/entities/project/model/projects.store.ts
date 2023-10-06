@@ -2,20 +2,21 @@ import { makeAutoObservable } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
 import {
     apiClient,
-    DTOProject,
-    getWindow,
-    serializeState,
+    createImmediateReaction,
     deserializeState,
-    toColor,
+    DTOProject,
+    DTOProjectCapabilities,
+    getWindow,
     Loadable,
     replaceIfNotEqual,
-    createImmediateReaction
+    serializeState,
+    toColor
 } from 'src/shared';
-import { Project, CreateProjectFormValues, UpdateProjectFormValues } from './interfaces';
+import { CreateProjectFormValues, Project, UpdateProjectFormValues } from './interfaces';
 import { tGUserStore } from '../../tg-user';
 
 class ProjectsStore {
-    projects$ = new Loadable<Project[]>([], { makePersistable: 'Projects' });
+    projects$ = new Loadable<Project[]>([]);
 
     private selectedProjectId: number | null = null;
 
@@ -181,7 +182,10 @@ function mapProjectDtoToProject(projectDTO: DTOProject): Project {
         name: projectDTO.name,
         imgUrl: projectDTO.avatar,
         creationDate: new Date(projectDTO.date_create),
-        fallbackBackground: gradient(toColor(Math.abs(projectDTO.id ^ 255), { min: 30, max: 215 }))
+        fallbackBackground: gradient(toColor(Math.abs(projectDTO.id ^ 255), { min: 30, max: 215 })),
+        capabilities: {
+            invoices: projectDTO.capabilities.includes(DTOProjectCapabilities.DTOInvoices)
+        }
     };
 }
 

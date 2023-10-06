@@ -1,9 +1,6 @@
 import { FunctionComponent, useEffect } from 'react';
 import {
-    Button,
     chakra,
-    Checkbox,
-    Flex,
     FormControl,
     FormErrorMessage,
     FormLabel,
@@ -11,24 +8,18 @@ import {
     Input,
     InputGroup,
     InputRightElement,
-    Skeleton,
     StyleProps,
-    Text,
-    Textarea
+    Text
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
-import { InvoiceForm, invoicesAppStore } from '../models';
+import { InvoiceForm } from '../models';
 import {
-    formatNumber,
-    InfoTooltip,
-    isAddersValid,
     isNumber,
     mergeRefs,
     OptionsInput,
     OptionsInputOption,
     OptionsInputText,
     Span,
-    TickIcon,
     TonCurrencyAmount,
     tonMask
 } from 'src/shared';
@@ -38,13 +29,9 @@ import { observer } from 'mobx-react-lite';
 interface InternalForm {
     amount: string;
 
-    subtractFeeFromAmount: boolean;
-
     lifeTimeMinutes: number;
 
     description: string;
-
-    receiverAddress: string;
 }
 
 export const CreateInvoiceFrom: FunctionComponent<
@@ -57,19 +44,16 @@ export const CreateInvoiceFrom: FunctionComponent<
 > = observer(({ onSubmit, defaultValues, disableDefaultFocus, ...rest }) => {
     const { amount: defaultAmount, ...restDefaultValues } = defaultValues || {};
     const context = useFormContext<InternalForm>();
-    let { handleSubmit, register, formState, setFocus, watch, setValue, trigger } =
-        useForm<InternalForm>({
-            defaultValues: {
-                amount: defaultAmount?.stringAmount,
-                ...restDefaultValues
-            }
-        });
+    let { handleSubmit, register, formState, setFocus } = useForm<InternalForm>({
+        defaultValues: {
+            amount: defaultAmount?.stringAmount,
+            ...restDefaultValues
+        }
+    });
 
     if (context) {
-        ({ handleSubmit, register, formState, setFocus, watch, setValue, trigger } = context);
+        ({ handleSubmit, register, formState, setFocus } = context);
     }
-
-    const addressChanged = watch('receiverAddress') !== restDefaultValues.receiverAddress;
 
     useEffect(() => {
         if (!disableDefaultFocus) {
@@ -104,19 +88,6 @@ export const CreateInvoiceFrom: FunctionComponent<
         });
     };
 
-    const feePercent = invoicesAppStore.feePercent$.value || 0;
-    const feePercentResolved = invoicesAppStore.feePercent$.isResolved;
-    const subtractFeeFromAmount = watch('subtractFeeFromAmount');
-    const amountRaw = Number(watch('amount'));
-    const amount = isFinite(amountRaw) ? amountRaw : 0;
-    let businessWillGet = amount * ((100 - feePercent) / 100);
-    let buyerWillSee = amount;
-
-    if (!subtractFeeFromAmount) {
-        businessWillGet = amount;
-        buyerWillSee = amount / ((100 - feePercent) / 100);
-    }
-
     return (
         <chakra.form w="100%" onSubmit={handleSubmit(submitMiddleware)} noValidate {...rest}>
             <FormControl mb="8" isInvalid={!!formState.errors.amount} isRequired>
@@ -137,52 +108,6 @@ export const CreateInvoiceFrom: FunctionComponent<
                 <FormErrorMessage>
                     {formState.errors.amount && formState.errors.amount.message}
                 </FormErrorMessage>
-            </FormControl>
-
-            <FormControl mb="5">
-                <Flex align="center" gap="1" mb="3">
-                    <Checkbox
-                        defaultChecked
-                        icon={<TickIcon w="12px" />}
-                        id="subtractFeeFromAmount"
-                        {...register('subtractFeeFromAmount')}
-                    >
-                        Subtract fee from amount
-                    </Checkbox>
-                    <InfoTooltip>
-                        <Span textStyle="body2" color="text.primary">
-                            Indicates who will be charged {feePercentResolved && feePercent + '% '}
-                            service fee - the business or a buyer
-                        </Span>
-                    </InfoTooltip>
-                </Flex>
-                <Flex textStyle="body2" justify="space-between" mb="1">
-                    <Flex align="center" gap="1" color="text.secondary">
-                        How much money a business will get
-                        <InfoTooltip>
-                            <Span textStyle="body2" color="text.primary">
-                                Excluding blockchain fee
-                            </Span>
-                        </InfoTooltip>
-                    </Flex>
-                    <Span color="text.primary">
-                        {feePercentResolved ? (
-                            formatNumber(businessWillGet) + ' TON'
-                        ) : (
-                            <Skeleton w="40px" h="14px" />
-                        )}
-                    </Span>
-                </Flex>
-                <Flex textStyle="body2" justify="space-between">
-                    <Span color="text.secondary">Amount the buyer will see</Span>
-                    <Span color="text.primary">
-                        {feePercentResolved ? (
-                            formatNumber(buyerWillSee) + ' TON'
-                        ) : (
-                            <Skeleton w="40px" h="14px" />
-                        )}
-                    </Span>
-                </Flex>
             </FormControl>
 
             <FormControl mb="4" isInvalid={!!formState.errors.lifeTimeMinutes} isRequired>
@@ -232,58 +157,6 @@ export const CreateInvoiceFrom: FunctionComponent<
                 >
                     This description will be seen by the recipient
                 </Text>
-            </FormControl>
-
-            <FormControl mb="1" isInvalid={!!formState.errors.receiverAddress} isRequired>
-                <Flex align="flex-end" mb="2">
-                    <FormLabel flex="1" mb="0" htmlFor="receiverAddress">
-                        <Span textStyle="label2">Receiver address</Span>
-                    </FormLabel>
-                    <Span textStyle="body3" color="text.secondary">
-                        {addressChanged
-                            ? 'The default address has been changed'
-                            : 'Default address'}
-                    </Span>
-                    {addressChanged && (
-                        <Button
-                            h="fit-content"
-                            ml="2"
-                            p="0"
-                            color="accent.blue"
-                            onClick={() => {
-                                setValue(
-                                    'receiverAddress',
-                                    restDefaultValues.receiverAddress || ''
-                                );
-                                trigger('receiverAddress');
-                            }}
-                            variant="flat"
-                        >
-                            <Span textStyle="label3">Cancel</Span>
-                        </Button>
-                    )}
-                </Flex>
-                <Textarea
-                    minH="calc(3em + 16px)"
-                    resize="none"
-                    autoComplete="off"
-                    id="receiverAddress"
-                    placeholder="EQ..."
-                    spellCheck="false"
-                    {...register('receiverAddress', {
-                        required: 'This is required',
-                        validate(value) {
-                            if (isAddersValid(value)) {
-                                return;
-                            }
-
-                            return 'Invalid address';
-                        }
-                    })}
-                />
-                <FormErrorMessage>
-                    {formState.errors.receiverAddress && formState.errors.receiverAddress.message}
-                </FormErrorMessage>
             </FormControl>
         </chakra.form>
     );

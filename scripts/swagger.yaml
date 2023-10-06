@@ -1077,6 +1077,8 @@ paths:
         - $ref: '#/components/parameters/queryFieldOrder'
         - $ref: '#/components/parameters/queryTypeOrder'
         - $ref: '#/components/parameters/queryInvoicesSearchID'
+        - $ref: '#/components/parameters/queryFilterStatus'
+        - $ref: '#/components/parameters/queryFilterOverpayment'
       responses:
         '200':
           $ref: '#/components/responses/Invoices'
@@ -1236,6 +1238,23 @@ components:
       schema:
         type: string
         minLength: 2
+    queryFilterStatus:
+      description: Filter status
+      in: query
+      name: filter_status
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/InvoiceStatus'
+    queryFilterOverpayment:
+      description: Overpayment
+      in: query
+      name: overpayment
+      required: false
+      schema:
+        type: boolean
+        default: false
     queryLimit:
       description: Limit
       in: query
@@ -1635,7 +1654,6 @@ components:
             required:
               - amount
               - life_time
-              - recipient_address
             properties:
               amount:
                 type: integer
@@ -1650,12 +1668,6 @@ components:
               description:
                 type: string
                 example: "Test description"
-              subtract_fee_from_amount:
-                type: boolean
-                example: false
-              recipient_address:
-                type: string
-                example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
     InvoiceChange:
       description: "Data that is expected"
       content:
@@ -2097,13 +2109,7 @@ components:
           type: string
           example: "Test description"
         status:
-          type: string
-          example: "pending_status"
-          enum:
-            - pending_status
-            - success_status
-            - cancel_status
-            - expired_status
+          $ref: '#/components/schemas/InvoiceStatus'
         recipient_address:
           type: string
           example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
@@ -2152,7 +2158,14 @@ components:
         date_create:
           type: string
           example: "2023-03-23"
-  
+    InvoiceStatus:
+      type: string
+      example: "pending_status"
+      enum:
+        - pending_status
+        - success_status
+        - cancel_status
+        - expired_status
   
   responses:
     NotFound:

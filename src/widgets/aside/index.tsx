@@ -5,6 +5,7 @@ import {
     DropDownMenu,
     DropDownMenuItem,
     DropDownMenuItemExpandable,
+    InvoicesIcon24,
     MessageIcon24,
     SettingsIcon,
     TextWithSkeleton,
@@ -24,15 +25,15 @@ const Aside: FunctionComponent = () => {
             </DropDownMenuItem>
             {invoicesAppStore.invoicesApp$.value ? (
                 <DropDownMenuItemExpandable
-                    leftIcon={<TonapiIcon />}
+                    leftIcon={<InvoicesIcon24 />}
                     content="Invoices"
                     linkTo="invoices"
                 >
                     <DropDownMenuItem linkTo="manage">Manage</DropDownMenuItem>
-                    <DropDownMenuItem linkTo="api-description">Api Description</DropDownMenuItem>
+                    <DropDownMenuItem linkTo="api-description">Dashboard</DropDownMenuItem>
                 </DropDownMenuItemExpandable>
             ) : (
-                <DropDownMenuItem linkTo="invoices" leftIcon={<DashboardIcon />}>
+                <DropDownMenuItem linkTo="invoices" leftIcon={<InvoicesIcon24 />}>
                     Invoices
                 </DropDownMenuItem>
             )}
