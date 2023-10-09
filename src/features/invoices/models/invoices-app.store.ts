@@ -8,16 +8,21 @@ import {
     TonCurrencyAmount
 } from 'src/shared';
 import { projectsStore } from 'src/entities';
-import { InvoicesApp, InvoicesProjectForm, InvoicesStatistics } from './interfaces';
+import {
+    InvoicesApp,
+    InvoicesProjectForm,
+    InvoicesStatistics,
+    InvoicesWebhook
+} from './interfaces';
 
 class InvoicesAppStore {
     invoicesApp$ = new Loadable<InvoicesApp | null>(null);
 
     appToken$ = new Loadable<string | null>(null);
 
-    feePercent$ = new Loadable<number | null>(null);
-
     statistics$ = new Loadable<InvoicesStatistics | null>(null);
+
+    webhooks$ = new Loadable<InvoicesWebhook[]>([]);
 
     get invoicesServiceAvailable(): boolean {
         return !!projectsStore.selectedProject?.capabilities.invoices;
@@ -25,8 +30,6 @@ class InvoicesAppStore {
 
     constructor() {
         makeAutoObservable(this);
-
-        this.feePercent$.value = 0;
 
         createImmediateReaction(
             () => projectsStore.selectedProject,
@@ -46,6 +49,7 @@ class InvoicesAppStore {
 
                 if (app) {
                     this.fetchAppToken();
+                    this.fetchWebhooks();
                     this.fetchInvoicesStatistics();
                 }
             }
@@ -120,6 +124,51 @@ class InvoicesAppStore {
         return response.data.token;
     });
 
+    fetchWebhooks = this.webhooks$.createAsyncAction(async () => {
+        await new Promise(r => setTimeout(r, 1000)); // TODO
+        return [
+            {
+                id: 'fwdfds',
+                value: 'https://google.com'
+            }
+        ];
+    });
+
+    addWebhook = this.webhooks$.createAsyncAction(
+        async (value: string) => {
+            // TODO
+            await new Promise(r => setTimeout(r, 1000));
+            return this.webhooks$.value.concat({
+                id: Math.random().toString(),
+                value
+            });
+        },
+        {
+            successToast: {
+                title: 'Webhook added successfully'
+            },
+            errorToast: {
+                title: "Webhook wasn't added"
+            }
+        }
+    );
+
+    deleteWebhook = this.webhooks$.createAsyncAction(
+        async (id: string) => {
+            // TODO
+            await new Promise(r => setTimeout(r, 1000));
+            return (this.webhooks$.value = this.webhooks$.value.filter(w => w.id !== id));
+        },
+        {
+            successToast: {
+                title: 'Webhook deleted successfully'
+            },
+            errorToast: {
+                title: "Webhook wasn't deleted"
+            }
+        }
+    );
+
     regenerateAppToken = this.appToken$.createAsyncAction(
         async () => {
             const response = await apiClient.api.regenerateInvoicesAppToken({
@@ -152,7 +201,6 @@ class InvoicesAppStore {
 
     clearAppRelatedState(): void {
         this.appToken$.clear();
-        this.feePercent$.clear();
         this.statistics$.clear();
     }
 }

@@ -7,3 +7,4 @@ export { CreateInvoiceFrom } from './CreateInvoiceFrom';
 export * from './table';
 export { default as InvoicesTokenRegenerateConfirmation } from './InvoicesTokenRegenerateConfirmation';
 export { default as CancelInvoiceConfirmation } from './CancelInvoiceConfirmation';
+export { default as AddWebhookModal } from './AddWebhookModal';

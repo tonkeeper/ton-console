@@ -5,6 +5,7 @@ import { H4, Overlay } from 'src/shared';
 import { InvoicesProjectInfo } from 'src/features';
 import InvoicesStats from './InvoicesStats';
 import InvoicesAuthorization from './InvoicesAuthorization';
+import InvoicesWebhooks from './InvoicesWebhooks';
 
 const InvoiceDashboardPage: FunctionComponent<ComponentProps<typeof Box>> = props => {
     return (
@@ -15,6 +16,9 @@ const InvoiceDashboardPage: FunctionComponent<ComponentProps<typeof Box>> = prop
             <InvoicesStats mb="6" />
             <Divider w="auto" mb="5" mx="-6" />
             <InvoicesAuthorization />
+            <Divider w="auto" mb="5" mx="-6" />
+            <InvoicesWebhooks mb="6" />
+            <Divider w="auto" mb="5" mx="-6" />
         </Overlay>
     );
 };

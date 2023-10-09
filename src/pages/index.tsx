@@ -9,6 +9,7 @@ import SettingsRouting from 'src/pages/settings';
 import InvoicesRouting from './invoices';
 import { LayoutSolid } from 'src/pages/layouts/LayoutSolid';
 import { LayoutWithAside } from 'src/pages/layouts/LayoutWithAside';
+import { isDevelopmentMode } from 'src/shared';
 
 const LandingPage = lazy(() => import('./landing'));
 const CreateFirstProjectPage = lazy(() => import('./create-first-project'));
@@ -22,6 +23,10 @@ const Routing: FunctionComponent = () => {
     useEffect(() => {
         const metatag = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
         if (!metatag) {
+            return;
+        }
+
+        if (isDevelopmentMode()) {
             return;
         }
 
