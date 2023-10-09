@@ -7,7 +7,6 @@ import {
     DTOCharge,
     hasProperty,
     Loadable,
-    setIntervalWhenPageOnFocus,
     testnetExplorer,
     TonCurrencyAmount,
     UsdCurrencyAmount
@@ -31,15 +30,11 @@ class FaucetStore {
     constructor() {
         makeAutoObservable(this);
 
-        let dispose: (() => void) | undefined;
-
         createImmediateReaction(
             () => projectsStore.selectedProject,
             project => {
-                dispose?.();
                 if (project) {
                     this.fetchTonSupplyAndRate();
-                    dispose = setIntervalWhenPageOnFocus(this.fetchTonSupplyAndRate, 5000);
                 }
             }
         );

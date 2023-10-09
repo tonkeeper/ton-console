@@ -1237,7 +1237,7 @@ components:
       required: false
       schema:
         type: string
-        minLength: 2
+        minLength: 1
     queryFilterStatus:
       description: Filter status
       in: query
@@ -1645,6 +1645,8 @@ components:
               recipient_address:
                 type: string
                 example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+              refunded:
+                type: boolean
     InvoiceCreate:
       description: "Data that is expected"
       content:
@@ -1674,11 +1676,11 @@ components:
         application/json:
           schema:
             type: object
-            required:
-              - refunded_amount
             properties:
-              refunded_amount:
+              refund_amount:
                 type: number
+              refunded:
+                type: boolean
   
   schemas:
     Ok:
@@ -2103,7 +2105,7 @@ components:
           example: false
         overpayment:
           type: number
-        refunded_amount:
+        refund_amount:
           type: number
         description:
           type: string
@@ -2116,15 +2118,25 @@ components:
         paid_address:
           type: string
           example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+        refunded:
+          type: boolean
+          example: false
+        date_refund:
+          type: integer
+          format: int64
+          example: 1690889913000
         date_paid:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
         date_cancel:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
         date_create:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
     InvoicesApp:
       type: object
       required:
@@ -2156,8 +2168,9 @@ components:
           type: string
           example: "https://mydapp.com/api/handle-invoice-change"
         date_create:
-          type: string
-          example: "2023-03-23"
+          type: integer
+          format: int64
+          example: 1690889913000
     InvoiceStatus:
       type: string
       example: "pending_status"

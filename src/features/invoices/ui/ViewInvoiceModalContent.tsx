@@ -59,10 +59,14 @@ export const ViewInvoiceModalContent: FunctionComponent<{
                         </Flex>
                     </CardBody>
                 </Card>
-                <Text textStyle="label2" mb="2">
-                    Link for payment
-                </Text>
-                <CopyPad text={createInvoicePaymentLink(invoice)} />
+                {invoice.status === 'pending' && (
+                    <>
+                        <Text textStyle="label2" mb="2">
+                            Link for payment
+                        </Text>
+                        <CopyPad text={createInvoicePaymentLink(invoice)} />
+                    </>
+                )}
             </ModalBody>
             <ModalFooter gap="3">
                 <Button flex={1} onClick={onClose} variant="secondary">

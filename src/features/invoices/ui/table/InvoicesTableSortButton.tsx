@@ -22,7 +22,7 @@ const InvoicesTableColumnLabel: FunctionComponent<
     return (
         <Button
             pos="relative"
-            left="-24px"
+            left={disabled ? '0' : '-24px'}
             h="fit-content"
             p="0"
             _hover={{ svg: { opacity: 1 } }}

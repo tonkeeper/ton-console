@@ -304,7 +304,7 @@ export interface DTOInvoicesInvoice {
     /** @example false */
     subtract_fee_from_amount: boolean;
     overpayment?: number;
-    refunded_amount?: number;
+    refund_amount?: number;
     /** @example "Test description" */
     description: string;
     status: DTOInvoiceStatus;
@@ -312,12 +312,28 @@ export interface DTOInvoicesInvoice {
     recipient_address: string;
     /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
     paid_address?: string;
-    /** @example "2023-03-23" */
-    date_paid?: string;
-    /** @example "2023-03-23" */
-    date_cancel?: string;
-    /** @example "2023-03-23" */
-    date_create: string;
+    /** @example false */
+    refunded?: boolean;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_refund?: number;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_paid?: number;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_cancel?: number;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 export interface DTOInvoicesApp {
@@ -339,8 +355,11 @@ export interface DTOInvoicesApp {
     recipient_address: string;
     /** @example "https://mydapp.com/api/handle-invoice-change" */
     webhook?: string;
-    /** @example "2023-03-23" */
-    date_create: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 /** @example "pending_status" */
@@ -2323,6 +2342,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 webhook?: string | null;
                 /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
                 recipient_address?: string;
+                refunded?: boolean;
             },
             params: RequestParams = {}
         ) =>
@@ -2528,7 +2548,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 type_order?: DTOGetInvoicesParamsTypeOrder;
                 /**
                  * Search ID
-                 * @minLength 2
+                 * @minLength 1
                  */
                 search_id?: string;
                 /** Filter status */
@@ -2606,7 +2626,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 app_id: number;
             },
             data: {
-                refunded_amount: number;
+                refund_amount?: number;
+                refunded?: boolean;
             },
             params: RequestParams = {}
         ) =>

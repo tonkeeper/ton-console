@@ -20,6 +20,7 @@ export interface InvoiceCommon {
     receiverAddress: string;
     overpayment?: TokenCurrencyAmount;
     refundDate?: Date;
+    refundedAmount?: TokenCurrencyAmount;
 }
 
 export interface InvoiceSuccessful extends InvoiceCommon {

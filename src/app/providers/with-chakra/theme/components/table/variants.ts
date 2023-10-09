@@ -51,10 +51,18 @@ export default {
             },
             py: '14px',
             borderBottom: '1px',
-            borderBottomLeftRadius: 'sm',
-            borderBottomRightRadius: 'sm',
             borderBottomColor: 'background.contentTint',
             borderColor: 'background.contentTint'
+        },
+        tr: {
+            '&:last-child td': {
+                '&:first-of-type': {
+                    borderBottomLeftRadius: 'sm'
+                },
+                '&:last-child': {
+                    borderBottomRightRadius: 'sm'
+                }
+            }
         }
     })
 };

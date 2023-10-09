@@ -26,12 +26,14 @@ import {
     toTimeLeft,
     VerticalDotsIcon16,
     useCountdown,
-    toDateTime,
-    FilledInfoIcon16
+    toDateTime
 } from 'src/shared';
 import { InvoicesTableContext } from './invoices-table-context';
 import { InvoiceStatusBadge } from './InvoiceStatusBadge';
 import { ViewInvoiceModal } from 'src/features/invoices/ui/ViewInvoiceModal';
+import CancelInvoiceConfirmation from '../CancelInvoiceConfirmation';
+import { InvoiceOverpayment } from 'src/features/invoices/ui/table/InvoiceOverpayment';
+import { toJS } from 'mobx';
 
 const LoadingRaw: FunctionComponent = () => {
     const { rawHeight } = useContext(InvoicesTableContext);
@@ -47,7 +49,9 @@ const LoadingRaw: FunctionComponent = () => {
 };
 
 const ItemRaw: FunctionComponent<{ invoice: Invoice }> = observer(({ invoice }) => {
-    const { isOpen, onClose, onOpen } = useDisclosure();
+    const { isOpen: isOpenView, onClose: onCloseView, onOpen: onOpenView } = useDisclosure();
+    const { isOpen: isOpenCancel, onClose: onCloseCancel, onOpen: onOpenCancel } = useDisclosure();
+
     const { onCopy: onCopyId, hasCopied: hasCopiedId } = useClipboard(invoice.id);
     const { onCopy: onCopyPaidBy, hasCopied: hasCopiedPaidBy } = useClipboard(
         invoice.status === 'success' ? invoice.paidBy : ''
@@ -73,13 +77,18 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice }> = observer(({ invoice }) 
 
     return (
         <>
-            <ViewInvoiceModal isOpen={isOpen} onClose={onClose} invoice={invoice} />
+            <ViewInvoiceModal isOpen={isOpenView} onClose={onCloseView} invoice={invoice} />
+            <CancelInvoiceConfirmation
+                isOpen={isOpenCancel}
+                onClose={onCloseCancel}
+                invoice={invoice}
+            />
             <Tr
                 sx={{ td: { px: 2, py: 0 } }}
                 h={rawHeight}
                 maxH={rawHeight}
-                cursor="pointer"
-                onClick={onOpen}
+                cursor={invoice.status === 'pending' ? 'pointer' : 'default'}
+                onClick={invoice.status === 'pending' ? onOpenView : () => {}}
             >
                 <Td
                     minW="100px"
@@ -161,34 +170,8 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice }> = observer(({ invoice }) 
                             <Box maxW="500px">{invoice.description}</Box>
                         </TooltipHoverable>
                         <Flex gap="2">
-                            {invoice.overpayment && (
-                                <Menu placement="bottom-end">
-                                    <MenuButton ml="auto" onClick={e => e.stopPropagation()}>
-                                        <Flex
-                                            align="center"
-                                            px="3"
-                                            py="1.5"
-                                            bg="background.contentTint"
-                                            borderRadius="full"
-                                        >
-                                            <FilledInfoIcon16 color="accent.red" />
-                                            <Span ml="1.5" textStyle="label3" fontFamily="mono">
-                                                <Span color="text.secondary">Overpayment: </Span>
-                                                <Span>
-                                                    {invoice.overpayment.stringCurrencyAmount}
-                                                </Span>
-                                            </Span>
-                                        </Flex>
-                                    </MenuButton>
-                                    <MenuList w="200px">
-                                        <MenuItem onClick={() => {}}>
-                                            <Text textStyle="label2">Refund</Text>
-                                        </MenuItem>
-                                        <MenuItem onClick={() => {}}>
-                                            <Text textStyle="label2">Mark as refunded</Text>
-                                        </MenuItem>
-                                    </MenuList>
-                                </Menu>
+                            {!!(invoice.overpayment || invoice.refundDate) && (
+                                <InvoiceOverpayment invoice={toJS(invoice)} />
                             )}
                             {canCancel && (
                                 <Menu placement="bottom-end">
@@ -196,7 +179,13 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice }> = observer(({ invoice }) 
                                         <VerticalDotsIcon16 display="block" />
                                     </MenuButton>
                                     <MenuList w="126px">
-                                        <MenuItem onClick={() => {}}>
+                                        <MenuItem
+                                            isDisabled={invoicesTableStore.cancelInvoice.isLoading}
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                onOpenCancel();
+                                            }}
+                                        >
                                             <Text textStyle="label2">Cancel</Text>
                                         </MenuItem>
                                     </MenuList>

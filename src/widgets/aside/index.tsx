@@ -23,20 +23,6 @@ const Aside: FunctionComponent = () => {
             <DropDownMenuItem linkTo="dashboard" leftIcon={<DashboardIcon />}>
                 Dashboard
             </DropDownMenuItem>
-            {invoicesAppStore.invoicesApp$.value ? (
-                <DropDownMenuItemExpandable
-                    leftIcon={<InvoicesIcon24 />}
-                    content="Invoices"
-                    linkTo="invoices"
-                >
-                    <DropDownMenuItem linkTo="manage">Manage</DropDownMenuItem>
-                    <DropDownMenuItem linkTo="api-description">Dashboard</DropDownMenuItem>
-                </DropDownMenuItemExpandable>
-            ) : (
-                <DropDownMenuItem linkTo="invoices" leftIcon={<InvoicesIcon24 />}>
-                    Invoices
-                </DropDownMenuItem>
-            )}
             <DropDownMenuItemExpandable leftIcon={<TonapiIcon />} content="TON API" linkTo="tonapi">
                 <DropDownMenuItem linkTo="api-keys">Api keys and calls</DropDownMenuItem>
                 <DropDownMenuItem linkTo="pricing">Pricing</DropDownMenuItem>
@@ -44,6 +30,20 @@ const Aside: FunctionComponent = () => {
             <DropDownMenuItem linkTo="tonkeeper-messages" leftIcon={<MessageIcon24 />}>
                 Tonkeeper Messages
             </DropDownMenuItem>
+            {invoicesAppStore.invoicesApp$.value ? (
+                <DropDownMenuItemExpandable
+                    leftIcon={<InvoicesIcon24 />}
+                    content="Invoices"
+                    linkTo="invoices"
+                >
+                    <DropDownMenuItem linkTo="manage">Manage</DropDownMenuItem>
+                    <DropDownMenuItem linkTo="dashboard">Dashboard</DropDownMenuItem>
+                </DropDownMenuItemExpandable>
+            ) : (
+                <DropDownMenuItem linkTo="invoices" leftIcon={<InvoicesIcon24 />}>
+                    Invoices
+                </DropDownMenuItem>
+            )}
             <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>
                 Testnet Assets
             </DropDownMenuItem>

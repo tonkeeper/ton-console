@@ -7,7 +7,7 @@ import { Route, useNavigate } from 'react-router-dom';
 import { lazy } from '@loadable/component';
 import JoinInvoices from './JoinInvoices';
 
-const ApiDescriptionPage = lazy(() => import('./api-description'));
+const InvoiceDashboardPage = lazy(() => import('./dashboard'));
 const ManageInvoicesPage = lazy(() => import('./manage'));
 
 const InvoicesPage = observer(() => {
@@ -45,7 +45,7 @@ const ApiDescription = observer(() => {
 
     return (
         <Suspense>
-            <ApiDescriptionPage />
+            <InvoiceDashboardPage />
         </Suspense>
     );
 });
@@ -66,7 +66,7 @@ const Manage = observer(() => {
 
 const InvoicesRouting = (
     <>
-        <Route path="api-description" element={<ApiDescription />} />
+        <Route path="dashboard" element={<ApiDescription />} />
         <Route path="manage" element={<Manage />} />
         <Route index element={<Index />} />
         <Route path="*" element={<Index />} />

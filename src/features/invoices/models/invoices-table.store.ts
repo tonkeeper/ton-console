@@ -174,6 +174,47 @@ class InvoicesTableStore {
         }
     );
 
+    cancelInvoice = this.invoices$.createAsyncAction(
+        async (id: Invoice['id']) => {
+            await apiClient.api.cancelInvoicesInvoice(id, {
+                app_id: invoicesAppStore.invoicesApp$.value!.id
+            });
+            await this.updateCurrentListSilently({ silently: true });
+        },
+        {
+            successToast: {
+                title: 'Invoice cancelled successfully'
+            },
+            errorToast: {
+                title: 'Invoice cancellation error'
+            }
+        }
+    );
+
+    markInvoiceAsRefunded = this.invoices$.createAsyncAction(
+        async (form: { id: Invoice['id']; refundedAmount: number }) => {
+            await apiClient.api.updateInvoicesInvoice(
+                form.id,
+                {
+                    app_id: invoicesAppStore.invoicesApp$.value!.id
+                },
+                {
+                    refunded: true,
+                    refund_amount: form.refundedAmount
+                }
+            );
+            await this.updateCurrentListSilently({ silently: true });
+        },
+        {
+            successToast: {
+                title: 'Invoice marked as refunded successfully'
+            },
+            errorToast: {
+                title: 'Invoice was not marked as refunded'
+            }
+        }
+    );
+
     setFilterById = (value: string | undefined): void => {
         this.pagination.filter.id = value;
     };
@@ -248,7 +289,13 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
         validUntil: new Date(creationDate.getTime() + invoiceDTO.life_time * 1000),
         description: invoiceDTO.description,
         receiverAddress: invoiceDTO.recipient_address,
-        overpayment: new TonCurrencyAmount(invoiceDTO.amount) // TODO
+        overpayment: invoiceDTO.overpayment
+            ? new TonCurrencyAmount(invoiceDTO.overpayment)
+            : undefined,
+        refundDate: invoiceDTO.date_refund ? new Date(invoiceDTO.date_refund) : undefined,
+        refundedAmount: invoiceDTO.refund_amount
+            ? new TonCurrencyAmount(invoiceDTO.refund_amount)
+            : undefined
     };
 
     const status = mapInvoiceDTOStatusToInvoiceStatus[invoiceDTO.status];

@@ -47,7 +47,7 @@ const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = pro
             <MenuList zIndex={100} w="240px">
                 <Flex justify="space-between" mb="2" pt="2" px="1" color="text.secondary">
                     <Span textStyle="label2">Display only</Span>
-                    {invoicesTableStore.pagination.filter.status?.length && (
+                    {!!invoicesTableStore.pagination.filter.status?.length && (
                         <Button
                             h="fit-content"
                             p="0"
