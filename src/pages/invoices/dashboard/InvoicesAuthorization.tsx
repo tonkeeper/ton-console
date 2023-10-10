@@ -12,9 +12,6 @@ const InvoicesStats: FunctionComponent<ComponentProps<typeof Box>> = props => {
             <Text textStyle="label1" mb="1">
                 Authorization
             </Text>
-            <Text textStyle="body2" mb="5" color="text.secondary">
-                Description
-            </Text>
             <Text textStyle="body2" mb="2">
                 Token:
             </Text>

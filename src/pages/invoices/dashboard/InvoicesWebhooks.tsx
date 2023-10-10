@@ -17,12 +17,56 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 import { CopyIcon24, DeleteIcon24, Span, VerticalDotsIcon16 } from 'src/shared';
-import { AddWebhookModal, invoicesAppStore } from 'src/features';
+import { AddWebhookModal, invoicesAppStore, InvoicesWebhook, INVOICES_LINKS } from 'src/features';
 import { observer } from 'mobx-react-lite';
+import { toJS } from 'mobx';
+
+const WebhookItem: FunctionComponent<{ webhook: InvoicesWebhook }> = observer(({ webhook }) => {
+    const { hasCopied, onCopy } = useClipboard(webhook.value);
+
+    return (
+        <ListItem>
+            <Flex align="center" gap="3" pl="2">
+                <Span color="text.primary" fontFamily="mono">
+                    {webhook.value}
+                </Span>
+                <Menu closeOnSelect={false} placement="right-start">
+                    <MenuButton>
+                        <VerticalDotsIcon16 display="block" />
+                    </MenuButton>
+                    <MenuList w="126px">
+                        <MenuItem alignItems="center" gap="2" display="flex" onClick={onCopy}>
+                            <CopyIcon24 color="icon.primary" />
+                            {hasCopied ? 'Copied' : 'Copy'}
+                        </MenuItem>
+                        <MenuItem
+                            pos="relative"
+                            isDisabled={invoicesAppStore.deleteWebhook.isLoading}
+                            onClick={() => invoicesAppStore.deleteWebhook(webhook.id)}
+                        >
+                            <Flex
+                                align="center"
+                                gap="2"
+                                opacity={invoicesAppStore.deleteWebhook.isLoading ? '0.3' : 1}
+                            >
+                                <DeleteIcon24 />
+                                Delete
+                            </Flex>
+                            {invoicesAppStore.deleteWebhook.isLoading && (
+                                <Center pos="absolute" top="0" right="0" bottom="0" left="0">
+                                    <Spinner size="sm" />
+                                </Center>
+                            )}
+                        </MenuItem>
+                    </MenuList>
+                </Menu>
+            </Flex>
+        </ListItem>
+    );
+});
 
 const InvoicesWebhooks: FunctionComponent<ComponentProps<typeof Box>> = props => {
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const { hasCopied, onCopy, setValue } = useClipboard('');
 
     return (
         <Box {...props}>
@@ -34,16 +78,15 @@ const InvoicesWebhooks: FunctionComponent<ComponentProps<typeof Box>> = props =>
                     </Text>
                     <Flex gap="3" mb="5">
                         <Span textStyle="body2" color="text.secondary">
-                            Description
+                            Handle invoices statuses change on your backend with webhooks
                         </Span>
-                        <Link color="accent.blue" href="#" /*TODO*/ isExternal>
+                        <Link color="accent.blue" href={INVOICES_LINKS.WEBHOOKS} isExternal>
                             Documentation
                         </Link>
                     </Flex>
                 </Box>
                 <Button
                     ml="auto"
-                    isDisabled={!invoicesAppStore.webhooks$.isResolved}
                     isLoading={invoicesAppStore.addWebhook.isLoading}
                     onClick={onOpen}
                     variant="secondary"
@@ -51,81 +94,16 @@ const InvoicesWebhooks: FunctionComponent<ComponentProps<typeof Box>> = props =>
                     + Add
                 </Button>
             </Flex>
-            {invoicesAppStore.webhooks$.isResolved ? (
-                invoicesAppStore.webhooks$.value.length ? (
-                    <OrderedList color="text.secondary" spacing="3">
-                        {invoicesAppStore.webhooks$.value.map(webhook => (
-                            <ListItem key={webhook.id}>
-                                <Flex align="center" gap="3" pl="2">
-                                    <Span color="text.primary" fontFamily="mono">
-                                        {webhook.value}
-                                    </Span>
-                                    <Menu closeOnSelect={false} placement="right-start">
-                                        <MenuButton>
-                                            <VerticalDotsIcon16 display="block" />
-                                        </MenuButton>
-                                        <MenuList w="126px">
-                                            <MenuItem
-                                                alignItems="center"
-                                                gap="2"
-                                                display="flex"
-                                                isDisabled={true}
-                                                onClick={() => {
-                                                    setValue(webhook.value);
-                                                    onCopy();
-                                                }}
-                                            >
-                                                <CopyIcon24 color="icon.primary" />
-                                                {hasCopied ? 'Copied' : 'Copy'}
-                                            </MenuItem>
-                                            <MenuItem
-                                                pos="relative"
-                                                isDisabled={
-                                                    invoicesAppStore.deleteWebhook.isLoading
-                                                }
-                                                onClick={() =>
-                                                    invoicesAppStore.deleteWebhook(webhook.id)
-                                                }
-                                            >
-                                                <Flex
-                                                    align="center"
-                                                    gap="2"
-                                                    opacity={
-                                                        invoicesAppStore.deleteWebhook.isLoading
-                                                            ? '0.3'
-                                                            : 1
-                                                    }
-                                                >
-                                                    <DeleteIcon24 />
-                                                    Delete
-                                                </Flex>
-                                                {invoicesAppStore.deleteWebhook.isLoading && (
-                                                    <Center
-                                                        pos="absolute"
-                                                        top="0"
-                                                        right="0"
-                                                        bottom="0"
-                                                        left="0"
-                                                    >
-                                                        <Spinner size="sm" />
-                                                    </Center>
-                                                )}
-                                            </MenuItem>
-                                        </MenuList>
-                                    </Menu>
-                                </Flex>
-                            </ListItem>
-                        ))}
-                    </OrderedList>
-                ) : (
-                    <Box textStyle="body2" h="6" color="text.secondary" textAlign="center">
-                        Click to the Add button to register a webhook
-                    </Box>
-                )
+            {invoicesAppStore.invoicesApp$.value!.webhooks.length ? (
+                <OrderedList color="text.secondary" spacing="3">
+                    {invoicesAppStore.invoicesApp$.value!.webhooks.map(webhook => (
+                        <WebhookItem key={webhook.id} webhook={toJS(webhook)} />
+                    ))}
+                </OrderedList>
             ) : (
-                <Center>
-                    <Spinner />
-                </Center>
+                <Box textStyle="body2" h="6" color="text.secondary" textAlign="center">
+                    Click to the Add button to register a webhook
+                </Box>
             )}
         </Box>
     );

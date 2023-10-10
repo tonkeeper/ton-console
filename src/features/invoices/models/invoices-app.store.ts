@@ -8,12 +8,7 @@ import {
     TonCurrencyAmount
 } from 'src/shared';
 import { projectsStore } from 'src/entities';
-import {
-    InvoicesApp,
-    InvoicesProjectForm,
-    InvoicesStatistics,
-    InvoicesWebhook
-} from './interfaces';
+import { InvoicesApp, InvoicesProjectForm, InvoicesStatistics } from './interfaces';
 
 class InvoicesAppStore {
     invoicesApp$ = new Loadable<InvoicesApp | null>(null);
@@ -21,8 +16,6 @@ class InvoicesAppStore {
     appToken$ = new Loadable<string | null>(null);
 
     statistics$ = new Loadable<InvoicesStatistics | null>(null);
-
-    webhooks$ = new Loadable<InvoicesWebhook[]>([]);
 
     get invoicesServiceAvailable(): boolean {
         return !!projectsStore.selectedProject?.capabilities.invoices;
@@ -32,7 +25,7 @@ class InvoicesAppStore {
         makeAutoObservable(this);
 
         createImmediateReaction(
-            () => projectsStore.selectedProject,
+            () => projectsStore.selectedProject?.id,
             project => {
                 this.clearState();
 
@@ -43,13 +36,12 @@ class InvoicesAppStore {
         );
 
         createImmediateReaction(
-            () => this.invoicesApp$.value,
+            () => this.invoicesApp$.value?.id,
             app => {
                 this.clearAppRelatedState();
 
                 if (app) {
                     this.fetchAppToken();
-                    this.fetchWebhooks();
                     this.fetchInvoicesStatistics();
                 }
             }
@@ -124,24 +116,14 @@ class InvoicesAppStore {
         return response.data.token;
     });
 
-    fetchWebhooks = this.webhooks$.createAsyncAction(async () => {
-        await new Promise(r => setTimeout(r, 1000)); // TODO
-        return [
-            {
-                id: 'fwdfds',
-                value: 'https://google.com'
-            }
-        ];
-    });
-
-    addWebhook = this.webhooks$.createAsyncAction(
+    addWebhook = this.invoicesApp$.createAsyncAction(
         async (value: string) => {
-            // TODO
-            await new Promise(r => setTimeout(r, 1000));
-            return this.webhooks$.value.concat({
-                id: Math.random().toString(),
-                value
-            });
+            const response = await apiClient.api.createInvoicesAppWebhook(
+                this.invoicesApp$.value!.id,
+                { webhook: value }
+            );
+
+            return mapInvoicesAppDTOToInvoicesApp(response.data.app!);
         },
         {
             successToast: {
@@ -153,11 +135,14 @@ class InvoicesAppStore {
         }
     );
 
-    deleteWebhook = this.webhooks$.createAsyncAction(
+    deleteWebhook = this.invoicesApp$.createAsyncAction(
         async (id: string) => {
-            // TODO
-            await new Promise(r => setTimeout(r, 1000));
-            return (this.webhooks$.value = this.webhooks$.value.filter(w => w.id !== id));
+            const response = await apiClient.api.deleteInvoicesAppWebhook(
+                this.invoicesApp$.value!.id,
+                id
+            );
+
+            return mapInvoicesAppDTOToInvoicesApp(response.data.app!);
         },
         {
             successToast: {
@@ -210,7 +195,8 @@ function mapInvoicesAppDTOToInvoicesApp(invoicesAppDTO: DTOInvoicesApp): Invoice
         id: invoicesAppDTO.id,
         name: invoicesAppDTO.name,
         creationDate: new Date(invoicesAppDTO.date_create),
-        receiverAddress: toUserFriendlyAddress(invoicesAppDTO.recipient_address)
+        receiverAddress: toUserFriendlyAddress(invoicesAppDTO.recipient_address),
+        webhooks: (invoicesAppDTO.webhooks || []).map(w => ({ id: w.id, value: w.webhook }))
     };
 }
 
@@ -221,8 +207,8 @@ function mapInvoicesStatsDTOToInvoicesStats(
         totalInvoices: invoicesStatsDTO.total,
         earnedTotal: new TonCurrencyAmount(invoicesStatsDTO.success_total),
         earnedLastWeek: new TonCurrencyAmount(invoicesStatsDTO.success_in_week),
-        invoicesInProgress: 0, // TODO
-        awaitingForPaymentAmount: new TonCurrencyAmount(invoicesStatsDTO.awaiting_payment)
+        invoicesInProgress: invoicesStatsDTO.invoices_in_progress,
+        awaitingForPaymentAmount: new TonCurrencyAmount(invoicesStatsDTO.total_amount_pending)
     };
 }
 

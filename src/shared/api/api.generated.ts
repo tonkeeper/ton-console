@@ -353,8 +353,7 @@ export interface DTOInvoicesApp {
     description: string;
     /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
     recipient_address: string;
-    /** @example "https://mydapp.com/api/handle-invoice-change" */
-    webhook?: string;
+    webhooks?: DTOInvoicesAppWebhooks;
     /**
      * @format int64
      * @example 1690889913000
@@ -369,6 +368,12 @@ export enum DTOInvoiceStatus {
     DTOCancelStatus = 'cancel_status',
     DTOExpiredStatus = 'expired_status'
 }
+
+export type DTOInvoicesAppWebhooks = {
+    id: string;
+    /** @example "https://mydapp.com/api/handle-invoice-change" */
+    webhook: string;
+}[];
 
 /** backend error code */
 export enum DTOErrorCode {
@@ -2263,8 +2268,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 name: string;
                 /** @example "Test description" */
                 description?: string;
-                /** @example "https://mydapp.com/api/handle-invoice-change" */
-                webhook?: string | null;
+                webhooks?: string[];
                 /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
                 recipient_address: string;
             },
@@ -2338,8 +2342,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 name?: string;
                 /** @example "Test description" */
                 description?: string;
-                /** @example "https://mydapp.com/api/handle-invoice-change" */
-                webhook?: string | null;
                 /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
                 recipient_address?: string;
                 refunded?: boolean;
@@ -2382,6 +2384,98 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 }
             >({
                 path: `/api/v1/services/invoices/app/${id}`,
+                method: 'DELETE',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name CreateInvoicesAppWebhook
+         * @summary Create webhook for app
+         * @request POST:/api/v1/services/invoices/app/{id}/webhook
+         */
+        createInvoicesAppWebhook: (
+            id: number,
+            data: {
+                /** @example "https://mydapp.com/api/handle-invoice-change" */
+                webhook: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    app: DTOInvoicesApp;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/invoices/app/${id}/webhook`,
+                method: 'POST',
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name UpdateInvoicesAppWebhook
+         * @summary Update webhook for app
+         * @request PATCH:/api/v1/services/invoices/app/{id}/webhook/{webhook_id}
+         */
+        updateInvoicesAppWebhook: (
+            id: number,
+            webhookId: string,
+            data: {
+                /** @example "https://mydapp.com/api/handle-invoice-change" */
+                webhook: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    app: DTOInvoicesApp;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/invoices/app/${id}/webhook/${webhookId}`,
+                method: 'PATCH',
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name DeleteInvoicesAppWebhook
+         * @summary Delete webhook for app
+         * @request DELETE:/api/v1/services/invoices/app/{id}/webhook/{webhook_id}
+         */
+        deleteInvoicesAppWebhook: (id: number, webhookId: string, params: RequestParams = {}) =>
+            this.request<
+                {
+                    app: DTOInvoicesApp;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/invoices/app/${id}/webhook/${webhookId}`,
                 method: 'DELETE',
                 ...params
             }),
@@ -2725,7 +2819,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                          * @format uint32
                          * @example 10000
                          */
-                        awaiting_payment: number;
+                        invoices_in_progress: number;
+                        /**
+                         * @format uint64
+                         * @example 1000000000
+                         */
+                        total_amount_pending: number;
                     };
                 },
                 {

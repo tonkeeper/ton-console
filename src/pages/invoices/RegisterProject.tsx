@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
-import { H4, Overlay } from 'src/shared';
-import { Button, Divider, Text, useDisclosure } from '@chakra-ui/react';
-import { CreateInvoicesProjectModal, invoicesAppStore } from 'src/features';
+import { ButtonLink, H4, Overlay } from 'src/shared';
+import { Button, Divider, Flex, Text, useDisclosure } from '@chakra-ui/react';
+import { CreateInvoicesProjectModal, INVOICES_LINKS, invoicesAppStore } from 'src/features';
 import { observer } from 'mobx-react-lite';
 const RegisterProject: FunctionComponent = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
@@ -10,26 +10,29 @@ const RegisterProject: FunctionComponent = () => {
         <Overlay>
             <H4 mb="1">Invoices</H4>
             <Text textStyle="body2" mb="5" color="text.secondary">
-                Description
+                Track TON payments for your business easily with Ton Console Invoices
             </Text>
             <Divider w="auto" mb="4" mx="-6" />
-            <Text textStyle="label1">Instruction</Text>
-            <Text textStyle="body2" mb="5" color="text.secondary">
-                We need you to verify ownership of domain Please follow the steps below to prove the
-                ownership. We need you to verify ownership of domain Please follow the steps below
-                to prove the ownership. We need you to verify ownership of domain Please follow the
-                steps below to prove the ownership. We need you to verify ownership of domain Please
-                follow the steps below to prove the ownership. We need you to verify ownership of
-                domain Please follow the steps below to prove the ownership. We need you to verify
-                ownership of domain Please follow the steps below to prove the ownership.
+            <Text textStyle="label1" mb="6">
+                Create Invoices Project to get started
             </Text>
-            <Button
-                isLoading={invoicesAppStore.createInvoicesApp.isLoading}
-                onClick={onOpen}
-                variant="primary"
-            >
-                Create Project
-            </Button>
+
+            <Flex gap="3">
+                <Button
+                    isLoading={invoicesAppStore.createInvoicesApp.isLoading}
+                    onClick={onOpen}
+                    variant="primary"
+                >
+                    Create
+                </Button>
+                <ButtonLink
+                    variant="secondary"
+                    href={INVOICES_LINKS.BUSINESS_DESCRIPTION}
+                    isExternal
+                >
+                    Learn more
+                </ButtonLink>
+            </Flex>
             <CreateInvoicesProjectModal isOpen={isOpen} onClose={onClose} />
         </Overlay>
     );

@@ -1012,6 +1012,62 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/app/{id}/webhook:
+    post:
+      summary: "Create webhook for app"
+      operationId: createInvoicesAppWebhook
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/appID'
+      requestBody:
+        $ref: "#/components/requestBodies/InvoiceWebhook"
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesAppResp'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/app/{id}/webhook/{webhook_id}:
+    patch:
+      summary: "Update webhook for app"
+      operationId: updateInvoicesAppWebhook
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/appID'
+        - $ref: '#/components/parameters/webhookID'
+      requestBody:
+        $ref: "#/components/requestBodies/InvoiceWebhook"
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesAppResp'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: "Delete webhook for app"
+      operationId: deleteInvoicesAppWebhook
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/appID'
+        - $ref: '#/components/parameters/webhookID'
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesAppResp'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /api/v1/services/invoices/token:
     get:
       summary: "Get invoices app token"
@@ -1205,6 +1261,13 @@ components:
       schema:
         type: integer
         format: uint32
+    webhookID:
+      description: Webhook ID
+      in: path
+      name: webhook_id
+      required: true
+      schema:
+        type: string
     tierID:
       description: Tier ID
       in: path
@@ -1618,10 +1681,10 @@ components:
               description:
                 type: string
                 example: "Test description"
-              webhook:
-                type: string
-                example: "https://mydapp.com/api/handle-invoice-change"
-                nullable: true
+              webhooks:
+                type: array
+                items:
+                  type: string
               recipient_address:
                 type: string
                 example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
@@ -1638,10 +1701,6 @@ components:
               description:
                 type: string
                 example: "Test description"
-              webhook:
-                type: string
-                example: "https://mydapp.com/api/handle-invoice-change"
-                nullable: true
               recipient_address:
                 type: string
                 example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
@@ -1681,6 +1740,18 @@ components:
                 type: number
               refunded:
                 type: boolean
+    InvoiceWebhook:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - webhook
+            properties:
+              webhook:
+                type: string
+                example: "https://mydapp.com/api/handle-invoice-change"
   
   schemas:
     Ok:
@@ -2164,9 +2235,8 @@ components:
         recipient_address:
           type: string
           example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-        webhook:
-          type: string
-          example: "https://mydapp.com/api/handle-invoice-change"
+        webhooks:
+          $ref: '#/components/schemas/InvoicesAppWebhooks'
         date_create:
           type: integer
           format: int64
@@ -2179,6 +2249,19 @@ components:
         - success_status
         - cancel_status
         - expired_status
+    InvoicesAppWebhooks:
+      type: array
+      items:
+        type: object
+        required:
+          - id
+          - webhook
+        properties:
+          id:
+            type: string
+          webhook:
+            type: string
+            example: "https://mydapp.com/api/handle-invoice-change"
   
   responses:
     NotFound:
@@ -2670,7 +2753,8 @@ components:
                   - total
                   - success_total
                   - success_in_week
-                  - awaiting_payment
+                  - invoices_in_progress
+                  - total_amount_pending
                 properties:
                   total:
                     type: integer
@@ -2684,7 +2768,11 @@ components:
                     type: integer
                     format: uint32
                     example: 10000
-                  awaiting_payment:
+                  invoices_in_progress:
                     type: integer
                     format: uint32
                     example: 10000
+                  total_amount_pending:
+                    type: integer
+                    format: uint64
+                    example: 1000000000

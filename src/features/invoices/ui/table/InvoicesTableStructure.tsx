@@ -57,84 +57,84 @@ export const InvoicesTableStructure = observer(
             }
 
             return (
-                <Box {...rest} ref={ref}>
-                    <Table
-                        sx={{ borderCollapse: 'separate', borderSpacing: '0' }}
-                        pos="sticky"
-                        top="0"
-                        w="100%"
-                        variant="withBottomBorder"
-                    >
-                        <Thead>
-                            <Tr sx={{ th: { px: 2, zIndex: 2 } }}>
-                                <Th
-                                    pos="sticky"
-                                    top="0"
-                                    minW="100px"
-                                    bg="background.contentTint"
-                                    borderTop="1px"
-                                    borderTopColor="background.contentTint"
-                                    borderLeft="1px"
-                                    borderLeftColor="background.contentTint"
-                                    borderTopLeftRadius="sm"
-                                    boxSizing="content-box"
-                                >
-                                    ID
-                                </Th>
-                                <Th
-                                    pos="sticky"
-                                    top="0"
-                                    minW="320px"
-                                    bg="background.contentTint"
-                                    boxSizing="content-box"
-                                >
-                                    <InvoicesTableColumnLabel column="status">
-                                        Status
-                                    </InvoicesTableColumnLabel>
-                                </Th>
-                                <Th
-                                    pos="sticky"
-                                    top="0"
-                                    minW="160px"
-                                    bg="background.contentTint"
-                                    boxSizing="content-box"
-                                >
-                                    <InvoicesTableColumnLabel column="amount">
-                                        Amount
-                                    </InvoicesTableColumnLabel>
-                                </Th>
-                                <Th
-                                    pos="sticky"
-                                    top="0"
-                                    minW="180px"
-                                    bg="background.contentTint"
-                                    boxSizing="content-box"
-                                >
-                                    <InvoicesTableColumnLabel column="creation-date">
-                                        Creation Date
-                                    </InvoicesTableColumnLabel>
-                                </Th>
-                                <Th
-                                    pos="sticky"
-                                    top="0"
-                                    w="100%"
-                                    bg="background.contentTint"
-                                    borderTop="1px"
-                                    borderTopColor="background.contentTint"
-                                    borderRight="1px"
-                                    borderRightColor="background.contentTint"
-                                    borderTopRightRadius="sm"
-                                    boxSizing="content-box"
-                                >
-                                    <InvoicesTableColumnLabel column="description">
-                                        Invoice description
-                                    </InvoicesTableColumnLabel>
-                                </Th>
-                            </Tr>
-                        </Thead>
-                        <Tbody>{body}</Tbody>
-                    </Table>
-                </Box>
+                <Table
+                    ref={ref}
+                    sx={{ borderCollapse: 'separate', borderSpacing: '0' }}
+                    pos="sticky"
+                    top="0"
+                    w="100%"
+                    variant="withBottomBorder"
+                    {...rest}
+                >
+                    <Thead>
+                        <Tr sx={{ th: { px: 2, zIndex: 2 } }}>
+                            <Th
+                                pos="sticky"
+                                top="0"
+                                minW="100px"
+                                bg="background.contentTint"
+                                borderTop="1px"
+                                borderTopColor="background.contentTint"
+                                borderLeft="1px"
+                                borderLeftColor="background.contentTint"
+                                borderTopLeftRadius="sm"
+                                boxSizing="content-box"
+                            >
+                                ID
+                            </Th>
+                            <Th
+                                pos="sticky"
+                                top="0"
+                                minW="320px"
+                                bg="background.contentTint"
+                                boxSizing="content-box"
+                            >
+                                <InvoicesTableColumnLabel column="status">
+                                    Status
+                                </InvoicesTableColumnLabel>
+                            </Th>
+                            <Th
+                                pos="sticky"
+                                top="0"
+                                minW="160px"
+                                bg="background.contentTint"
+                                boxSizing="content-box"
+                            >
+                                <InvoicesTableColumnLabel column="amount">
+                                    Amount
+                                </InvoicesTableColumnLabel>
+                            </Th>
+                            <Th
+                                pos="sticky"
+                                top="0"
+                                minW="180px"
+                                bg="background.contentTint"
+                                boxSizing="content-box"
+                            >
+                                <InvoicesTableColumnLabel column="creation-date">
+                                    Creation Date
+                                </InvoicesTableColumnLabel>
+                            </Th>
+                            <Th
+                                pos="sticky"
+                                top="0"
+                                w="100%"
+                                bg="background.contentTint"
+                                borderTop="1px"
+                                borderTopColor="background.contentTint"
+                                borderRight="1px"
+                                borderRightColor="background.contentTint"
+                                borderTopRightRadius="sm"
+                                boxSizing="content-box"
+                            >
+                                <InvoicesTableColumnLabel column="description">
+                                    Invoice description
+                                </InvoicesTableColumnLabel>
+                            </Th>
+                        </Tr>
+                    </Thead>
+                    <Tbody>{body}</Tbody>
+                </Table>
             );
         }
     )
