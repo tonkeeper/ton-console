@@ -39,6 +39,7 @@ export const InvoicesTableStructure = observer(
     forwardRef<PropsWithChildren<ComponentProps<typeof Box>>, typeof Box>(
         ({ children, ...rest }, ref) => {
             let body = children;
+            const { rawHeight } = useContext(InvoicesTableContext);
 
             if (!invoicesTableStore.invoices$.isResolved) {
                 body = (
@@ -60,17 +61,21 @@ export const InvoicesTableStructure = observer(
                 <Table
                     ref={ref}
                     sx={{ borderCollapse: 'separate', borderSpacing: '0' }}
-                    pos="sticky"
-                    top="0"
                     w="100%"
                     variant="withBottomBorder"
                     {...rest}
                 >
                     <Thead>
-                        <Tr sx={{ th: { px: 2, zIndex: 2 } }}>
+                        <Tr
+                            sx={{ th: { px: 2, zIndex: 2 } }}
+                            pos="sticky"
+                            zIndex="4"
+                            top="0"
+                            left="0"
+                            w="100%"
+                            h={rawHeight}
+                        >
                             <Th
-                                pos="sticky"
-                                top="0"
                                 minW="100px"
                                 bg="background.contentTint"
                                 borderTop="1px"
@@ -82,42 +87,22 @@ export const InvoicesTableStructure = observer(
                             >
                                 ID
                             </Th>
-                            <Th
-                                pos="sticky"
-                                top="0"
-                                minW="320px"
-                                bg="background.contentTint"
-                                boxSizing="content-box"
-                            >
+                            <Th minW="320px" bg="background.contentTint" boxSizing="content-box">
                                 <InvoicesTableColumnLabel column="status">
                                     Status
                                 </InvoicesTableColumnLabel>
                             </Th>
-                            <Th
-                                pos="sticky"
-                                top="0"
-                                minW="160px"
-                                bg="background.contentTint"
-                                boxSizing="content-box"
-                            >
+                            <Th minW="160px" bg="background.contentTint" boxSizing="content-box">
                                 <InvoicesTableColumnLabel column="amount">
                                     Amount
                                 </InvoicesTableColumnLabel>
                             </Th>
-                            <Th
-                                pos="sticky"
-                                top="0"
-                                minW="180px"
-                                bg="background.contentTint"
-                                boxSizing="content-box"
-                            >
+                            <Th minW="180px" bg="background.contentTint" boxSizing="content-box">
                                 <InvoicesTableColumnLabel column="creation-date">
                                     Creation Date
                                 </InvoicesTableColumnLabel>
                             </Th>
                             <Th
-                                pos="sticky"
-                                top="0"
                                 w="100%"
                                 bg="background.contentTint"
                                 borderTop="1px"

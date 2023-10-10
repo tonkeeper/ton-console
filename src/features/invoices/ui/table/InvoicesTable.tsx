@@ -35,7 +35,6 @@ const InvoicesTable: FunctionComponent<ComponentProps<typeof Box>> = props => {
                                     onItemsRendered={onItemsRendered}
                                     itemSize={parseInt(rawHeight)}
                                     innerElementType={InvoicesTableStructure}
-                                    outerElementType="section"
                                     ref={ref}
                                 >
                                     {InvoicesTableRaw}

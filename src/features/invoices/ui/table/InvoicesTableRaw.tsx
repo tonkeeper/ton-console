@@ -90,12 +90,15 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
                 />
                 <Tr
                     sx={{ td: { px: 2, py: 0 } }}
+                    pos="absolute"
+                    top={parseFloat(style.top!.toString()) + parseFloat(rawHeight) + 'px'}
+                    left="0"
                     display="table-row"
+                    w="100%"
                     h={rawHeight}
                     maxH={rawHeight}
                     cursor={invoice.status === 'pending' ? 'pointer' : 'default'}
                     onClick={invoice.status === 'pending' ? onOpenView : () => {}}
-                    style={style}
                 >
                     <Td
                         minW="100px"
