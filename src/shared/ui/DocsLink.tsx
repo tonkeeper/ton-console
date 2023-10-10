@@ -28,11 +28,11 @@ export const DocsLink: FunctionComponent<
                 <ConsoleDocsIcon32 mr="3" alignSelf="center" />
                 <Box flex="1">
                     <Text textStyle="label1" textDecoration="none">
-                        Console Docs
+                        Ton Console Docs
                     </Text>
                     {children || (
                         <Text textStyle="body2" color="text.secondary" textDecoration="none">
-                            Open platform with technical documentation of TON Apps products.
+                            Software guides for Ton Apps products
                         </Text>
                     )}
                 </Box>
