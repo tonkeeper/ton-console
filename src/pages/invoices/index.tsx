@@ -1,16 +1,16 @@
 import RegisterProject from './RegisterProject';
-import { Suspense } from 'react';
+import { FunctionComponent, PropsWithChildren, Suspense, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { invoicesAppStore } from 'src/features';
 import { Center, Spinner } from '@chakra-ui/react';
-import { Route, useNavigate } from 'react-router-dom';
+import { Route, useLocation, useNavigate } from 'react-router-dom';
 import { lazy } from '@loadable/component';
 import JoinInvoices from './JoinInvoices';
 
 const InvoiceDashboardPage = lazy(() => import('./dashboard'));
 const ManageInvoicesPage = lazy(() => import('./manage'));
 
-const InvoicesPage = observer(() => {
+const WaitForAppResolving: FunctionComponent<PropsWithChildren> = observer(({ children }) => {
     if (!invoicesAppStore.invoicesApp$.isResolved) {
         return (
             <Center h="200px">
@@ -19,6 +19,10 @@ const InvoicesPage = observer(() => {
         );
     }
 
+    return <>{children}</>;
+});
+
+const InvoicesPage = observer(() => {
     if (invoicesAppStore.invoicesServiceAvailable) {
         return <RegisterProject />;
     }
@@ -28,18 +32,30 @@ const InvoicesPage = observer(() => {
 
 const Index = observer(() => {
     const navigate = useNavigate();
-    if (invoicesAppStore.invoicesApp$.value) {
-        setTimeout(() => navigate('manage'));
-        return null;
-    }
+    const location = useLocation();
+
+    const id = invoicesAppStore.invoicesApp$.value?.id;
+
+    useEffect(() => {
+        if (id) {
+            navigate(location.pathname.endsWith('dashboard') ? 'dashboard' : 'manage');
+        }
+    }, [id]);
 
     return <InvoicesPage />;
 });
 
 const ApiDescription = observer(() => {
     const navigate = useNavigate();
-    if (!invoicesAppStore.invoicesApp$.value) {
-        setTimeout(() => navigate('../'));
+    const id = invoicesAppStore.invoicesApp$.value?.id;
+
+    useEffect(() => {
+        if (!id) {
+            navigate('../');
+        }
+    }, [id]);
+
+    if (!id) {
         return null;
     }
 
@@ -52,8 +68,15 @@ const ApiDescription = observer(() => {
 
 const Manage = observer(() => {
     const navigate = useNavigate();
-    if (!invoicesAppStore.invoicesApp$.value) {
-        setTimeout(() => navigate('../'));
+    const id = invoicesAppStore.invoicesApp$.value?.id;
+
+    useEffect(() => {
+        if (!id) {
+            navigate('../');
+        }
+    }, [id]);
+
+    if (!id) {
         return null;
     }
 
@@ -66,10 +89,38 @@ const Manage = observer(() => {
 
 const InvoicesRouting = (
     <>
-        <Route path="dashboard" element={<ApiDescription />} />
-        <Route path="manage" element={<Manage />} />
-        <Route index element={<Index />} />
-        <Route path="*" element={<Index />} />
+        <Route
+            path="dashboard"
+            element={
+                <WaitForAppResolving>
+                    <ApiDescription />
+                </WaitForAppResolving>
+            }
+        />
+        <Route
+            path="manage"
+            element={
+                <WaitForAppResolving>
+                    <Manage />
+                </WaitForAppResolving>
+            }
+        />
+        <Route
+            index
+            element={
+                <WaitForAppResolving>
+                    <Index />
+                </WaitForAppResolving>
+            }
+        />
+        <Route
+            path="*"
+            element={
+                <WaitForAppResolving>
+                    <Index />
+                </WaitForAppResolving>
+            }
+        />
     </>
 );
 
