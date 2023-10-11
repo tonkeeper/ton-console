@@ -11,7 +11,7 @@ export const AppMessagesDashboard: FunctionComponent = () => {
         <Flex gap="4">
             <Overlay px="0">
                 <Box mb="6" px="6">
-                    <H4 mb="5">Tonkeeper Messages Dashboard</H4>
+                    <H4 mb="5">Tonkeeper Messages</H4>
                     <CurrentDappCard withMenu />
                 </Box>
                 <Divider />
