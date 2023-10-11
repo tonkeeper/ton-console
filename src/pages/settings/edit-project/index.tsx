@@ -1,9 +1,9 @@
 import { FunctionComponent, useCallback, useMemo } from 'react';
-import { Button, Center, Flex } from '@chakra-ui/react';
+import { Button, Center, Flex, Text } from '@chakra-ui/react';
 import { CreateProjectForm, CreateProjectFormValues, projectsStore } from 'src/entities';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toJS } from 'mobx';
-import { H4, Overlay } from 'src/shared';
+import { CopyPad, H4, Overlay } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 
 const EditProjectPage: FunctionComponent = () => {
@@ -39,6 +39,18 @@ const EditProjectPage: FunctionComponent = () => {
             <H4>Edit project</H4>
             <Center h="100%">
                 <Flex align="center" direction="column" w="100%" maxW="512px">
+                    <Text textStyle="label2" alignSelf="flex-start" mb="1">
+                        Project ID
+                    </Text>
+                    <CopyPad
+                        alignSelf="flex-start"
+                        mb="4"
+                        variant="flat"
+                        size="sm"
+                        textStyles={{ textStyle: 'label1' }}
+                        text={projectsStore.selectedProject?.id.toString() || ''}
+                    />
+
                     <FormProvider {...methods}>
                         <CreateProjectForm
                             defaultValues={defaultValues}
