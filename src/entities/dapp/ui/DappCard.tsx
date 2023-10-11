@@ -68,7 +68,7 @@ const DappCard: FunctionComponent<
                                 <MenuItem onClick={onOpen}>
                                     <DeleteIcon24 mr="2" />
                                     <Text textStyle="label2" fontFamily="body">
-                                        Delete
+                                        Remove
                                     </Text>
                                 </MenuItem>
                             </MenuList>

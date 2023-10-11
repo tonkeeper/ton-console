@@ -21,10 +21,10 @@ export const MessagesTokenRegenerateConfirmation: FunctionComponent<{
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside" size="md">
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Regenerate the token?</ModalHeader>
+                <ModalHeader>Generate new token?</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody pt="0" pb="2">
-                    If you regenerate the token, the previous token will no longer work
+                    If you generate new the token, the previous token will no longer work
                 </ModalBody>
                 <ModalFooter gap="3" pt="4">
                     <Button flex={1} onClick={onClose} variant="secondary">
