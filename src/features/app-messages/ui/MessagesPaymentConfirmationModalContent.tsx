@@ -23,7 +23,7 @@ const MessagesPaymentConfirmationModalContent: FunctionComponent<{
 
     return (
         <ModalContent>
-            <ModalHeader>Payment Details</ModalHeader>
+            <ModalHeader>Details</ModalHeader>
             <ModalCloseButton />
             <ModalBody pt="0" pb="2">
                 <Card>
@@ -33,7 +33,7 @@ const MessagesPaymentConfirmationModalContent: FunctionComponent<{
                             <Span>{pkg.name}</Span>
                         </Flex>
                         <Flex justify="space-between" mb="3">
-                            <Span color="text.secondary">Included</Span>
+                            <Span color="text.secondary">Includes</Span>
                             <Span>{formatWithSuffix(pkg.messagesIncluded)} messages</Span>
                         </Flex>
                         <Flex justify="space-between" mb="3">
@@ -68,7 +68,7 @@ const MessagesPaymentConfirmationModalContent: FunctionComponent<{
                     onClick={onConfirm}
                     variant="primary"
                 >
-                    Confirm Purchase
+                    Purchase
                 </Button>
             </ModalFooter>
         </ModalContent>

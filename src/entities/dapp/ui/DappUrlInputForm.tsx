@@ -25,7 +25,7 @@ type AppUrlFormStruct = {
 
 const inputsLabels = {
     manifest: 'TonConnect Manifest URL',
-    url: 'Input dApp URL directly'
+    url: 'App URL'
 };
 
 export const DAppUrlInputForm: FunctionComponent<
@@ -99,7 +99,7 @@ export const DAppUrlInputForm: FunctionComponent<
     return (
         <Box {...rest}>
             <Text textStyle="label1" mb="6" color="text.primary">
-                Register your dApp
+                Registration
             </Text>
             <Flex align="center" justify="space-between">
                 <Menu gutter={2} placement="bottom-start">
@@ -189,7 +189,7 @@ export const DAppUrlInputForm: FunctionComponent<
                     isLoading={submitButtonLoading}
                     type="submit"
                 >
-                    Submit
+                    Register
                 </Button>
             </chakra.form>
         </Box>

@@ -22,11 +22,11 @@ export const PendingDappInfo: FunctionComponent<
     return (
         <Box {...rest}>
             <Text textStyle="label1" mb="3" color="text.primary">
-                Given dApp
+                Your app
             </Text>
             <DappCard maxW="600px" mb="4" dapp={pendingDapp} />
             <Button onClick={onOpen} variant="secondary">
-                Reset
+                Remove
             </Button>
             <ConfirmAppResetModal
                 appUrl={pendingDapp.url}

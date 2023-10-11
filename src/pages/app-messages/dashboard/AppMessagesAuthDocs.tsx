@@ -44,7 +44,7 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                         onClick={onOpen}
                         variant="secondary"
                     >
-                        Regenerate
+                        Generate
                     </Button>
                     <MessagesTokenRegenerateConfirmation isOpen={isOpen} onClose={onClose} />
                 </Flex>
@@ -58,8 +58,8 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
             </Box>
             <Tabs mb="4">
                 <TabList pl="6">
-                    <Tab>Send message</Tab>
-                    <Tab>Send message to all users</Tab>
+                    <Tab>Message user</Tab>
+                    <Tab>Message all users</Tab>
                 </TabList>
 
                 <TabPanels px="6">

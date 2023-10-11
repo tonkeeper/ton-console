@@ -20,13 +20,11 @@ export const ConfirmDappDeleteModal: FunctionComponent<{
         <Modal scrollBehavior="inside" size="md" {...rest}>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader textAlign="center">
-                    Are you sure you want to delete the dApp?
-                </ModalHeader>
+                <ModalHeader textAlign="center">Remove your app?</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody pb="0">
                     <Text textStyle="text.body2" mb="6" color="text.secondary" textAlign="center">
-                        Delete {appUrl}?
+                        {appUrl}
                     </Text>
                 </ModalBody>
 
@@ -40,7 +38,7 @@ export const ConfirmDappDeleteModal: FunctionComponent<{
                         type="submit"
                         variant="primary"
                     >
-                        Delete
+                        Remove
                     </Button>
                 </ModalFooter>
             </ModalContent>
