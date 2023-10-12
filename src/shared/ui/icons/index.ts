@@ -33,3 +33,4 @@ export { CoinsIcon24 } from './CoinsIcon24';
 export { InvoicesIcon24 } from './InvoicesIcon24';
 export { FilledInfoIcon16 } from './FilledInfoIcon16';
 export { InvoiceIcon40 } from './InvoiceIcon40';
+export { FolderIcon40 } from './FolderIcon40';

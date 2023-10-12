@@ -45,13 +45,10 @@ const BalancePage: FunctionComponent = () => {
                         contentUnderSkeleton="&nbsp;USD"
                     />
                     <Flex gap="3">
-                        <Button onClick={onOpen} size="lg">
-                            Refill
-                        </Button>
+                        <Button onClick={onOpen}>Refill</Button>
                         <Button
                             isLoading={refreshLoading}
                             onClick={onRefreshClick}
-                            size="lg"
                             variant="secondary"
                         >
                             Refresh

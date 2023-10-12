@@ -49,12 +49,11 @@ const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = pro
                     <Span textStyle="label2">Display only</Span>
                     {!!invoicesTableStore.pagination.filter.status?.length && (
                         <Button
-                            h="fit-content"
-                            p="0"
                             onClick={() => {
                                 invoicesTableStore.clearFilterByStatus();
                                 onClose();
                             }}
+                            size="fit"
                             variant="flat"
                         >
                             <Span color="text.secondary" textStyle="body2">

@@ -1349,8 +1349,8 @@ components:
           - status
           - life_time
           - description
-          - recipient_address
-          - paid_address
+          - pay_to_address
+          - paid_by_address
           - date_create
           - date_paid
     queryTypeOrder:
@@ -1717,10 +1717,9 @@ components:
               - life_time
             properties:
               amount:
-                type: integer
-                format: int64
+                type: string
                 description: "nano ton are expected"
-                example: 1000000000
+                example: "1000000000"
               life_time:
                 type: integer
                 format: int64
@@ -2141,12 +2140,10 @@ components:
         - id
         - app_id
         - app_name
-        - app_description
         - amount
         - life_time
-        - subtract_fee_from_amount
         - description
-        - recipient_address
+        - pay_to_address
         - status
         - date_create
       properties:
@@ -2160,20 +2157,13 @@ components:
         app_name:
           type: string
           example: "My app"
-        app_description:
-          type: string
-          example: "App description"
         amount:
-          type: integer
-          format: int64
-          example: 1000000000
+          type: string
+          example: "1000000000"
         life_time:
           type: integer
           format: int64
           example: 100
-        subtract_fee_from_amount:
-          type: boolean
-          example: false
         overpayment:
           type: number
         refund_amount:
@@ -2183,10 +2173,10 @@ components:
           example: "Test description"
         status:
           $ref: '#/components/schemas/InvoiceStatus'
-        recipient_address:
+        pay_to_address:
           type: string
           example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-        paid_address:
+        paid_by_address:
           type: string
           example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
         refunded:
@@ -2200,7 +2190,7 @@ components:
           type: integer
           format: int64
           example: 1690889913000
-        date_cancel:
+        date_cancelled:
           type: integer
           format: int64
           example: 1690889913000
@@ -2243,12 +2233,12 @@ components:
           example: 1690889913000
     InvoiceStatus:
       type: string
-      example: "pending_status"
+      example: "pending"
       enum:
-        - pending_status
-        - success_status
-        - cancel_status
-        - expired_status
+        - pending
+        - paid
+        - cancelled
+        - expired
     InvoicesAppWebhooks:
       type: array
       items:

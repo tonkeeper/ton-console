@@ -131,13 +131,12 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
                                     <Tooltip isOpen={hasCopiedPaidBy} label="Copied!">
                                         <Button
                                             display="inline-block"
-                                            h="fit-content"
-                                            p="0"
                                             _hover={{ svg: { opacity: 1 } }}
                                             onClick={e => {
                                                 e.stopPropagation();
                                                 onCopyPaidBy();
                                             }}
+                                            size="fit"
                                             variant="flat"
                                         >
                                             <Span textStyle="body3" color="text.secondary">

@@ -14,10 +14,9 @@ export interface InvoiceCommon {
     id: string;
     amount: TokenCurrencyAmount;
     validUntil: Date;
-    subtractFeeFromAmount: boolean;
     description: string;
     creationDate: Date;
-    receiverAddress: string;
+    payTo: string;
     overpayment?: TokenCurrencyAmount;
     refundDate?: Date;
     refundedAmount?: TokenCurrencyAmount;

@@ -19,7 +19,6 @@ const InvoiceDashboardPage: FunctionComponent<ComponentProps<typeof Box>> = prop
             <InvoicesAuthorization />
             <Divider w="auto" mb="5" mx="-6" />
             <InvoicesWebhooks mb="6" />
-            <Divider w="auto" mb="5" mx="-6" />
             <InvoicesApi />
         </Overlay>
     );

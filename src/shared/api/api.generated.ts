@@ -289,29 +289,22 @@ export interface DTOInvoicesInvoice {
     app_id: number;
     /** @example "My app" */
     app_name: string;
-    /** @example "App description" */
-    app_description: string;
-    /**
-     * @format int64
-     * @example 1000000000
-     */
-    amount: number;
+    /** @example "1000000000" */
+    amount: string;
     /**
      * @format int64
      * @example 100
      */
     life_time: number;
-    /** @example false */
-    subtract_fee_from_amount: boolean;
     overpayment?: number;
     refund_amount?: number;
     /** @example "Test description" */
     description: string;
     status: DTOInvoiceStatus;
     /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-    recipient_address: string;
+    pay_to_address: string;
     /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-    paid_address?: string;
+    paid_by_address?: string;
     /** @example false */
     refunded?: boolean;
     /**
@@ -328,7 +321,7 @@ export interface DTOInvoicesInvoice {
      * @format int64
      * @example 1690889913000
      */
-    date_cancel?: number;
+    date_cancelled?: number;
     /**
      * @format int64
      * @example 1690889913000
@@ -361,12 +354,12 @@ export interface DTOInvoicesApp {
     date_create: number;
 }
 
-/** @example "pending_status" */
+/** @example "pending" */
 export enum DTOInvoiceStatus {
-    DTOPendingStatus = 'pending_status',
-    DTOSuccessStatus = 'success_status',
-    DTOCancelStatus = 'cancel_status',
-    DTOExpiredStatus = 'expired_status'
+    DTOPending = 'pending',
+    DTOPaid = 'paid',
+    DTOCancelled = 'cancelled',
+    DTOExpired = 'expired'
 }
 
 export type DTOInvoicesAppWebhooks = {
@@ -396,8 +389,8 @@ export enum DTOGetInvoicesParamsFieldOrder {
     DTOStatus = 'status',
     DTOLifeTime = 'life_time',
     DTODescription = 'description',
-    DTORecipientAddress = 'recipient_address',
-    DTOPaidAddress = 'paid_address',
+    DTOPayToAddress = 'pay_to_address',
+    DTOPaidByAddress = 'paid_by_address',
     DTODateCreate = 'date_create',
     DTODatePaid = 'date_paid'
 }
@@ -2571,10 +2564,9 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             data: {
                 /**
                  * nano ton are expected
-                 * @format int64
-                 * @example 1000000000
+                 * @example "1000000000"
                  */
-                amount: number;
+                amount: string;
                 /**
                  * seconds are expected
                  * @format int64

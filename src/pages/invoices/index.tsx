@@ -37,7 +37,7 @@ const Index = observer(() => {
     const id = invoicesAppStore.invoicesApp$.value?.id;
 
     useEffect(() => {
-        if (id) {
+        if (id !== undefined) {
             navigate(location.pathname.endsWith('dashboard') ? 'dashboard' : 'manage');
         }
     }, [id]);
@@ -50,12 +50,12 @@ const ApiDescription = observer(() => {
     const id = invoicesAppStore.invoicesApp$.value?.id;
 
     useEffect(() => {
-        if (!id) {
+        if (id === undefined) {
             navigate('../');
         }
     }, [id]);
 
-    if (!id) {
+    if (id === undefined) {
         return null;
     }
 
@@ -71,12 +71,12 @@ const Manage = observer(() => {
     const id = invoicesAppStore.invoicesApp$.value?.id;
 
     useEffect(() => {
-        if (!id) {
+        if (id === undefined) {
             navigate('../');
         }
     }, [id]);
 
-    if (!id) {
+    if (id === undefined) {
         return null;
     }
 

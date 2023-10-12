@@ -23,8 +23,6 @@ const InvoicesTableColumnLabel: FunctionComponent<
         <Button
             pos="relative"
             left={disabled ? '0' : '-24px'}
-            h="fit-content"
-            p="0"
             _hover={{ svg: { opacity: 1 } }}
             _disabled={{
                 opacity: 1,
@@ -36,6 +34,7 @@ const InvoicesTableColumnLabel: FunctionComponent<
                     ? invoicesTableStore.toggleSortDirection
                     : () => invoicesTableStore.setSortColumn(column)
             }
+            size="fit"
             variant="flat"
             {...(!disabled && {
                 leftIcon: (

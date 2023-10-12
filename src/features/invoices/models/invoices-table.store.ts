@@ -153,7 +153,7 @@ class InvoicesTableStore {
                     app_id: invoicesAppStore.invoicesApp$.value!.id
                 },
                 {
-                    amount: Number(form.amount.stringWeiAmount),
+                    amount: form.amount.stringWeiAmount,
                     description: form.description,
                     life_time: form.lifeTimeSeconds
                 }
@@ -270,10 +270,10 @@ class InvoicesTableStore {
 }
 
 const mapInvoiceDTOStatusToInvoiceStatus: Record<DTOInvoicesInvoice['status'], InvoiceStatus> = {
-    [DTOInvoiceStatus.DTOSuccessStatus]: 'success',
-    [DTOInvoiceStatus.DTOPendingStatus]: 'pending',
-    [DTOInvoiceStatus.DTOExpiredStatus]: 'expired',
-    [DTOInvoiceStatus.DTOCancelStatus]: 'cancelled'
+    [DTOInvoiceStatus.DTOPaid]: 'success',
+    [DTOInvoiceStatus.DTOPending]: 'pending',
+    [DTOInvoiceStatus.DTOExpired]: 'expired',
+    [DTOInvoiceStatus.DTOCancelled]: 'cancelled'
 };
 
 const mapInvoiceStatusToInvoiceDTOStatus: Record<InvoiceStatus, DTOInvoicesInvoice['status']> =
@@ -284,11 +284,10 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
     const commonInvoice: InvoiceCommon = {
         amount: new TonCurrencyAmount(invoiceDTO.amount),
         creationDate,
-        subtractFeeFromAmount: invoiceDTO.subtract_fee_from_amount,
         id: invoiceDTO.id,
         validUntil: new Date(creationDate.getTime() + invoiceDTO.life_time * 1000),
         description: invoiceDTO.description,
-        receiverAddress: invoiceDTO.recipient_address,
+        payTo: invoiceDTO.pay_to_address,
         overpayment: invoiceDTO.overpayment
             ? new TonCurrencyAmount(invoiceDTO.overpayment)
             : undefined,
@@ -303,7 +302,7 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
     if (status === 'success') {
         return {
             ...commonInvoice,
-            paidBy: invoiceDTO.paid_address!,
+            paidBy: invoiceDTO.paid_by_address!,
             paymentDate: new Date(invoiceDTO.date_paid!),
             status
         };
@@ -339,8 +338,6 @@ function createMockInvoice(): Invoice {
                amount: TonCurrencyAmount.fromRelativeAmount(
                    Math.round(Math.random() * 1000000) / 1000
                ),
-               receiverAddress: 'EQCmtv9UrlDC27A0KsJNSaloAtHp5G3fli5jJjJug0waNf1u',
-               subtractFeeFromAmount: true,
                description: 'Tag ' + Math.round(Math.random() * 1000).toString(),
                lifeTimeSeconds: ttl < 1000 ? 1000 : ttl
            });
@@ -356,7 +353,7 @@ const mapSortColumnToFieldOrder: Record<InvoiceTableSortColumn, DTOGetInvoicesPa
 
 export function createInvoicePaymentLink(invoice: Invoice): string {
     return createTransferLink({
-        address: invoice.receiverAddress,
+        address: invoice.payTo,
         amount: invoice.amount,
         text: invoice.id,
         exp: invoice.validUntil

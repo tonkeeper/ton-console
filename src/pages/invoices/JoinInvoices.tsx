@@ -17,6 +17,7 @@ const JoinInvoices: FunctionComponent = () => {
 
             <Flex gap="5">
                 <ButtonLink
+                    size="md"
                     variant="secondary"
                     isExternal
                     href={INVOICES_LINKS.BUSINESS_DESCRIPTION}
