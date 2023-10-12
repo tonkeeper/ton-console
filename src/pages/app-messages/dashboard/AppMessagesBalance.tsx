@@ -19,7 +19,7 @@ const AppMessagesBalance: FunctionComponent<ComponentProps<typeof Box>> = props 
                 )}
             </H4>
             <Text textStyle="body2" mb="5" color="text.secondary">
-                Messages available
+                Available Messages
             </Text>
             <Button w="100%" onClick={onOpen} variant={balanceIsZero ? 'primary' : 'secondary'}>
                 Refill
