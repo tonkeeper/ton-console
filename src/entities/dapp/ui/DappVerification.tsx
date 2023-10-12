@@ -34,7 +34,7 @@ export const DappVerification: FunctionComponent<
                 copy and paste content below:
             </Text>
             <Text textStyle="label1" mb="3" color="text.primary">
-                Key
+                Payload Key
             </Text>
             <CopyPad
                 whiteSpace="pre-wrap"

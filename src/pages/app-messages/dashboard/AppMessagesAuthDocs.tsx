@@ -28,7 +28,7 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
         <Box {...props}>
             <Box px="6">
                 <Text textStyle="body2" mb="2">
-                    Token:
+                    Token
                 </Text>
                 <Flex gap="3" mb="2">
                     <CopyPad
@@ -58,8 +58,8 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
             </Box>
             <Tabs mb="4">
                 <TabList pl="6">
-                    <Tab>Message user</Tab>
-                    <Tab>Message all users</Tab>
+                    <Tab>Message User</Tab>
+                    <Tab>Message All Users</Tab>
                 </TabList>
 
                 <TabPanels px="6">
