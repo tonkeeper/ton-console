@@ -1,7 +1,7 @@
 import { ComponentProps, FunctionComponent, useContext } from 'react';
 import { Box, useTheme } from '@chakra-ui/react';
 import CodeMirror from '@uiw/react-codemirror';
-import { PostgreSQL, sql, SQLConfig } from '@codemirror/lang-sql';
+import { PostgreSQL, sql } from '@codemirror/lang-sql';
 import { draculaInit } from '@uiw/codemirror-theme-dracula/src';
 import { tags as t } from '@lezer/highlight';
 import { CodeAreaGroupContext } from './CodeAreaGroup';
@@ -27,10 +27,6 @@ export const CodeArea: FunctionComponent<
 
     const height = rest.h || rest.height || '260px';
 
-    const schema: SQLConfig['schema'] = {
-        users: ['name', 'age', 'is_admin']
-    };
-
     return (
         <Box
             {...rest}
@@ -54,7 +50,7 @@ export const CodeArea: FunctionComponent<
                 value={value}
                 onChange={onChange}
                 theme={dracula}
-                extensions={[sql({ dialect: PostgreSQL, schema })]}
+                extensions={[sql({ dialect: PostgreSQL })]}
                 basicSetup={{ autocompletion: true }}
                 width="100%"
                 height={height.toString()}

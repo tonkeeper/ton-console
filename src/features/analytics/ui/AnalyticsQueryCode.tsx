@@ -6,7 +6,7 @@ export const AnalyticsQueryCode: FunctionComponent<ComponentProps<typeof Box>> =
     return (
         <Box {...props}>
             <CodeAreaGroup>
-                <CodeArea value="123" onChange={() => {}} />
+                <CodeArea value="SELECT " onChange={() => {}} />
                 <CodeAreaFooter>
                     <Flex align="center" justify="space-between">
                         <Span textStyle="label2">Explain</Span>
