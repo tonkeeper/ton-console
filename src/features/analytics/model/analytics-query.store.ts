@@ -5,7 +5,7 @@ import { AnalyticsQuery, AnalyticsQueryTemplate } from './interfaces';
 const wait = (to: number): Promise<void> => new Promise(r => setTimeout(r, to));
 
 class AnalyticsQueryStore {
-    template$ = new Loadable<AnalyticsQueryTemplate | null>(null);
+    request$ = new Loadable<AnalyticsQueryTemplate | null>(null);
 
     query$ = new Loadable<AnalyticsQuery | null>(null);
 
@@ -13,7 +13,10 @@ class AnalyticsQueryStore {
         makeAutoObservable(this);
     }
 
-    estimateRequest = this.template$.createAsyncAction(async (request: string) => {
+    estimateRequest = (request: string): Promise<unknown> =>
+        this._estimateRequest(request, { cancelAllPreviousCalls: true });
+
+    private _estimateRequest = this.request$.createAsyncAction(async (request: string) => {
         await wait(1000);
         return {
             request,
@@ -21,6 +24,11 @@ class AnalyticsQueryStore {
             estimatedCost: new TonCurrencyAmount(3000000000)
         };
     });
+
+    clearRequest = (): void => {
+        this._estimateRequest.cancelAllPendingCalls();
+        this.request$.clear();
+    };
 }
 
 export const analyticsQueryStore = new AnalyticsQueryStore();

@@ -1,26 +1,47 @@
-import { ComponentProps, FunctionComponent } from 'react';
-import { Box, Button, Flex } from '@chakra-ui/react';
-import { CodeArea, CodeAreaFooter, CodeAreaGroup, Span } from 'src/shared';
+import { ComponentProps, FunctionComponent, useEffect, useState } from 'react';
+import { Box, Flex } from '@chakra-ui/react';
+import {
+    CodeArea,
+    CodeAreaFooter,
+    CodeAreaGroup,
+    Span,
+    useDebounce,
+    usePrevious
+} from 'src/shared';
+import { analyticsQueryStore } from 'src/features';
+import { observer } from 'mobx-react-lite';
+import AnalyticsQueryControlPanel from './AnalyticsQueryControlPanel';
 
-export const AnalyticsQueryCode: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const AnalyticsQueryCode: FunctionComponent<ComponentProps<typeof Box>> = props => {
+    const [value, setValue] = useState('SELECT ');
+    const debouncedValue = useDebounce(value);
+    const prevDebouncedValue = usePrevious(debouncedValue);
+
+    useEffect(() => {
+        if (!prevDebouncedValue) {
+            return;
+        }
+
+        if (debouncedValue) {
+            analyticsQueryStore.estimateRequest(debouncedValue);
+        } else {
+            analyticsQueryStore.clearRequest();
+        }
+    }, [debouncedValue]);
+
     return (
         <Box {...props}>
             <CodeAreaGroup>
-                <CodeArea value="SELECT " onChange={() => {}} />
+                <CodeArea value={value} onChange={setValue} />
                 <CodeAreaFooter>
                     <Flex align="center" justify="space-between">
                         <Span textStyle="label2">Explain</Span>
-                        <Box>
-                            <Span opacity="0.6" fontFamily="mono">
-                                ≈ 30 min · $0.15
-                            </Span>
-                            <Button ml="4" size="sm" variant="contrast">
-                                Run
-                            </Button>
-                        </Box>
+                        <AnalyticsQueryControlPanel />
                     </Flex>
                 </CodeAreaFooter>
             </CodeAreaGroup>
         </Box>
     );
 };
+
+export default observer(AnalyticsQueryCode);

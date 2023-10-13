@@ -1,1 +1,1 @@
-export * from './AnalyticsQueryCode';
+export { default as AnalyticsQueryCode } from './AnalyticsQueryCode';

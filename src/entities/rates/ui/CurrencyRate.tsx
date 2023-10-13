@@ -10,7 +10,7 @@ const CurrencyRate: FunctionComponent<
         ComponentProps<typeof Text> & {
             showSkeletonOnUpdate?: boolean;
             leftSign?: string;
-            currency: CRYPTO_CURRENCY;
+            currency?: CRYPTO_CURRENCY;
             amount?: Amount;
             skeletonWidth?: string | number;
             precision?: number;
@@ -34,12 +34,13 @@ const CurrencyRate: FunctionComponent<
     thousandSeparators,
     ...rest
 }) => {
+    currency ||= CRYPTO_CURRENCY.TON;
     const sign = leftSign === undefined ? '' : leftSign;
     const precisionWithFallback = precision === undefined ? 2 : precision;
     const thousandSeparatorsWithFallback =
         thousandSeparators === undefined ? true : thousandSeparators;
     const [skeletonHeight, setSkeletonHeight] = useState('30px');
-    const rate$ = ratesStore.rates$[currency as CRYPTO_CURRENCY];
+    const rate$ = ratesStore.rates$[currency];
 
     const ref = (element: HTMLElement | null): void => {
         const window = getWindow();
