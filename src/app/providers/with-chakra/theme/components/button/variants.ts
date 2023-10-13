@@ -6,8 +6,9 @@ import semanticTokens from '../../foundations/semanticTokens';
 const button = semanticTokens.colors.button;
 
 function variant(backgroundColor: string, color: string): SystemStyleInterpolation {
+    const { minHeight, ...fontStyles } = textStyles.label2;
     return defineStyle({
-        ...textStyles.label2,
+        ...fontStyles,
         backgroundColor,
         borderRadius: 'md',
         color,
@@ -47,7 +48,13 @@ const secondary = {
     }
 };
 const danger = variant(button.danger.background, button.danger.foreground);
-const flat = variant(button.flat.background, button.flat.foreground);
+const flat = {
+    ...variant(button.flat.background, button.flat.foreground),
+    px: 0,
+    py: 0,
+    p: 0,
+    h: 'fit-content'
+};
 const contrast = variant(button.contrast.background, button.contrast.foreground);
 
 export default {

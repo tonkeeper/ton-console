@@ -93,26 +93,55 @@ export class Loadable<T> {
         }
     }
 
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    createAsyncAction<A extends (...args: any[]) => Promise<T | void>>(
+    createAsyncAction<
+        N extends boolean,
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        A extends (...args: any[]) => Promise<N extends true ? unknown : T | void>
+    >(
         asyncAction: A,
         options?: {
+            notMutateState?: N;
             successToast?: UseToastOptions;
             errorToast?: UseToastOptions;
             onError?: (e: unknown) => void;
+            resetBeforeExecution?: boolean;
         }
-    ): ((...args: [...Parameters<A>, ({ silently?: boolean } | unknown)?]) => Promise<void>) & {
+    ): ((
+        ...args: [
+            ...Parameters<A>,
+            { silently?: boolean; cancelPreviousCall?: boolean; cancelAllPreviousCalls?: boolean }?
+        ]
+    ) => ReturnType<A>) & {
         isLoading: boolean;
         error: unknown;
+        cancelLastCall: () => void;
+        cancelAllPendingCalls: () => void;
     } {
         const fn = (async (...args) => {
+            if (options?.resetBeforeExecution) {
+                this.clear();
+            }
+
             const callOpts = args[args.length - 1];
-            const silently = Boolean(
-                callOpts &&
-                    typeof callOpts === 'object' &&
-                    'silently' in callOpts &&
-                    callOpts.silently
-            );
+
+            const lastCallId = fn.pendingCallsIds.at(-1);
+
+            let silently = false;
+            if (callOpts && typeof callOpts === 'object') {
+                silently = 'silently' in callOpts && !!callOpts.silently;
+
+                if (
+                    'cancelPreviousCall' in callOpts &&
+                    !!callOpts.cancelPreviousCall &&
+                    lastCallId !== undefined
+                ) {
+                    fn.shouldCancelCallsIds.push(lastCallId);
+                }
+
+                if ('cancelAllPreviousCalls' in callOpts && !!callOpts.cancelAllPreviousCalls) {
+                    fn.shouldCancelCallsIds = fn.pendingCallsIds.slice();
+                }
+            }
 
             const changeState = (state: Loadable<unknown>['state']): void => {
                 if (!silently) {
@@ -135,11 +164,20 @@ export class Loadable<T> {
 
             fn.error = null;
             fn.isLoading = true;
+            const callId = (lastCallId || 0) + 1;
+            fn.pendingCallsIds.push(callId);
 
             try {
                 const result = await asyncAction(...args);
-                if (result !== undefined) {
-                    runInAction(() => (this.value = result));
+
+                fn.pendingCallsIds = fn.pendingCallsIds.filter(id => id !== callId);
+                if (fn.shouldCancelCallsIds.includes(callId)) {
+                    fn.shouldCancelCallsIds = fn.shouldCancelCallsIds.filter(id => id !== callId);
+                    return;
+                }
+
+                if (result !== undefined && !options?.notMutateState) {
+                    runInAction(() => (this.value = result as T));
                 }
                 changeState('ready');
 
@@ -152,6 +190,7 @@ export class Loadable<T> {
                         ...options.successToast
                     });
                 }
+                return result;
             } catch (e) {
                 console.error(e);
                 changeError(e);
@@ -180,9 +219,27 @@ export class Loadable<T> {
             }
         }) as ((
             ...args: [...Parameters<A>, ({ silently?: boolean } | unknown)?]
-        ) => Promise<void>) & {
+        ) => ReturnType<A>) & {
             isLoading: boolean;
             error: unknown;
+            cancelLastCall: () => void;
+            cancelAllPendingCalls: () => void;
+            pendingCallsIds: number[];
+            shouldCancelCallsIds: number[];
+        };
+
+        fn.shouldCancelCallsIds = [];
+        fn.pendingCallsIds = [];
+        fn.cancelLastCall = () => {
+            const lastCallId = fn.pendingCallsIds.at(-1);
+            if (lastCallId === undefined) {
+                return;
+            }
+
+            fn.shouldCancelCallsIds.push(lastCallId);
+        };
+        fn.cancelAllPendingCalls = () => {
+            fn.shouldCancelCallsIds = fn.pendingCallsIds.slice();
         };
 
         fn.isLoading = false;

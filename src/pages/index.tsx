@@ -6,9 +6,11 @@ import { Layout } from './layouts';
 import { projectsStore, tGUserStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import SettingsRouting from 'src/pages/settings';
+import InvoicesRouting from './invoices';
 import { LayoutSolid } from 'src/pages/layouts/LayoutSolid';
 import { LayoutWithAside } from 'src/pages/layouts/LayoutWithAside';
 import AnalyticsRouting from 'src/pages/analytics';
+import { isDevelopmentMode } from 'src/shared';
 
 const LandingPage = lazy(() => import('./landing'));
 const CreateFirstProjectPage = lazy(() => import('./create-first-project'));
@@ -22,6 +24,10 @@ const Routing: FunctionComponent = () => {
     useEffect(() => {
         const metatag = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
         if (!metatag) {
+            return;
+        }
+
+        if (isDevelopmentMode()) {
             return;
         }
 
@@ -83,6 +89,7 @@ const Routing: FunctionComponent = () => {
                         </Suspense>
                     }
                 />
+                <Route path="invoices">{InvoicesRouting}</Route>
                 <Route path="tonapi">{TonapiRouting}</Route>
                 <Route
                     path="tonkeeper-messages"

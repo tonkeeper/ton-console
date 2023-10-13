@@ -44,6 +44,12 @@ const colors = {
     scrollbar: {
         primary: '#C1C1C1',
         hover: '#7C7D7C'
+    },
+    badge: {
+        success: 'rgba(21, 173, 97, 0.16)',
+        danger: 'rgba(245, 60, 54, 0.16)',
+        warning: 'rgba(245, 153, 49, 0.16)',
+        secondary: '#F1F3F5'
     }
 } as const;
 

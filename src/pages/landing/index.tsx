@@ -47,7 +47,7 @@ const LandingPage: FunctionComponent = () => {
                         <Button
                             isLoading={tGUserStore.user$.isLoading}
                             leftIcon={<TgIcon color="constant.white" />}
-                            onClick={tGUserStore.login}
+                            onClick={() => tGUserStore.login()}
                             variant="primary"
                         >
                             Connect and try

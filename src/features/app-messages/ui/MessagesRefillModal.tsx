@@ -88,7 +88,7 @@ const MessagesRefillModal: FunctionComponent<{
                                     <Flex justify="space-between">
                                         <Text textStyle="label1">{pkg.name}</Text>
                                         <Text textStyle="label1" textAlign="end">
-                                            {pkg.price.toStringCurrencyAmount()}
+                                            {pkg.price.stringCurrencyAmount}
                                         </Text>
                                     </Flex>
                                     <Flex justify="space-between" w="100%">

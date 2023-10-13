@@ -12,9 +12,12 @@ export interface CurrencyAmount {
 
     stringCurrencyAmount: string;
 
-    toStringAmount(precision: number): string;
+    toStringAmount(options?: { decimalPlaces?: number; thousandSeparators?: boolean }): string;
 
-    toStringCurrencyAmount(precision: number): string;
+    toStringCurrencyAmount(options?: {
+        decimalPlaces?: number;
+        thousandSeparators?: boolean;
+    }): string;
 
     toJSON(): unknown;
 
