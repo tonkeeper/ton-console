@@ -1,3 +1,5 @@
+import colors from './colors';
+
 export default {
     colors: {
         button: {
@@ -17,7 +19,19 @@ export default {
             flat: {
                 background: 'transparent',
                 foreground: '#000000'
+            },
+            contrast: {
+                background: '#FFFFFF',
+                foreground: '#000000'
             }
+        },
+        codeArea: {
+            background: '#2E3032',
+            gutterBackground: '#2E3032',
+            gutterForeground: colors.text.secondary,
+            stringsColor: '#F53C36',
+            operatorsColor: colors.text.accent,
+            footerBackground: '#232728'
         }
     }
 };

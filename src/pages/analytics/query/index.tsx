@@ -1,6 +1,8 @@
 import { ComponentProps, FunctionComponent } from 'react';
-import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
-import { CodeArea, H4, Overlay } from 'src/shared';
+import { Box, Flex, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
+import { H4, Overlay } from 'src/shared';
+import { AnalyticsQueryCode } from 'src/features';
+import { QueryLinks } from './QueryLinks';
 
 const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
     return (
@@ -13,7 +15,10 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
                 </TabList>
                 <TabPanels>
                     <TabPanel>
-                        <CodeArea />
+                        <Flex gap="6">
+                            <AnalyticsQueryCode flex="1" />
+                            <QueryLinks />
+                        </Flex>
                     </TabPanel>
                     <TabPanel />
                 </TabPanels>

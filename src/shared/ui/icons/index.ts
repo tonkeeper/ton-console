@@ -26,3 +26,6 @@ export { FilledWarnIcon16 } from './FilledWarnIcon16';
 export { ConsoleDocsIcon32 } from './ConsoleDocsIcon32';
 export { CoinsIcon24 } from './CoinsIcon24';
 export { StatsIcon24 } from './StatsIcon24';
+export { TableIcon36 } from './TableIcon36';
+export { CubeIcon36 } from './CubeIcon36';
+export { ShurikenIcon36 } from './ShurikenIcon36';

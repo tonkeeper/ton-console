@@ -19,6 +19,7 @@
     "@codemirror/lang-sql": "^6.5.4",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@lezer/highlight": "^1.1.6",
     "@loadable/component": "^5.15.3",
     "@react-hook/resize-observer": "^1.2.6",
     "@uiw/codemirror-theme-dracula": "^4.21.18",

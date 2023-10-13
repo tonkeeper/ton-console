@@ -48,10 +48,12 @@ const secondary = {
 };
 const danger = variant(button.danger.background, button.danger.foreground);
 const flat = variant(button.flat.background, button.flat.foreground);
+const contrast = variant(button.contrast.background, button.contrast.foreground);
 
 export default {
     primary,
     secondary,
     danger,
-    flat
+    flat,
+    contrast
 };
