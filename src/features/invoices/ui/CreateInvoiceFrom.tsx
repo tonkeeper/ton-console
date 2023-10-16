@@ -155,7 +155,7 @@ export const CreateInvoiceFrom: FunctionComponent<
                     mt={!!formState.errors.description ? '0' : '2'}
                     color="text.secondary"
                 >
-                    This description will be seen by the recipient
+                    Description will only be visible to you, the user will not see this description
                 </Text>
             </FormControl>
         </chakra.form>

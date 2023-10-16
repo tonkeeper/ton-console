@@ -308,6 +308,14 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
         };
     }
 
+    if (status === 'cancelled') {
+        return {
+            ...commonInvoice,
+            status,
+            cancellationDate: new Date(invoiceDTO.date_cancelled!)
+        };
+    }
+
     return { ...commonInvoice, status };
 }
 /*

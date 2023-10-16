@@ -28,8 +28,17 @@ export interface InvoiceSuccessful extends InvoiceCommon {
     status: 'success';
 }
 
-export interface InvoiceNotSuccessful extends InvoiceCommon {
-    status: Exclude<InvoiceStatus, 'success'>;
+export interface InvoiceCancelled extends InvoiceCommon {
+    status: 'cancelled';
+    cancellationDate: Date;
 }
 
-export type Invoice = InvoiceNotSuccessful | InvoiceSuccessful;
+export interface InvoiceExpired extends InvoiceCommon {
+    status: 'expired';
+}
+
+export interface InvoicePending extends InvoiceCommon {
+    status: 'pending';
+}
+
+export type Invoice = InvoicePending | InvoiceSuccessful | InvoiceCancelled | InvoiceExpired;
