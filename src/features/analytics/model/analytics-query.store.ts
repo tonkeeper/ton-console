@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx';
-import { Loadable, TonCurrencyAmount } from 'src/shared';
+import { apiClient, Loadable, TonCurrencyAmount } from 'src/shared';
 import { AnalyticsQuery, AnalyticsQueryTemplate } from './interfaces';
+import { projectsStore } from 'src/entities';
 
 const wait = (to: number): Promise<void> => new Promise(r => setTimeout(r, to));
 
@@ -23,6 +24,13 @@ class AnalyticsQueryStore {
             estimatedTimeMS: 360_000,
             estimatedCost: new TonCurrencyAmount(3000000000)
         };
+    });
+
+    createQuery = this.query$.createAsyncAction(async () => {
+        await apiClient.api.sendSqlToStats({
+            project_id: projectsStore.selectedProject!.id,
+            query: this.request$.value!.request
+        });
     });
 
     clearRequest = (): void => {

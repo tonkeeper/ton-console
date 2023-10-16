@@ -21,7 +21,13 @@ const AnalyticsQueryControlPanel: FunctionComponent<ComponentProps<typeof Box>> 
                 </Span>
             )}
 
-            <Button ml="4" size="sm" variant="contrast">
+            <Button
+                ml="4"
+                isDisabled={!analyticsQueryStore.request$.value}
+                isLoading={analyticsQueryStore.request$.isLoading}
+                size="sm"
+                variant="contrast"
+            >
                 Run
             </Button>
         </Flex>

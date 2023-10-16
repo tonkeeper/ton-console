@@ -17,6 +17,13 @@ const AnalyticsQueryCode: FunctionComponent<ComponentProps<typeof Box>> = props 
     const debouncedValue = useDebounce(value);
     const prevDebouncedValue = usePrevious(debouncedValue);
 
+    const onValueChange = (val: string): void => {
+        setValue(val);
+        if (analyticsQueryStore.request$.value) {
+            analyticsQueryStore.clearRequest();
+        }
+    };
+
     useEffect(() => {
         if (!prevDebouncedValue) {
             return;
@@ -32,7 +39,7 @@ const AnalyticsQueryCode: FunctionComponent<ComponentProps<typeof Box>> = props 
     return (
         <Box {...props}>
             <CodeAreaGroup>
-                <CodeArea value={value} onChange={setValue} />
+                <CodeArea value={value} onChange={onValueChange} />
                 <CodeAreaFooter>
                     <Flex align="center" justify="space-between">
                         <Span textStyle="label2">Explain</Span>
