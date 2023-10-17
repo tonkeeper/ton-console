@@ -77,7 +77,7 @@ export const EditInvoicesProjectForm: FunctionComponent<
                     })}
                 />
                 <Text textStyle="body3" color="text.secondary">
-                    Address, which will receive funds for the created invoices
+                    This address will be used for receiving funds.
                 </Text>
                 <FormErrorMessage>
                     {formState.errors.receiverAddress && formState.errors.receiverAddress.message}

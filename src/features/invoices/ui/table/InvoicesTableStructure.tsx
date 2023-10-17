@@ -50,9 +50,7 @@ export const InvoicesTableStructure = observer(
             } else if (!invoicesTableStore.invoices$.value.length) {
                 body = (
                     <EmptyTable>
-                        {!invoicesTableStore.isFilterEmpty
-                            ? 'Nothing found. Try changing your search inputs.'
-                            : 'This is where you’ll see your invoices'}
+                        {!invoicesTableStore.isFilterEmpty ? 'No matches' : 'No invoices yet'}
                     </EmptyTable>
                 );
             }
@@ -113,7 +111,7 @@ export const InvoicesTableStructure = observer(
                                 boxSizing="content-box"
                             >
                                 <InvoicesTableColumnLabel column="description">
-                                    Invoice description
+                                    Description
                                 </InvoicesTableColumnLabel>
                             </Th>
                         </Tr>

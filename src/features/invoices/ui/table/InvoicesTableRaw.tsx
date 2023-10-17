@@ -156,6 +156,16 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
                                     {formattedTimeLeft}
                                 </Span>
                             )}
+                            {invoice.status === 'cancelled' && (
+                                <Span textStyle="body3" ml="2">
+                                    {toDateTime(invoice.cancellationDate)}
+                                </Span>
+                            )}
+                            {invoice.status === 'expired' && (
+                                <Span textStyle="body3" ml="2">
+                                    {toDateTime(invoice.validUntil)}
+                                </Span>
+                            )}
                         </Flex>
                     </Td>
                     <Td minW="160px" h={rawHeight} maxH={rawHeight} boxSizing="content-box">
