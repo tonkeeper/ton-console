@@ -58,7 +58,7 @@ const CreateInvoiceModal: FunctionComponent<{
                             type="submit"
                             variant="primary"
                         >
-                            Save
+                            Create
                         </Button>
                     </ModalFooter>
                 </ModalContent>

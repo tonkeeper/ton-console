@@ -111,7 +111,7 @@ export const CreateInvoiceFrom: FunctionComponent<
             </FormControl>
 
             <FormControl mb="4" isInvalid={!!formState.errors.lifeTimeMinutes} isRequired>
-                <FormLabel htmlFor="lifeTimeMinutes">Life time</FormLabel>
+                <FormLabel htmlFor="lifeTimeMinutes">Duration</FormLabel>
                 <OptionsInput
                     {...register('lifeTimeMinutes', { required: 'This is required' })}
                     defaultValue="1440"
@@ -138,7 +138,9 @@ export const CreateInvoiceFrom: FunctionComponent<
             </FormControl>
 
             <FormControl mb="4" isInvalid={!!formState.errors.description}>
-                <FormLabel htmlFor="description">Invoice description</FormLabel>
+                <FormLabel htmlFor="description">
+                    Description <Span color="text.tertiary">(Optional)</Span>
+                </FormLabel>
                 <Input
                     autoComplete="off"
                     id="description"
@@ -155,7 +157,7 @@ export const CreateInvoiceFrom: FunctionComponent<
                     mt={!!formState.errors.description ? '0' : '2'}
                     color="text.secondary"
                 >
-                    Description will only be visible to you, the user will not see this description
+                    Only the administrator can see this description.
                 </Text>
             </FormControl>
         </chakra.form>
