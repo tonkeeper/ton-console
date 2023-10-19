@@ -9,10 +9,6 @@ export function useCountdown(value: number, options?: { frequencyMS?: number }):
     const shouldComplete = count === 0;
 
     useEffect(() => {
-        if (value !== prevValue) {
-            return setCount(value < 0 ? 0 : value);
-        }
-
         if (shouldComplete) {
             return;
         }
@@ -21,7 +17,13 @@ export function useCountdown(value: number, options?: { frequencyMS?: number }):
             setCount(val => val - 1);
         }, frequencyMS);
         return () => clearInterval(timer);
-    }, [shouldComplete, value, prevValue]);
+    }, [shouldComplete, frequencyMS]);
+
+    useEffect(() => {
+        if (prevValue !== undefined && value !== prevValue) {
+            setCount(value < 0 ? 0 : value);
+        }
+    }, [value, prevValue]);
 
     return count;
 }

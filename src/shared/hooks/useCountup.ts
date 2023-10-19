@@ -12,10 +12,6 @@ export function useCountup(
     const shouldComplete = options?.limit && count === options.limit;
 
     useEffect(() => {
-        if (value !== prevValue) {
-            return setCount(options?.limit && value > options.limit ? options.limit : value);
-        }
-
         if (shouldComplete) {
             return;
         }
@@ -24,7 +20,13 @@ export function useCountup(
             setCount(val => val + 1);
         }, frequencyMS);
         return () => clearInterval(timer);
-    }, [shouldComplete, value, prevValue]);
+    }, [shouldComplete, frequencyMS]);
+
+    useEffect(() => {
+        if (prevValue !== undefined && value !== prevValue) {
+            return setCount(options?.limit && value > options.limit ? options.limit : value);
+        }
+    }, [value, prevValue, options?.limit]);
 
     return count;
 }
