@@ -18,6 +18,7 @@ import Tabs from './tabs';
 import Code from './code';
 import Badge from './badge';
 import Radio from './radio';
+import Skeleton from './skeleton';
 
 export default {
     Button,
@@ -39,5 +40,6 @@ export default {
     Tabs,
     Code,
     Badge,
-    Radio
+    Radio,
+    Skeleton
 };

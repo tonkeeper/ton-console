@@ -1,5 +1,10 @@
 import { TonCurrencyAmount } from 'src/shared';
 
+export interface AnalyticsTableSource {
+    headings: string[];
+    data: string[][];
+}
+
 export interface AnalyticsQueryTemplate {
     request: string;
     estimatedTimeMS: number;
@@ -21,6 +26,7 @@ export interface AnalyticsQueryCompleted extends AnalyticsQueryBasic {
 export interface AnalyticsQuerySuccessful extends AnalyticsQueryCompleted {
     status: 'success';
     csvUrl: string;
+    preview: AnalyticsTableSource;
 }
 
 export interface AnalyticsQueryErrored extends AnalyticsQueryBasic {
@@ -30,6 +36,12 @@ export interface AnalyticsQueryErrored extends AnalyticsQueryBasic {
 
 export interface AnalyticsQueryPending extends AnalyticsQueryBasic {
     status: 'executing';
+}
+
+export function isAnalyticsQueryCompleted(
+    query: AnalyticsQueryBasic
+): query is AnalyticsQueryCompleted {
+    return query.status === 'success' || query.status === 'error';
 }
 
 export type AnalyticsQuery =

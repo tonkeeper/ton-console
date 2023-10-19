@@ -9,6 +9,7 @@ const CurrencyRate: FunctionComponent<
     PropsWithChildren<
         ComponentProps<typeof Text> & {
             showSkeletonOnUpdate?: boolean;
+            skeletonVariant?: string;
             leftSign?: string;
             currency?: CRYPTO_CURRENCY;
             amount?: Amount;
@@ -22,6 +23,7 @@ const CurrencyRate: FunctionComponent<
     >
 > = ({
     children,
+    skeletonVariant,
     showSkeletonOnUpdate,
     leftSign,
     currency,
@@ -71,7 +73,12 @@ const CurrencyRate: FunctionComponent<
     return (
         <Text ref={ref} as={Box} alignItems="center" display="flex" {...rest}>
             {amountLoading || !rate$.isResolved || (rate$.isLoading && showSkeletonOnUpdate) ? (
-                <Skeleton display="inline-block" w={skeletonWidth || '40px'} h={skeletonHeight} />
+                <Skeleton
+                    display="inline-block"
+                    w={skeletonWidth || '40px'}
+                    h={skeletonHeight}
+                    variant={skeletonVariant}
+                />
             ) : value.get() !== undefined ? (
                 sign + value + (contentUnderSkeleton || '')
             ) : (
