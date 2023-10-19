@@ -6,7 +6,7 @@ import { InvoicesProjectInfo } from 'src/features';
 import InvoicesStats from './InvoicesStats';
 import InvoicesAuthorization from './InvoicesAuthorization';
 import InvoicesWebhooks from './InvoicesWebhooks';
-import { InvoicesApi } from './InvoicesApi';
+import InvoicesApi from './InvoicesApi';
 
 const InvoiceDashboardPage: FunctionComponent<ComponentProps<typeof Box>> = props => {
     return (

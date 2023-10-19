@@ -28,7 +28,7 @@ const CancelInvoiceConfirmation: FunctionComponent<{
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>
-                    <H4 mb="1">Cancel Invoice?</H4>
+                    <H4 mb="1">Cancel Invoice</H4>
                     <Text textStyle="body2" color="text.secondary">
                         <Span>ID {invoice.id}</Span>
                         {invoice.description && <Span>&nbsp;·&nbsp;{invoice.description}</Span>}
@@ -37,7 +37,7 @@ const CancelInvoiceConfirmation: FunctionComponent<{
                 <ModalCloseButton />
                 <ModalBody py="0">
                     <Text textStyle="text.body2" color="text.secondary">
-                        Are you sure you want to cancel this invoice? This action cannot be undone.
+                        Cancel this invoice? You cannot revert this action.
                     </Text>
                 </ModalBody>
 

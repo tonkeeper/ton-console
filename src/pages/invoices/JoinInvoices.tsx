@@ -9,10 +9,7 @@ const JoinInvoices: FunctionComponent = () => {
             <InvoiceIcon40 mb="5" />
             <H3 mb="4">Invoices</H3>
             <Text textStyle="body2" maxW="392px" mb="9" color="text.secondary" textAlign="center">
-                Invoices service simplifies in-TON payment tracking and reconciliation for partners
-                by offering an intuitive API and user-friendly admin panel, enabling seamless
-                monitoring of blockchain payments and enhancing transparency and accountability in
-                financial transactions.
+                Invoices is a simple yet powerful tool for tracking TON transactions.
             </Text>
 
             <Flex gap="5">
@@ -22,7 +19,7 @@ const JoinInvoices: FunctionComponent = () => {
                     isExternal
                     href={INVOICES_LINKS.BUSINESS_DESCRIPTION}
                 >
-                    Documentation
+                    Read Guide
                 </ButtonLink>
                 <ButtonLink isExternal href={INVOICES_LINKS.JOIN_CONTACT}>
                     Join invoices

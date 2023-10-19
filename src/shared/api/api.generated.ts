@@ -291,11 +291,6 @@ export interface DTOInvoicesInvoice {
     app_name: string;
     /** @example "1000000000" */
     amount: string;
-    /**
-     * @format int64
-     * @example 100
-     */
-    life_time: number;
     overpayment?: number;
     refund_amount?: number;
     /** @example "Test description" */
@@ -316,12 +311,12 @@ export interface DTOInvoicesInvoice {
      * @format int64
      * @example 1690889913000
      */
-    date_paid?: number;
+    date_change: number;
     /**
      * @format int64
      * @example 1690889913000
      */
-    date_cancelled?: number;
+    date_expire: number;
     /**
      * @format int64
      * @example 1690889913000

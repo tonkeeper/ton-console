@@ -116,7 +116,7 @@ export const InvoicesTableStructure = observer(
                             </Th>
                         </Tr>
                     </Thead>
-                    <Tbody>{body}</Tbody>
+                    <Tbody pos="relative">{body}</Tbody>
                 </Table>
             );
         }
