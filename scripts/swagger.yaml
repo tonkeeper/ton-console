@@ -2141,10 +2141,11 @@ components:
         - app_id
         - app_name
         - amount
-        - life_time
         - description
         - pay_to_address
         - status
+        - date_expire
+        - date_change
         - date_create
       properties:
         id:
@@ -2160,10 +2161,6 @@ components:
         amount:
           type: string
           example: "1000000000"
-        life_time:
-          type: integer
-          format: int64
-          example: 100
         overpayment:
           type: number
         refund_amount:
@@ -2186,11 +2183,11 @@ components:
           type: integer
           format: int64
           example: 1690889913000
-        date_paid:
+        date_change:
           type: integer
           format: int64
           example: 1690889913000
-        date_cancelled:
+        date_expire:
           type: integer
           format: int64
           example: 1690889913000

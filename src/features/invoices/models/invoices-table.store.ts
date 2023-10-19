@@ -285,7 +285,7 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
         amount: new TonCurrencyAmount(invoiceDTO.amount),
         creationDate,
         id: invoiceDTO.id,
-        validUntil: new Date(creationDate.getTime() + invoiceDTO.life_time * 1000),
+        validUntil: new Date(invoiceDTO.date_expire),
         description: invoiceDTO.description,
         payTo: invoiceDTO.pay_to_address,
         overpayment: invoiceDTO.overpayment
@@ -303,7 +303,7 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
         return {
             ...commonInvoice,
             paidBy: invoiceDTO.paid_by_address!,
-            paymentDate: new Date(invoiceDTO.date_paid!),
+            paymentDate: new Date(invoiceDTO.date_change!),
             status
         };
     }
@@ -312,7 +312,7 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
         return {
             ...commonInvoice,
             status,
-            cancellationDate: new Date(invoiceDTO.date_cancelled!)
+            cancellationDate: new Date(invoiceDTO.date_change!)
         };
     }
 
