@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext } from 'react';
+import { FunctionComponent, useContext, useEffect } from 'react';
 import {
     Box,
     Button,
@@ -80,6 +80,12 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
 
         const paymentDate = invoice.status === 'success' ? toDateTime(invoice.paymentDate) : '';
 
+        useEffect(() => {
+            if (invoice.status === 'pending' && secondsLeft === 0) {
+                invoicesTableStore.updateCurrentListSilently({ silently: true });
+            }
+        }, [secondsLeft, invoice.status]);
+
         return (
             <>
                 <ViewInvoiceModal isOpen={isOpenView} onClose={onCloseView} invoice={invoice} />
@@ -91,7 +97,7 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
                 <Tr
                     sx={{ td: { px: 2, py: 0 } }}
                     pos="absolute"
-                    top={parseFloat(style.top!.toString()) + parseFloat(rawHeight) + 'px'}
+                    top={parseFloat(style.top!.toString()) + 'px'}
                     left="0"
                     display="table-row"
                     w="100%"

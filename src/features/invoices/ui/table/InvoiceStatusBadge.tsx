@@ -9,7 +9,7 @@ export const invoiceBadges: Record<InvoiceStatus, { color: string; label: string
     },
     pending: {
         color: 'badge.warning',
-        label: 'Expecting payment'
+        label: 'Pending'
     },
     expired: {
         color: 'badge.danger',
@@ -17,7 +17,7 @@ export const invoiceBadges: Record<InvoiceStatus, { color: string; label: string
     },
     cancelled: {
         color: 'badge.secondary',
-        label: 'Cancelled'
+        label: 'Canceled'
     }
 };
 

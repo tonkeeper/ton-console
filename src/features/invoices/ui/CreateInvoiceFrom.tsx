@@ -118,12 +118,12 @@ export const CreateInvoiceFrom: FunctionComponent<
                 >
                     <Grid gap="2" gridTemplate="repeat(2, 1fr) / repeat(3, 1fr)">
                         <OptionsInputOption value="60">Hour</OptionsInputOption>
-                        <OptionsInputOption value="360">6 Hours</OptionsInputOption>
+                        <OptionsInputOption value="360">6 hours</OptionsInputOption>
                         <OptionsInputOption value="1440">Day</OptionsInputOption>
                         <OptionsInputOption value="10080">Week</OptionsInputOption>
                         <OptionsInputOption value="43200">Month</OptionsInputOption>
                         <OptionsInputText
-                            placeholder="Few min"
+                            placeholder="Minutes"
                             rightElement={
                                 <Span textStyle="body2" color="text.secondary">
                                     min

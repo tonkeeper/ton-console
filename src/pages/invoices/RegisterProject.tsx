@@ -24,7 +24,7 @@ const RegisterProject: FunctionComponent = () => {
                         href={INVOICES_LINKS.BUSINESS_DESCRIPTION}
                         isExternal
                     >
-                        Guide
+                        Read Guide
                     </ButtonLink>
                     <Button
                         isLoading={invoicesAppStore.createInvoicesApp.isLoading}

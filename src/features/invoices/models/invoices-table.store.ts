@@ -50,7 +50,11 @@ class InvoicesTableStore {
     }
 
     get isFilterEmpty(): boolean {
-        return !this.pagination.filter.status && !this.pagination.filter.id;
+        return (
+            !this.pagination.filter.status &&
+            !this.pagination.filter.id &&
+            !this.pagination.filter.overpayment
+        );
     }
 
     constructor() {

@@ -29,7 +29,7 @@ const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = pro
         >
             <MenuButtonDefault px="4" rightIcon={<ArrowIcon />}>
                 <Flex textStyle="label2" gap="2">
-                    Filter by status{' '}
+                    Filter by Status{' '}
                     {!!invoicesTableStore.pagination.filter.status?.length && (
                         <Center
                             textStyle="label3"
@@ -57,7 +57,7 @@ const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = pro
                             variant="flat"
                         >
                             <Span color="text.secondary" textStyle="body2">
-                                Clear all
+                                Clear All
                             </Span>
                         </Button>
                     )}

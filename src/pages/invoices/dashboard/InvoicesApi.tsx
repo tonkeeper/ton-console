@@ -13,8 +13,9 @@ import {
 } from '@chakra-ui/react';
 import { CopyPad, DocsLink } from 'src/shared';
 import { invoicesAppStore, INVOICES_LINKS } from 'src/features';
+import { observer } from 'mobx-react-lite';
 
-export const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
     return (
         <Box {...props}>
             <Tabs mb="4">
@@ -33,7 +34,7 @@ export const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props 
                             isLoading={!invoicesAppStore.appToken$.isResolved}
                             whiteSpace="pre-wrap"
                             text={`curl -X POST 
-    https://tonconsole.com/api/v1/invoices/invoice
+    https://tonconsole.com/api/v1/services/invoices/invoice
     -H 'Content-Type: application/json'
     -H 'Authorization: Bearer ${invoicesAppStore.appToken$.value}'
     -d 
@@ -67,7 +68,7 @@ export const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props 
                             isLoading={!invoicesAppStore.appToken$.isResolved}
                             whiteSpace="pre-wrap"
                             text={`curl GET 
-    https://tonconsole.com/api/v1/invoices/invoice?id=<INVOICE_ID>
+    https://tonconsole.com/api/v1/services/invoices/invoice?id=<INVOICE_ID>
     -H 'Content-Type: application/json'
     -H 'Authorization: Bearer ${invoicesAppStore.appToken$.value}'`}
                             iconAlign="start"
@@ -88,3 +89,5 @@ export const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props 
         </Box>
     );
 };
+
+export default observer(InvoicesApi);
