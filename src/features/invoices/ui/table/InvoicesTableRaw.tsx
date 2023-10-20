@@ -175,7 +175,7 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
                         </Flex>
                     </Td>
                     <Td minW="160px" h={rawHeight} maxH={rawHeight} boxSizing="content-box">
-                        {invoice.amount.stringCurrencyAmount}
+                        {invoice.amount.toStringCurrencyAmount({ decimalPlaces: 'all' })}
                     </Td>
                     <Td
                         minW="180px"

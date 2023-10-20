@@ -46,7 +46,9 @@ export const ViewInvoiceModalContent: FunctionComponent<{
                         </Flex>
                         <Flex justify="space-between">
                             <Span color="text.secondary">Amount</Span>
-                            <Span color="text.primary">{invoice.amount.stringCurrencyAmount}</Span>
+                            <Span color="text.primary">
+                                {invoice.amount.toStringCurrencyAmount({ decimalPlaces: 'all' })}
+                            </Span>
                         </Flex>
                         <Flex justify="flex-end">
                             <CurrencyRate

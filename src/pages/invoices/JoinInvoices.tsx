@@ -22,7 +22,7 @@ const JoinInvoices: FunctionComponent = () => {
                     Read Guide
                 </ButtonLink>
                 <ButtonLink isExternal href={INVOICES_LINKS.JOIN_CONTACT}>
-                    Join invoices
+                    Start
                 </ButtonLink>
             </Flex>
         </Overlay>

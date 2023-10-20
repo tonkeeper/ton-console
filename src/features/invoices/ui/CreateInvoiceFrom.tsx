@@ -63,6 +63,7 @@ export const CreateInvoiceFrom: FunctionComponent<
 
     const { ref: maskRef } = useIMask({
         ...tonMask,
+        min: 0,
         max: 100000
     });
 
@@ -73,8 +74,8 @@ export const CreateInvoiceFrom: FunctionComponent<
                 return 'Amount should be valid number';
             }
 
-            if (Number(value) < 1) {
-                return 'Amount must be grater then 1 TON';
+            if (Number(value) < 0.000000001) {
+                return 'Amount must be grater then 0';
             }
         }
     });
