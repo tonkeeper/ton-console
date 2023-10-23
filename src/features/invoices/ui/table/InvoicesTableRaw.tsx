@@ -31,16 +31,23 @@ import {
 } from 'src/shared';
 import { InvoicesTableContext } from './invoices-table-context';
 import { InvoiceStatusBadge } from './InvoiceStatusBadge';
-import { ViewInvoiceModal } from 'src/features/invoices/ui/ViewInvoiceModal';
+import { ViewInvoiceModal } from '../ViewInvoiceModal';
 import CancelInvoiceConfirmation from '../CancelInvoiceConfirmation';
-import { InvoiceOverpayment } from 'src/features/invoices/ui/table/InvoiceOverpayment';
+import { InvoiceOverpayment } from './InvoiceOverpayment';
 import { toJS } from 'mobx';
 
-const LoadingRaw: FunctionComponent = () => {
+const LoadingRaw: FunctionComponent<{ style: React.CSSProperties }> = ({
+    style: { top, ...style }
+}) => {
     const { rawHeight } = useContext(InvoicesTableContext);
     return (
-        <Tr h={rawHeight} maxH={rawHeight}>
-            <Td border="none" colSpan={5}>
+        <Tr
+            top={parseFloat(top!.toString()) + parseFloat(rawHeight) + 'px'}
+            h={rawHeight}
+            maxH={rawHeight}
+            style={style}
+        >
+            <Td pos="absolute" right="0" left="0" border="none" colSpan={5}>
                 <Center>
                     <Spinner color="text.secondary" size="sm" />
                 </Center>
@@ -108,7 +115,7 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
                 <Tr
                     sx={{ td: { px: 2, py: 0 } }}
                     pos="absolute"
-                    top={parseFloat(style.top!.toString()) + 'px'}
+                    top={parseFloat(style.top!.toString()) + parseFloat(rawHeight) + 'px'}
                     left="0"
                     display="table-row"
                     w="100%"
@@ -264,7 +271,7 @@ const InvoicesTableRaw: FunctionComponent<{ index: number; style: React.CSSPrope
         return <ItemRaw key={invoice.id} style={style} invoice={invoice} />;
     }
 
-    return <LoadingRaw />;
+    return <LoadingRaw style={style} />;
 };
 
 export default observer(InvoicesTableRaw);

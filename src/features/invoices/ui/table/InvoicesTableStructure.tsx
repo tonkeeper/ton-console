@@ -126,7 +126,6 @@ export const InvoicesTableStructure = observer(
                                 minWidth: `${tbodyWidth || 0}px` // SAFARI width: 100% bug workaround
                             }
                         }}
-                        pos="relative"
                     >
                         {body}
                     </Tbody>
