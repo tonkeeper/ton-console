@@ -85,7 +85,7 @@ export const CreateInvoiceFrom: FunctionComponent<
         const { amount, ...values } = form;
         onSubmit({
             amount: TonCurrencyAmount.fromRelativeAmount(amount),
-            lifeTimeSeconds: values.lifeTimeMinutes * 60,
+            lifeTimeSeconds: Math.floor(values.lifeTimeMinutes * 60),
             ...values
         });
     };
