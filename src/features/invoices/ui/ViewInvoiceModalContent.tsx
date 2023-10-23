@@ -9,7 +9,8 @@ import {
     ModalContent,
     ModalFooter,
     ModalHeader,
-    Text
+    Text,
+    useConst
 } from '@chakra-ui/react';
 import { createInvoicePaymentLink, Invoice } from 'src/features';
 import { CopyPad, CURRENCY, H4, Span, toTimeLeft } from 'src/shared';
@@ -20,8 +21,9 @@ export const ViewInvoiceModalContent: FunctionComponent<{
     onClose: () => void;
     invoice: Invoice;
 }> = ({ onClose, invoice }) => {
+    const renderingTime = useConst(Date.now());
     const secondsLeft = useCountdown(
-        Math.floor((invoice.validUntil.getTime() - Date.now()) / 1000)
+        Math.floor((invoice.validUntil.getTime() - renderingTime) / 1000)
     );
     const formattedTimeLeft = toTimeLeft(secondsLeft * 1000);
 
@@ -41,7 +43,7 @@ export const ViewInvoiceModalContent: FunctionComponent<{
                         <Flex justify="space-between" mb="3">
                             <Span color="text.secondary">Life time</Span>
                             <Span color="text.primary" fontFamily="mono">
-                                {formattedTimeLeft}
+                                {secondsLeft !== 0 ? formattedTimeLeft : 'Expired'}
                             </Span>
                         </Flex>
                         <Flex justify="space-between">
@@ -61,7 +63,7 @@ export const ViewInvoiceModalContent: FunctionComponent<{
                         </Flex>
                     </CardBody>
                 </Card>
-                {invoice.status === 'pending' && (
+                {invoice.status === 'pending' && secondsLeft !== 0 && (
                     <>
                         <Text textStyle="label2" mb="2">
                             Link for payment
