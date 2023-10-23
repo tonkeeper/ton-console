@@ -32,7 +32,7 @@ const InvoicesStats: FunctionComponent<ComponentProps<typeof Box>> = props => {
                 Statistics
             </Text>
             <Grid gap="6" templateColumns="repeat(auto-fit, minmax(200px, 1fr))">
-                <StatsCard header="Total invoices">
+                <StatsCard header="Total Number of Invoices">
                     {stats => formatNumber(stats.totalInvoices)}
                 </StatsCard>
                 <StatsCard header="Active Invoices">
