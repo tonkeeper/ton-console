@@ -9,7 +9,8 @@ const JoinInvoices: FunctionComponent = () => {
             <InvoiceIcon40 mb="5" />
             <H3 mb="4">Invoices</H3>
             <Text textStyle="body2" maxW="392px" mb="9" color="text.secondary" textAlign="center">
-                Invoices is a simple yet powerful tool for tracking TON transactions.
+                Keep track of your operations with Invoices: a simple yet powerful service for
+                managing TON transactions. Contact us to start using it today!
             </Text>
 
             <Flex gap="5">
@@ -22,7 +23,7 @@ const JoinInvoices: FunctionComponent = () => {
                     Read Guide
                 </ButtonLink>
                 <ButtonLink isExternal href={INVOICES_LINKS.JOIN_CONTACT}>
-                    Start
+                    Contact Us
                 </ButtonLink>
             </Flex>
         </Overlay>

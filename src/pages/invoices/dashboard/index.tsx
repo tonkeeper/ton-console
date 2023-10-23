@@ -11,7 +11,7 @@ import InvoicesApi from './InvoicesApi';
 const InvoiceDashboardPage: FunctionComponent<ComponentProps<typeof Box>> = props => {
     return (
         <Overlay {...props}>
-            <H4 mb="1">Invoices Dashboard</H4>
+            <H4 mb="1">Overview</H4>
             <InvoicesProjectInfo mb="5" />
             <Divider w="auto" mb="5" mx="-6" />
             <InvoicesStats mb="6" />

@@ -94,16 +94,12 @@ const InvoicesWebhooks: FunctionComponent<ComponentProps<typeof Box>> = props =>
                     + Add
                 </Button>
             </Flex>
-            {invoicesAppStore.invoicesApp$.value!.webhooks.length ? (
+            {!!invoicesAppStore.invoicesApp$.value!.webhooks.length && (
                 <OrderedList color="text.secondary" spacing="3">
                     {invoicesAppStore.invoicesApp$.value!.webhooks.map(webhook => (
                         <WebhookItem key={webhook.id} webhook={toJS(webhook)} />
                     ))}
                 </OrderedList>
-            ) : (
-                <Box textStyle="body2" h="6" color="text.secondary" textAlign="center">
-                    Click to the Add button to register a webhook
-                </Box>
             )}
         </Box>
     );

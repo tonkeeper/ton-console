@@ -21,7 +21,7 @@ const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
             <Tabs mb="4">
                 <TabList w="auto" mx="-6" pl="6">
                     <Tab>Create Invoice</Tab>
-                    <Tab>Get Invoice</Tab>
+                    <Tab>GET Invoice</Tab>
                 </TabList>
 
                 <TabPanels>

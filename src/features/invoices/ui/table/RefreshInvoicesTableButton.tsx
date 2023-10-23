@@ -16,7 +16,7 @@ const RefreshInvoicesTableButton: FunctionComponent<ComponentProps<typeof Button
             {...props}
         >
             <RefreshIcon16 mr="2" />
-            Refresh table
+            Update
         </Button>
     );
 };
