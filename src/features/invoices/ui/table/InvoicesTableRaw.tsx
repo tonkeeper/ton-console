@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext, useEffect } from 'react';
+import { FunctionComponent, useContext, useEffect, useState } from 'react';
 import {
     Box,
     Button,
@@ -14,6 +14,7 @@ import {
     Tooltip,
     Tr,
     useClipboard,
+    useConst,
     useDisclosure
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
@@ -50,6 +51,7 @@ const LoadingRaw: FunctionComponent = () => {
 
 const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties }> = observer(
     ({ invoice, style }) => {
+        const renderTime = useConst(Date.now());
         const { isOpen: isOpenView, onClose: onCloseView, onOpen: onOpenView } = useDisclosure();
         const {
             isOpen: isOpenCancel,
@@ -61,11 +63,13 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
         const { onCopy: onCopyPaidBy, hasCopied: hasCopiedPaidBy } = useClipboard(
             invoice.status === 'success' ? invoice.paidBy : ''
         );
+        const [isStatusUpdating, setIsStatusUpdating] = useState(false);
+
         const { rawHeight } = useContext(InvoicesTableContext);
 
         const timeoutSeconds =
             invoice.status === 'pending'
-                ? Math.floor((invoice.validUntil.getTime() - Date.now()) / 1000)
+                ? Math.floor((invoice.validUntil.getTime() - renderTime) / 1000)
                 : 0;
 
         const secondsLeft = useCountdown(timeoutSeconds);
@@ -82,7 +86,14 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
 
         useEffect(() => {
             if (invoice.status === 'pending' && secondsLeft === 0) {
-                invoicesTableStore.updateCurrentListSilently({ silently: true });
+                setIsStatusUpdating(true);
+
+                const timeout = setTimeout(async () => {
+                    await invoicesTableStore.updateCurrentListSilently({ silently: true });
+                    setIsStatusUpdating(false);
+                }, 2500);
+
+                return () => clearTimeout(timeout);
             }
         }, [secondsLeft, invoice.status]);
 
@@ -128,7 +139,10 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
                     </Td>
                     <Td minW="320px" h={rawHeight} maxH={rawHeight} boxSizing="content-box">
                         <Flex align="center">
-                            <InvoiceStatusBadge status={invoice.status} />
+                            <InvoiceStatusBadge
+                                isLoading={isStatusUpdating}
+                                status={invoice.status}
+                            />
                             {invoice.status === 'success' && (
                                 <>
                                     <Span textStyle="body3" ml="2" color="text.secondary">
@@ -246,7 +260,8 @@ const InvoicesTableRaw: FunctionComponent<{ index: number; style: React.CSSPrope
     style
 }) => {
     if (invoicesTableStore.isItemLoaded(index)) {
-        return <ItemRaw style={style} invoice={toJS(invoicesTableStore.invoices$.value[index])} />;
+        const invoice = toJS(invoicesTableStore.invoices$.value[index]);
+        return <ItemRaw key={invoice.id} style={style} invoice={invoice} />;
     }
 
     return <LoadingRaw />;

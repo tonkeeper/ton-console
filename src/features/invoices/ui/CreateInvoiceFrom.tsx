@@ -20,6 +20,7 @@ import {
     OptionsInputOption,
     OptionsInputText,
     Span,
+    numberMask,
     TonCurrencyAmount,
     tonMask
 } from 'src/shared';
@@ -114,7 +115,14 @@ export const CreateInvoiceFrom: FunctionComponent<
             <FormControl mb="4" isInvalid={!!formState.errors.lifeTimeMinutes} isRequired>
                 <FormLabel htmlFor="lifeTimeMinutes">Duration</FormLabel>
                 <OptionsInput
-                    {...register('lifeTimeMinutes', { required: 'This is required' })}
+                    {...register('lifeTimeMinutes', {
+                        required: 'This is required',
+                        validate: v => {
+                            if (v <= 0) {
+                                return 'Value must be grater than 0';
+                            }
+                        }
+                    })}
                     defaultValue="1440"
                 >
                     <Grid gap="2" gridTemplate="repeat(2, 1fr) / repeat(3, 1fr)">
@@ -125,6 +133,7 @@ export const CreateInvoiceFrom: FunctionComponent<
                         <OptionsInputOption value="43200">Month</OptionsInputOption>
                         <OptionsInputText
                             placeholder="Minutes"
+                            mask={numberMask}
                             rightElement={
                                 <Span textStyle="body2" color="text.secondary">
                                     min

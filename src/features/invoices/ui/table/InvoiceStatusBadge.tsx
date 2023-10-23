@@ -1,6 +1,7 @@
 import { ComponentProps, FunctionComponent } from 'react';
-import { Badge } from '@chakra-ui/react';
+import { Badge, Center, Spinner } from '@chakra-ui/react';
 import { InvoiceStatus } from '../../models';
+import { Span } from 'src/shared';
 
 export const invoiceBadges: Record<InvoiceStatus, { color: string; label: string }> = {
     success: {
@@ -22,13 +23,18 @@ export const invoiceBadges: Record<InvoiceStatus, { color: string; label: string
 };
 
 export const InvoiceStatusBadge: FunctionComponent<
-    ComponentProps<typeof Badge> & { status: InvoiceStatus }
-> = ({ status, ...rest }) => {
+    ComponentProps<typeof Badge> & { status: InvoiceStatus; isLoading?: boolean }
+> = ({ status, isLoading, ...rest }) => {
     const badge = invoiceBadges[status];
 
     return (
-        <Badge bgColor={badge.color} {...rest}>
-            {badge.label}
+        <Badge pos="relative" bgColor={badge.color} {...rest}>
+            {isLoading && (
+                <Center pos="absolute" top="0" right="0" bottom="0" left="0">
+                    <Spinner color="icon.secondary" size="xs" />
+                </Center>
+            )}
+            <Span opacity={isLoading ? 0.3 : 1}>{badge.label}</Span>
         </Badge>
     );
 };
