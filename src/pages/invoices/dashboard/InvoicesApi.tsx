@@ -33,12 +33,10 @@ const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
                         <CopyPad
                             isLoading={!invoicesAppStore.appToken$.isResolved}
                             whiteSpace="pre-wrap"
-                            text={`curl -X POST 
-    https://tonconsole.com/api/v1/services/invoices/invoice
-    -H 'Content-Type: application/json'
-    -H 'Authorization: Bearer ${invoicesAppStore.appToken$.value}'
-    -d 
-    '{"amount": "1000000000", "life_time": "1800", "description": "Example description"}'`}
+                            text={`curl -X POST https://tonconsole.com/api/v1/services/invoices/invoice \\
+    -H 'Content-Type: application/json' \\
+    -H 'Authorization: Bearer ${invoicesAppStore.appToken$.value}' \\
+    -d '{"amount": "1000000000", "life_time": 1800, "description": "Example description"}'`}
                             iconAlign="start"
                             mb="3"
                         />
@@ -67,21 +65,12 @@ const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
                         <CopyPad
                             isLoading={!invoicesAppStore.appToken$.isResolved}
                             whiteSpace="pre-wrap"
-                            text={`curl GET 
-    https://tonconsole.com/api/v1/services/invoices/invoice?id=<INVOICE_ID>
-    -H 'Content-Type: application/json'
+                            text={`curl -X GET https://dev.tonconsole.com/api/v1/services/invoices/<INVOICE_ID> \\
+    -H 'Content-Type: application/json' \\
     -H 'Authorization: Bearer ${invoicesAppStore.appToken$.value}'`}
                             iconAlign="start"
                             mb="3"
                         />
-                        <Box textStyle="body2" mb="4" color="text.secondary">
-                            <Box mb="1">Where query parameters are:</Box>
-                            <UnorderedList listStyleType={'"-"'} spacing="1">
-                                <ListItem pl="1">
-                                    <Code>id</Code> is an id of the required invoice to the invoice
-                                </ListItem>
-                            </UnorderedList>
-                        </Box>
                     </TabPanel>
                 </TabPanels>
             </Tabs>

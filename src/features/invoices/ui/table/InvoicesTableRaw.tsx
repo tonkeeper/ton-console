@@ -27,7 +27,8 @@ import {
     toTimeLeft,
     VerticalDotsIcon16,
     useCountdown,
-    toDateTime
+    toDateTime,
+    FlashIcon16
 } from 'src/shared';
 import { InvoicesTableContext } from './invoices-table-context';
 import { InvoiceStatusBadge } from './InvoiceStatusBadge';
@@ -83,6 +84,7 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
         const formattedTimeLeft = secondsLeft === 0 ? '' : toTimeLeft(secondsLeft * 1000);
 
         const canCancel = invoice.status === 'pending';
+        const shouldShowFlash = secondsLeft < 300;
 
         const paidBy =
             invoice.status === 'success'
@@ -178,18 +180,19 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
                                     </Tooltip>
                                 </>
                             )}
-                            {invoice.status === 'pending' && (
+                            {invoice.status === 'pending' && !!secondsLeft && (
                                 <Span textStyle="body3" ml="2">
+                                    {shouldShowFlash && <FlashIcon16 mr="2px" />}
                                     {formattedTimeLeft}
                                 </Span>
                             )}
                             {invoice.status === 'cancelled' && (
-                                <Span textStyle="body3" ml="2">
+                                <Span textStyle="body3" ml="2" color="text.secondary">
                                     {toDateTime(invoice.cancellationDate)}
                                 </Span>
                             )}
                             {invoice.status === 'expired' && (
-                                <Span textStyle="body3" ml="2">
+                                <Span textStyle="body3" ml="2" color="text.secondary">
                                     {toDateTime(invoice.validUntil)}
                                 </Span>
                             )}
