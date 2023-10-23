@@ -221,6 +221,7 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
                             <TooltipHoverable
                                 host={
                                     <Span
+                                        wordBreak="break-all"
                                         mr={canCancel ? '4' : '8'}
                                         maxW="100%"
                                         width="fit-content"
