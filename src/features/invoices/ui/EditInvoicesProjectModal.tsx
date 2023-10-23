@@ -7,8 +7,7 @@ import {
     ModalContent,
     ModalFooter,
     ModalHeader,
-    ModalOverlay,
-    Text
+    ModalOverlay
 } from '@chakra-ui/react';
 import { EditInvoicesProjectForm } from './EditInvoicesProjectForm';
 import { H4 } from 'src/shared';
@@ -29,13 +28,10 @@ const EditInvoicesProjectModal: FunctionComponent<{
             <ModalOverlay></ModalOverlay>
             <ModalContent>
                 <ModalCloseButton />
-                <ModalHeader borderBottom="1px" borderBottomColor="separator.common">
+                <ModalHeader>
                     <H4>Edit Project</H4>
-                    <Text textStyle="body2" color="text.secondary">
-                        This information will be displayed in the invoices that you create.
-                    </Text>
                 </ModalHeader>
-                <ModalBody>
+                <ModalBody py="0">
                     {!!app && (
                         <EditInvoicesProjectForm
                             defaultValues={toJS(app)}

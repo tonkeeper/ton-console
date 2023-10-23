@@ -64,7 +64,7 @@ export const CreateInvoiceFrom: FunctionComponent<
 
     const { ref: maskRef } = useIMask({
         ...tonMask,
-        min: 0,
+        min: 0.001,
         max: 100000
     });
 
