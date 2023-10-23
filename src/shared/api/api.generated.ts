@@ -292,7 +292,6 @@ export interface DTOInvoicesInvoice {
     /** @example "1000000000" */
     amount: string;
     overpayment?: number;
-    refund_amount?: number;
     /** @example "Test description" */
     description: string;
     status: DTOInvoiceStatus;
@@ -300,13 +299,6 @@ export interface DTOInvoicesInvoice {
     pay_to_address: string;
     /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
     paid_by_address?: string;
-    /** @example false */
-    refunded?: boolean;
-    /**
-     * @format int64
-     * @example 1690889913000
-     */
-    date_refund?: number;
     /**
      * @format int64
      * @example 1690889913000
@@ -2332,7 +2324,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 description?: string;
                 /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
                 recipient_address?: string;
-                refunded?: boolean;
             },
             params: RequestParams = {}
         ) =>
@@ -2549,13 +2540,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @request POST:/api/v1/services/invoices/invoice
          */
         createInvoicesInvoice: (
-            query: {
-                /**
-                 * App ID
-                 * @format uint32
-                 */
-                app_id: number;
-            },
             data: {
                 /**
                  * nano ton are expected
@@ -2570,6 +2554,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 life_time: number;
                 /** @example "Test description" */
                 description?: string;
+            },
+            query?: {
+                /**
+                 * App ID
+                 * @format uint32
+                 */
+                app_id?: number;
             },
             params: RequestParams = {}
         ) =>

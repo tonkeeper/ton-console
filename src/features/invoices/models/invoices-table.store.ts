@@ -154,12 +154,12 @@ class InvoicesTableStore {
         async (form: InvoiceForm) => {
             const result = await apiClient.api.createInvoicesInvoice(
                 {
-                    app_id: invoicesAppStore.invoicesApp$.value!.id
-                },
-                {
                     amount: form.amount.stringWeiAmount,
                     description: form.description,
                     life_time: form.lifeTimeSeconds
+                },
+                {
+                    app_id: invoicesAppStore.invoicesApp$.value!.id
                 }
             );
 
@@ -191,30 +191,6 @@ class InvoicesTableStore {
             },
             errorToast: {
                 title: 'Invoice cancellation error'
-            }
-        }
-    );
-
-    markInvoiceAsRefunded = this.invoices$.createAsyncAction(
-        async (form: { id: Invoice['id']; refundedAmount: number }) => {
-            await apiClient.api.updateInvoicesInvoice(
-                form.id,
-                {
-                    app_id: invoicesAppStore.invoicesApp$.value!.id
-                },
-                {
-                    refunded: true,
-                    refund_amount: form.refundedAmount
-                }
-            );
-            await this.updateCurrentListSilently({ silently: true });
-        },
-        {
-            successToast: {
-                title: 'Invoice marked as refunded successfully'
-            },
-            errorToast: {
-                title: 'Invoice was not marked as refunded'
             }
         }
     );
@@ -294,10 +270,6 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
         payTo: invoiceDTO.pay_to_address,
         overpayment: invoiceDTO.overpayment
             ? new TonCurrencyAmount(invoiceDTO.overpayment)
-            : undefined,
-        refundDate: invoiceDTO.date_refund ? new Date(invoiceDTO.date_refund) : undefined,
-        refundedAmount: invoiceDTO.refund_amount
-            ? new TonCurrencyAmount(invoiceDTO.refund_amount)
             : undefined
     };
 

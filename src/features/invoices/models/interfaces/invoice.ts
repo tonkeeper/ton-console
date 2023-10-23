@@ -18,8 +18,6 @@ export interface InvoiceCommon {
     creationDate: Date;
     payTo: string;
     overpayment?: TokenCurrencyAmount;
-    refundDate?: Date;
-    refundedAmount?: TokenCurrencyAmount;
 }
 
 export interface InvoiceSuccessful extends InvoiceCommon {

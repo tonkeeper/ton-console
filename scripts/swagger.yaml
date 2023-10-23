@@ -1108,7 +1108,13 @@ paths:
       tags:
         - invoices_service
       parameters:
-        - $ref: '#/components/parameters/queryAppID'
+        - description: App ID
+          in: query
+          name: app_id
+          required: false
+          schema:
+            type: integer
+            format: uint32
       requestBody:
         $ref: "#/components/requestBodies/InvoiceCreate"
       responses:
@@ -1704,8 +1710,8 @@ components:
               recipient_address:
                 type: string
                 example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-              refunded:
-                type: boolean
+#              refunded:
+#                type: boolean
     InvoiceCreate:
       description: "Data that is expected"
       content:
@@ -2163,8 +2169,8 @@ components:
           example: "1000000000"
         overpayment:
           type: number
-        refund_amount:
-          type: number
+#        refund_amount:
+#          type: number
         description:
           type: string
           example: "Test description"
@@ -2176,13 +2182,13 @@ components:
         paid_by_address:
           type: string
           example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-        refunded:
-          type: boolean
-          example: false
-        date_refund:
-          type: integer
-          format: int64
-          example: 1690889913000
+#        refunded:
+#          type: boolean
+#          example: false
+#        date_refund:
+#          type: integer
+#          format: int64
+#          example: 1690889913000
         date_change:
           type: integer
           format: int64

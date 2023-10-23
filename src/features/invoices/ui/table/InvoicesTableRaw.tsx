@@ -212,6 +212,7 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
                     </Td>
                     <Td
                         w="100%"
+                        minW="300px"
                         h={rawHeight}
                         maxH={rawHeight}
                         borderRight="1px"
@@ -222,7 +223,7 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
                                 host={
                                     <Span
                                         wordBreak="break-all"
-                                        mr={canCancel ? '4' : '8'}
+                                        mr={canCancel || invoice.overpayment ? '0' : '8'}
                                         maxW="100%"
                                         width="fit-content"
                                         noOfLines={1}
@@ -233,8 +234,8 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
                             >
                                 <Box maxW="500px">{invoice.description}</Box>
                             </TooltipHoverable>
-                            <Flex gap="2">
-                                {!!(invoice.overpayment || invoice.refundDate) && (
+                            <Flex gap="2" minW="fit-content">
+                                {!!invoice.overpayment && (
                                     <InvoiceOverpayment invoice={toJS(invoice)} />
                                 )}
                                 {canCancel && (

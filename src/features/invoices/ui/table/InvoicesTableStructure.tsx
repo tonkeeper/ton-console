@@ -105,6 +105,7 @@ export const InvoicesTableStructure = observer(
                             </Th>
                             <Th
                                 w="100%"
+                                minW="300px"
                                 bg="background.contentTint"
                                 borderTop="1px"
                                 borderTopColor="background.contentTint"
