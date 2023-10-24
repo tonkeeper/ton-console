@@ -65,7 +65,7 @@ const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
                         <CopyPad
                             isLoading={!invoicesAppStore.appToken$.isResolved}
                             whiteSpace="pre-wrap"
-                            text={`curl -X GET https://dev.tonconsole.com/api/v1/services/invoices/<INVOICE_ID> \\
+                            text={`curl -X GET https://tonconsole.com/api/v1/services/invoices/<INVOICE_ID> \\
     -H 'Content-Type: application/json' \\
     -H 'Authorization: Bearer ${invoicesAppStore.appToken$.value}'`}
                             iconAlign="start"
