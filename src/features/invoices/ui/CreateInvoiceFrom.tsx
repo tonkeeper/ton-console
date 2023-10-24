@@ -35,6 +35,11 @@ interface InternalForm {
     description: string;
 }
 
+const invoiceLifeTimeMask = {
+    ...numberMask,
+    max: 60 * 24 * 90 // 3 months
+};
+
 export const CreateInvoiceFrom: FunctionComponent<
     StyleProps & {
         id?: string;
@@ -122,6 +127,10 @@ export const CreateInvoiceFrom: FunctionComponent<
                             if (v <= 0) {
                                 return 'Value must be grater than 0';
                             }
+
+                            if (v > invoiceLifeTimeMask.max) {
+                                return `Value must be less or equal to ${invoiceLifeTimeMask.max}`;
+                            }
                         }
                     })}
                     defaultValue="1440"
@@ -134,7 +143,7 @@ export const CreateInvoiceFrom: FunctionComponent<
                         <OptionsInputOption value="43200">Month</OptionsInputOption>
                         <OptionsInputText
                             placeholder="Minutes"
-                            mask={numberMask}
+                            mask={invoiceLifeTimeMask}
                             rightElement={
                                 <Span textStyle="body2" color="text.secondary">
                                     min
