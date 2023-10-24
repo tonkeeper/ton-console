@@ -291,7 +291,8 @@ export interface DTOInvoicesInvoice {
     app_name: string;
     /** @example "1000000000" */
     amount: string;
-    overpayment?: number;
+    /** @example "1000000000" */
+    overpayment?: string;
     /** @example "Test description" */
     description: string;
     status: DTOInvoiceStatus;
@@ -2663,7 +2664,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @summary Get invoice
          * @request GET:/api/v1/services/invoices/{id}
          */
-        getInvoicesInvoice: (id: string, params: RequestParams = {}) =>
+        getInvoicesInvoice: (
+            id: string,
+            query?: {
+                /**
+                 * App ID
+                 * @format uint32
+                 */
+                app_id?: number;
+            },
+            params: RequestParams = {}
+        ) =>
             this.request<
                 {
                     invoice: DTOInvoicesInvoice;
@@ -2677,6 +2688,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             >({
                 path: `/api/v1/services/invoices/${id}`,
                 method: 'GET',
+                query: query,
                 ...params
             }),
 
@@ -2784,12 +2796,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                          */
                         total: number;
                         /**
-                         * @format uint32
+                         * @format uint64
                          * @example 10000
                          */
                         success_total: number;
                         /**
-                         * @format uint32
+                         * @format uint64
                          * @example 10000
                          */
                         success_in_week: number;

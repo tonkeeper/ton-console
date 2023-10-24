@@ -260,17 +260,17 @@ const mapInvoiceStatusToInvoiceDTOStatus: Record<InvoiceStatus, DTOInvoicesInvoi
     Object.fromEntries(Object.entries(mapInvoiceDTOStatusToInvoiceStatus).map(a => a.reverse()));
 
 function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
-    const creationDate = new Date(invoiceDTO.date_create);
     const commonInvoice: InvoiceCommon = {
         amount: new TonCurrencyAmount(invoiceDTO.amount),
-        creationDate,
+        creationDate: new Date(invoiceDTO.date_create * 1000),
         id: invoiceDTO.id,
-        validUntil: new Date(invoiceDTO.date_expire),
+        validUntil: new Date(invoiceDTO.date_expire * 1000),
         description: invoiceDTO.description,
         payTo: invoiceDTO.pay_to_address,
-        overpayment: invoiceDTO.overpayment
-            ? new TonCurrencyAmount(invoiceDTO.overpayment)
-            : undefined
+        overpayment:
+            invoiceDTO.overpayment && Number(invoiceDTO.overpayment) !== 0
+                ? new TonCurrencyAmount(invoiceDTO.overpayment)
+                : undefined
     };
 
     const status = mapInvoiceDTOStatusToInvoiceStatus[invoiceDTO.status];
@@ -279,7 +279,7 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
         return {
             ...commonInvoice,
             paidBy: invoiceDTO.paid_by_address!,
-            paymentDate: new Date(invoiceDTO.date_change!),
+            paymentDate: new Date(invoiceDTO.date_change * 1000),
             status
         };
     }
@@ -288,44 +288,12 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
         return {
             ...commonInvoice,
             status,
-            cancellationDate: new Date(invoiceDTO.date_change!)
+            cancellationDate: new Date(invoiceDTO.date_change * 1000)
         };
     }
 
     return { ...commonInvoice, status };
 }
-/*
-function createMockInvoice(): Invoice {
-    const id = Math.round(Math.random() * 1000000);
-    const status = (['pending', 'success', 'cancelled', 'expired'] as const)[id % 4];
-
-    return {
-        amount: new TonCurrencyAmount(1000000000),
-        creationDate: new Date(),
-        status,
-        subtractFeeFromAmount: true,
-        id: id.toString(),
-        validUntil: new Date(Date.now() + 1000 * 3600 * 24),
-        description:
-            'TestdescripotionTestdescripotionTestdescripotionTestdescripotionTestdescripotionTest descripotionTest descripotionTestdescripotion',
-        receiverAddress: 'EQCmtv9UrlDC27A0KsJNSaloAtHp5G3fli5jJjJug0waNf1u',
-        ...(status === 'success' && {
-            paidBy: 'EQCmtv9UrlDC27A0KsJNSaloAtHp5G3fli5jJjJug0waNf1u',
-            paymentDate: new Date()
-        })
-    } as Invoice;
-}*/
-/*
-[...new Array(500)].forEach(() => {
-           const ttl = 10000 * Math.round(Math.random() * 10);
-           this.createInvoice({
-               amount: TonCurrencyAmount.fromRelativeAmount(
-                   Math.round(Math.random() * 1000000) / 1000
-               ),
-               description: 'Tag ' + Math.round(Math.random() * 1000).toString(),
-               lifeTimeSeconds: ttl < 1000 ? 1000 : ttl
-           });
-       });*/
 
 const mapSortColumnToFieldOrder: Record<InvoiceTableSortColumn, DTOGetInvoicesParamsFieldOrder> = {
     id: DTOGetInvoicesParamsFieldOrder.DTOId,

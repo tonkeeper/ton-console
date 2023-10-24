@@ -194,7 +194,7 @@ function mapInvoicesAppDTOToInvoicesApp(invoicesAppDTO: DTOInvoicesApp): Invoice
     return {
         id: invoicesAppDTO.id,
         name: invoicesAppDTO.name,
-        creationDate: new Date(invoicesAppDTO.date_create),
+        creationDate: new Date(invoicesAppDTO.date_create * 1000),
         receiverAddress: toUserFriendlyAddress(invoicesAppDTO.recipient_address),
         webhooks: (invoicesAppDTO.webhooks || []).map(w => ({ id: w.id, value: w.webhook }))
     };
