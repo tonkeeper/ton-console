@@ -69,7 +69,7 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
 
         const { onCopy: onCopyId, hasCopied: hasCopiedId } = useClipboard(invoice.id);
         const { onCopy: onCopyPaidBy, hasCopied: hasCopiedPaidBy } = useClipboard(
-            invoice.status === 'success' ? invoice.paidBy : ''
+            invoice.status === 'success' ? invoice.paidBy.userFriendly : ''
         );
         const [isStatusUpdating, setIsStatusUpdating] = useState(false);
 

@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { EditInvoicesProjectForm } from './EditInvoicesProjectForm';
 import { H4 } from 'src/shared';
-import { invoicesAppStore } from '../models';
+import { invoicesAppStore, InvoicesProjectForm } from '../models';
 import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
 
@@ -22,6 +22,15 @@ const EditInvoicesProjectModal: FunctionComponent<{
     const id = useId();
 
     const app = invoicesAppStore.invoicesApp$.value;
+
+    const stuctApp = toJS(app);
+
+    const defaultValues: Partial<InvoicesProjectForm> | undefined = stuctApp
+        ? {
+              ...stuctApp,
+              receiverAddress: stuctApp.receiverAddress.userFriendly
+          }
+        : undefined;
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside" size="md">
@@ -34,7 +43,7 @@ const EditInvoicesProjectModal: FunctionComponent<{
                 <ModalBody py="0">
                     {!!app && (
                         <EditInvoicesProjectForm
-                            defaultValues={toJS(app)}
+                            defaultValues={defaultValues}
                             id={id}
                             onSubmit={form =>
                                 invoicesAppStore

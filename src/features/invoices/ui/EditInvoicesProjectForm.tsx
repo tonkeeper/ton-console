@@ -65,7 +65,7 @@ export const EditInvoicesProjectForm: FunctionComponent<
                     resize="none"
                     autoComplete="off"
                     id="receiverAddress"
-                    placeholder="EQ..."
+                    placeholder="UQ..."
                     spellCheck="false"
                     {...register('receiverAddress', {
                         required: 'This is required',

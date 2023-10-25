@@ -11,7 +11,8 @@
     "test": "vitest",
     "lint": "eslint ./",
     "prepare": "husky install",
-    "generate-api": "node ./scripts/swagger"
+    "generate-api": "node ./scripts/swagger",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@chakra-ui/anatomy": "^2.1.2",
@@ -75,6 +76,7 @@
     "husky": "^8.0.3",
     "jsdom": "^21.1.0",
     "lint-staged": "^13.1.0",
+    "patch-package": "^8.0.0",
     "prettier": "^2.8.3",
     "swagger-typescript-api": "^12.0.3",
     "typescript": "^4.9.3",

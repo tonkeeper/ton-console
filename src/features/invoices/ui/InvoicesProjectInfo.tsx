@@ -21,10 +21,11 @@ const InvoicesProjectInfo: FunctionComponent<ComponentProps<typeof Flex>> = prop
             </Box>
             <Span>&nbsp;·&nbsp;</Span>
             <TooltipHoverable
+                canBeShown={true}
                 placement="top"
                 host={<Span cursor="default">{sliceAddress(app.receiverAddress)}</Span>}
             >
-                <Span color="text.primary">{app.receiverAddress}</Span>
+                <Span color="text.primary">{app.receiverAddress.userFriendly}</Span>
             </TooltipHoverable>
             <Button
                 textStyle="label2"
