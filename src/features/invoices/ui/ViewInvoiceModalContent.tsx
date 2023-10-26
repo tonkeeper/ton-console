@@ -12,7 +12,7 @@ import {
     Text,
     useConst
 } from '@chakra-ui/react';
-import { createInvoicePaymentLink, Invoice } from 'src/features';
+import { Invoice } from 'src/features';
 import { CopyPad, CURRENCY, H4, Span, toTimeLeft } from 'src/shared';
 import { CurrencyRate } from 'src/entities';
 import { useCountdown } from 'src/shared/hooks/useCountdown';
@@ -68,7 +68,7 @@ export const ViewInvoiceModalContent: FunctionComponent<{
                         <Text textStyle="label2" mb="2">
                             Link for payment
                         </Text>
-                        <CopyPad text={createInvoicePaymentLink(invoice)} />
+                        <CopyPad text={invoice.paymentLink} />
                     </>
                 )}
             </ModalBody>

@@ -17,6 +17,7 @@ export interface InvoiceCommon {
     description: string;
     creationDate: Date;
     payTo: TonAddress;
+    paymentLink: string;
     overpayment?: TokenCurrencyAmount;
 }
 

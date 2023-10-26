@@ -282,13 +282,6 @@ export interface DTOStatsSqlResult {
 export interface DTOInvoicesInvoice {
     /** @example "60ffb075" */
     id: string;
-    /**
-     * @format int64
-     * @example 4177275498
-     */
-    app_id: number;
-    /** @example "My app" */
-    app_name: string;
     /** @example "1000000000" */
     amount: string;
     /** @example "1000000000" */
@@ -300,6 +293,8 @@ export interface DTOInvoicesInvoice {
     pay_to_address: string;
     /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
     paid_by_address?: string;
+    /** @example "https://app.tonkeeper.com/transfer/UQ....UQ" */
+    payment_link: string;
     /**
      * @format int64
      * @example 1690889913000
@@ -2566,9 +2561,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             params: RequestParams = {}
         ) =>
             this.request<
-                {
-                    invoice: DTOInvoicesInvoice;
-                },
+                DTOInvoicesInvoice,
                 {
                     /** Error message */
                     error: string;
@@ -2676,9 +2669,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             params: RequestParams = {}
         ) =>
             this.request<
-                {
-                    invoice: DTOInvoicesInvoice;
-                },
+                DTOInvoicesInvoice,
                 {
                     /** Error message */
                     error: string;
@@ -2716,9 +2707,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             params: RequestParams = {}
         ) =>
             this.request<
-                {
-                    invoice: DTOInvoicesInvoice;
-                },
+                DTOInvoicesInvoice,
                 {
                     /** Error message */
                     error: string;
@@ -2753,9 +2742,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             params: RequestParams = {}
         ) =>
             this.request<
-                {
-                    invoice: DTOInvoicesInvoice;
-                },
+                DTOInvoicesInvoice,
                 {
                     /** Error message */
                     error: string;

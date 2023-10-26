@@ -1119,7 +1119,7 @@ paths:
         $ref: "#/components/requestBodies/InvoiceCreate"
       responses:
         '201':
-          $ref: '#/components/responses/InvoicesInvoiceResponse'
+          $ref: '#/components/schemas/InvoicesInvoice'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -1167,7 +1167,7 @@ paths:
             format: uint32
       responses:
         '200':
-          $ref: '#/components/responses/InvoicesInvoiceResponse'
+          $ref: '#/components/schemas/InvoicesInvoice'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -1186,7 +1186,7 @@ paths:
         $ref: "#/components/requestBodies/InvoiceChange"
       responses:
         '200':
-          $ref: '#/components/responses/InvoicesInvoiceResponse'
+          $ref: '#/components/schemas/InvoicesInvoice'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -1204,7 +1204,7 @@ paths:
         - $ref: '#/components/parameters/queryAppID'
       responses:
         '200':
-          $ref: '#/components/responses/InvoicesInvoiceResponse'
+          $ref: '#/components/schemas/InvoicesInvoice'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -2151,11 +2151,10 @@ components:
       type: object
       required:
         - id
-        - app_id
-        - app_name
         - amount
         - description
         - pay_to_address
+        - payment_link
         - status
         - date_expire
         - date_change
@@ -2164,21 +2163,12 @@ components:
         id:
           type: string
           example: "60ffb075"
-        app_id:
-          type: integer
-          format: int64
-          example: 4177275498
-        app_name:
-          type: string
-          example: "My app"
         amount:
           type: string
           example: "1000000000"
         overpayment:
           type: string
           example: "1000000000"
-        #        refund_amount:
-        #          type: number
         description:
           type: string
           example: "Test description"
@@ -2190,13 +2180,9 @@ components:
         paid_by_address:
           type: string
           example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-        #        refunded:
-        #          type: boolean
-        #          example: false
-        #        date_refund:
-        #          type: integer
-        #          format: int64
-        #          example: 1690889913000
+        payment_link:
+          type: string
+          example: "https://app.tonkeeper.com/transfer/UQ....UQ"
         date_change:
           type: integer
           format: int64
@@ -2697,17 +2683,6 @@ components:
               token:
                 type: string
                 example: "TC-INVOICES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA=="
-    InvoicesInvoiceResponse:
-      description: "Invoice"
-      content:
-        application/json:
-          schema:
-            required:
-              - invoice
-            type: object
-            properties:
-              invoice:
-                $ref: '#/components/schemas/InvoicesInvoice'
     Invoices:
       description: "Invoices"
       content:
