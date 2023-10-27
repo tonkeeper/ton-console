@@ -22,7 +22,7 @@ export const InvoiceOverpayment: FunctionComponent<
             <FilledInfoIcon16 color="accent.red" />
             <Span ml="1.5" textStyle="label3" fontFamily="mono">
                 <Span color="text.secondary">Overpayment: </Span>
-                <Span>{invoice.overpayment!.stringCurrencyAmount}</Span>
+                <Span>{invoice.overpayment!.toStringCurrencyAmount({ decimalPlaces: 'all' })}</Span>
             </Span>
         </Flex>
     );
