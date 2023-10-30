@@ -45,6 +45,7 @@ export const FeatureCard: FunctionComponent<
                         px={imgBorder ? '1' : '0'}
                         objectFit="contain"
                         bgColor={imgBorder ? 'rgba(255, 255, 255, 0.24)' : 'transparent'}
+                        draggable="false"
                         fallback={fallback || <></>}
                         src={src}
                     />
