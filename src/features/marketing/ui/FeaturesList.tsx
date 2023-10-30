@@ -92,7 +92,7 @@ const FeaturesList: FunctionComponent<
                 background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
                 src="/assets/images/tonkeeper-price-graph.webp"
                 heading="Token Stats & Prices"
-                description="Add a chart for your token on Tonkeeper: unlock exclusive customization for your holders' UX."
+                description="Add a chart for your token on Tonkeeper: unlock exclusive customization for your holders' UX."
                 imgBorder
                 imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
