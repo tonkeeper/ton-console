@@ -35,7 +35,7 @@ class TGUserStore {
             projectsStore.selectProject(projectsStore.projects$.value[0].id);
         }
 
-        this.user$.value = mapTgUserDTOToTgUser(tgOAuthResponse);
+        return mapTgUserDTOToTgUser(tgOAuthResponse);
     });
 
     logoutIfSessionExpired = this.user$.createAsyncAction(async () => {

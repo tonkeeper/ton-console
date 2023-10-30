@@ -1,23 +1,23 @@
-import { ComponentProps, FunctionComponent, useEffect, useState } from 'react';
-import { ButtonLink, DocsIcon16, EXTERNAL_LINKS, H1, H2, Overlay, TgIcon } from 'src/shared';
-import { Button, Flex, SlideFade, Text, useBreakpointValue } from '@chakra-ui/react';
+import { FunctionComponent, useRef } from 'react';
+import { ButtonLink, DocsIcon16, EXTERNAL_LINKS, H1, H2, H3, Overlay, TgIcon } from 'src/shared';
+import { Button, Flex, Text, useBreakpointValue } from '@chakra-ui/react';
 import { tGUserStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import TonApiPricing from './TonApiPricing';
 import { Footer } from 'src/widgets';
-
-const SlideFadeTransition: FunctionComponent<ComponentProps<typeof SlideFade>> = props => (
-    <SlideFade transition={{ enter: { duration: 0.5 } }} {...props} />
-);
+import { FeaturesList } from 'src/features';
 
 const LandingPage: FunctionComponent = () => {
+    const tonapiRef = useRef<HTMLDivElement | null>(null);
+
+    const onTonapiClick = (): void => {
+        tonapiRef?.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
     const Heading = useBreakpointValue({
         md: H1,
         base: H2
     })!;
-
-    const [isOpen, seIsOpen] = useState(false);
-    useEffect(() => seIsOpen(true), []);
 
     return (
         <Overlay pt="0">
@@ -31,7 +31,7 @@ const LandingPage: FunctionComponent = () => {
                     maxH="600px"
                     mx="auto"
                     pt={{ base: 10, md: 18, lg: 8 }}
-                    pb={{ base: 12, md: 15, lg: 8 }}
+                    pb={{ base: 12, md: 14 }}
                     textAlign={{ base: 'start', md: 'center' }}
                 >
                     <Heading mb="5">Connecting businesses to the TON ecosystem</Heading>
@@ -62,16 +62,12 @@ const LandingPage: FunctionComponent = () => {
                         </ButtonLink>
                     </Flex>
                 </Flex>
-                <TonApiPricing
-                    as={SlideFadeTransition}
-                    w="100%"
-                    flex="1"
-                    in={isOpen}
-                    offsetY="-10px"
-                    mb={{ base: 8, md: 14, lg: 6 }}
-                    px={{ base: 0, md: 10 }}
-                />
-                <Footer gap="6" />
+                <H3 mb={{ base: '5', md: '7' }} alignSelf={{ base: 'flex-start', md: 'center' }}>
+                    Features
+                </H3>
+                <FeaturesList onTonapiClick={onTonapiClick} mb={{ base: '48px', md: '88px' }} />
+                <TonApiPricing ref={tonapiRef} w="100%" flex="1" mb={{ base: 8, md: 14 }} />
+                <Footer gap="6" alignSelf={{ base: 'flex-start', md: 'center' }} />
             </Flex>
         </Overlay>
     );

@@ -1,18 +1,18 @@
 import { ComponentProps, FunctionComponent } from 'react';
-import { Box, Grid } from '@chakra-ui/react';
+import { Box, forwardRef, Grid } from '@chakra-ui/react';
 import { TonApiTierCard, tonApiTiersStore } from 'src/features';
 import { observer } from 'mobx-react-lite';
 import { H3, H3Thin } from 'src/shared';
 
-const TonApiPricing: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const TonApiPricing: FunctionComponent<ComponentProps<typeof Box>> = forwardRef((props, ref) => {
     if (!tonApiTiersStore.tiers$.isResolved) {
         return null;
     }
 
     return (
-        <Box {...props}>
-            <H3 mb="7" textAlign="center">
-                Pricing
+        <Box {...props} ref={ref}>
+            <H3 mb={{ base: '5', md: '7' }} textAlign={{ base: 'left', md: 'center' }}>
+                TON API Pricing
             </H3>
             <Grid
                 justifyContent="center"
@@ -41,6 +41,6 @@ const TonApiPricing: FunctionComponent<ComponentProps<typeof Box>> = props => {
             </Grid>
         </Box>
     );
-};
+});
 
 export default observer(TonApiPricing);

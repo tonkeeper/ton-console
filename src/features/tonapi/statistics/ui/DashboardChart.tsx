@@ -59,7 +59,7 @@ const DashboardChart: FunctionComponent<ComponentProps<typeof Box>> = props => {
 
     if (!data?.length || !selectedTier) {
         return (
-            <Text textStyle="body2" color="text.secondary" textAlign="center">
+            <Text textStyle="body2" py="6" color="text.secondary" textAlign="center">
                 No data available
             </Text>
         );
