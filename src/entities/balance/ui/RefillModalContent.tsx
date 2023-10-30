@@ -34,7 +34,7 @@ const RefillModalContent: FunctionComponent<{
                             <QRCodeSVG
                                 bgColor="transparent"
                                 size={180}
-                                value={createTransferLink(depositAddress)}
+                                value={createTransferLink({ address: depositAddress })}
                             />
                         </Pad>
                         <CopyPad text={depositAddress} />

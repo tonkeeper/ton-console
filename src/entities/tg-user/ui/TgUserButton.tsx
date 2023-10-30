@@ -38,7 +38,7 @@ export const TgUserButton: FunctionComponent = observer(() => {
                     </HStack>
                 </MenuButtonDefault>
                 <MenuList w="216px">
-                    <MenuItem onClick={tGUserStore.logout}>
+                    <MenuItem onClick={() => tGUserStore.logout()}>
                         <DisconnectIcon mr="2" />
                         <Text textStyle="label2">Disconnect</Text>
                     </MenuItem>
@@ -50,7 +50,7 @@ export const TgUserButton: FunctionComponent = observer(() => {
             <Button
                 isLoading={tGUserStore.user$.isLoading}
                 leftIcon={<TgIcon />}
-                onClick={tGUserStore.login}
+                onClick={() => tGUserStore.login()}
                 variant="secondary"
             >
                 {buttonText}

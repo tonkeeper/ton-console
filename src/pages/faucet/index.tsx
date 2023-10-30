@@ -1,6 +1,6 @@
 import { FunctionComponent, useId, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { H4, isNumber, Overlay, Span, TonCurrencyAmount } from 'src/shared';
+import { H4, isNumber, Overlay, Span, TonCurrencyAmount, useIntervalUpdate } from 'src/shared';
 import { Button, Divider, Flex, Link, useDisclosure } from '@chakra-ui/react';
 import {
     FaucetForm,
@@ -18,6 +18,8 @@ const FaucetPage: FunctionComponent = () => {
     const { isOpen: isRefillOpen, onClose: onRefillClose, onOpen: onRefillOpen } = useDisclosure();
     const [receiverAddress, setReceiverAddress] = useState('');
     const [amount, setAmount] = useState<TonCurrencyAmount | undefined>(undefined);
+
+    useIntervalUpdate(faucetStore.fetchTonSupplyAndRate);
 
     const formId = useId();
 

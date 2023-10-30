@@ -17,7 +17,7 @@ const CreateFirstProjectPage: FunctionComponent = () => {
                             <CreateProjectForm
                                 id={formId}
                                 mb="2"
-                                onSubmit={projectsStore.createProject}
+                                onSubmit={form => projectsStore.createProject(form)}
                             />
                             <Text
                                 textStyle="body3"

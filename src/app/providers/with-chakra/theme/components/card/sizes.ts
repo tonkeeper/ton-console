@@ -23,6 +23,26 @@ export default {
     }),
     lg: definePartsStyle({
         container: {
+            minH: '50px'
+        },
+        header: {
+            px: '5',
+            pt: '4',
+            pb: '4'
+        },
+        body: {
+            pt: '0',
+            px: '5',
+            pb: '4'
+        },
+        footer: {
+            pt: '0',
+            px: '5',
+            pb: '4'
+        }
+    }),
+    xl: definePartsStyle({
+        container: {
             minH: '60px'
         },
         header: {

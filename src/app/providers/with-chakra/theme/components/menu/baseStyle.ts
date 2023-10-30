@@ -21,7 +21,10 @@ export default defineStyle({
             bg: 'background.content'
         },
         _hover: {
-            bg: 'button.secondary.backgroundHover'
+            bg: 'button.secondary.backgroundHover',
+            _disabled: {
+                bg: 'background.content !important'
+            }
         }
     }
 });

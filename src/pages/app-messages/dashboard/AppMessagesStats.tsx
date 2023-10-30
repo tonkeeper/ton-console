@@ -1,6 +1,6 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Box, Flex, Skeleton } from '@chakra-ui/react';
-import { formatWithSuffix, InfoTooltip, Span } from 'src/shared';
+import { formatWithSuffix, InfoTooltip, Span, useIntervalUpdate } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { appMessagesStore } from 'src/features';
 
@@ -9,6 +9,8 @@ const AppMessagesStats: FunctionComponent<ComponentProps<typeof Box>> = props =>
     const balance = appMessagesStore.balance$.value;
     const isResolved =
         appMessagesStore.stats$.isResolved && stats && appMessagesStore.balance$.isResolved;
+
+    useIntervalUpdate(appMessagesStore.fetchStats);
 
     return (
         <Box {...props}>

@@ -5,6 +5,7 @@ import {
     DropDownMenu,
     DropDownMenuItem,
     DropDownMenuItemExpandable,
+    InvoicesIcon24,
     MessageIcon24,
     SettingsIcon,
     TextWithSkeleton,
@@ -14,6 +15,7 @@ import { FunctionComponent } from 'react';
 import { Flex, Text } from '@chakra-ui/react';
 import { balanceStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
+import { invoicesAppStore } from 'src/features';
 
 const Aside: FunctionComponent = () => {
     return (
@@ -28,6 +30,20 @@ const Aside: FunctionComponent = () => {
             <DropDownMenuItem linkTo="tonkeeper-messages" leftIcon={<MessageIcon24 />}>
                 Tonkeeper Messages
             </DropDownMenuItem>
+            {invoicesAppStore.invoicesApp$.value ? (
+                <DropDownMenuItemExpandable
+                    leftIcon={<InvoicesIcon24 />}
+                    content="Invoices"
+                    linkTo="invoices"
+                >
+                    <DropDownMenuItem linkTo="manage">Manage</DropDownMenuItem>
+                    <DropDownMenuItem linkTo="dashboard">Overview</DropDownMenuItem>
+                </DropDownMenuItemExpandable>
+            ) : (
+                <DropDownMenuItem linkTo="invoices" leftIcon={<InvoicesIcon24 />}>
+                    Invoices
+                </DropDownMenuItem>
+            )}
             <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>
                 Testnet Assets
             </DropDownMenuItem>

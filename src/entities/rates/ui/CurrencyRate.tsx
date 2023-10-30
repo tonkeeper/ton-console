@@ -17,6 +17,7 @@ const CurrencyRate: FunctionComponent<
             reverse?: boolean;
             amountLoading?: boolean;
             contentUnderSkeleton?: string;
+            thousandSeparators?: boolean;
         }
     >
 > = ({
@@ -30,10 +31,13 @@ const CurrencyRate: FunctionComponent<
     reverse,
     amountLoading,
     contentUnderSkeleton,
+    thousandSeparators,
     ...rest
 }) => {
     const sign = leftSign === undefined ? '' : leftSign;
     const precisionWithFallback = precision === undefined ? 2 : precision;
+    const thousandSeparatorsWithFallback =
+        thousandSeparators === undefined ? true : thousandSeparators;
     const [skeletonHeight, setSkeletonHeight] = useState('30px');
     const rate$ = ratesStore.rates$[currency as CRYPTO_CURRENCY];
 
@@ -54,7 +58,13 @@ const CurrencyRate: FunctionComponent<
 
         const result = reverse ? new BigNumber(amount).div(rate) : rate.multipliedBy(amount);
 
-        return result.decimalPlaces(precisionWithFallback).toString();
+        const format = {
+            decimalSeparator: '.',
+            groupSeparator: thousandSeparatorsWithFallback ? ' ' : '',
+            groupSize: 3
+        };
+
+        return result.decimalPlaces(precisionWithFallback).toFormat(format);
     });
 
     return (
