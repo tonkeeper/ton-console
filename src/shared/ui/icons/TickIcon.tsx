@@ -1,15 +1,20 @@
-import { Icon } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent } from 'react';
+import { forwardRef, Icon } from '@chakra-ui/react';
+import { ComponentProps } from 'react';
 
-export const TickIcon: FunctionComponent<ComponentProps<typeof Icon>> = props => {
+export const TickIcon = forwardRef<
+    ComponentProps<typeof Icon> & { isIndeterminate?: unknown; isChecked?: unknown },
+    typeof Icon
+>((props, ref) => {
+    const { isIndeterminate: _, isChecked: __, ...rest } = props;
     return (
         <Icon
+            ref={ref}
             w="16px"
             h="16px"
             fill="none"
             viewBox="0 0 16 16"
             xmlns="http://www.w3.org/2000/svg"
-            {...props}
+            {...rest}
         >
             <path
                 fillRule="evenodd"
@@ -19,4 +24,6 @@ export const TickIcon: FunctionComponent<ComponentProps<typeof Icon>> = props =>
             />
         </Icon>
     );
-};
+});
+
+TickIcon.displayName = 'TickIcon';

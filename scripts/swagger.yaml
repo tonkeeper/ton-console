@@ -49,6 +49,48 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
   
+  /api/v1/admin/project/{id}/balance:
+    get:
+      summary: "Private method: Get project balance"
+      operationId: adminGetProjectBalance
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/projectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProjectBalance'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/admin/project/{id}/charge:
+    post:
+      summary: "Private method: Charge project"
+      description: "Private method"
+      operationId: adminChargeProject
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/projectID'
+      requestBody:
+        $ref: "#/components/requestBodies/ProjectCharge"
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
   /api/v1/auth/tg:
     post:
       summary: "Auth via telegram"
@@ -261,6 +303,26 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/DepositsHistory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/project/{id}/promocode/{promo_code}:
+    post:
+      summary: "Crediting funds with a promo code"
+      operationId: promoCodeDepositProject
+      tags:
+        - project
+      parameters:
+        - $ref: '#/components/parameters/projectID'
+        - $ref: '#/components/parameters/promoCode'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -729,7 +791,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       requestBody:
-        $ref: "#/components/requestBodies/TestnetBuyCoinsInput"
+        $ref: "#/components/requestBodies/TestnetBuyCoins"
       tags:
         - testnet_service
       responses:
@@ -762,6 +824,410 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  
+  /api/v1/services/stats/ddl:
+    get:
+      summary: "Get stats db ddl"
+      operationId: getStatsDDL
+      tags:
+        - stats_service
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsDDL'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/query:
+    post:
+      summary: "Send sql query to stats service"
+      operationId: sendSqlToStats
+      tags:
+        - stats_service
+      requestBody:
+        $ref: "#/components/requestBodies/StatsSQLQuery"
+      responses:
+        '201':
+          $ref: '#/components/responses/StatsSqlResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/query/{id}:
+    get:
+      summary: "Get result by sql query id"
+      operationId: getSqlResultFromStats
+      tags:
+        - stats_service
+      parameters:
+        - $ref: '#/components/parameters/queryID'
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsSqlResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/queries/history:
+    get:
+      summary: "Get sql history queries"
+      operationId: getSqlHistoryFromStats
+      tags:
+        - stats_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+        - $ref: '#/components/parameters/queryOffset'
+        - $ref: '#/components/parameters/queryLimit'
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsSqlHistory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/cosmos/graph:
+    post:
+      summary: "Get an intersection between accounts"
+      operationId: getGraphFromStats
+      tags:
+        - stats_service
+      parameters:
+        - $ref: '#/components/parameters/queryAddresses'
+        - $ref: '#/components/parameters/queryOnlyBetween'
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsSqlResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/payments/history:
+    get:
+      summary: "Get project stats payments history"
+      operationId: getProjectStatsPaymentsHistory
+      tags:
+        - stats_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/PaymentsHistory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
+  /api/v1/services/invoices/app:
+    post:
+      summary: "Create invoices app"
+      operationId: createInvoicesApp
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/InvoicesAppCreate"
+      responses:
+        '201':
+          $ref: '#/components/responses/InvoicesAppResp'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    get:
+      summary: "Get invoices app by project"
+      operationId: getInvoicesApp
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesAppResp'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/app/{id}:
+    patch:
+      summary: "Update invoices app"
+      operationId: updateInvoicesApp
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/appID'
+      requestBody:
+        $ref: "#/components/requestBodies/InvoicesAppUpdate"
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesAppResp'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: "Delete invoices app"
+      operationId: deleteInvoicesApp
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/appID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/app/{id}/webhook:
+    post:
+      summary: "Create webhook for app"
+      operationId: createInvoicesAppWebhook
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/appID'
+      requestBody:
+        $ref: "#/components/requestBodies/InvoiceWebhook"
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesAppResp'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/app/{id}/webhook/{webhook_id}:
+    patch:
+      summary: "Update webhook for app"
+      operationId: updateInvoicesAppWebhook
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/appID'
+        - $ref: '#/components/parameters/webhookID'
+      requestBody:
+        $ref: "#/components/requestBodies/InvoiceWebhook"
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesAppResp'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: "Delete webhook for app"
+      operationId: deleteInvoicesAppWebhook
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/appID'
+        - $ref: '#/components/parameters/webhookID'
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesAppResp'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/token:
+    get:
+      summary: "Get invoices app token"
+      operationId: getInvoicesAppToken
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/queryAppID'
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesAppToken'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      summary: "Regenerate invoices app token"
+      operationId: regenerateInvoicesAppToken
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/queryAppID'
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesAppToken'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/invoice:
+    post:
+      summary: "Create invoice"
+      operationId: createInvoicesInvoice
+      tags:
+        - invoices_service
+      parameters:
+        - description: App ID
+          in: query
+          name: app_id
+          required: false
+          schema:
+            type: integer
+            format: uint32
+      requestBody:
+        $ref: "#/components/requestBodies/InvoiceCreate"
+      responses:
+        '201':
+          $ref: '#/components/schemas/InvoicesInvoice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices:
+    get:
+      summary: "Get invoices"
+      operationId: getInvoices
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/queryAppID'
+        - $ref: '#/components/parameters/queryLimit'
+        - $ref: '#/components/parameters/queryOffset'
+        - $ref: '#/components/parameters/queryFieldOrder'
+        - $ref: '#/components/parameters/queryTypeOrder'
+        - $ref: '#/components/parameters/queryInvoicesSearchID'
+        - $ref: '#/components/parameters/queryFilterStatus'
+        - $ref: '#/components/parameters/queryFilterOverpayment'
+      responses:
+        '200':
+          $ref: '#/components/responses/Invoices'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/{id}:
+    get:
+      summary: "Get invoice"
+      operationId: getInvoicesInvoice
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/invoiceID'
+        - description: App ID
+          in: query
+          name: app_id
+          required: false
+          schema:
+            type: integer
+            format: uint32
+      responses:
+        '200':
+          $ref: '#/components/schemas/InvoicesInvoice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      summary: "Update invoice"
+      operationId: updateInvoicesInvoice
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/invoiceID'
+        - $ref: '#/components/parameters/queryAppID'
+      requestBody:
+        $ref: "#/components/requestBodies/InvoiceChange"
+      responses:
+        '200':
+          $ref: '#/components/schemas/InvoicesInvoice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/{id}/cancel:
+    patch:
+      summary: "Cancel invoice"
+      operationId: cancelInvoicesInvoice
+      tags:
+        - invoices_service
+      parameters:
+        - $ref: '#/components/parameters/invoiceID'
+        - $ref: '#/components/parameters/queryAppID'
+      responses:
+        '200':
+          $ref: '#/components/schemas/InvoicesInvoice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/stats:
+    get:
+      summary: "Get invoices stats"
+      operationId: getInvoicesStats
+      parameters:
+        - $ref: '#/components/parameters/queryAppID'
+      tags:
+        - invoices_service
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesStats'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
 components:
   securitySchemes:
@@ -769,6 +1235,14 @@ components:
       type: http
       scheme: bearer
   parameters:
+    queryID:
+      description: Query ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
     tokenID:
       description: Token ID
       in: path
@@ -785,6 +1259,13 @@ components:
       schema:
         type: integer
         format: uint32
+    promoCode:
+      description: Promo code
+      in: path
+      name: promo_code
+      required: true
+      schema:
+        type: string
     appID:
       description: App ID
       in: path
@@ -792,7 +1273,14 @@ components:
       required: true
       schema:
         type: integer
-        format: int64
+        format: uint32
+    webhookID:
+      description: Webhook ID
+      in: path
+      name: webhook_id
+      required: true
+      schema:
+        type: string
     tierID:
       description: Tier ID
       in: path
@@ -802,6 +1290,14 @@ components:
         type: integer
         format: uint32
         example: 1
+    invoiceID:
+      description: Invoice ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        example: "60ffb075"
     queryProjectID:
       description: Project ID
       in: query
@@ -810,6 +1306,31 @@ components:
       schema:
         type: integer
         format: uint32
+    queryInvoicesSearchID:
+      description: Search ID
+      in: query
+      name: search_id
+      required: false
+      schema:
+        type: string
+        minLength: 1
+    queryFilterStatus:
+      description: Filter status
+      in: query
+      name: filter_status
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/InvoiceStatus'
+    queryFilterOverpayment:
+      description: Overpayment
+      in: query
+      name: overpayment
+      required: false
+      schema:
+        type: boolean
+        default: false
     queryLimit:
       description: Limit
       in: query
@@ -817,6 +1338,7 @@ components:
       required: false
       schema:
         type: integer
+        default: 100
         example: 50
     queryOffset:
       description: Offset
@@ -840,8 +1362,8 @@ components:
           - status
           - life_time
           - description
-          - recipient_address
-          - paid_address
+          - pay_to_address
+          - paid_by_address
           - date_create
           - date_paid
     queryTypeOrder:
@@ -894,7 +1416,20 @@ components:
       schema:
         type: boolean
         example: true
-  
+    queryOnlyBetween:
+      in: query
+      name: only_between
+      schema:
+        type: boolean
+        default: false
+    queryAddresses:
+      description: Addresses
+      in: query
+      name: addresses
+      required: true
+      schema:
+        type: string
+        example: "EQ..fz,EQ...fa"
   
   requestBodies:
     TgAuth:
@@ -1087,7 +1622,7 @@ components:
                 type: string
                 description: "If the address has not been transmitted, then push messages will be sent to all users"
                 example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-    TestnetBuyCoinsInput:
+    TestnetBuyCoins:
       description: "Data that is expected"
       content:
         application/json:
@@ -1105,6 +1640,130 @@ components:
                 format: int64
                 description: "nano ton are expected"
                 example: 1000000000
+    ProjectCharge:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - amount
+              - type_of_charge
+              - info
+            properties:
+              amount:
+                type: integer
+                format: int64
+                example: 1000000000
+              type_of_charge:
+                type: string
+                example: ""
+              info:
+                additionalProperties: true
+                example: { "first_key": "1", "second_key": 2 } # map[string]any
+    StatsSQLQuery:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - project_id
+              - query
+            properties:
+              project_id:
+                type: integer
+                format: uint32
+                example: 1647024163
+              query:
+                type: string
+                example: "select id from test"
+    InvoicesAppCreate:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+              - recipient_address
+            properties:
+              name:
+                type: string
+                example: "Test name"
+              description:
+                type: string
+                example: "Test description"
+              webhooks:
+                type: array
+                items:
+                  type: string
+              recipient_address:
+                type: string
+                example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+    InvoicesAppUpdate:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Test name"
+              description:
+                type: string
+                example: "Test description"
+              recipient_address:
+                type: string
+                example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+    #              refunded:
+    #                type: boolean
+    InvoiceCreate:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - amount
+              - life_time
+            properties:
+              amount:
+                type: string
+                description: "nano ton are expected"
+                example: "1000000000"
+              life_time:
+                type: integer
+                format: int64
+                description: "seconds are expected"
+                example: 100
+              description:
+                type: string
+                example: "Test description"
+    InvoiceChange:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              refund_amount:
+                type: number
+              refunded:
+                type: boolean
+    InvoiceWebhook:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - webhook
+            properties:
+              webhook:
+                type: string
+                example: "https://mydapp.com/api/handle-invoice-change"
   
   schemas:
     Ok:
@@ -1293,6 +1952,14 @@ components:
           type: integer
           format: uint32
           example: 1
+        stats_spent_time:
+          type: number
+          format: float64
+          example: 7.8
+        stats_price_per_second:
+          type: integer
+          format: uint32
+          example: 1000000
         amount:
           type: integer
           format: int64
@@ -1322,6 +1989,7 @@ components:
       required:
         - id
         - name
+        - capabilities
         - date_create
       properties:
         id:
@@ -1334,6 +2002,12 @@ components:
         avatar:
           type: string
           example: "https://tonapi.io/static/test.png"
+        capabilities:
+          type: array
+          items:
+            type: string
+            enum:
+              - invoices
         date_create:
           type: integer
           format: int64
@@ -1449,6 +2123,132 @@ components:
           type: integer
           format: int64
           example: 1690889913000
+    StatsSqlResult:
+      type: object
+      required:
+        - id
+        - success
+      properties:
+        id:
+          type: string
+          example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+        url:
+          type: string
+          example: "https://sql.io/123.csv"
+        meta_url:
+          type: string
+          example: "https://sql.io/123_meta.csv"
+        spent_time:
+          type: number
+          example: 1.8
+        success:
+          type: boolean
+          example: true
+        error:
+          type: string
+          example: "invalid something"
+    InvoicesInvoice:
+      type: object
+      required:
+        - id
+        - amount
+        - description
+        - pay_to_address
+        - payment_link
+        - status
+        - date_expire
+        - date_change
+        - date_create
+      properties:
+        id:
+          type: string
+          example: "60ffb075"
+        amount:
+          type: string
+          example: "1000000000"
+        overpayment:
+          type: string
+          example: "1000000000"
+        description:
+          type: string
+          example: "Test description"
+        status:
+          $ref: '#/components/schemas/InvoiceStatus'
+        pay_to_address:
+          type: string
+          example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+        paid_by_address:
+          type: string
+          example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+        payment_link:
+          type: string
+          example: "https://app.tonkeeper.com/transfer/UQ....UQ"
+        date_change:
+          type: integer
+          format: int64
+          example: 1690889913000
+        date_expire:
+          type: integer
+          format: int64
+          example: 1690889913000
+        date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
+    InvoicesApp:
+      type: object
+      required:
+        - id
+        - project_id
+        - name
+        - description
+        - recipient_address
+        - date_create
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 4177275498
+        project_id:
+          type: integer
+          format: int64
+          example: 4268870487
+        name:
+          type: string
+          example: "Test name"
+        description:
+          type: string
+          example: "Test description"
+        recipient_address:
+          type: string
+          example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+        webhooks:
+          $ref: '#/components/schemas/InvoicesAppWebhooks'
+        date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
+    InvoiceStatus:
+      type: string
+      example: "pending"
+      enum:
+        - pending
+        - paid
+        - cancelled
+        - expired
+    InvoicesAppWebhooks:
+      type: array
+      items:
+        type: object
+        required:
+          - id
+          - webhook
+        properties:
+          id:
+            type: string
+          webhook:
+            type: string
+            example: "https://mydapp.com/api/handle-invoice-change"
   
   responses:
     NotFound:
@@ -1820,4 +2620,135 @@ components:
               hash:
                 type: string
                 example: "546e80bd41ff70ecebe22625f7db3ae48e5a24c175697a8e07899de116bec397"
-                
+    ProjectBalance:
+      description: "Project balance"
+      content:
+        application/json:
+          schema:
+            required:
+              - balance
+            type: object
+            properties:
+              balance:
+                type: integer
+                format: int64
+                example: 1000000000
+    StatsDDL:
+      description: "Stats db ddl"
+      content:
+        application/sql:
+          schema:
+            type: string
+            format: binary
+            example: create table test (...);
+    StatsSqlHistory:
+      description: "History of sql queries"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - items
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatsSqlResult'
+    StatsSqlResult:
+      description: "SQL result"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StatsSqlResult'
+    InvoicesAppResp:
+      description: "Invoices app"
+      content:
+        application/json:
+          schema:
+            required:
+              - app
+            type: object
+            properties:
+              app:
+                $ref: '#/components/schemas/InvoicesApp'
+    InvoicesAppToken:
+      description: "Invoices app token"
+      content:
+        application/json:
+          schema:
+            required:
+              - token
+            type: object
+            properties:
+              token:
+                type: string
+                example: "TC-INVOICES_ZmUtFjYBOMhLaNZH7Q3BIv_f3ns3UP5HxwyG53pRP147nK7v-LrwwA=="
+    Invoices:
+      description: "Invoices"
+      content:
+        application/json:
+          schema:
+            required:
+              - items
+              - count
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InvoicesInvoice'
+              count:
+                type: integer
+                format: int64
+                example: 1000
+    InvoicesServiceFee:
+      description: "Service invoices fee"
+      content:
+        application/json:
+          schema:
+            required:
+              - fee
+            type: object
+            properties:
+              fee:
+                type: integer
+                description: "percent"
+                example: 1
+    InvoicesStats:
+      description: "Invoices stats"
+      content:
+        application/json:
+          schema:
+            required:
+              - stats
+            type: object
+            properties:
+              stats:
+                type: object
+                required:
+                  - total
+                  - success_total
+                  - success_in_week
+                  - invoices_in_progress
+                  - total_amount_pending
+                properties:
+                  total:
+                    type: integer
+                    format: uint32
+                    example: 10000
+                  success_total:
+                    type: integer
+                    format: uint64
+                    example: 10000
+                  success_in_week:
+                    type: integer
+                    format: uint64
+                    example: 10000
+                  invoices_in_progress:
+                    type: integer
+                    format: uint32
+                    example: 10000
+                  total_amount_pending:
+                    type: integer
+                    format: uint64
+                    example: 1000000000

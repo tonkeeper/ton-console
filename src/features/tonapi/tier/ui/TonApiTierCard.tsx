@@ -23,7 +23,7 @@ export const TonApiTierCard: FunctionComponent<
     }
 > = ({ tier, button, tonPriceStyles, zeroTonPricePlaceholder, ...rest }) => {
     return (
-        <Card size="lg" variant="outline" {...rest}>
+        <Card size="xl" variant="outline" {...rest}>
             <CardHeader>
                 <Text textStyle="label2" color="text.primary">
                     {tier.name}

@@ -4,4 +4,7 @@ export interface Project {
     imgUrl?: string;
     fallbackBackground: string;
     creationDate: Date;
+    capabilities: {
+        invoices: boolean;
+    };
 }

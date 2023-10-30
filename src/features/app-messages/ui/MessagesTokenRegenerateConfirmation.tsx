@@ -10,8 +10,9 @@ import {
     ModalOverlay
 } from '@chakra-ui/react';
 import { appMessagesStore } from '../model';
+import { observer } from 'mobx-react-lite';
 
-export const MessagesTokenRegenerateConfirmation: FunctionComponent<{
+const MessagesTokenRegenerateConfirmation: FunctionComponent<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ isOpen, onClose }) => {
@@ -43,3 +44,5 @@ export const MessagesTokenRegenerateConfirmation: FunctionComponent<{
         </Modal>
     );
 };
+
+export default observer(MessagesTokenRegenerateConfirmation);

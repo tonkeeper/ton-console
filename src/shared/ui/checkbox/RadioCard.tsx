@@ -1,7 +1,6 @@
 import { Box, Center, Fade, Flex, useRadio } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent } from 'react';
-import { ejectRadioProps } from 'src/shared/ui/checkbox/eject-radio-props';
-import { FilledTickIcon18 } from 'src/shared';
+import { FilledTickIcon18, ejectRadioProps } from 'src/shared';
 
 export const RadioCard: FunctionComponent<
     Parameters<typeof useRadio>[0] & ComponentProps<typeof Box>

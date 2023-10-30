@@ -19,10 +19,5 @@ export default definePartsStyle({
         fontFamily: Fonts.mono,
         ...textStyles.body2,
         color: 'text.primary'
-    },
-    tbody: {
-        'tr:last-child td': {
-            border: 'none'
-        }
     }
 });
