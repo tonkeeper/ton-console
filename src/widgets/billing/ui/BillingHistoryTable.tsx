@@ -71,14 +71,22 @@ const BillingHistoryTable: FunctionComponent<ComponentProps<typeof TableContaine
                             ) : (
                                 <>
                                     <Td>
-                                        Refill from{' '}
-                                        <Link
-                                            color="text.accent"
-                                            href={explorer.accountLink(historyItem.fromAddress)}
-                                            isExternal
-                                        >
-                                            {shortAddress(historyItem.fromAddress)}
-                                        </Link>
+                                        {historyItem.type === 'deposit' ? (
+                                            <>
+                                                Refill from{' '}
+                                                <Link
+                                                    color="text.accent"
+                                                    href={explorer.accountLink(
+                                                        historyItem.fromAddress
+                                                    )}
+                                                    isExternal
+                                                >
+                                                    {shortAddress(historyItem.fromAddress)}
+                                                </Link>
+                                            </>
+                                        ) : (
+                                            'Refill with promo code'
+                                        )}
                                     </Td>
                                     <Td color="accent.green" textAlign="right">
                                         +{historyItem.amount.stringCurrencyAmount}

@@ -107,10 +107,11 @@ export interface DTOAppTier {
 }
 
 export interface DTODeposit {
+    type: DTODepositType;
     /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
-    deposit_address: string;
+    deposit_address?: string;
     /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
-    source_address: string;
+    source_address?: string;
     /**
      * @format int64
      * @example 1690889913000
@@ -356,6 +357,11 @@ export enum DTOErrorCode {
     DTOValue1 = 1,
     DTOValue2 = 2,
     DTOValue3 = 3
+}
+
+export enum DTODepositType {
+    DTOPromoCode = 'promo_code',
+    DTODeposit = 'deposit'
 }
 
 export enum DTOProjectCapabilities {
