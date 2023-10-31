@@ -19,7 +19,7 @@ const BalancePage: FunctionComponent = () => {
 
     useEffect(() => {
         if (h2Ref.current) {
-            setH2Width(Math.ceil(h2Ref.current?.getBoundingClientRect().width));
+            setH2Width(Math.ceil(h2Ref.current.getBoundingClientRect().width));
         }
     }, [balanceStore.balances[0]?.stringAmount]);
 
@@ -37,11 +37,11 @@ const BalancePage: FunctionComponent = () => {
             <Overlay h="fit-content" p="0">
                 <Box pt="5" pb="6" px="6">
                     <Flex align="center" gap="2" mb="1">
-                        <H2 display="flex" alignItems="center" gap="2">
+                        <H2 minW={h2Width} display="flex" alignItems="center" gap="2">
                             {balanceStore.portfolio$.isLoading ? (
                                 <Skeleton w={h2Width || '100px'} h="6" />
                             ) : (
-                                <Span ref={h2Ref} minW={h2Width}>
+                                <Span ref={h2Ref}>
                                     {balanceStore.balances[0]?.stringAmount + ' TON'}
                                 </Span>
                             )}
