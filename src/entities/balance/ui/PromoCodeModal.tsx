@@ -27,7 +27,8 @@ const PromoCodeModal: FunctionComponent<{
         register,
         formState: { errors, isDirty },
         setError,
-        reset
+        reset,
+        setFocus
     } = useForm<{ promoCode: string }>();
 
     const formId = useId();
@@ -37,21 +38,20 @@ const PromoCodeModal: FunctionComponent<{
         if (result) {
             onClose();
         } else {
-            setError(
-                'promoCode',
-                {
-                    message: 'Invalid promo code'
-                },
-                { shouldFocus: true }
-            );
+            setError('promoCode', {
+                message: 'Invalid promo code'
+            });
+            setTimeout(() => setFocus('promoCode'));
         }
     };
 
     useEffect(() => {
-        if (!isOpen) {
+        if (isOpen) {
+            setTimeout(() => setFocus('promoCode'));
+        } else {
             reset();
         }
-    }, [isOpen]);
+    }, [isOpen, setFocus, reset]);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
