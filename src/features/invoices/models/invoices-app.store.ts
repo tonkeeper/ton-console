@@ -3,9 +3,9 @@ import {
     apiClient,
     Loadable,
     createImmediateReaction,
-    toUserFriendlyAddress,
     DTOInvoicesApp,
-    TonCurrencyAmount
+    TonCurrencyAmount,
+    TonAddress
 } from 'src/shared';
 import { projectsStore } from 'src/entities';
 import { InvoicesApp, InvoicesProjectForm, InvoicesStatistics } from './interfaces';
@@ -194,8 +194,8 @@ function mapInvoicesAppDTOToInvoicesApp(invoicesAppDTO: DTOInvoicesApp): Invoice
     return {
         id: invoicesAppDTO.id,
         name: invoicesAppDTO.name,
-        creationDate: new Date(invoicesAppDTO.date_create),
-        receiverAddress: toUserFriendlyAddress(invoicesAppDTO.recipient_address),
+        creationDate: new Date(invoicesAppDTO.date_create * 1000),
+        receiverAddress: TonAddress.parse(invoicesAppDTO.recipient_address),
         webhooks: (invoicesAppDTO.webhooks || []).map(w => ({ id: w.id, value: w.webhook }))
     };
 }

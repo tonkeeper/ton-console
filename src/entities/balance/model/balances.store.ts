@@ -1,17 +1,21 @@
 import { makeAutoObservable } from 'mobx';
 import {
     apiClient,
+    createAsyncAction,
     createImmediateReaction,
     CurrencyAmount,
     DTODeposit,
+    DTODepositType,
     Loadable,
     setIntervalWhenPageOnFocus,
+    TonAddress,
     TonCurrencyAmount,
     UsdCurrencyAmount
 } from 'src/shared';
 import { projectsStore } from '../../project';
 import { Portfolio, Refill } from './interfaces';
 import { ratesStore } from 'src/entities';
+import { createStandaloneToast } from '@chakra-ui/react';
 
 class BalancesStore {
     portfolio$ = new Loadable<Portfolio | null>(null);
@@ -79,6 +83,34 @@ class BalancesStore {
         return response.data.ton_deposit_wallet;
     });
 
+    applyPromoCode = createAsyncAction(async (promoCode: string) => {
+        const { toast } = createStandaloneToast();
+
+        try {
+            await apiClient.api.promoCodeDepositProject(
+                projectsStore.selectedProject!.id,
+                promoCode
+            );
+            await this.fetchPortfolio();
+            toast({
+                title: 'Promo code succesfully used',
+                status: 'success',
+                isClosable: true,
+                duration: 2000
+            });
+            return true;
+        } catch (e) {
+            toast({
+                title: 'Invalid Promo Code',
+                status: 'error',
+                isClosable: true,
+                duration: 2000
+            });
+
+            return false;
+        }
+    });
+
     clearState = (): void => {
         this.portfolio$.clear();
         this.depositAddress$.clear();
@@ -86,11 +118,23 @@ class BalancesStore {
 }
 
 function mapDTODepositToRefill(dtoDeposit: DTODeposit): Refill {
-    return {
+    const commonFields = {
         id: new Date(dtoDeposit.income_date).getTime(),
         date: new Date(dtoDeposit.income_date),
-        amount: new TonCurrencyAmount(dtoDeposit.amount),
-        fromAddress: dtoDeposit.source_address
+        amount: new TonCurrencyAmount(dtoDeposit.amount)
+    };
+
+    if (dtoDeposit.type === DTODepositType.DTODeposit) {
+        return {
+            ...commonFields,
+            type: 'deposit',
+            fromAddress: TonAddress.parse(dtoDeposit.source_address!)
+        };
+    }
+
+    return {
+        ...commonFields,
+        type: 'promoCode'
     };
 }
 

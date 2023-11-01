@@ -10,7 +10,7 @@ import {
     Td,
     Center
 } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent, PropsWithChildren, useContext } from 'react';
+import { ComponentProps, FunctionComponent, PropsWithChildren, useContext, useRef } from 'react';
 import InvoicesTableColumnLabel from './InvoicesTableSortButton';
 import { invoicesTableStore } from 'src/features';
 import { InvoicesTableContext } from 'src/features/invoices/ui/table/invoices-table-context';
@@ -54,6 +54,9 @@ export const InvoicesTableStructure = observer(
                     </EmptyTable>
                 );
             }
+
+            const tbodyRef = useRef<HTMLTableSectionElement | null>(null);
+            const tbodyWidth = tbodyRef.current?.clientWidth;
 
             return (
                 <Table
@@ -102,6 +105,7 @@ export const InvoicesTableStructure = observer(
                             </Th>
                             <Th
                                 w="100%"
+                                minW="300px"
                                 bg="background.contentTint"
                                 borderTop="1px"
                                 borderTopColor="background.contentTint"
@@ -116,7 +120,16 @@ export const InvoicesTableStructure = observer(
                             </Th>
                         </Tr>
                     </Thead>
-                    <Tbody pos="relative">{body}</Tbody>
+                    <Tbody
+                        ref={tbodyRef}
+                        sx={{
+                            tr: {
+                                minWidth: `${tbodyWidth || 0}px` // SAFARI width: 100% bug workaround
+                            }
+                        }}
+                    >
+                        {body}
+                    </Tbody>
                 </Table>
             );
         }

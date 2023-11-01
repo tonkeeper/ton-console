@@ -17,7 +17,7 @@ const ManageInvoicesPage: FunctionComponent = () => {
     return (
         <Overlay display="flex" flexDirection="column">
             <Flex justify="space-between">
-                <H4 mb="1">Manage invoices</H4>
+                <H4 mb="1">Manage</H4>
                 <RefreshInvoicesTableButton alignSelf="flex-end" />
             </Flex>
             <InvoicesProjectInfo mb="5" />

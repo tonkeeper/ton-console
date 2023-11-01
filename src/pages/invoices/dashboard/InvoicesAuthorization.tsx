@@ -13,7 +13,7 @@ const InvoicesStats: FunctionComponent<ComponentProps<typeof Box>> = props => {
                 Authorization
             </Text>
             <Text textStyle="body2" mb="2">
-                Token:
+                Token
             </Text>
             <Flex gap="3" mb="2">
                 <CopyPad
@@ -29,15 +29,14 @@ const InvoicesStats: FunctionComponent<ComponentProps<typeof Box>> = props => {
                     onClick={onOpen}
                     variant="secondary"
                 >
-                    Regenerate
+                    Generate
                 </Button>
                 <InvoicesTokenRegenerateConfirmation isOpen={isOpen} onClose={onClose} />
             </Flex>
             <Text textStyle="body2" mb="4" color="text.secondary">
-                This is a service to service authorisation token. The service have token-based
-                authentication, is a type of authentication that generates encrypted security
-                tokens. To authorise your request, you have to call service URL&apos;s with token in
-                the path. Keep token secret.
+                Token-based authentication is a protocol which allows for identity verification and
+                offers the second layer of security. The token is secret, don’t reveal it to any
+                third party. If your token was compromised, generate a new one.
             </Text>
         </Box>
     );

@@ -32,19 +32,19 @@ const InvoicesStats: FunctionComponent<ComponentProps<typeof Box>> = props => {
                 Statistics
             </Text>
             <Grid gap="6" templateColumns="repeat(auto-fit, minmax(200px, 1fr))">
-                <StatsCard header="Total invoices">
+                <StatsCard header="Total Number of Invoices">
                     {stats => formatNumber(stats.totalInvoices)}
                 </StatsCard>
-                <StatsCard header="Invoices in progress">
+                <StatsCard header="Active Invoices">
                     {stats => formatNumber(stats.invoicesInProgress)}
                 </StatsCard>
-                <StatsCard header="Earned total">
+                <StatsCard header="Earned Total">
                     {stats => stats.earnedTotal.stringCurrencyAmount}
                 </StatsCard>
-                <StatsCard header="Earned last 7 days">
+                <StatsCard header="Earned Last 7 Days">
                     {stats => stats.earnedLastWeek.stringCurrencyAmount}
                 </StatsCard>
-                <StatsCard header="Awaiting for payment">
+                <StatsCard header="Pending Payment">
                     {stats => stats.awaitingForPaymentAmount.stringCurrencyAmount}
                 </StatsCard>
             </Grid>

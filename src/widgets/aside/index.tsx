@@ -38,7 +38,7 @@ const Aside: FunctionComponent = () => {
                     linkTo="invoices"
                 >
                     <DropDownMenuItem linkTo="manage">Manage</DropDownMenuItem>
-                    <DropDownMenuItem linkTo="dashboard">Dashboard</DropDownMenuItem>
+                    <DropDownMenuItem linkTo="dashboard">Overview</DropDownMenuItem>
                 </DropDownMenuItemExpandable>
             ) : (
                 <DropDownMenuItem linkTo="invoices" leftIcon={<InvoicesIcon24 />}>

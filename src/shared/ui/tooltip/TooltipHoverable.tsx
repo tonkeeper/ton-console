@@ -83,7 +83,12 @@ export const TooltipHoverable: FunctionComponent<
                 border="none"
                 borderRadius="lg"
                 whiteSpace="normal"
+                cursor="text"
                 filter="drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.04)) drop-shadow(0px 4px 20px rgba(0, 0, 0, 0.12))"
+                onClick={e => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }}
                 onMouseEnter={onOpen}
                 onMouseLeave={onClose}
             >

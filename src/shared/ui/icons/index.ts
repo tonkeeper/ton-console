@@ -39,3 +39,4 @@ export { TableIcon36 } from './TableIcon36';
 export { CubeIcon36 } from './CubeIcon36';
 export { ShurikenIcon36 } from './ShurikenIcon36';
 export { DownloadIcon16 } from './DownloadIcon16';
+export { FlashIcon16 } from './FlashIcon16';

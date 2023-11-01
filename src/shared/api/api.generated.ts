@@ -107,10 +107,11 @@ export interface DTOAppTier {
 }
 
 export interface DTODeposit {
+    type: DTODepositType;
     /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
-    deposit_address: string;
+    deposit_address?: string;
     /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
-    source_address: string;
+    source_address?: string;
     /**
      * @format int64
      * @example 1690889913000
@@ -282,17 +283,10 @@ export interface DTOStatsSqlResult {
 export interface DTOInvoicesInvoice {
     /** @example "60ffb075" */
     id: string;
-    /**
-     * @format int64
-     * @example 4177275498
-     */
-    app_id: number;
-    /** @example "My app" */
-    app_name: string;
     /** @example "1000000000" */
     amount: string;
-    overpayment?: number;
-    refund_amount?: number;
+    /** @example "1000000000" */
+    overpayment?: string;
     /** @example "Test description" */
     description: string;
     status: DTOInvoiceStatus;
@@ -300,13 +294,8 @@ export interface DTOInvoicesInvoice {
     pay_to_address: string;
     /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
     paid_by_address?: string;
-    /** @example false */
-    refunded?: boolean;
-    /**
-     * @format int64
-     * @example 1690889913000
-     */
-    date_refund?: number;
+    /** @example "https://app.tonkeeper.com/transfer/UQ....UQ" */
+    payment_link: string;
     /**
      * @format int64
      * @example 1690889913000
@@ -368,6 +357,11 @@ export enum DTOErrorCode {
     DTOValue1 = 1,
     DTOValue2 = 2,
     DTOValue3 = 3
+}
+
+export enum DTODepositType {
+    DTOPromoCode = 'promo_code',
+    DTODeposit = 'deposit'
 }
 
 export enum DTOProjectCapabilities {
@@ -2332,7 +2326,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 description?: string;
                 /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
                 recipient_address?: string;
-                refunded?: boolean;
             },
             params: RequestParams = {}
         ) =>
@@ -2549,13 +2542,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @request POST:/api/v1/services/invoices/invoice
          */
         createInvoicesInvoice: (
-            query: {
-                /**
-                 * App ID
-                 * @format uint32
-                 */
-                app_id: number;
-            },
             data: {
                 /**
                  * nano ton are expected
@@ -2571,12 +2557,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 /** @example "Test description" */
                 description?: string;
             },
+            query?: {
+                /**
+                 * App ID
+                 * @format uint32
+                 */
+                app_id?: number;
+            },
             params: RequestParams = {}
         ) =>
             this.request<
-                {
-                    invoice: DTOInvoicesInvoice;
-                },
+                DTOInvoicesInvoice,
                 {
                     /** Error message */
                     error: string;
@@ -2672,11 +2663,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @summary Get invoice
          * @request GET:/api/v1/services/invoices/{id}
          */
-        getInvoicesInvoice: (id: string, params: RequestParams = {}) =>
+        getInvoicesInvoice: (
+            id: string,
+            query?: {
+                /**
+                 * App ID
+                 * @format uint32
+                 */
+                app_id?: number;
+            },
+            params: RequestParams = {}
+        ) =>
             this.request<
-                {
-                    invoice: DTOInvoicesInvoice;
-                },
+                DTOInvoicesInvoice,
                 {
                     /** Error message */
                     error: string;
@@ -2686,6 +2685,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             >({
                 path: `/api/v1/services/invoices/${id}`,
                 method: 'GET',
+                query: query,
                 ...params
             }),
 
@@ -2713,9 +2713,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             params: RequestParams = {}
         ) =>
             this.request<
-                {
-                    invoice: DTOInvoicesInvoice;
-                },
+                DTOInvoicesInvoice,
                 {
                     /** Error message */
                     error: string;
@@ -2750,9 +2748,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             params: RequestParams = {}
         ) =>
             this.request<
-                {
-                    invoice: DTOInvoicesInvoice;
-                },
+                DTOInvoicesInvoice,
                 {
                     /** Error message */
                     error: string;
@@ -2793,12 +2789,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                          */
                         total: number;
                         /**
-                         * @format uint32
+                         * @format uint64
                          * @example 10000
                          */
                         success_total: number;
                         /**
-                         * @format uint32
+                         * @format uint64
                          * @example 10000
                          */
                         success_in_week: number;

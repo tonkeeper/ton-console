@@ -38,7 +38,7 @@ const CreateInvoiceModal: FunctionComponent<{
             ) : (
                 <ModalContent maxH="calc(100% - 3rem)" my="3">
                     <ModalCloseButton />
-                    <ModalHeader>New invoice</ModalHeader>
+                    <ModalHeader>New Invoice</ModalHeader>
                     <ModalBody>
                         <CreateInvoiceFrom
                             id={id}

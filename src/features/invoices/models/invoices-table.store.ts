@@ -2,12 +2,12 @@ import { makeAutoObservable, reaction } from 'mobx';
 import {
     apiClient,
     createImmediateReaction,
-    createTransferLink,
     DTOGetInvoicesParamsFieldOrder,
     DTOGetInvoicesParamsTypeOrder,
     DTOInvoicesInvoice,
     DTOInvoiceStatus,
     Loadable,
+    TonAddress,
     TonCurrencyAmount
 } from 'src/shared';
 import {
@@ -154,18 +154,18 @@ class InvoicesTableStore {
         async (form: InvoiceForm) => {
             const result = await apiClient.api.createInvoicesInvoice(
                 {
-                    app_id: invoicesAppStore.invoicesApp$.value!.id
-                },
-                {
                     amount: form.amount.stringWeiAmount,
                     description: form.description,
                     life_time: form.lifeTimeSeconds
+                },
+                {
+                    app_id: invoicesAppStore.invoicesApp$.value!.id
                 }
             );
 
             await this.updateCurrentListSilently({ silently: true });
 
-            return mapInvoiceDTOToInvoice(result.data.invoice);
+            return mapInvoiceDTOToInvoice(result.data);
         },
         {
             notMutateState: true,
@@ -191,30 +191,6 @@ class InvoicesTableStore {
             },
             errorToast: {
                 title: 'Invoice cancellation error'
-            }
-        }
-    );
-
-    markInvoiceAsRefunded = this.invoices$.createAsyncAction(
-        async (form: { id: Invoice['id']; refundedAmount: number }) => {
-            await apiClient.api.updateInvoicesInvoice(
-                form.id,
-                {
-                    app_id: invoicesAppStore.invoicesApp$.value!.id
-                },
-                {
-                    refunded: true,
-                    refund_amount: form.refundedAmount
-                }
-            );
-            await this.updateCurrentListSilently({ silently: true });
-        },
-        {
-            successToast: {
-                title: 'Invoice marked as refunded successfully'
-            },
-            errorToast: {
-                title: 'Invoice was not marked as refunded'
             }
         }
     );
@@ -284,21 +260,18 @@ const mapInvoiceStatusToInvoiceDTOStatus: Record<InvoiceStatus, DTOInvoicesInvoi
     Object.fromEntries(Object.entries(mapInvoiceDTOStatusToInvoiceStatus).map(a => a.reverse()));
 
 function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
-    const creationDate = new Date(invoiceDTO.date_create);
     const commonInvoice: InvoiceCommon = {
         amount: new TonCurrencyAmount(invoiceDTO.amount),
-        creationDate,
+        creationDate: new Date(invoiceDTO.date_create * 1000),
         id: invoiceDTO.id,
-        validUntil: new Date(invoiceDTO.date_expire),
+        validUntil: new Date(invoiceDTO.date_expire * 1000),
         description: invoiceDTO.description,
-        payTo: invoiceDTO.pay_to_address,
-        overpayment: invoiceDTO.overpayment
-            ? new TonCurrencyAmount(invoiceDTO.overpayment)
-            : undefined,
-        refundDate: invoiceDTO.date_refund ? new Date(invoiceDTO.date_refund) : undefined,
-        refundedAmount: invoiceDTO.refund_amount
-            ? new TonCurrencyAmount(invoiceDTO.refund_amount)
-            : undefined
+        payTo: TonAddress.parse(invoiceDTO.pay_to_address),
+        paymentLink: invoiceDTO.payment_link,
+        overpayment:
+            invoiceDTO.overpayment && Number(invoiceDTO.overpayment) !== 0
+                ? new TonCurrencyAmount(invoiceDTO.overpayment)
+                : undefined
     };
 
     const status = mapInvoiceDTOStatusToInvoiceStatus[invoiceDTO.status];
@@ -306,8 +279,8 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
     if (status === 'success') {
         return {
             ...commonInvoice,
-            paidBy: invoiceDTO.paid_by_address!,
-            paymentDate: new Date(invoiceDTO.date_change!),
+            paidBy: TonAddress.parse(invoiceDTO.paid_by_address!),
+            paymentDate: new Date(invoiceDTO.date_change * 1000),
             status
         };
     }
@@ -316,44 +289,12 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
         return {
             ...commonInvoice,
             status,
-            cancellationDate: new Date(invoiceDTO.date_change!)
+            cancellationDate: new Date(invoiceDTO.date_change * 1000)
         };
     }
 
     return { ...commonInvoice, status };
 }
-/*
-function createMockInvoice(): Invoice {
-    const id = Math.round(Math.random() * 1000000);
-    const status = (['pending', 'success', 'cancelled', 'expired'] as const)[id % 4];
-
-    return {
-        amount: new TonCurrencyAmount(1000000000),
-        creationDate: new Date(),
-        status,
-        subtractFeeFromAmount: true,
-        id: id.toString(),
-        validUntil: new Date(Date.now() + 1000 * 3600 * 24),
-        description:
-            'TestdescripotionTestdescripotionTestdescripotionTestdescripotionTestdescripotionTest descripotionTest descripotionTestdescripotion',
-        receiverAddress: 'EQCmtv9UrlDC27A0KsJNSaloAtHp5G3fli5jJjJug0waNf1u',
-        ...(status === 'success' && {
-            paidBy: 'EQCmtv9UrlDC27A0KsJNSaloAtHp5G3fli5jJjJug0waNf1u',
-            paymentDate: new Date()
-        })
-    } as Invoice;
-}*/
-/*
-[...new Array(500)].forEach(() => {
-           const ttl = 10000 * Math.round(Math.random() * 10);
-           this.createInvoice({
-               amount: TonCurrencyAmount.fromRelativeAmount(
-                   Math.round(Math.random() * 1000000) / 1000
-               ),
-               description: 'Tag ' + Math.round(Math.random() * 1000).toString(),
-               lifeTimeSeconds: ttl < 1000 ? 1000 : ttl
-           });
-       });*/
 
 const mapSortColumnToFieldOrder: Record<InvoiceTableSortColumn, DTOGetInvoicesParamsFieldOrder> = {
     id: DTOGetInvoicesParamsFieldOrder.DTOId,
@@ -362,14 +303,5 @@ const mapSortColumnToFieldOrder: Record<InvoiceTableSortColumn, DTOGetInvoicesPa
     status: DTOGetInvoicesParamsFieldOrder.DTOStatus,
     'creation-date': DTOGetInvoicesParamsFieldOrder.DTODateCreate
 };
-
-export function createInvoicePaymentLink(invoice: Invoice): string {
-    return createTransferLink({
-        address: invoice.payTo,
-        amount: invoice.amount,
-        text: invoice.id,
-        exp: invoice.validUntil
-    });
-}
 
 export const invoicesTableStore = new InvoicesTableStore();

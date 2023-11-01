@@ -38,7 +38,7 @@ export const EditInvoicesProjectForm: FunctionComponent<
 
     return (
         <chakra.form w="100%" onSubmit={handleSubmit(onSubmit)} noValidate {...rest}>
-            <FormControl mb="8" isInvalid={!!formState.errors.name} isRequired>
+            <FormControl mb="4" isInvalid={!!formState.errors.name} isRequired>
                 <FormLabel htmlFor="name">Name</FormLabel>
                 <Input
                     autoComplete="off"
@@ -50,20 +50,22 @@ export const EditInvoicesProjectForm: FunctionComponent<
                         maxLength: { value: 64, message: 'Maximum length is 64' }
                     })}
                 />
+                <Text textStyle="body3" color="text.secondary">
+                    Only the administrator can see this name.
+                </Text>
                 <FormErrorMessage>
                     {formState.errors.name && formState.errors.name.message}
                 </FormErrorMessage>
             </FormControl>
 
-            <FormControl mb="8" isInvalid={!!formState.errors.receiverAddress} isRequired>
+            <FormControl mb="0" isInvalid={!!formState.errors.receiverAddress} isRequired>
                 <FormLabel htmlFor="receiverAddress">Address</FormLabel>
                 <Textarea
                     minH="calc(3em + 16px)"
-                    mb="2"
                     resize="none"
                     autoComplete="off"
                     id="receiverAddress"
-                    placeholder="EQ..."
+                    placeholder="UQ..."
                     spellCheck="false"
                     {...register('receiverAddress', {
                         required: 'This is required',
@@ -79,7 +81,7 @@ export const EditInvoicesProjectForm: FunctionComponent<
                 <Text textStyle="body3" color="text.secondary">
                     This address will be used for receiving funds.
                 </Text>
-                <FormErrorMessage>
+                <FormErrorMessage pos="static">
                     {formState.errors.receiverAddress && formState.errors.receiverAddress.message}
                 </FormErrorMessage>
             </FormControl>
