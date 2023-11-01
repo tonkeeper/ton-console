@@ -44,6 +44,12 @@ export function isAnalyticsQueryCompleted(
     return query.status === 'success' || query.status === 'error';
 }
 
+export function isAnalyticsQuerySuccessful(
+    query: AnalyticsQueryBasic
+): query is AnalyticsQuerySuccessful {
+    return query.status === 'success';
+}
+
 export type AnalyticsQuery =
     | AnalyticsQueryPending
     | AnalyticsQuerySuccessful

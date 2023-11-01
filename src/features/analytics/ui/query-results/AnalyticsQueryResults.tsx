@@ -1,8 +1,8 @@
 import { ComponentProps, FunctionComponent, useCallback } from 'react';
-import { Box, Button, Center, Flex, Spinner } from '@chakra-ui/react';
-import { DownloadIcon16, Span, useIntervalUpdate } from 'src/shared';
+import { Box, Center, Flex, Spinner } from '@chakra-ui/react';
+import { ButtonLink, DownloadIcon16, Span, useIntervalUpdate } from 'src/shared';
 import { observer } from 'mobx-react-lite';
-import { analyticsQueryStore, isAnalyticsQueryCompleted } from '../../model';
+import { analyticsQueryStore, isAnalyticsQuerySuccessful } from '../../model';
 import { AnalyticsQueryResultsCountdown } from './AnalyticsQueryResultsCountdown';
 import { toJS } from 'mobx';
 import { AnalyticsTable } from './AnalyticsQueryResultsTable';
@@ -24,10 +24,18 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
                 {query?.status === 'executing' && (
                     <AnalyticsQueryResultsCountdown query={toJS(query)} ml="2" />
                 )}
-                {query && isAnalyticsQueryCompleted(query) && (
-                    <Button ml="auto" leftIcon={<DownloadIcon16 />} size="sm" variant="secondary">
+                {query && isAnalyticsQuerySuccessful(query) && (
+                    <ButtonLink
+                        ml="auto"
+                        leftIcon={<DownloadIcon16 />}
+                        size="sm"
+                        variant="secondary"
+                        href={query.csvUrl}
+                        isExternal
+                        download="customers.csv"
+                    >
                         Download CSV
-                    </Button>
+                    </ButtonLink>
                 )}
             </Flex>
             {query?.status !== 'success' && (

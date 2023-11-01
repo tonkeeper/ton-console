@@ -13,13 +13,10 @@ class AnalyticsQueryStore {
         makeAutoObservable(this);
     }
 
-    estimateRequest = (request: string): Promise<unknown> =>
-        this._estimateRequest(request, { cancelAllPreviousCalls: true });
-
-    private _estimateRequest = this.request$.createAsyncAction(async (request: string) => {
+    public estimateRequest = this.request$.createAsyncAction(async (request: string) => {
         await apiClient.api.sendSqlToStats({
             project_id: projectsStore.selectedProject!.id,
-            query: 'select id from blockchain.account_code'
+            query: 'select id, last_paid, status, get_method_tables, interfaces, data from blockchain.accounts limit 10'
         });
         return {
             request,
@@ -45,13 +42,13 @@ class AnalyticsQueryStore {
         return {
             ...this.query$.value,
             status: 'success',
-            csvUrl: 'https://example.com',
+            csvUrl: 'https://media.githubusercontent.com/media/datablist/sample-csv-files/main/files/customers/customers-100.csv',
             preview
         };
     });
 
     clearRequest = (): void => {
-        this._estimateRequest.cancelAllPendingCalls();
+        this.estimateRequest.cancelAllPendingCalls();
         this.request$.clear();
     };
 }

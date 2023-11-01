@@ -30,7 +30,7 @@ const AnalyticsQueryCode: FunctionComponent<ComponentProps<typeof Box>> = props 
         }
 
         if (debouncedValue) {
-            analyticsQueryStore.estimateRequest(debouncedValue);
+            analyticsQueryStore.estimateRequest(debouncedValue, { cancelAllPreviousCalls: true });
         } else {
             analyticsQueryStore.clearRequest();
         }

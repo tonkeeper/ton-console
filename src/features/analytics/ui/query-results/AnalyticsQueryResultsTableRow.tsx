@@ -3,7 +3,7 @@
 import { FunctionComponent } from 'react';
 import { Box, Flex, Link } from '@chakra-ui/react';
 import { AnalyticsTableSource } from 'src/features';
-import { TooltipHoverable } from 'src/shared';
+import { Span, TooltipHoverable } from 'src/shared';
 
 export const AnalyticsQueryResultsTableRow: FunctionComponent<{
     source: AnalyticsTableSource;
@@ -40,6 +40,7 @@ export const AnalyticsQueryResultsTableRow: FunctionComponent<{
             style={style}
         >
             <TooltipHoverable
+                inPortal
                 host={
                     <Box
                         overflow="hidden"
@@ -57,7 +58,7 @@ export const AnalyticsQueryResultsTableRow: FunctionComponent<{
                     </Box>
                 }
             >
-                {content}
+                <Span textStyle="body3">{content}</Span>
             </TooltipHoverable>
         </Flex>
     );
