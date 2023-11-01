@@ -67,7 +67,13 @@ const PromoCodeModal: FunctionComponent<{
                             <Input
                                 isDisabled={balanceStore.applyPromoCode.isLoading}
                                 placeholder="Promo Code"
-                                {...register('promoCode', { required: 'This is required' })}
+                                {...register('promoCode', {
+                                    required: 'This is required',
+                                    maxLength: {
+                                        value: 30,
+                                        message: 'Max length is 30'
+                                    }
+                                })}
                             />
                             <FormErrorMessage>
                                 {errors.promoCode && errors.promoCode.message}
