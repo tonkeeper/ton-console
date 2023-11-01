@@ -1,8 +1,18 @@
-import { CurrencyAmount } from 'src/shared';
+import { CurrencyAmount, TonAddress } from 'src/shared';
 
-export interface Refill {
+export interface RefillBasic {
     id: number;
     date: Date;
-    fromAddress: string;
     amount: CurrencyAmount;
 }
+
+export interface RefillDeposit extends RefillBasic {
+    type: 'deposit';
+    fromAddress: TonAddress;
+}
+
+export interface RefillPromoCode extends RefillBasic {
+    type: 'promoCode';
+}
+
+export type Refill = RefillDeposit | RefillPromoCode;
