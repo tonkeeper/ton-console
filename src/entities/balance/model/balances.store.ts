@@ -93,17 +93,18 @@ class BalancesStore {
             );
             await this.fetchPortfolio();
             toast({
-                title: 'Promo code successfully applied',
+                title: 'Promo code succesfully used',
                 status: 'success',
-                isClosable: true
+                isClosable: true,
+                duration: 2000
             });
             return true;
         } catch (e) {
             toast({
                 title: 'Invalid Promo Code',
-                description: 'Unable to apply promo code',
                 status: 'error',
-                isClosable: true
+                isClosable: true,
+                duration: 2000
             });
 
             return false;

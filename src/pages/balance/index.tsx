@@ -71,7 +71,7 @@ const BalancePage: FunctionComponent = () => {
                             onClick={onPromoOpen}
                             variant="secondary"
                         >
-                            Promo Code
+                            Use Promo Code
                         </Button>
                     </Flex>
                 </Box>

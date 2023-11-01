@@ -93,7 +93,7 @@ const PromoCodeModal: FunctionComponent<{
                         type="submit"
                         variant="primary"
                     >
-                        Apply
+                        Refill
                     </Button>
                 </ModalFooter>
             </ModalContent>
