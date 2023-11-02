@@ -1,9 +1,9 @@
 /* eslint-disable chakra-ui/props-order*/
 
-import { FunctionComponent } from 'react';
-import { Box, Flex, Link } from '@chakra-ui/react';
+import { FunctionComponent, useRef } from 'react';
+import { Box, Flex, Link, Tooltip, useClipboard, useDisclosure } from '@chakra-ui/react';
 import { AnalyticsTableSource } from 'src/features';
-import { Span, TooltipHoverable } from 'src/shared';
+import { Span } from 'src/shared';
 
 export const AnalyticsQueryResultsTableRow: FunctionComponent<{
     source: AnalyticsTableSource;
@@ -13,6 +13,35 @@ export const AnalyticsQueryResultsTableRow: FunctionComponent<{
 }> = ({ source, columnIndex, rowIndex, style: { top, ...style } }) => {
     const content = source.data[rowIndex][columnIndex];
     const isLink = content.startsWith('https://') || content.startsWith('http://');
+    const { isOpen, onClose, onOpen } = useDisclosure();
+    const ref = useRef<HTMLDivElement | null>(null);
+    const { hasCopied, onCopy } = useClipboard(content);
+
+    const node = ref.current;
+    const canShowTooltip =
+        node && (node.offsetWidth < node.scrollWidth || node.offsetHeight < node.scrollHeight);
+
+    const contentView = (
+        <Box
+            overflow="hidden"
+            fontFamily="mono"
+            whiteSpace="nowrap"
+            textOverflow="ellipsis"
+            cursor={canShowTooltip ? 'pointer' : 'default'}
+            onClick={canShowTooltip && !isLink ? onCopy : undefined}
+            onMouseEnter={onOpen}
+            onMouseLeave={onClose}
+            ref={ref}
+        >
+            {isLink ? (
+                <Link href={content} isExternal>
+                    {content}
+                </Link>
+            ) : (
+                content
+            )}
+        </Box>
+    );
 
     return (
         <Flex
@@ -39,27 +68,19 @@ export const AnalyticsQueryResultsTableRow: FunctionComponent<{
             }
             style={style}
         >
-            <TooltipHoverable
-                inPortal
-                host={
-                    <Box
-                        overflow="hidden"
-                        fontFamily="mono"
-                        whiteSpace="nowrap"
-                        textOverflow="ellipsis"
-                    >
-                        {isLink ? (
-                            <Link href={content} isExternal>
-                                {content}
-                            </Link>
-                        ) : (
-                            content
-                        )}
-                    </Box>
-                }
-            >
-                <Span textStyle="body3">{content}</Span>
-            </TooltipHoverable>
+            {canShowTooltip ? (
+                <Tooltip
+                    closeDelay={0}
+                    closeOnScroll
+                    hasArrow
+                    label={<Span textStyle="body3">{!hasCopied ? content : 'Copied!'}</Span>}
+                    isOpen={isOpen}
+                >
+                    {contentView}
+                </Tooltip>
+            ) : (
+                contentView
+            )}
         </Flex>
     );
 };

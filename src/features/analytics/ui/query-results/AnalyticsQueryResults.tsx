@@ -18,7 +18,7 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
     useIntervalUpdate(callback, 1000);
 
     return (
-        <Box {...props}>
+        <Flex direction="column" {...props}>
             <Flex align="center" h="8" mb="3">
                 <Span textStyle="label1">Query Results</Span>
                 {query?.status === 'executing' && (
@@ -45,8 +45,10 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
                     {query?.status === 'error' && 'Data loading error'}
                 </Center>
             )}
-            {query?.status === 'success' && <AnalyticsTable source={toJS(query.preview)} />}
-        </Box>
+            {query?.status === 'success' && (
+                <AnalyticsTable flex="1" source={toJS(query.preview)} />
+            )}
+        </Flex>
     );
 };
 

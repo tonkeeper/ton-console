@@ -15,6 +15,9 @@ export default {
             _active: {
                 transform: 'none'
             }
+        },
+        '[data-popper-arrow] > div': {
+            backgroundColor: 'background.content !important'
         }
     }
 };

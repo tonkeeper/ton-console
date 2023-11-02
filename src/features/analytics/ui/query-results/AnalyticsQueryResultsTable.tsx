@@ -1,4 +1,12 @@
-import { FunctionComponent, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+    ComponentProps,
+    FunctionComponent,
+    useCallback,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState
+} from 'react';
 import { Box, Flex, forwardRef } from '@chakra-ui/react';
 import { VariableSizeGrid } from 'react-window';
 import { AnalyticsTableSource } from 'src/features';
@@ -20,7 +28,9 @@ function getTHWidth(text: string, isEdge: boolean): number {
     return getTextWidth(text) + 2 * px + edgePadding;
 }
 
-export const AnalyticsTable: FunctionComponent<{ source: AnalyticsTableSource }> = ({ source }) => {
+export const AnalyticsTable: FunctionComponent<
+    ComponentProps<typeof Box> & { source: AnalyticsTableSource }
+> = ({ source, ...rest }) => {
     const [tableWidth, setTableWidth] = useState(0);
     const [columnsWidths, setColumnsWidths] = useState(
         source.headings.map((v, i) => getTHWidth(v, i === 0 || i === source.headings.length - 1))
@@ -48,9 +58,9 @@ export const AnalyticsTable: FunctionComponent<{ source: AnalyticsTableSource }>
 
     const TableStruct = useMemo(
         () =>
-            forwardRef(({ children, ...rest }, ref) => {
+            forwardRef(({ children, ...restProps }, ref) => {
                 return (
-                    <Box ref={ref} {...rest}>
+                    <Box ref={ref} {...restProps}>
                         <Flex
                             textStyle="body3"
                             pos="sticky"
@@ -92,21 +102,23 @@ export const AnalyticsTable: FunctionComponent<{ source: AnalyticsTableSource }>
     );
 
     return (
-        <AutoSizer onResize={v => setTableWidth(v.width || 0)}>
-            {({ width }) => (
-                <VariableSizeGrid
-                    ref={gridRef}
-                    columnCount={source.headings.length}
-                    columnWidth={i => columnsWidths[i]}
-                    height={300}
-                    rowCount={source.data.length}
-                    rowHeight={() => 35}
-                    width={width || 800}
-                    innerElementType={TableStruct}
-                >
-                    {params => <AnalyticsQueryResultsTableRow source={source} {...params} />}
-                </VariableSizeGrid>
-            )}
-        </AutoSizer>
+        <Box {...rest}>
+            <AutoSizer onResize={v => setTableWidth(v.width || 0)}>
+                {({ width, height }) => (
+                    <VariableSizeGrid
+                        ref={gridRef}
+                        columnCount={source.headings.length}
+                        columnWidth={i => columnsWidths[i]}
+                        height={height || 300}
+                        rowCount={source.data.length}
+                        rowHeight={() => 35}
+                        width={width || 800}
+                        innerElementType={TableStruct}
+                    >
+                        {params => <AnalyticsQueryResultsTableRow source={source} {...params} />}
+                    </VariableSizeGrid>
+                )}
+            </AutoSizer>
+        </Box>
     );
 };
