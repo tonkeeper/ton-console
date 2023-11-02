@@ -26,19 +26,23 @@ const FeaturesList: FunctionComponent<
     const buttonVariant = isContrast ? 'secondary' : 'overlay';
 
     return (
-        <SimpleGrid columns={{ base: 1, md: 2 }} spacing="4" {...rest}>
+        <SimpleGrid
+            gridTemplateColumns="repeat(auto-fit, minmax(min(100%/1, max(450px, 100%/3)), 1fr))"
+            spacing="4"
+            {...rest}
+        >
             <FeatureCard
                 h="100%"
                 background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
                 src="/assets/images/tonkeeper-on-ramp.webp"
                 heading="On-Ramp"
-                description="Put your exchange, payment solution, or DEX under the Buy button in Tonkeeper and get over a million new customers for your service."
+                description="Put your exchange, payment solution, or DEX under the Buy button on Tonkeeper and get over a million new customers for your service."
                 imgBorder
                 imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
-                    Become a partner
+                    Become Partner
                 </ButtonLink>
             </FeatureCard>
 
@@ -47,7 +51,7 @@ const FeaturesList: FunctionComponent<
                 background="linear-gradient(104deg, #2EA5FF 0%, #0F97FF 100%)"
                 src="/assets/images/tonkeeper-browser.webp"
                 heading="Tonkeeper Browser"
-                description="Over 500K clicks per month through the Tonkeeper built-in app catalog. Monthly payments."
+                description="Over 500K click a month via the Tonkeeper app catalog and monthly payments."
                 imgBorder
                 imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
@@ -61,14 +65,14 @@ const FeaturesList: FunctionComponent<
                 h="100%"
                 background="linear-gradient(104deg, #5C92FF 0%, #3D7EFF 100%)"
                 src="/assets/images/tonkeeper-NFT.webp"
-                heading="NFT Theme NFTs"
+                heading="NFT Themes"
                 description="Customize Tonkeeper with your NFTs."
                 imgBorder
                 imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
-                    Become a partner
+                    Become Partner
                 </ButtonLink>
             </FeatureCard>
 
@@ -83,7 +87,7 @@ const FeaturesList: FunctionComponent<
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
-                    Become a partner
+                    Become Partner
                 </ButtonLink>
             </FeatureCard>
 
@@ -98,7 +102,7 @@ const FeaturesList: FunctionComponent<
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
-                    Become a partner
+                    Become Partner
                 </ButtonLink>
             </FeatureCard>
 
@@ -107,7 +111,7 @@ const FeaturesList: FunctionComponent<
                 background="linear-gradient(104deg, #2EA5FF 0%, #0F97FF 100%)"
                 src="/assets/images/tonkeeper-activity.webp"
                 heading="Tonkeeper Messages"
-                description="You can significantly increase the user retention and conversion rate for your decentralized applications. Tonkeeper Messages is designed like a convenient and trusted way to message the highly motivated audience of Tonkeeper."
+                description="You can significantly increase the user retention and conversion rate for your decentralized applications. Tonkeeper Messages is a convenient and trusted way to message the highly motivated audience of Tonkeeper."
                 imgBorder
                 imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
@@ -157,7 +161,7 @@ const FeaturesList: FunctionComponent<
                 imgHeight="186px"
                 src="/assets/images/tonapi.webp"
                 heading="TON API"
-                description="Build on TON with ease."
+                description="Build on TON. Easy."
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button
@@ -169,7 +173,7 @@ const FeaturesList: FunctionComponent<
                 </Button>
                 {!tGUserStore.user$.value && (
                     <Button onClick={onTonapiClick} variant={buttonVariant}>
-                        Choose Plan
+                        See Prices
                     </Button>
                 )}
             </FeatureCard>
@@ -185,12 +189,12 @@ const FeaturesList: FunctionComponent<
                 ]}
                 imgHeight="142px"
                 src="/assets/images/tonviewer-pages.webp"
-                heading="Customized Pages"
+                heading="Custom Pages"
                 description="Promote your own project through most convenient blockchain explorer in the TON ecosystem."
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
-                    Become a partner
+                    Become Partner
                 </ButtonLink>
             </FeatureCard>
 
@@ -206,11 +210,11 @@ const FeaturesList: FunctionComponent<
                 imgHeight="194px"
                 src="/assets/images/tonviewer-widget.webp"
                 heading="App Widget on Tonviewer"
-                description="Add custom widget with stats and actions to your decentralized app."
+                description="Add a custom widget with stats and actions to your decentralized app."
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
-                    Become a partner
+                    Become Partner
                 </ButtonLink>
             </FeatureCard>
 
@@ -225,12 +229,12 @@ const FeaturesList: FunctionComponent<
                 ]}
                 imgHeight={{ base: '184px', md: '84px' }}
                 src="/assets/images/partnerships.webp"
-                heading="Premium Partnerships"
-                description="Get unique offers specifically for your project — Ton Apps provides exclusive terms for a limited circle of partners."
+                heading="Premium Partnership"
+                description="Get unique offers for your project: Ton Apps provides exclusive terms for a limited number of partenrs."
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
-                    Become a partner
+                    Become Partner
                 </ButtonLink>
             </FeatureCard>
         </SimpleGrid>

@@ -36,8 +36,8 @@ const LandingPage: FunctionComponent = () => {
                 >
                     <Heading mb="5">Connecting businesses to the TON ecosystem</Heading>
                     <Text textStyle="body1" mb={{ base: 8, md: 10 }} color="text.secondary">
-                        Launch a successful business with TON blockchain: manage dapps, tokens and
-                        payments in one place with powerful API and deep commercial integrations
+                        Launch a successful business with the TON blockchain: manage Dapps, tokens,
+                        and payments in just one place with a deeply integrated commercial API
                     </Text>
                     <Flex
                         direction={{ base: 'column', md: 'row' }}
@@ -50,7 +50,7 @@ const LandingPage: FunctionComponent = () => {
                             onClick={() => tGUserStore.login()}
                             variant="primary"
                         >
-                            Connect and try
+                            Connect and Try
                         </Button>
                         <ButtonLink
                             leftIcon={<DocsIcon16 />}

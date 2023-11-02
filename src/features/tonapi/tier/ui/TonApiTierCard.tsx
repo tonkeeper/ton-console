@@ -48,7 +48,7 @@ export const TonApiTierCard: FunctionComponent<
                             reverse
                             {...tonPriceStyles}
                         >
-                            &nbsp;TON per month
+                            &nbsp;TON monthly
                         </CurrencyRate>
                     </>
                 )}
@@ -88,9 +88,9 @@ export const TonApiTierCard: FunctionComponent<
                         <ListItem display="flex">
                             <ListIcon as={TickIcon} color="accent.green" />
                             <Box textStyle="body2" color="text.primary">
-                                event streaming from{' '}
+                                mempool events{' '}
                                 <Span whiteSpace="nowrap">
-                                    mempool&nbsp;
+                                    streaming&nbsp;
                                     <InfoTooltip>
                                         Get access to the TON blockchain mempool
                                     </InfoTooltip>

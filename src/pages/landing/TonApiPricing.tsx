@@ -31,11 +31,7 @@ const TonApiPricing: FunctionComponent<ComponentProps<typeof Box>> = forwardRef(
                         key={tier.id}
                         variant="elevated"
                         tonPriceStyles={{ mt: '1', mb: '6', textStyle: 'h3Thin' }}
-                        zeroTonPricePlaceholder={
-                            <H3Thin mb="6" mt="1" color="text.secondary">
-                                Forever
-                            </H3Thin>
-                        }
+                        zeroTonPricePlaceholder={<H3Thin mb="6" mt="1" color="text.secondary" />}
                     />
                 ))}
             </Grid>
