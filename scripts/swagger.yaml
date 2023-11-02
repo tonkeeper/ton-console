@@ -1119,7 +1119,7 @@ paths:
         $ref: "#/components/requestBodies/InvoiceCreate"
       responses:
         '201':
-          $ref: '#/components/schemas/InvoicesInvoice'
+          $ref: '#/components/responses/InvoicesInvoiceResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -1167,7 +1167,7 @@ paths:
             format: uint32
       responses:
         '200':
-          $ref: '#/components/schemas/InvoicesInvoice'
+          $ref: '#/components/responses/InvoicesInvoiceResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -1186,7 +1186,7 @@ paths:
         $ref: "#/components/requestBodies/InvoiceChange"
       responses:
         '200':
-          $ref: '#/components/schemas/InvoicesInvoice'
+          $ref: '#/components/responses/InvoicesInvoiceResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -1204,7 +1204,7 @@ paths:
         - $ref: '#/components/parameters/queryAppID'
       responses:
         '200':
-          $ref: '#/components/schemas/InvoicesInvoice'
+          $ref: '#/components/responses/InvoicesInvoiceResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -1910,11 +1910,15 @@ components:
     Deposit:
       type: object
       required:
-        - deposit_address
-        - source_address
+        - type
         - income_date
         - amount
       properties:
+        type:
+          type: string
+          enum:
+            - promo_code
+            - deposit
         deposit_address:
           type: string
           example: "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR"
@@ -2714,6 +2718,12 @@ components:
                 type: integer
                 description: "percent"
                 example: 1
+    InvoicesInvoiceResponse:
+      description: "Service invoices fee"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InvoicesInvoice'
     InvoicesStats:
       description: "Invoices stats"
       content:
