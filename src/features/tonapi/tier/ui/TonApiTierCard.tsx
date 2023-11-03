@@ -48,14 +48,14 @@ export const TonApiTierCard: FunctionComponent<
                             reverse
                             {...tonPriceStyles}
                         >
-                            &nbsp;TON per month
+                            &nbsp;TON monthly
                         </CurrencyRate>
                     </>
                 )}
                 <List flex="1" spacing="2">
                     <ListItem display="flex">
                         <ListIcon as={TickIcon} color="accent.green" />
-                        <Text textStyle="body2" color="text.primary">
+                        <Box textStyle="body2" color="text.primary">
                             {tier.description.requestsPerSecondLimit} requests per second
                             {tier.price.amount.isZero() && (
                                 <>
@@ -67,11 +67,11 @@ export const TonApiTierCard: FunctionComponent<
                                     </InfoTooltip>
                                 </>
                             )}
-                        </Text>
+                        </Box>
                     </ListItem>
                     <ListItem display="flex">
                         <ListIcon as={TickIcon} color="accent.green" />
-                        <Text as={Box} textStyle="body2" color="text.primary">
+                        <Box textStyle="body2" color="text.primary">
                             {tier.description.realtimeConnectionsLimit} realtime connections, watch
                             up to {tier.description.entitiesPerRealtimeConnectionLimit} accounts for
                             each{' '}
@@ -82,20 +82,20 @@ export const TonApiTierCard: FunctionComponent<
                                     websockets
                                 </InfoTooltip>
                             </Span>
-                        </Text>
+                        </Box>
                     </ListItem>
                     {tier.description.mempool && (
                         <ListItem display="flex">
                             <ListIcon as={TickIcon} color="accent.green" />
-                            <Text as={Box} textStyle="body2" color="text.primary">
-                                event streaming from{' '}
+                            <Box textStyle="body2" color="text.primary">
+                                mempool events{' '}
                                 <Span whiteSpace="nowrap">
-                                    mempool&nbsp;
+                                    streaming&nbsp;
                                     <InfoTooltip>
                                         Get access to the TON blockchain mempool
                                     </InfoTooltip>
                                 </Span>
-                            </Text>
+                            </Box>
                         </ListItem>
                     )}
                 </List>

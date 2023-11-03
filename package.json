@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "vite",
+    "dev-host": "vite --host",
     "build": "tsc && vite build",
     "build:staging": "tsc && vite build --mode staging",
     "build:staging2": "tsc && vite build --mode staging2",
