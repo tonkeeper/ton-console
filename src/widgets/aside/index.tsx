@@ -34,7 +34,7 @@ const Aside: FunctionComponent = () => {
             {invoicesAppStore.invoicesApp$.value ? (
                 <DropDownMenuItemExpandable
                     leftIcon={<InvoicesIcon24 />}
-                    content="Track Payments"
+                    content="Payment Tracker"
                     linkTo="invoices"
                 >
                     <DropDownMenuItem linkTo="manage">Manage</DropDownMenuItem>
@@ -42,7 +42,7 @@ const Aside: FunctionComponent = () => {
                 </DropDownMenuItemExpandable>
             ) : (
                 <DropDownMenuItem linkTo="invoices" leftIcon={<InvoicesIcon24 />}>
-                    Track Payments
+                    Payment Tracker
                 </DropDownMenuItem>
             )}
             <DropDownMenuItemExpandable
