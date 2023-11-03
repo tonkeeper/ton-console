@@ -4,7 +4,15 @@ export default {
             height: '100%'
         },
         body: {
-            backgroundColor: 'background.page'
+            backgroundColor: 'background.page',
+            '-webkit-touch-callout': 'none'
+        },
+        img: {
+            '-webkit-user-select': 'none',
+            '-khtml-user-select': 'none',
+            '-moz-user-select:': 'none',
+            '-o-user-select': 'none',
+            'user-select': 'none'
         },
         '[data-tc-dropdown-button="true"]': {
             backgroundColor: 'background.contentTint',

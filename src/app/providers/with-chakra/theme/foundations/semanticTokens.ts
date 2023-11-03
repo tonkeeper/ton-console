@@ -10,6 +10,11 @@ export default {
                 foreground: '#000000',
                 backgroundHover: '#E5E7EA'
             },
+            overlay: {
+                background: '#FFFFFF',
+                foreground: '#000000',
+                backgroundHover: '#FAFAFA'
+            },
             danger: {
                 background: '#F53C36',
                 foreground: '#FFFFFF'
