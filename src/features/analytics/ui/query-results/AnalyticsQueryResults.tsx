@@ -12,7 +12,7 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
 
     const callback = useCallback(() => {
         if (query?.status === 'executing') {
-            analyticsQueryStore.fetchQuery();
+            analyticsQueryStore.refetchQuery();
         }
     }, [query?.status]);
     useIntervalUpdate(callback, 1000);

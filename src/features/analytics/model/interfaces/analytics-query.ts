@@ -19,7 +19,7 @@ export interface AnalyticsQueryBasic extends AnalyticsQueryTemplate {
 
 export interface AnalyticsQueryCompleted extends AnalyticsQueryBasic {
     status: 'success' | 'error';
-    spentTime: number;
+    spentTimeMS: number;
     cost: TonCurrencyAmount;
 }
 
@@ -29,7 +29,7 @@ export interface AnalyticsQuerySuccessful extends AnalyticsQueryCompleted {
     preview: AnalyticsTableSource;
 }
 
-export interface AnalyticsQueryErrored extends AnalyticsQueryBasic {
+export interface AnalyticsQueryErrored extends AnalyticsQueryCompleted {
     status: 'error';
     errorReason: string;
 }

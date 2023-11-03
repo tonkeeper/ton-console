@@ -28,7 +28,9 @@ const AnalyticsQueryControlPanel: FunctionComponent<ComponentProps<typeof Box>> 
 
             <Button
                 ml="4"
-                isDisabled={!analyticsQueryStore.request$.value}
+                isDisabled={
+                    !analyticsQueryStore.request$.value || analyticsQueryStore.requestEqQuery
+                }
                 isLoading={
                     analyticsQueryStore.request$.isLoading ||
                     analyticsQueryStore.createQuery.isLoading

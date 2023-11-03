@@ -1,6 +1,6 @@
 import { Box, Button, chakra } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent, PropsWithChildren, ReactNode, useMemo } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 
 const MenuItemButton = chakra(Button, {
     baseStyle: {
@@ -34,27 +34,33 @@ export const DropDownMenuItem: FunctionComponent<
     ComponentProps<typeof Box> &
         PropsWithChildren & { layer?: number; leftIcon?: ReactNode; linkTo?: string; path?: string }
 > = props => {
+    const location = useLocation();
     const navLinkProps = useMemo<
         ({ as: typeof NavLink } & ComponentProps<typeof NavLink>) | Record<never, never>
-    >(
-        () =>
-            props.linkTo
-                ? {
-                      as: chakra(NavLink),
-                      to: props.path ? `${props.path}/${props.linkTo}` : props.linkTo,
-                      _activeLink: {
-                          backgroundColor: 'background.contentTint',
-                          _hover: {
-                              transform: 'none'
-                          },
-                          _active: {
-                              transform: 'none'
-                          }
+    >(() => {
+        const pathname = props.path ? `${props.path}/${props.linkTo}` : props.linkTo;
+
+        return props.linkTo
+            ? {
+                  as: chakra(NavLink),
+                  to: {
+                      pathname,
+                      search: location.pathname === pathname ? location.search : ''
+                  },
+                  _activeLink: {
+                      backgroundColor: 'background.contentTint',
+                      _hover: {
+                          transform: 'none'
+                      },
+                      _active: {
+                          transform: 'none'
                       }
                   }
-                : {},
-        [props.linkTo, props.path]
-    ) as { as: typeof NavLink } & ComponentProps<typeof NavLink>;
+              }
+            : {};
+    }, [props.linkTo, props.path, location.pathname, location.search]) as {
+        as: typeof NavLink;
+    } & ComponentProps<typeof NavLink>;
     return (
         <MenuItemButton
             pl={props.layer ? props.layer * 16 : 3}

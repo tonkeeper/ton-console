@@ -1,10 +1,22 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FunctionComponent, useEffect } from 'react';
 import { Box, Flex, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import { H4, Overlay } from 'src/shared';
-import { AnalyticsQueryCode, AnalyticsQueryResults } from 'src/features';
+import { AnalyticsQueryCode, AnalyticsQueryResults, analyticsQueryStore } from 'src/features';
 import { QueryLinks } from './QueryLinks';
+import { useSearchParams } from 'react-router-dom';
 
 const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
+    const [searchParams] = useSearchParams();
+    const queryId = searchParams.get('id');
+
+    useEffect(() => {
+        if (queryId) {
+            analyticsQueryStore.loadQueryAndRequest(queryId);
+        } else {
+            analyticsQueryStore.clear();
+        }
+    }, [queryId]);
+
     return (
         <Overlay display="flex" flexDirection="column">
             <H4 mb="4">New Request</H4>

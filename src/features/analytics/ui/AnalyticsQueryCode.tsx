@@ -13,7 +13,7 @@ import { observer } from 'mobx-react-lite';
 import AnalyticsQueryControlPanel from './AnalyticsQueryControlPanel';
 
 const AnalyticsQueryCode: FunctionComponent<ComponentProps<typeof Box>> = props => {
-    const [value, setValue] = useState('SELECT ');
+    const [value, setValue] = useState(analyticsQueryStore.request$.value?.request || 'SELECT ');
     const debouncedValue = useDebounce(value);
     const prevDebouncedValue = usePrevious(debouncedValue);
 
