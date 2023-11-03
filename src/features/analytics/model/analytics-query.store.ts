@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import {
     apiClient,
     createAsyncAction,
+    DTOStatsEstimateSQL,
     DTOStatsSqlResult,
     Loadable,
     TonCurrencyAmount
@@ -24,18 +25,29 @@ class AnalyticsQueryStore {
     }
 
     public estimateRequest = this.request$.createAsyncAction(async (request: string) => {
-        await apiClient.api.sendSqlToStats({
-            project_id: projectsStore.selectedProject!.id,
-            query: 'select id, last_paid, status, get_method_tables, interfaces, data from blockchain.accounts limit 10'
-        });
-        return {
-            request,
-            estimatedTimeMS: 360_000,
-            estimatedCost: new TonCurrencyAmount(3000000000)
-        };
+        try {
+            const result = await apiClient.api.estimateStatsSqlQuery({
+                project_id: projectsStore.selectedProject!.id,
+                query: request
+            });
+
+            return mapDTOStatsEstimateSQLToAnalyticsQuery(request, result.data);
+        } catch (e) {
+            const errText =
+                (
+                    e as { response: { data: { error: string } } }
+                )?.response?.data?.error?.toString() || 'Unknown error';
+
+            throw new Error(errText);
+        }
     });
 
     createQuery = this.query$.createAsyncAction(async () => {
+        await apiClient.api.sendSqlToStats({
+            project_id: projectsStore.selectedProject!.id,
+            query: this.request$.value!.request
+        });
+
         return {
             ...this.request$.value,
             id: Math.random().toString(),
@@ -103,6 +115,17 @@ class AnalyticsQueryStore {
         this.request$.clear();
         this.query$.clear();
     }
+}
+
+function mapDTOStatsEstimateSQLToAnalyticsQuery(
+    request: string,
+    value: DTOStatsEstimateSQL
+): AnalyticsQueryTemplate {
+    return {
+        request,
+        estimatedTimeMS: Math.ceil(value.approximate_time * 1000),
+        estimatedCost: new TonCurrencyAmount(value.approximate_cost)
+    };
 }
 
 export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsSqlResult): AnalyticsQuery {

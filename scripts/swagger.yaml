@@ -842,6 +842,25 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/query/estimate:
+    post:
+      summary: "Explain SQL query"
+      operationId: estimateStatsSqlQuery
+      tags:
+        - db
+      requestBody:
+        $ref: "#/components/requestBodies/StatsSQLQuery"
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsEstimateSql'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /api/v1/services/stats/query:
     post:
       summary: "Send sql query to stats service"
@@ -2151,6 +2170,18 @@ components:
         error:
           type: string
           example: "invalid something"
+    StatsEstimateSQL:
+      type: object
+      required:
+        - approximate_time
+        - approximate_cost
+      properties:
+        approximate_time:
+          type: number
+          format: float64
+        approximate_cost:
+          type: integer
+          format: int64
     InvoicesInvoice:
       type: object
       required:
@@ -2653,7 +2684,12 @@ components:
             type: object
             required:
               - items
+              - count
             properties:
+              count:
+                type: integer
+                format: int32
+                example: 10
               items:
                 type: array
                 items:
@@ -2664,6 +2700,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/StatsSqlResult'
+    StatsEstimateSql:
+      description: "Estimate SQL"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StatsEstimateSQL'
     InvoicesAppResp:
       description: "Invoices app"
       content:

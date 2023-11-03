@@ -1,6 +1,7 @@
 import { Box, Button, chakra } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent, PropsWithChildren, ReactNode, useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { eqPaths } from 'src/shared';
 
 const MenuItemButton = chakra(Button, {
     baseStyle: {
@@ -45,7 +46,7 @@ export const DropDownMenuItem: FunctionComponent<
                   as: chakra(NavLink),
                   to: {
                       pathname,
-                      search: location.pathname === pathname ? location.search : ''
+                      search: eqPaths(location.pathname, pathname) ? location.search : ''
                   },
                   _activeLink: {
                       backgroundColor: 'background.contentTint',

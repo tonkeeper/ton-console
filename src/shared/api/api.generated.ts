@@ -280,6 +280,13 @@ export interface DTOStatsSqlResult {
     error?: string;
 }
 
+export interface DTOStatsEstimateSQL {
+    /** @format float64 */
+    approximate_time: number;
+    /** @format int64 */
+    approximate_cost: number;
+}
+
 export interface DTOInvoicesInvoice {
     /** @example "60ffb075" */
     id: string;
@@ -2053,6 +2060,41 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
+         * @tags db
+         * @name EstimateStatsSqlQuery
+         * @summary Explain SQL query
+         * @request POST:/api/v1/services/stats/query/estimate
+         */
+        estimateStatsSqlQuery: (
+            data: {
+                /**
+                 * @format uint32
+                 * @example 1647024163
+                 */
+                project_id: number;
+                /** @example "select id from test" */
+                query: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOStatsEstimateSQL,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/stats/query/estimate`,
+                method: 'POST',
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
          * @tags stats_service
          * @name SendSqlToStats
          * @summary Send sql query to stats service
@@ -2139,6 +2181,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 {
+                    /**
+                     * @format int32
+                     * @example 10
+                     */
+                    count: number;
                     items: DTOStatsSqlResult[];
                 },
                 {
