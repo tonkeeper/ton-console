@@ -16,7 +16,7 @@ import { ArrowIcon, DisconnectIcon, MenuButtonDefault, TgIcon } from 'src/shared
 export const TgUserButton: FunctionComponent = observer(() => {
     const buttonText = useBreakpointValue({
         base: 'Connect',
-        md: 'Connect Telegram'
+        md: 'Connect via Telegram'
     });
 
     if (tGUserStore.user$.value) {

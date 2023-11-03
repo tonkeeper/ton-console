@@ -8,7 +8,7 @@ const RegisterProject: FunctionComponent = () => {
 
     return (
         <Overlay h="fit-content" pb="76px">
-            <H4 mb="1">Invoices</H4>
+            <H4 mb="1">Track TON Payments</H4>
             <Text textStyle="body2" mb="5" color="text.secondary">
                 Easy TON transaction tracking
             </Text>
