@@ -230,7 +230,7 @@ const FeaturesList: FunctionComponent<
                 imgHeight={{ base: '184px', md: '84px' }}
                 src="/assets/images/partnerships.webp"
                 heading="Premium Partnership"
-                description="Get unique offers for your project: Ton Apps provides exclusive terms for a limited number of partenrs."
+                description="Get unique offers for your project: Ton Apps provides exclusive terms for a limited number of partners."
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
