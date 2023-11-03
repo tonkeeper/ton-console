@@ -121,7 +121,7 @@ const FeaturesList: FunctionComponent<
                     onClick={() => loginAndNavigateTo('/tonkeeper-messages')}
                     variant={buttonVariant}
                 >
-                    {tGUserStore.user$.value ? 'Open' : 'Connect and try'}
+                    {tGUserStore.user$.value ? 'Open' : 'Connect and Try'}
                 </Button>
             </FeatureCard>
 
@@ -145,7 +145,7 @@ const FeaturesList: FunctionComponent<
                     onClick={() => loginAndNavigateTo('/invoices')}
                     variant={buttonVariant}
                 >
-                    {tGUserStore.user$.value ? 'Open' : 'Connect and try'}
+                    {tGUserStore.user$.value ? 'Open' : 'Connect and Try'}
                 </Button>
             </FeatureCard>
 
@@ -169,7 +169,7 @@ const FeaturesList: FunctionComponent<
                     onClick={() => loginAndNavigateTo('/tonapi')}
                     variant={buttonVariant}
                 >
-                    {tGUserStore.user$.value ? 'Open' : 'Connect and try'}
+                    {tGUserStore.user$.value ? 'Open' : 'Connect and Try'}
                 </Button>
                 {!tGUserStore.user$.value && (
                     <Button onClick={onTonapiClick} variant={buttonVariant}>
