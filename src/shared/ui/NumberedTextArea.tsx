@@ -1,6 +1,7 @@
 import { ChangeEvent, ComponentProps, useRef, useState, UIEvent } from 'react';
 import { Box, forwardRef, Textarea } from '@chakra-ui/react';
 import { mergeRefs } from 'src/shared';
+import ResizeTextarea from 'react-textarea-autosize';
 
 export const NumberedTextArea = forwardRef<
     ComponentProps<typeof Textarea> & { wrapperProps?: ComponentProps<typeof Box> },
@@ -48,12 +49,17 @@ export const NumberedTextArea = forwardRef<
                 fontSize={fontSize}
                 fontWeight={fontWeight}
                 lineHeight={lineHeight}
+                resize="none"
             >
                 {Array.from({ length: linesNumber }, (_, i) => i + 1).join('\n')}
             </Box>
             <Textarea
                 {...rest}
                 ref={mergeRefs(ref, internalTextareaRef)}
+                as={ResizeTextarea}
+                overflow="hidden"
+                minH="unset"
+                maxH="100%"
                 pl="44px"
                 onChange={onTextAreaChange}
                 onScroll={onTextareaScroll}

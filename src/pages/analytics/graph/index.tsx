@@ -5,7 +5,7 @@ import { GraphAnalyticsForm } from 'src/features';
 
 const GraphPage: FunctionComponent<ComponentProps<typeof Box>> = props => {
     return (
-        <Overlay {...props}>
+        <Overlay {...props} display="flex" flexDirection="column">
             <Flex align="center" justify="space-between" mb="1">
                 <H4 mb="1">Graph</H4>
                 <Link textStyle="label2" color="accent.blue" href="#" isExternal>
@@ -16,7 +16,7 @@ const GraphPage: FunctionComponent<ComponentProps<typeof Box>> = props => {
                 Visualization of the transaction history of the accounts you are interested in.
             </Text>
             <Divider w="auto" mb="5" mx="-6" />
-            <GraphAnalyticsForm />
+            <GraphAnalyticsForm flex="1" />
         </Overlay>
     );
 };
