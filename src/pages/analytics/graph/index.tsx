@@ -1,9 +1,21 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FunctionComponent, useEffect } from 'react';
 import { Box, Divider, Flex, Link, Text } from '@chakra-ui/react';
 import { H4, Overlay } from 'src/shared';
-import { GraphAnalyticsForm } from 'src/features';
+import { analyticsGraphQueryStore, GraphAnalyticsForm } from 'src/features';
+import { useSearchParams } from 'react-router-dom';
 
 const GraphPage: FunctionComponent<ComponentProps<typeof Box>> = props => {
+    const [searchParams] = useSearchParams();
+    const queryId = searchParams.get('id');
+
+    useEffect(() => {
+        if (queryId) {
+            analyticsGraphQueryStore.loadQuery(queryId);
+        } else {
+            analyticsGraphQueryStore.clear();
+        }
+    }, [queryId]);
+
     return (
         <Overlay {...props} display="flex" flexDirection="column">
             <Flex align="center" justify="space-between" mb="1">

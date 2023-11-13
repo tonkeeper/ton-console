@@ -1,7 +1,7 @@
 import { FunctionComponent, useContext } from 'react';
 import { Center, Flex, Spinner, Td, Tr, useConst } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { analyticsHistoryTableStore, AnalyticsQuery, isAnalyticsQueryCompleted } from '../../model';
+import { AnalyticsGraphQuery, analyticsHistoryTableStore, AnalyticsQuery } from '../../model';
 import { TooltipHoverable, toTimeLeft, toDateTime, useCountup } from 'src/shared';
 import { toJS } from 'mobx';
 import { AnalyticsHistoryTableContext } from './analytics-history-table-context';
@@ -29,89 +29,92 @@ const LoadingRow: FunctionComponent<{ style: React.CSSProperties }> = ({
     );
 };
 
-const ItemRow: FunctionComponent<{ query: AnalyticsQuery; style: React.CSSProperties }> = observer(
-    ({ query, style }) => {
-        const navigate = useNavigate();
-        const renderTime = useConst(Date.now());
+const ItemRow: FunctionComponent<{
+    query: AnalyticsQuery | AnalyticsGraphQuery;
+    style: React.CSSProperties;
+}> = observer(({ query, style }) => {
+    const navigate = useNavigate();
+    const renderTime = useConst(Date.now());
 
-        //  const { onCopy: onCopyRequest, hasCopied: hasCopiedRequest } = useClipboard(query.request);
-        const { rowHeight } = useContext(AnalyticsHistoryTableContext);
+    //  const { onCopy: onCopyRequest, hasCopied: hasCopiedRequest } = useClipboard(query.request);
+    const { rowHeight } = useContext(AnalyticsHistoryTableContext);
 
-        const passedSeconds =
-            query.status === 'executing'
-                ? Math.floor((renderTime - query.creationDate.getTime()) / 1000)
-                : 0;
+    const passedSeconds =
+        query.status === 'executing'
+            ? Math.floor((renderTime - query.creationDate.getTime()) / 1000)
+            : 0;
 
-        const durationSeconds = useCountup(passedSeconds);
-        const formattedDuration = durationSeconds === 0 ? '' : toTimeLeft(durationSeconds * 1000);
+    const durationSeconds = useCountup(passedSeconds);
+    const formattedDuration = durationSeconds === 0 ? '' : toTimeLeft(durationSeconds * 1000);
 
-        const onRowClick = (): void => {
-            navigate(`../query?id=${query.id}`);
-        };
+    const onRowClick = (): void => {
+        navigate(`../query?id=${query.id}`);
+    };
 
-        return (
-            <Tr
-                sx={{ td: { px: 2, py: 0 } }}
-                pos="absolute"
-                top={parseFloat(style.top!.toString()) + parseFloat(rowHeight) + 'px'}
-                left="0"
-                display="table-row"
-                w="100%"
+    const request = query.type === 'graph' ? query.addresses.join(',') : query.request;
+
+    return (
+        <Tr
+            sx={{ td: { px: 2, py: 0 } }}
+            pos="absolute"
+            top={parseFloat(style.top!.toString()) + parseFloat(rowHeight) + 'px'}
+            left="0"
+            display="table-row"
+            w="100%"
+            h={rowHeight}
+            maxH={rowHeight}
+            cursor="pointer"
+            onClick={onRowClick}
+        >
+            <Td
+                minW="128px"
                 h={rowHeight}
                 maxH={rowHeight}
-                cursor="pointer"
-                onClick={onRowClick}
+                borderLeft="1px"
+                borderLeftColor="background.contentTint"
+                boxSizing="content-box"
             >
-                <Td
-                    minW="128px"
-                    h={rowHeight}
-                    maxH={rowHeight}
-                    borderLeft="1px"
-                    borderLeftColor="background.contentTint"
-                    boxSizing="content-box"
-                >
-                    {isAnalyticsQueryCompleted(query) ? (
-                        <Flex align="center" color="text.secondary">
-                            {toTimeLeft(query.spentTimeMS)}
-                            <CurrencyRate reverse amount={query.cost.amount} leftSign=" · $" />
-                        </Flex>
-                    ) : (
-                        formattedDuration
-                    )}
-                </Td>
-                <Td minW="108px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
-                    {query.status === 'error' ? (
-                        <TooltipHoverable
-                            canBeShown
-                            host={<AnalyticsQueryStatusBadge status={query.status} />}
-                        >
-                            {query.errorReason}
-                        </TooltipHoverable>
-                    ) : (
-                        <AnalyticsQueryStatusBadge status={query.status} />
-                    )}
-                </Td>
-                <Td w="100%" minW="300px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
-                    {query.request}
-                </Td>
-                <Td
-                    w="120px"
-                    minW="120px"
-                    maxW="120px"
-                    h={rowHeight}
-                    maxH={rowHeight}
-                    color="text.secondary"
-                    textAlign="right"
-                    borderRight="1px"
-                    borderRightColor="background.contentTint"
-                    boxSizing="content-box"
-                >
-                    {toDateTime(query.creationDate)}
-                </Td>
-            </Tr>
-        );
-    }
-);
+                {query.status === 'success' || query.status === 'error' ? (
+                    <Flex align="center" color="text.secondary">
+                        {toTimeLeft(query.spentTimeMS)}
+                        <CurrencyRate reverse amount={query.cost.amount} leftSign=" · $" />
+                    </Flex>
+                ) : (
+                    formattedDuration
+                )}
+            </Td>
+            <Td minW="108px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
+                {query.status === 'error' ? (
+                    <TooltipHoverable
+                        canBeShown
+                        host={<AnalyticsQueryStatusBadge status={query.status} />}
+                    >
+                        {query.errorReason}
+                    </TooltipHoverable>
+                ) : (
+                    <AnalyticsQueryStatusBadge status={query.status} />
+                )}
+            </Td>
+            <Td w="100%" minW="300px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
+                {request}
+            </Td>
+            <Td
+                w="120px"
+                minW="120px"
+                maxW="120px"
+                h={rowHeight}
+                maxH={rowHeight}
+                color="text.secondary"
+                textAlign="right"
+                borderRight="1px"
+                borderRightColor="background.contentTint"
+                boxSizing="content-box"
+            >
+                {toDateTime(query.creationDate)}
+            </Td>
+        </Tr>
+    );
+});
 
 const AnalyticsHistoryTableRow: FunctionComponent<{
     index: number;

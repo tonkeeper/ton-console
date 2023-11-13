@@ -5,7 +5,7 @@ import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { analyticsHistoryTableStore } from '../../model';
-import InvoicesTableRaw from './AnalyticsHistoryTableRow';
+import AnalyticsHistoryTableRow from './AnalyticsHistoryTableRow';
 import { AnalyticsHistoryTableStructure } from './AnalyticsHistoryTableStructure';
 import { AnalyticsHistoryTableContext } from './analytics-history-table-context';
 
@@ -37,7 +37,7 @@ const AnalyticsHistoryTable: FunctionComponent<ComponentProps<typeof Box>> = pro
                                     innerElementType={AnalyticsHistoryTableStructure}
                                     ref={ref}
                                 >
-                                    {InvoicesTableRaw}
+                                    {AnalyticsHistoryTableRow}
                                 </FixedSizeList>
                             )}
                         </AutoSizer>

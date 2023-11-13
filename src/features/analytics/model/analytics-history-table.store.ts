@@ -1,11 +1,18 @@
 import { makeAutoObservable } from 'mobx';
-import { apiClient, createImmediateReaction, Loadable } from 'src/shared';
-import { AnalyticsQuery } from './interfaces';
+import {
+    apiClient,
+    createImmediateReaction,
+    DTOStatsQueryResult,
+    DTOStatsQueryResultType,
+    Loadable
+} from 'src/shared';
+import { AnalyticsGraphQuery, AnalyticsQuery } from './interfaces';
 import { projectsStore } from 'src/entities';
 import { mapDTOStatsSqlResultToAnalyticsQuery } from './analytics-query.store';
+import { mapDTOStatsGraphResultToAnalyticsGraphQuery } from './analytics-graph-query.store';
 
 class AnalyticsHistoryTableStore {
-    queries$ = new Loadable<AnalyticsQuery[]>([]);
+    queries$ = new Loadable<(AnalyticsQuery | AnalyticsGraphQuery)[]>([]);
 
     private totalQueries = 0;
 
@@ -49,7 +56,7 @@ class AnalyticsHistoryTableStore {
                 offset: this.queries$.value.length
             });
 
-            const invoices = response.data.items.map(mapDTOStatsSqlResultToAnalyticsQuery);
+            const invoices = response.data.items.map(mapDTOStatsResultToAnalyticsHistoryResult);
 
             this.totalQueries = 20; //response.data.count;
             return invoices;
@@ -64,7 +71,7 @@ class AnalyticsHistoryTableStore {
             offset: this.queries$.value.length
         });
 
-        const queries = response.data.items.map(mapDTOStatsSqlResultToAnalyticsQuery);
+        const queries = response.data.items.map(mapDTOStatsResultToAnalyticsHistoryResult);
 
         this.totalQueries = 10; // response.data.count;
         return this.queries$.value.concat(queries);
@@ -73,6 +80,16 @@ class AnalyticsHistoryTableStore {
     clearState(): void {
         this.queries$.clear();
     }
+}
+
+function mapDTOStatsResultToAnalyticsHistoryResult(
+    value: DTOStatsQueryResult
+): AnalyticsQuery | AnalyticsGraphQuery {
+    if (value.type === DTOStatsQueryResultType.DTOGraph) {
+        return mapDTOStatsGraphResultToAnalyticsGraphQuery(value);
+    }
+
+    return mapDTOStatsSqlResultToAnalyticsQuery(value);
 }
 
 export const analyticsHistoryTableStore = new AnalyticsHistoryTableStore();

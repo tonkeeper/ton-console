@@ -12,6 +12,7 @@ export interface AnalyticsQueryTemplate {
 }
 
 export interface AnalyticsQueryBasic extends AnalyticsQueryTemplate {
+    type: 'query';
     id: string;
     status: 'executing' | 'success' | 'error';
     creationDate: Date;

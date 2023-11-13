@@ -2,14 +2,14 @@ import { makeAutoObservable } from 'mobx';
 import {
     apiClient,
     createAsyncAction,
-    DTOStatsEstimateSQL,
-    DTOStatsSqlResult,
+    DTOStatsEstimateQuery,
+    DTOStatsQueryResult,
+    DTOStatsQueryStatus,
     Loadable,
     TonCurrencyAmount
 } from 'src/shared';
 import { AnalyticsQuery, AnalyticsQueryTemplate } from './interfaces';
 import { projectsStore } from 'src/entities';
-import { fetchCSV } from './csv-utils';
 
 class AnalyticsQueryStore {
     request$ = new Loadable<AnalyticsQueryTemplate | null>(null);
@@ -26,7 +26,7 @@ class AnalyticsQueryStore {
 
     public estimateRequest = this.request$.createAsyncAction(async (request: string) => {
         try {
-            const result = await apiClient.api.estimateStatsSqlQuery({
+            const result = await apiClient.api.estimateStatsQuery({
                 project_id: projectsStore.selectedProject!.id,
                 query: request
             });
@@ -43,30 +43,18 @@ class AnalyticsQueryStore {
     });
 
     createQuery = this.query$.createAsyncAction(async () => {
-        await apiClient.api.sendSqlToStats({
+        const result = await apiClient.api.sendQueryToStats({
             project_id: projectsStore.selectedProject!.id,
             query: this.request$.value!.request
         });
 
-        return {
-            ...this.request$.value,
-            id: Math.random().toString(),
-            status: 'executing',
-            creationDate: new Date()
-        };
+        return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
     });
 
     refetchQuery = this.query$.createAsyncAction(async () => {
-        const preview = await fetchCSV(
-            'https://media.githubusercontent.com/media/datablist/sample-csv-files/main/files/customers/customers-100.csv'
-        );
+        const result = await apiClient.api.getSqlResultFromStats(this.query$.value!.id);
 
-        return {
-            ...this.query$.value,
-            status: 'success',
-            csvUrl: 'https://media.githubusercontent.com/media/datablist/sample-csv-files/main/files/customers/customers-100.csv',
-            preview
-        };
+        return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
     });
 
     loadQueryAndRequest = createAsyncAction(async (id: string) => {
@@ -76,31 +64,16 @@ class AnalyticsQueryStore {
         this.request$.setStartLoading();
         this.query$.setStartLoading();
 
+        const result = await apiClient.api.getSqlResultFromStats(id);
+        const query = mapDTOStatsSqlResultToAnalyticsQuery(result.data);
+
         this.request$.setValue({
-            estimatedTimeMS: 10000,
-            estimatedCost: new TonCurrencyAmount(3000000000),
-            request: 'SELECT 1234'
+            estimatedTimeMS: query.estimatedTimeMS,
+            estimatedCost: query.estimatedCost,
+            request: query.request
         });
 
-        this.query$.setValue({
-            id: id,
-            creationDate: new Date(),
-            status: 'success',
-            estimatedTimeMS: 10000,
-            estimatedCost: new TonCurrencyAmount(3000000000),
-            request: 'SELECT 1234',
-            cost: new TonCurrencyAmount(3000000000),
-            spentTimeMS: 10000,
-            csvUrl: 'https://media.githubusercontent.com/media/datablist/sample-csv-files/main/files/customers/customers-100.csv',
-            preview: {
-                data: [
-                    ['Vincent', '12'],
-                    ['peter', '15'],
-                    ['pudge', '2023']
-                ],
-                headings: ['name', 'age']
-            }
-        });
+        this.query$.setValue(query);
 
         this.request$.setEndLoading();
         this.query$.setEndLoading();
@@ -119,7 +92,7 @@ class AnalyticsQueryStore {
 
 function mapDTOStatsEstimateSQLToAnalyticsQuery(
     request: string,
-    value: DTOStatsEstimateSQL
+    value: DTOStatsEstimateQuery
 ): AnalyticsQueryTemplate {
     return {
         request,
@@ -128,50 +101,44 @@ function mapDTOStatsEstimateSQLToAnalyticsQuery(
     };
 }
 
-export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsSqlResult): AnalyticsQuery {
-    const rnd = Math.random();
-    if (rnd > 0.67) {
+export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult): AnalyticsQuery {
+    const basicQuery = {
+        type: 'query',
+        id: value.id,
+        creationDate: new Date(value.date_create),
+        request: value.query!.sql!,
+        estimatedTimeMS: value.estimate!.approximate_time,
+        estimatedCost: new TonCurrencyAmount(value.estimate!.approximate_cost)
+    } as const;
+
+    if (value.status === DTOStatsQueryStatus.DTOExecuting) {
         return {
-            id: value.id,
-            creationDate: new Date(),
-            status: 'executing',
-            estimatedTimeMS: 10000,
-            estimatedCost: new TonCurrencyAmount(3000000000),
-            request: 'SELECT 123'
-        };
-    } else if (rnd > 0.33) {
-        return {
-            id: value.id,
-            creationDate: new Date(),
-            status: 'success',
-            estimatedTimeMS: 10000,
-            estimatedCost: new TonCurrencyAmount(3000000000),
-            request: 'SELECT 123',
-            cost: new TonCurrencyAmount(3000000000),
-            spentTimeMS: 10000,
-            csvUrl: 'https://media.githubusercontent.com/media/datablist/sample-csv-files/main/files/customers/customers-100.csv',
-            preview: {
-                data: [
-                    ['Vincent', '12'],
-                    ['peter', '15'],
-                    ['pudge', '2023']
-                ],
-                headings: ['name', 'age']
-            }
-        };
-    } else {
-        return {
-            id: value.id,
-            creationDate: new Date(),
-            status: 'error',
-            estimatedTimeMS: 10000,
-            estimatedCost: new TonCurrencyAmount(3000000000),
-            request: 'SELECT 123',
-            cost: new TonCurrencyAmount(3000000000),
-            spentTimeMS: 10000,
-            errorReason: 'Cannot fetch data'
+            ...basicQuery,
+            status: 'executing'
         };
     }
+
+    if (value.status === DTOStatsQueryStatus.DTOSuccess) {
+        return {
+            ...basicQuery,
+            status: 'success',
+            cost: new TonCurrencyAmount(value.cost!),
+            spentTimeMS: value.spent_time! * 1000,
+            csvUrl: value.url!,
+            preview: {
+                headings: [],
+                data: []
+            }
+        };
+    }
+
+    return {
+        ...basicQuery,
+        status: 'error',
+        cost: new TonCurrencyAmount(value.cost!),
+        spentTimeMS: value.spent_time! * 1000,
+        errorReason: value.error!
+    };
 }
 
 export const analyticsQueryStore = new AnalyticsQueryStore();
