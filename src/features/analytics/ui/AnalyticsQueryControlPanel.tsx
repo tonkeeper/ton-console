@@ -25,7 +25,7 @@ const AnalyticsQueryControlPanel: FunctionComponent<ComponentProps<typeof Box>> 
                     <TooltipHoverable
                         canBeShown
                         host={
-                            <Center gap="1" color="accent.orange" cursor="default">
+                            <Center gap="1" color="accent.red" cursor="default">
                                 Error <InfoIcon16 color="accent.red" />
                             </Center>
                         }

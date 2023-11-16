@@ -41,3 +41,5 @@ export { ShurikenIcon36 } from './ShurikenIcon36';
 export { DownloadIcon16 } from './DownloadIcon16';
 export { FlashIcon16 } from './FlashIcon16';
 export { DoneIconCircle24 } from './DoneIconCircle24';
+export { ErrorIconCircle24 } from './ErrorIconCircle24';
+export { EmptyFolderIcon48 } from './EmptyFolderIcon48';

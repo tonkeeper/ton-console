@@ -10,25 +10,39 @@ import {
     TabPanels,
     Tabs
 } from '@chakra-ui/react';
-import { H4, Overlay } from 'src/shared';
+import { H4, Overlay, usePrevious } from 'src/shared';
 import { AnalyticsQueryCode, AnalyticsQueryResults, analyticsQueryStore } from 'src/features';
 import { QueryLinks } from './QueryLinks';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { projectsStore } from 'src/entities';
 
 const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
-    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const queryId = searchParams.get('id');
     const [queryResolved, setQueryResolved] = useState(false);
 
     useEffect(() => {
         if (queryId) {
             setQueryResolved(false);
-            analyticsQueryStore.loadQueryAndRequest(queryId).then(() => setQueryResolved(true));
+            analyticsQueryStore
+                .loadQueryAndRequest(queryId)
+                .then(() => setQueryResolved(true))
+                .catch(() => setSearchParams({}));
         } else {
             analyticsQueryStore.clear();
             setQueryResolved(true);
         }
     }, []);
+
+    const projectId = projectsStore.selectedProject?.id;
+    const prevProjectId = usePrevious(projectId);
+
+    useEffect(() => {
+        if (prevProjectId !== undefined && projectId !== prevProjectId) {
+            navigate('../history');
+        }
+    }, [prevProjectId, projectId]);
 
     return (
         <Overlay display="flex" flexDirection="column">

@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import {
     apiClient,
     createAsyncAction,
+    createReaction,
     DTOStatsEstimateQuery,
     DTOStatsQueryResult,
     DTOStatsQueryStatus,
@@ -22,6 +23,15 @@ class AnalyticsQueryStore {
 
     constructor() {
         makeAutoObservable(this);
+
+        createReaction(
+            () => projectsStore.selectedProject?.id,
+            (_, prevId) => {
+                if (prevId) {
+                    this.clear();
+                }
+            }
+        );
     }
 
     public estimateRequest = this.request$.createAsyncAction(async (request: string) => {

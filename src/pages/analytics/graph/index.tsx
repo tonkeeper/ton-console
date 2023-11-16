@@ -1,27 +1,41 @@
 import { ComponentProps, FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { Box, Center, Spinner } from '@chakra-ui/react';
-import { Overlay, useIntervalUpdate } from 'src/shared';
+import { Overlay, useIntervalUpdate, usePrevious } from 'src/shared';
 import { analyticsGraphQueryStore } from 'src/features';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GraphSuccess } from './GraphSuccess';
 import { GraphError } from './GraphError';
 import { GraphHome } from './GraphHome';
 import { observer } from 'mobx-react-lite';
+import { projectsStore } from 'src/entities';
 
 const GraphPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
-    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const queryId = searchParams.get('id');
     const [queryResolved, setQueryResolved] = useState(false);
 
     useEffect(() => {
         if (queryId) {
             setQueryResolved(false);
-            analyticsGraphQueryStore.loadQuery(queryId).then(() => setQueryResolved(true));
+            analyticsGraphQueryStore
+                .loadQuery(queryId)
+                .then(() => setQueryResolved(true))
+                .catch(() => setSearchParams({}));
         } else {
             setQueryResolved(true);
             analyticsGraphQueryStore.clear();
         }
     }, [queryId]);
+
+    const projectId = projectsStore.selectedProject?.id;
+    const prevProjectId = usePrevious(projectId);
+
+    useEffect(() => {
+        if (prevProjectId !== undefined && projectId !== prevProjectId) {
+            navigate('../history');
+        }
+    }, [prevProjectId, projectId]);
 
     const query = analyticsGraphQueryStore.query$.value;
     const callback = useCallback(() => {

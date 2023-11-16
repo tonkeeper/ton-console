@@ -8,8 +8,7 @@ import {
     toDateTime,
     useCountup,
     Span,
-    sliceAddress,
-    TonAddress
+    sliceAddress
 } from 'src/shared';
 import { toJS } from 'mobx';
 import { AnalyticsHistoryTableContext } from './analytics-history-table-context';
@@ -112,8 +111,8 @@ const ItemRow: FunctionComponent<{
                             Graph:&nbsp;
                             <Span color="accent.blue">
                                 {query.addresses
-                                    .slice(0, 5)
-                                    .map(a => sliceAddress(TonAddress.parse(a).userFriendly))
+                                    .slice(0, 9)
+                                    .map(a => sliceAddress(a.userFriendly))
                                     .join(', ')}
                             </Span>
                         </>

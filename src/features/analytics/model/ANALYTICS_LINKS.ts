@@ -4,5 +4,8 @@ export const ANALYTICS_LINKS = {
         TABLES: '#',
         RAW: '#',
         EXAMPLES: '#'
+    },
+    GRAPH: {
+        HOW_IT_WORKS: 'https://docs.tonconsole.com/analytics/graph'
     }
 };

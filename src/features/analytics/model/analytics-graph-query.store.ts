@@ -1,9 +1,11 @@
 import { makeAutoObservable } from 'mobx';
 import {
     apiClient,
+    createReaction,
     DTOStatsQueryResult,
     DTOStatsQueryStatus,
     Loadable,
+    TonAddress,
     TonCurrencyAmount
 } from 'src/shared';
 import { AnalyticsGraphQuery, AnalyticsGraphQueryBasic } from './interfaces';
@@ -14,6 +16,15 @@ class AnalyticsGraphQueryStore {
 
     constructor() {
         makeAutoObservable(this);
+
+        createReaction(
+            () => projectsStore.selectedProject?.id,
+            (_, prevId) => {
+                if (prevId) {
+                    this.clear();
+                }
+            }
+        );
     }
 
     createQuery = this.query$.createAsyncAction(
@@ -27,6 +38,9 @@ class AnalyticsGraphQueryStore {
             return mapDTOStatsGraphResultToAnalyticsGraphQuery(result.data);
         },
         {
+            onError: () => {
+                this.query$.clear();
+            },
             errorToast: e => ({
                 title: 'Error',
                 description: (e as { response: { data: { error: string } } }).response.data.error
@@ -58,7 +72,7 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
     const basicQuery: AnalyticsGraphQueryBasic = {
         id: value.id,
         type: 'graph',
-        addresses: value.query!.addresses!,
+        addresses: value.query!.addresses!.map(a => TonAddress.parse(a)),
         creationDate: new Date(value.date_create),
         isBetweenSelectedOnly: value.query!.only_between!
     };

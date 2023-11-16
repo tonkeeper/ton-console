@@ -14,8 +14,12 @@ import { ComponentProps, FunctionComponent, PropsWithChildren, useContext, useRe
 import { analyticsHistoryTableStore } from '../../model';
 import { observer } from 'mobx-react-lite';
 import { AnalyticsHistoryTableContext } from './analytics-history-table-context';
+import { EmptyFolderIcon48 } from 'src/shared';
 
-const EmptyTable: FunctionComponent<PropsWithChildren> = ({ children }) => {
+const EmptyTable: FunctionComponent<PropsWithChildren<ComponentProps<typeof Box>>> = ({
+    children,
+    ...props
+}) => {
     const { rowHeight } = useContext(AnalyticsHistoryTableContext);
     return (
         <Tr h={rowHeight} maxH={rowHeight}>
@@ -26,7 +30,7 @@ const EmptyTable: FunctionComponent<PropsWithChildren> = ({ children }) => {
                 borderTop="0"
                 colSpan={4}
             >
-                <Center textStyle="body2" color="text.secondary" fontFamily="body">
+                <Center textStyle="body2" color="text.secondary" fontFamily="body" {...props}>
                     {children}
                 </Center>
             </Td>
@@ -47,7 +51,13 @@ export const AnalyticsHistoryTableStructure = observer(
                     </EmptyTable>
                 );
             } else if (!analyticsHistoryTableStore.queries$.value.length) {
-                body = <EmptyTable>No requests yet</EmptyTable>;
+                body = (
+                    <EmptyTable display="flex" flexDirection="column">
+                        <EmptyFolderIcon48 />
+                        <Box>No history yet</Box>
+                        <Box>Your requests will show up here.</Box>
+                    </EmptyTable>
+                );
             }
 
             const tbodyRef = useRef<HTMLTableSectionElement | null>(null);
