@@ -1,14 +1,18 @@
 import { ComponentProps, FunctionComponent } from 'react';
-import { Box, Button, Flex, Skeleton } from '@chakra-ui/react';
+import { Box, Button, Center, Flex, Skeleton } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { Span, TooltipHoverable, toTimeLeft } from 'src/shared';
+import { InfoIcon16, Span, TooltipHoverable, toTimeLeft } from 'src/shared';
 import { analyticsQueryStore } from 'src/features';
-import { CurrencyRate } from 'src/entities';
+import { useSearchParams } from 'react-router-dom';
 
 const AnalyticsQueryControlPanel: FunctionComponent<ComponentProps<typeof Box>> = props => {
     const request = analyticsQueryStore.request$.value;
+    const [_, setSearchParams] = useSearchParams();
 
-    console.log(analyticsQueryStore.request$.error);
+    const onCreate = async (): Promise<void> => {
+        const query = await analyticsQueryStore.createQuery();
+        setSearchParams({ id: query.id });
+    };
 
     return (
         <Flex {...props} align="center">
@@ -18,7 +22,14 @@ const AnalyticsQueryControlPanel: FunctionComponent<ComponentProps<typeof Box>> 
 
             {!analyticsQueryStore.request$.isLoading &&
                 (analyticsQueryStore.request$.error ? (
-                    <TooltipHoverable canBeShown host="Error">
+                    <TooltipHoverable
+                        canBeShown
+                        host={
+                            <Center gap="1" color="accent.orange" cursor="default">
+                                Error <InfoIcon16 color="accent.red" />
+                            </Center>
+                        }
+                    >
                         <Span color="text.primary">
                             {analyticsQueryStore.request$.error.toString()}
                         </Span>
@@ -31,12 +42,8 @@ const AnalyticsQueryControlPanel: FunctionComponent<ComponentProps<typeof Box>> 
                             ) : (
                                 <Span>≈ {toTimeLeft(request.estimatedTimeMS)}</Span>
                             )}
-                            <CurrencyRate
-                                skeletonVariant="dark"
-                                reverse
-                                amount={request.estimatedCost.amount}
-                                leftSign=" · $"
-                            />
+                            &nbsp;·&nbsp;
+                            {request.estimatedCost.toStringCurrencyAmount({ decimalPlaces: 'all' })}
                         </Span>
                     )
                 ))}
@@ -50,7 +57,7 @@ const AnalyticsQueryControlPanel: FunctionComponent<ComponentProps<typeof Box>> 
                     analyticsQueryStore.request$.isLoading ||
                     analyticsQueryStore.createQuery.isLoading
                 }
-                onClick={() => analyticsQueryStore.createQuery()}
+                onClick={onCreate}
                 size="sm"
                 variant="contrast"
             >

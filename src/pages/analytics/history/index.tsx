@@ -1,13 +1,17 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FunctionComponent, useEffect } from 'react';
 import { Box, Button, Flex } from '@chakra-ui/react';
 import { H4, Overlay } from 'src/shared';
-import { AnalyticsHistoryTable } from 'src/features';
+import { AnalyticsHistoryTable, analyticsHistoryTableStore } from 'src/features';
 import { Link } from 'react-router-dom';
 
 const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
+    useEffect(() => {
+        analyticsHistoryTableStore.clearState();
+    }, []);
+
     return (
         <Overlay display="flex" flexDirection="column">
-            <Flex align="center" justify="space-between" mb="5">
+            <Flex align="flex-start" justify="space-between" mb="5">
                 <H4>History</H4>
                 <Button as={Link} to="../query" variant="secondary">
                     New Request

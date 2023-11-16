@@ -8,7 +8,7 @@ import {
     Loadable,
     TonCurrencyAmount
 } from 'src/shared';
-import { AnalyticsQuery, AnalyticsQueryTemplate } from './interfaces';
+import { AnalyticsQuery, AnalyticsQueryTemplate, AnalyticsTableSource } from './interfaces';
 import { projectsStore } from 'src/entities';
 
 class AnalyticsQueryStore {
@@ -42,14 +42,22 @@ class AnalyticsQueryStore {
         }
     });
 
-    createQuery = this.query$.createAsyncAction(async () => {
-        const result = await apiClient.api.sendQueryToStats({
-            project_id: projectsStore.selectedProject!.id,
-            query: this.request$.value!.request
-        });
+    createQuery = this.query$.createAsyncAction(
+        async () => {
+            const result = await apiClient.api.sendQueryToStats({
+                project_id: projectsStore.selectedProject!.id,
+                query: this.request$.value!.request
+            });
 
-        return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
-    });
+            return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
+        },
+        {
+            errorToast: e => ({
+                title: 'Error',
+                description: (e as { response: { data: { error: string } } }).response.data.error
+            })
+        }
+    );
 
     refetchQuery = this.query$.createAsyncAction(async () => {
         const result = await apiClient.api.getSqlResultFromStats(this.query$.value!.id);
@@ -96,7 +104,7 @@ function mapDTOStatsEstimateSQLToAnalyticsQuery(
 ): AnalyticsQueryTemplate {
     return {
         request,
-        estimatedTimeMS: Math.ceil(value.approximate_time * 1000),
+        estimatedTimeMS: value.approximate_time,
         estimatedCost: new TonCurrencyAmount(value.approximate_cost)
     };
 }
@@ -123,12 +131,9 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
             ...basicQuery,
             status: 'success',
             cost: new TonCurrencyAmount(value.cost!),
-            spentTimeMS: value.spent_time! * 1000,
+            spentTimeMS: value.spent_time!,
             csvUrl: value.url!,
-            preview: {
-                headings: [],
-                data: []
-            }
+            preview: parsePreview(value.preview!)
         };
     }
 
@@ -136,9 +141,15 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         ...basicQuery,
         status: 'error',
         cost: new TonCurrencyAmount(value.cost!),
-        spentTimeMS: value.spent_time! * 1000,
+        spentTimeMS: value.spent_time!,
         errorReason: value.error!
     };
+}
+
+function parsePreview(value: string[][]): AnalyticsTableSource {
+    const headings = value[0];
+    const data = value.slice(1);
+    return { headings, data };
 }
 
 export const analyticsQueryStore = new AnalyticsQueryStore();

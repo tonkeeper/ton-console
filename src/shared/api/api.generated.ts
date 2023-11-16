@@ -289,7 +289,7 @@ export interface DTOStatsQueryResult {
     /** @example "https://sql.io/123_meta.csv" */
     meta_url?: string;
     /**
-     * @format int32
+     * @format int64
      * @example 100
      */
     spent_time?: number;
@@ -300,6 +300,7 @@ export interface DTOStatsQueryResult {
     cost?: number;
     /** @example "invalid something" */
     error?: string;
+    preview?: string[][];
     /**
      * @format int64
      * @example 1690889913000

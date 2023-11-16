@@ -5,6 +5,7 @@ import { PostgreSQL, sql } from '@codemirror/lang-sql';
 import { draculaInit } from '@uiw/codemirror-theme-dracula/src';
 import { tags as t } from '@lezer/highlight';
 import { CodeAreaGroupContext } from './CodeAreaGroup';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 export const CodeArea: FunctionComponent<
     { value: string; onChange: (value: string) => void } & ComponentProps<typeof Box>
@@ -46,15 +47,19 @@ export const CodeArea: FunctionComponent<
             }}
             h={height}
         >
-            <CodeMirror
-                value={value}
-                onChange={onChange}
-                theme={dracula}
-                extensions={[sql({ dialect: PostgreSQL })]}
-                basicSetup={{ autocompletion: true }}
-                width="100%"
-                height={height.toString()}
-            />
+            <AutoSizer>
+                {({ width }) => (
+                    <CodeMirror
+                        value={value}
+                        onChange={onChange}
+                        theme={dracula}
+                        extensions={[sql({ dialect: PostgreSQL })]}
+                        basicSetup={{ autocompletion: true }}
+                        width={width ? width.toString() + 'px' : '100%'}
+                        height={height.toString()}
+                    />
+                )}
+            </AutoSizer>
         </Box>
     );
 };

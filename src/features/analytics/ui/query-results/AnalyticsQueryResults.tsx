@@ -42,7 +42,16 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
                 <Center h="10">
                     {!query && 'No data available'}
                     {query?.status === 'executing' && <Spinner color="icon.secondary" size="sm" />}
-                    {query?.status === 'error' && 'Data loading error'}
+                    {query?.status === 'error' && (
+                        <Box w="100%">
+                            <Box textStyle="body1" mb="1" textAlign="center">
+                                Data loading error
+                            </Box>
+                            <Box textStyle="body3" fontFamily="mono">
+                                {query.errorReason}
+                            </Box>
+                        </Box>
+                    )}
                 </Center>
             )}
             {query?.status === 'success' && (

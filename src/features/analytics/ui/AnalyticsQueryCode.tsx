@@ -1,13 +1,6 @@
 import { ComponentProps, FunctionComponent, useEffect, useState } from 'react';
 import { Box, Flex } from '@chakra-ui/react';
-import {
-    CodeArea,
-    CodeAreaFooter,
-    CodeAreaGroup,
-    Span,
-    useDebounce,
-    usePrevious
-} from 'src/shared';
+import { CodeArea, CodeAreaFooter, CodeAreaGroup, useDebounce, usePrevious } from 'src/shared';
 import { analyticsQueryStore } from 'src/features';
 import { observer } from 'mobx-react-lite';
 import AnalyticsQueryControlPanel from './AnalyticsQueryControlPanel';
@@ -41,8 +34,7 @@ const AnalyticsQueryCode: FunctionComponent<ComponentProps<typeof Box>> = props 
             <CodeAreaGroup>
                 <CodeArea value={value} onChange={onValueChange} />
                 <CodeAreaFooter>
-                    <Flex align="center" justify="space-between">
-                        <Span textStyle="label2">Explain</Span>
+                    <Flex align="center" justify="flex-end">
                         <AnalyticsQueryControlPanel />
                     </Flex>
                 </CodeAreaFooter>

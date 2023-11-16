@@ -2207,7 +2207,7 @@ components:
           example: "https://sql.io/123_meta.csv"
         spent_time:
           type: integer
-          format: int32
+          format: int64
           example: 100
         cost:
           type: integer
@@ -2216,6 +2216,12 @@ components:
         error:
           type: string
           example: "invalid something"
+        preview:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
         date_create:
           type: integer
           format: int64

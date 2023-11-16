@@ -25,6 +25,12 @@ class AnalyticsGraphQueryStore {
             });
 
             return mapDTOStatsGraphResultToAnalyticsGraphQuery(result.data);
+        },
+        {
+            errorToast: e => ({
+                title: 'Error',
+                description: (e as { response: { data: { error: string } } }).response.data.error
+            })
         }
     );
 
@@ -37,6 +43,7 @@ class AnalyticsGraphQueryStore {
     loadQuery = this.query$.createAsyncAction(async id => {
         const result = await apiClient.api.getSqlResultFromStats(id);
 
+        this.refetchQuery.cancelAllPendingCalls();
         return mapDTOStatsGraphResultToAnalyticsGraphQuery(result.data);
     });
 
@@ -60,7 +67,9 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
         return {
             ...basicQuery,
             status: 'success',
-            resultUrl: value.meta_url!,
+            resultUrl: `https://cosmograph.app/run/?data=${encodeURIComponent(
+                value.url!
+            )}&meta=${encodeURIComponent(value.meta_url!)}`,
             spentTimeMS: value.spent_time!,
             cost: new TonCurrencyAmount(value.cost!)
         };

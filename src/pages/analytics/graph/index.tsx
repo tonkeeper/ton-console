@@ -1,36 +1,55 @@
-import { ComponentProps, FunctionComponent, useEffect } from 'react';
-import { Box, Divider, Flex, Link, Text } from '@chakra-ui/react';
-import { H4, Overlay } from 'src/shared';
-import { analyticsGraphQueryStore, GraphAnalyticsForm } from 'src/features';
+import { ComponentProps, FunctionComponent, useCallback, useEffect, useState } from 'react';
+import { Box, Center, Spinner } from '@chakra-ui/react';
+import { Overlay, useIntervalUpdate } from 'src/shared';
+import { analyticsGraphQueryStore } from 'src/features';
 import { useSearchParams } from 'react-router-dom';
+import { GraphSuccess } from './GraphSuccess';
+import { GraphError } from './GraphError';
+import { GraphHome } from './GraphHome';
+import { observer } from 'mobx-react-lite';
 
-const GraphPage: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const GraphPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
     const [searchParams] = useSearchParams();
     const queryId = searchParams.get('id');
+    const [queryResolved, setQueryResolved] = useState(false);
 
     useEffect(() => {
         if (queryId) {
-            analyticsGraphQueryStore.loadQuery(queryId);
+            setQueryResolved(false);
+            analyticsGraphQueryStore.loadQuery(queryId).then(() => setQueryResolved(true));
         } else {
+            setQueryResolved(true);
             analyticsGraphQueryStore.clear();
         }
     }, [queryId]);
 
-    return (
-        <Overlay {...props} display="flex" flexDirection="column">
-            <Flex align="center" justify="space-between" mb="1">
-                <H4 mb="1">Graph</H4>
-                <Link textStyle="label2" color="accent.blue" href="#" isExternal>
-                    How it works
-                </Link>
-            </Flex>
-            <Text textStyle="body2" mb="5" color="text.secondary">
-                Visualization of the transaction history of the accounts you are interested in.
-            </Text>
-            <Divider w="auto" mb="5" mx="-6" />
-            <GraphAnalyticsForm flex="1" />
-        </Overlay>
-    );
+    const query = analyticsGraphQueryStore.query$.value;
+    const callback = useCallback(() => {
+        if (query?.status === 'executing') {
+            analyticsGraphQueryStore.refetchQuery();
+        }
+    }, [query?.status]);
+    useIntervalUpdate(callback, 1000);
+
+    if (!queryResolved) {
+        return (
+            <Overlay>
+                <Center h="300px">
+                    <Spinner />
+                </Center>
+            </Overlay>
+        );
+    }
+
+    if (query?.status === 'success') {
+        return <GraphSuccess query={query} />;
+    }
+
+    if (query?.status === 'error') {
+        return <GraphError query={query} />;
+    }
+
+    return <GraphHome />;
 };
 
-export default GraphPage;
+export default observer(GraphPage);

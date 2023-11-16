@@ -82,7 +82,11 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                     {errors.addresses && errors.addresses.message}
                                 </FormErrorMessage>
                             </FormControl>
-                            <Button w="fit-content" type="submit">
+                            <Button
+                                w="fit-content"
+                                isLoading={analyticsGraphQueryStore.query$.isLoading}
+                                type="submit"
+                            >
                                 Send
                             </Button>
                         </>

@@ -1,11 +1,18 @@
 import { FunctionComponent, useContext } from 'react';
-import { Center, Flex, Spinner, Td, Tr, useConst } from '@chakra-ui/react';
+import { Box, Center, Flex, Spinner, Td, Tr, useConst } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { AnalyticsGraphQuery, analyticsHistoryTableStore, AnalyticsQuery } from '../../model';
-import { TooltipHoverable, toTimeLeft, toDateTime, useCountup } from 'src/shared';
+import {
+    TooltipHoverable,
+    toTimeLeft,
+    toDateTime,
+    useCountup,
+    Span,
+    sliceAddress,
+    TonAddress
+} from 'src/shared';
 import { toJS } from 'mobx';
 import { AnalyticsHistoryTableContext } from './analytics-history-table-context';
-import { CurrencyRate } from 'src/entities';
 import { AnalyticsQueryStatusBadge } from './AnalyticsQueryStatusBadge';
 import { useNavigate } from 'react-router-dom';
 
@@ -48,10 +55,9 @@ const ItemRow: FunctionComponent<{
     const formattedDuration = durationSeconds === 0 ? '' : toTimeLeft(durationSeconds * 1000);
 
     const onRowClick = (): void => {
-        navigate(`../query?id=${query.id}`);
+        const path = query.type === 'graph' ? 'graph' : 'query';
+        navigate(`../${path}?id=${query.id}`);
     };
-
-    const request = query.type === 'graph' ? query.addresses.join(',') : query.request;
 
     return (
         <Tr
@@ -67,7 +73,7 @@ const ItemRow: FunctionComponent<{
             onClick={onRowClick}
         >
             <Td
-                minW="128px"
+                minW="148px"
                 h={rowHeight}
                 maxH={rowHeight}
                 borderLeft="1px"
@@ -75,9 +81,13 @@ const ItemRow: FunctionComponent<{
                 boxSizing="content-box"
             >
                 {query.status === 'success' || query.status === 'error' ? (
-                    <Flex align="center" color="text.secondary">
-                        {toTimeLeft(query.spentTimeMS)}
-                        <CurrencyRate reverse amount={query.cost.amount} leftSign=" · $" />
+                    <Flex align="center" wrap="wrap" color="text.secondary">
+                        {query.spentTimeMS < 1000 ? (
+                            '< 1s'
+                        ) : (
+                            <Span>{toTimeLeft(query.spentTimeMS)}</Span>
+                        )}
+                        &nbsp;· {query.cost.toStringCurrencyAmount({ decimalPlaces: 'all' })}
                     </Flex>
                 ) : (
                     formattedDuration
@@ -96,7 +106,21 @@ const ItemRow: FunctionComponent<{
                 )}
             </Td>
             <Td w="100%" minW="300px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
-                {request}
+                <Box noOfLines={2}>
+                    {query.type === 'graph' ? (
+                        <>
+                            Graph:&nbsp;
+                            <Span color="accent.blue">
+                                {query.addresses
+                                    .slice(0, 5)
+                                    .map(a => sliceAddress(TonAddress.parse(a).userFriendly))
+                                    .join(', ')}
+                            </Span>
+                        </>
+                    ) : (
+                        query.request
+                    )}
+                </Box>
             </Td>
             <Td
                 w="120px"

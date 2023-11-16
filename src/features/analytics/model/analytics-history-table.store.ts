@@ -56,10 +56,10 @@ class AnalyticsHistoryTableStore {
                 offset: this.queries$.value.length
             });
 
-            const invoices = response.data.items.map(mapDTOStatsResultToAnalyticsHistoryResult);
+            const queries = response.data.items.map(mapDTOStatsResultToAnalyticsHistoryResult);
 
-            this.totalQueries = 20; //response.data.count;
-            return invoices;
+            this.totalQueries = response.data.count;
+            return queries;
         },
         { resetBeforeExecution: true }
     );
@@ -73,7 +73,7 @@ class AnalyticsHistoryTableStore {
 
         const queries = response.data.items.map(mapDTOStatsResultToAnalyticsHistoryResult);
 
-        this.totalQueries = 10; // response.data.count;
+        this.totalQueries = response.data.count;
         return this.queries$.value.concat(queries);
     });
 
