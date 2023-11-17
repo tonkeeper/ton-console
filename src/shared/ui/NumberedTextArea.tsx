@@ -1,4 +1,4 @@
-import { ChangeEvent, ComponentProps, useRef, useState, UIEvent } from 'react';
+import { ChangeEvent, ComponentProps, useRef, useState, UIEvent, useEffect } from 'react';
 import { Box, forwardRef, Textarea } from '@chakra-ui/react';
 import { mergeRefs } from 'src/shared';
 import ResizeTextarea from 'react-textarea-autosize';
@@ -10,6 +10,28 @@ export const NumberedTextArea = forwardRef<
     const [linesNumber, setLinesNumber] = useState(1);
     const internalTextareaRef = useRef<HTMLTextAreaElement | null>(null);
     const linesRef = useRef<HTMLDivElement | null>(null);
+    const [{ pt, fontSize, lineHeight, fontWeight, fontFamily }, setStyle] = useState({
+        pt: '0px',
+        fontSize: 'inherit',
+        lineHeight: 'inherit',
+        fontWeight: 'inherit',
+        fontFamily: 'inherit'
+    });
+
+    useEffect(() => {
+        const textAreaStyles = internalTextareaRef.current
+            ? getComputedStyle(internalTextareaRef.current)
+            : null;
+        if (textAreaStyles) {
+            setStyle({
+                pt: `${parseInt(textAreaStyles?.paddingTop || '0') + 1}px`,
+                fontSize: textAreaStyles?.fontSize,
+                lineHeight: textAreaStyles.lineHeight,
+                fontWeight: textAreaStyles.fontWeight,
+                fontFamily: textAreaStyles.fontFamily
+            });
+        }
+    }, []);
 
     const onTextAreaChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
         const lines = e.target.value.split('\n').length;
@@ -24,15 +46,6 @@ export const NumberedTextArea = forwardRef<
 
         onScroll?.(e);
     };
-
-    const textAreaStyles = internalTextareaRef.current
-        ? getComputedStyle(internalTextareaRef.current)
-        : null;
-    const pt = `${parseInt(textAreaStyles?.paddingTop || '0') + 1}px`;
-    const fontSize = textAreaStyles?.fontSize || 'inherit';
-    const lineHeight = textAreaStyles?.lineHeight || 'inherit';
-    const fontWeight = textAreaStyles?.fontWeight || 'inherit';
-    const fontFamily = textAreaStyles?.fontFamily || 'inherit';
 
     return (
         <Box {...wrapperProps} pos="relative" overflow="hidden">
