@@ -23,7 +23,17 @@ export function formatNumber(
     value: number | string | BigNumber,
     options?: { decimalPlaces?: number; thousandSeparators?: boolean }
 ): string {
-    const decimalPlaces = options?.decimalPlaces === undefined ? 2 : options.decimalPlaces;
+    let decimalPlaces = options?.decimalPlaces === undefined ? 2 : options.decimalPlaces;
+
+    const bnVal = new BigNumber(value);
+
+    if (bnVal.gt(0) && bnVal.lt(new BigNumber(10).pow(-decimalPlaces))) {
+        decimalPlaces =
+            bnVal
+                .toFixed()
+                .split('')
+                .findIndex(a => a !== '0' && a !== '.') - 1;
+    }
 
     const thousandSeparators =
         options?.thousandSeparators === undefined ? true : options.thousandSeparators;

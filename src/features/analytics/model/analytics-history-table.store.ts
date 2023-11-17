@@ -2,17 +2,22 @@ import { makeAutoObservable } from 'mobx';
 import {
     apiClient,
     createImmediateReaction,
+    DTOCharge,
     DTOStatsQueryResult,
     DTOStatsQueryResultType,
-    Loadable
+    Loadable,
+    TonCurrencyAmount,
+    UsdCurrencyAmount
 } from 'src/shared';
-import { AnalyticsGraphQuery, AnalyticsQuery } from './interfaces';
+import { AnalyticsGraphQuery, AnalyticsPayment, AnalyticsQuery } from './interfaces';
 import { projectsStore } from 'src/entities';
 import { mapDTOStatsSqlResultToAnalyticsQuery } from './analytics-query.store';
 import { mapDTOStatsGraphResultToAnalyticsGraphQuery } from './analytics-graph-query.store';
 
 class AnalyticsHistoryTableStore {
     queries$ = new Loadable<(AnalyticsQuery | AnalyticsGraphQuery)[]>([]);
+
+    paymentsHistory$ = new Loadable<AnalyticsPayment[]>([]);
 
     private totalQueries = 0;
 
@@ -38,6 +43,7 @@ class AnalyticsHistoryTableStore {
 
                 if (project) {
                     this.loadFirstPage();
+                    this.fetchPaymentsHistory();
                 }
             }
         );
@@ -77,7 +83,16 @@ class AnalyticsHistoryTableStore {
         return this.queries$.value.concat(queries);
     });
 
+    fetchPaymentsHistory = this.paymentsHistory$.createAsyncAction(async () => {
+        const response = await apiClient.api.getProjectStatsPaymentsHistory({
+            project_id: projectsStore.selectedProject!.id
+        });
+
+        return response.data.history.map(payment => mapDTOPaymentAnalyticsPayment(payment));
+    });
+
     clearState(): void {
+        this.paymentsHistory$.clear();
         this.queries$.clear();
     }
 }
@@ -90,6 +105,18 @@ function mapDTOStatsResultToAnalyticsHistoryResult(
     }
 
     return mapDTOStatsSqlResultToAnalyticsQuery(value);
+}
+
+function mapDTOPaymentAnalyticsPayment(payment: DTOCharge): AnalyticsPayment | null {
+    const tonAmount = new TonCurrencyAmount(payment.amount);
+    return {
+        id: payment.id,
+        date: new Date(payment.date_create),
+        amount: tonAmount,
+        amountUsdEquivalent: new UsdCurrencyAmount(
+            tonAmount.amount.multipliedBy(payment.exchange_rate)
+        )
+    };
 }
 
 export const analyticsHistoryTableStore = new AnalyticsHistoryTableStore();
