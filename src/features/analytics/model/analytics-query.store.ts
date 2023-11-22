@@ -143,7 +143,7 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
             cost: new TonCurrencyAmount(value.cost!),
             spentTimeMS: value.spent_time!,
             csvUrl: value.url!,
-            preview: parsePreview(value.preview!)
+            preview: parsePreview(value.preview!, !!value.all_data_in_preview)
         };
     }
 
@@ -156,10 +156,10 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
     };
 }
 
-function parsePreview(value: string[][]): AnalyticsTableSource {
+function parsePreview(value: string[][], isAllDataPresented: boolean): AnalyticsTableSource {
     const headings = value[0];
     const data = value.slice(1);
-    return { headings, data };
+    return { headings, data, isAllDataPresented };
 }
 
 export const analyticsQueryStore = new AnalyticsQueryStore();

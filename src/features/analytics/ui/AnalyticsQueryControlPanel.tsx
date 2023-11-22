@@ -1,18 +1,41 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FunctionComponent, useEffect } from 'react';
 import { Box, Button, Center, Flex, Skeleton } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { InfoIcon16, Span, TooltipHoverable, toTimeLeft } from 'src/shared';
 import { analyticsQueryStore } from 'src/features';
 import { useSearchParams } from 'react-router-dom';
+import { computed } from 'mobx';
 
 const AnalyticsQueryControlPanel: FunctionComponent<ComponentProps<typeof Box>> = props => {
     const request = analyticsQueryStore.request$.value;
     const [_, setSearchParams] = useSearchParams();
 
+    const canProcess = computed(
+        () =>
+            analyticsQueryStore.request$.value &&
+            !analyticsQueryStore.requestEqQuery &&
+            !analyticsQueryStore.request$.isLoading &&
+            !analyticsQueryStore.createQuery.isLoading
+    );
+
     const onCreate = async (): Promise<void> => {
         const query = await analyticsQueryStore.createQuery();
         setSearchParams({ id: query.id });
     };
+
+    useEffect(() => {
+        const onCtrlEnter = (e: KeyboardEvent) => {
+            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey) && canProcess.get()) {
+                e.preventDefault();
+                onCreate();
+            }
+        };
+
+        document.addEventListener('keydown', onCtrlEnter, { capture: true });
+        return () => {
+            document.removeEventListener('keydown', onCtrlEnter);
+        };
+    }, []);
 
     return (
         <Flex {...props} align="center">

@@ -300,6 +300,7 @@ export interface DTOStatsQueryResult {
     cost?: number;
     /** @example "invalid something" */
     error?: string;
+    all_data_in_preview?: boolean;
     preview?: string[][];
     /**
      * @format int64

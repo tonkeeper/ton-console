@@ -25,17 +25,24 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
                     <AnalyticsQueryResultsCountdown query={toJS(query)} ml="2" />
                 )}
                 {query && isAnalyticsQuerySuccessful(query) && (
-                    <ButtonLink
-                        ml="auto"
-                        leftIcon={<DownloadIcon16 />}
-                        size="sm"
-                        variant="secondary"
-                        href={query.csvUrl}
-                        isExternal
-                        download="customers.csv"
-                    >
-                        Download CSV
-                    </ButtonLink>
+                    <Flex align="center" ml="auto">
+                        {!query.preview.isAllDataPresented && (
+                            <Span mr="3" color="text.secondary" textStyle="body2">
+                                The first {query.preview.data.length} lines are shown; download the
+                                rest for the full results
+                            </Span>
+                        )}
+                        <ButtonLink
+                            leftIcon={<DownloadIcon16 />}
+                            size="sm"
+                            variant="secondary"
+                            href={query.csvUrl}
+                            isExternal
+                            download="customers.csv"
+                        >
+                            Download CSV
+                        </ButtonLink>
+                    </Flex>
                 )}
             </Flex>
             {query?.status !== 'success' && (

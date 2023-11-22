@@ -2216,6 +2216,8 @@ components:
         error:
           type: string
           example: "invalid something"
+        all_data_in_preview:
+          type: boolean
         preview:
           type: array
           items:

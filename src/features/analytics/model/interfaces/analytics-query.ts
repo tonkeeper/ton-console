@@ -3,6 +3,7 @@ import { TonCurrencyAmount } from 'src/shared';
 export interface AnalyticsTableSource {
     headings: string[];
     data: string[][];
+    isAllDataPresented: boolean;
 }
 
 export interface AnalyticsQueryTemplate {
