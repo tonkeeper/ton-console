@@ -18,8 +18,6 @@ export const NumberedTextArea = forwardRef<
         fontFamily: 'inherit'
     });
 
-    console.log(rest);
-
     useEffect(() => {
         const textAreaStyles = internalTextareaRef.current
             ? getComputedStyle(internalTextareaRef.current)

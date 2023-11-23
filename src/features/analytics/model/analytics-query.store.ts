@@ -157,6 +157,13 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
 }
 
 function parsePreview(value: string[][], isAllDataPresented: boolean): AnalyticsTableSource {
+    if (!value)
+        return {
+            headings: [],
+            data: [],
+            isAllDataPresented: true
+        };
+
     const headings = value[0];
     const data = value.slice(1);
     return { headings, data, isAllDataPresented };

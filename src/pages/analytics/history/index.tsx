@@ -8,7 +8,7 @@ import { observer } from 'mobx-react-lite';
 
 const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
     useEffect(() => {
-        analyticsHistoryTableStore.loadFirstPage();
+        analyticsHistoryTableStore.clearState();
     }, []);
 
     return (
