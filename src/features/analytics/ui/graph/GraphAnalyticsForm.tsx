@@ -30,6 +30,8 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
         setSearchParams({ id: query.id });
     };
 
+    const isFormDisabled = analyticsGraphQueryStore.query$.value?.status === 'executing';
+
     return (
         <chakra.form
             {...props}
@@ -42,7 +44,7 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
             <FormControl alignItems="center" gap="1" display="flex" mb="3">
                 <Checkbox
                     mb="0 !important"
-                    isDisabled={analyticsGraphQueryStore.query$.isLoading}
+                    isDisabled={isFormDisabled}
                     {...register('isBetweenAccountsOnly')}
                 >
                     Only between these accounts
@@ -57,13 +59,13 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                 <>
                                     <FormControl mb="6" isInvalid={!!errors.addresses}>
                                         <NumberedTextArea
-                                            isDisabled={analyticsGraphQueryStore.query$.isLoading}
+                                            isDisabled={isFormDisabled}
                                             wrapperProps={{
                                                 height: 'fit-content',
                                                 width,
                                                 maxHeight: height
                                             }}
-                                            placeholder="Enter addresses"
+                                            placeholder="Enter address in user-friendly format"
                                             maxRows={
                                                 height
                                                     ? Math.floor(
@@ -88,7 +90,8 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                                         'addresses',
                                                         value
                                                             .match(/[a-zA-Z0-9-_]{48}/g)
-                                                            ?.join('\n') || value
+                                                            ?.join('\n') || value,
+                                                        { shouldValidate: true }
                                                     );
                                                 });
                                             }}
@@ -101,7 +104,7 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                     <Button
                                         w="fit-content"
                                         isDisabled={!dirtyFields.addresses}
-                                        isLoading={analyticsGraphQueryStore.query$.isLoading}
+                                        isLoading={isFormDisabled}
                                         type="submit"
                                     >
                                         Send

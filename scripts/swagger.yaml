@@ -48,7 +48,7 @@ paths:
           description: "Ok"
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/admin/project/{id}/balance:
     get:
       summary: "Private method: Get project balance"
@@ -90,7 +90,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/auth/tg:
     post:
       summary: "Auth via telegram"
@@ -168,7 +168,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/account/logout:
     post:
       summary: "Logout from the system"
@@ -196,7 +196,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/project:
     post:
       summary: "Create project"
@@ -533,7 +533,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/messages/packages:
     get:
       summary: "Get messages packages"
@@ -824,7 +824,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/stats/ddl:
     get:
       summary: "Get stats db ddl"
@@ -961,7 +961,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/invoices/app:
     post:
       summary: "Create invoices app"
@@ -1459,7 +1459,7 @@ components:
         type: integer
         format: int32
         default: 0
-  
+
   requestBodies:
     TgAuth:
       description: "Data that is expected from Telegram"
@@ -1798,7 +1798,7 @@ components:
               webhook:
                 type: string
                 example: "https://mydapp.com/api/handle-invoice-change"
-  
+
   schemas:
     Ok:
       type: object
@@ -2046,6 +2046,7 @@ components:
             type: string
             enum:
               - invoices
+              - stats
         date_create:
           type: integer
           format: int64
@@ -2342,7 +2343,7 @@ components:
           webhook:
             type: string
             example: "https://mydapp.com/api/handle-invoice-change"
-  
+
   responses:
     NotFound:
       description: "The specified resource was not found"

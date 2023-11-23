@@ -10,6 +10,7 @@ export const AnalyticsQueryResultsTableRow: FunctionComponent<{
     columnIndex: number;
     rowIndex: number;
     style: React.CSSProperties;
+    // eslint-disable-next-line complexity
 }> = ({ source, columnIndex, rowIndex, style: { top, ...style } }) => {
     const content = source.data[rowIndex][columnIndex];
     const isLink = content.startsWith('https://') || content.startsWith('http://');
@@ -48,7 +49,11 @@ export const AnalyticsQueryResultsTableRow: FunctionComponent<{
             textStyle="body3"
             top={`${parseInt(top?.toString() || '0') + 30}px`}
             align="center"
-            justify={columnIndex === source.headings.length - 1 ? 'flex-end' : 'flex-start'}
+            justify={
+                columnIndex === source.headings.length - 1 && source.headings.length > 1
+                    ? 'flex-end'
+                    : 'flex-start'
+            }
             pr={columnIndex === source.headings.length - 1 ? 4 : 2}
             pl={columnIndex === 0 ? 4 : 2}
             borderRight={columnIndex === source.headings.length - 1 ? '1px' : 'none'}

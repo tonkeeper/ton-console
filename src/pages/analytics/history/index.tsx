@@ -3,6 +3,8 @@ import { Box, Flex, Menu, MenuItem, MenuList } from '@chakra-ui/react';
 import { H4, Overlay, MenuButtonDefault, ArrowIcon } from 'src/shared';
 import { AnalyticsHistoryTable, analyticsHistoryTableStore } from 'src/features';
 import { Link } from 'react-router-dom';
+import { projectsStore } from 'src/entities';
+import { observer } from 'mobx-react-lite';
 
 const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
     useEffect(() => {
@@ -18,9 +20,11 @@ const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
                         New Request
                     </MenuButtonDefault>
                     <MenuList w="146px">
-                        <MenuItem as={Link} to="../query">
-                            Query
-                        </MenuItem>
+                        {projectsStore.selectedProject?.capabilities.stats.query && (
+                            <MenuItem as={Link} to="../query">
+                                Query
+                            </MenuItem>
+                        )}
                         <MenuItem as={Link} to="../graph">
                             Graph
                         </MenuItem>
@@ -32,4 +36,4 @@ const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
     );
 };
 
-export default HistoryPage;
+export default observer(HistoryPage);

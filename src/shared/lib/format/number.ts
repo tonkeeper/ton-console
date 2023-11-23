@@ -44,5 +44,7 @@ export function formatNumber(
         groupSize: 3
     };
 
-    return new BigNumber(value).decimalPlaces(decimalPlaces).toFormat(format);
+    return new BigNumber(value)
+        .decimalPlaces(decimalPlaces, BigNumber.ROUND_FLOOR)
+        .toFormat(format);
 }

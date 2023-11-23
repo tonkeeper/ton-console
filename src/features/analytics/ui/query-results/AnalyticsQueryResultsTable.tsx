@@ -77,7 +77,10 @@ export const AnalyticsTable: FunctionComponent<
                                     key={text}
                                     align="center"
                                     justify={
-                                        i === source.headings.length - 1 ? 'flex-end' : 'flex-start'
+                                        i === source.headings.length - 1 &&
+                                        source.headings.length > 1
+                                            ? 'flex-end'
+                                            : 'flex-start'
                                     }
                                     flexShrink="0"
                                     w={columnsWidths[i]}

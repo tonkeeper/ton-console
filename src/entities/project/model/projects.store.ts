@@ -184,7 +184,10 @@ function mapProjectDtoToProject(projectDTO: DTOProject): Project {
         creationDate: new Date(projectDTO.date_create),
         fallbackBackground: gradient(toColor(Math.abs(projectDTO.id ^ 255), { min: 30, max: 215 })),
         capabilities: {
-            invoices: projectDTO.capabilities.includes(DTOProjectCapabilities.DTOInvoices)
+            invoices: projectDTO.capabilities.includes(DTOProjectCapabilities.DTOInvoices),
+            stats: {
+                query: projectDTO.capabilities.includes(DTOProjectCapabilities.DTOStats)
+            }
         }
     };
 }

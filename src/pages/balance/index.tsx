@@ -42,7 +42,7 @@ const BalancePage: FunctionComponent = () => {
                                 <Skeleton w={h2Width || '100px'} h="6" />
                             ) : (
                                 <Span ref={h2Ref}>
-                                    {balanceStore.balances[0]?.stringAmount + ' TON'}
+                                    {balanceStore.balances[0]?.stringCurrencyAmount}
                                 </Span>
                             )}
                         </H2>

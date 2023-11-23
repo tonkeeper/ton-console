@@ -1,10 +1,20 @@
 import { lazy } from '@loadable/component';
 import { Suspense } from 'react';
 import { Navigate, Route } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
+import { projectsStore } from 'src/entities';
 
 const GraphPage = lazy(() => import('./graph'));
 const HistoryPage = lazy(() => import('./history'));
 const QueryPage = lazy(() => import('./query'));
+
+const QueryGuard = observer(() => {
+    if (!projectsStore.selectedProject?.capabilities.stats.query) {
+        return <Navigate to=".." replace />;
+    }
+
+    return <QueryPage />;
+});
 
 const AnalyticsRouting = (
     <>
@@ -28,7 +38,7 @@ const AnalyticsRouting = (
             path="query"
             element={
                 <Suspense>
-                    <QueryPage />
+                    <QueryGuard />
                 </Suspense>
             }
         />

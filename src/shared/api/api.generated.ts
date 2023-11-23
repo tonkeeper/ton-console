@@ -401,7 +401,8 @@ export enum DTODepositType {
 }
 
 export enum DTOProjectCapabilities {
-    DTOInvoices = 'invoices'
+    DTOInvoices = 'invoices',
+    DTOStats = 'stats'
 }
 
 export enum DTOStatsQueryResultType {

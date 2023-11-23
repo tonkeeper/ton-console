@@ -18,6 +18,8 @@ export const NumberedTextArea = forwardRef<
         fontFamily: 'inherit'
     });
 
+    console.log(rest);
+
     useEffect(() => {
         const textAreaStyles = internalTextareaRef.current
             ? getComputedStyle(internalTextareaRef.current)
@@ -33,9 +35,13 @@ export const NumberedTextArea = forwardRef<
         }
     }, []);
 
-    const onTextAreaChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
-        const lines = e.target.value.split('\n').length;
+    const lines = internalTextareaRef.current?.value.split('\n').length;
+    if (lines && lines !== linesNumber) {
         setLinesNumber(lines);
+    }
+
+    const onTextAreaChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
+        setLinesNumber(e.target.value.split('\n').length);
         onChange?.(e);
     };
 

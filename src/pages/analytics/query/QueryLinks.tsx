@@ -38,9 +38,6 @@ const QueryLinkCard: FunctionComponent<{
 export const QueryLinks: FunctionComponent<ComponentProps<typeof Box>> = props => {
     return (
         <Box {...props} w="240px">
-            <Text textStyle="label2" mb="2" color="text.secondary">
-                Data base structure
-            </Text>
             <QueryLinkCard
                 icon={<ConsoleDocsIcon32 />}
                 heading="Console Docs"
