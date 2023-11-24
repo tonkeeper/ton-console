@@ -9,13 +9,20 @@ import {
     Loadable,
     TonCurrencyAmount
 } from 'src/shared';
-import { AnalyticsQuery, AnalyticsQueryTemplate, AnalyticsTableSource } from './interfaces';
+import {
+    AnalyticsQuery,
+    AnalyticsQueryTemplate,
+    AnalyticsTableSource,
+    AnalyticsTablesSchema
+} from './interfaces';
 import { projectsStore } from 'src/entities';
 
 class AnalyticsQueryStore {
     request$ = new Loadable<AnalyticsQueryTemplate | null>(null);
 
     query$ = new Loadable<AnalyticsQuery | null>(null);
+
+    tablesSchema$ = new Loadable<AnalyticsTablesSchema | undefined>(undefined);
 
     get requestEqQuery(): boolean {
         return this.request$.value?.request === this.query$.value?.request;
@@ -33,6 +40,16 @@ class AnalyticsQueryStore {
             }
         );
     }
+
+    public fetchAllTablesSchema = this.tablesSchema$.createAsyncAction(
+        async () => {
+            if (!this.tablesSchema$.value) {
+                const result = await apiClient.api.getStatsDdl();
+                return parseDDL(result.data as unknown as string);
+            }
+        },
+        { resetBeforeExecution: true }
+    );
 
     public estimateRequest = this.request$.createAsyncAction(async (request: string) => {
         try {
@@ -167,6 +184,20 @@ function parsePreview(value: string[][], isAllDataPresented: boolean): Analytics
     const headings = value[0];
     const data = value.slice(1);
     return { headings, data, isAllDataPresented };
+}
+
+function parseDDL(ddl: string): AnalyticsTablesSchema {
+    const tableRegex = /create table ([\w\.]+)\s*\(([\S\s]*?)\);/g;
+    const propertiesRegex = /(\s*([a-zA-Z0-9_]+) [^,]*,)/g;
+
+    const groups = Array.from(ddl.matchAll(tableRegex));
+
+    return groups.reduce((acc, group) => {
+        const name = group[1];
+        const properties = (group[2] + ',').matchAll(propertiesRegex);
+        acc[name] = Array.from(properties).map(match => match[2]);
+        return acc;
+    }, {} as AnalyticsTablesSchema);
 }
 
 export const analyticsQueryStore = new AnalyticsQueryStore();

@@ -1,15 +1,17 @@
 import { ComponentProps, FunctionComponent, useContext } from 'react';
 import { Box, useTheme } from '@chakra-ui/react';
 import CodeMirror from '@uiw/react-codemirror';
-import { PostgreSQL, sql } from '@codemirror/lang-sql';
 import { draculaInit } from '@uiw/codemirror-theme-dracula/src';
 import { tags as t } from '@lezer/highlight';
 import { CodeAreaGroupContext } from './CodeAreaGroup';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import type { Extension } from '@codemirror/state';
 
 export const CodeArea: FunctionComponent<
-    { value: string; onChange: (value: string) => void } & ComponentProps<typeof Box>
-> = ({ value, onChange, ...rest }) => {
+    { value: string; onChange: (value: string) => void; extensions?: Extension[] } & ComponentProps<
+        typeof Box
+    >
+> = ({ value, onChange, extensions, ...rest }) => {
     const theme = useTheme();
     const { hasFooter } = useContext(CodeAreaGroupContext);
 
@@ -53,7 +55,7 @@ export const CodeArea: FunctionComponent<
                         value={value}
                         onChange={onChange}
                         theme={dracula}
-                        extensions={[sql({ dialect: PostgreSQL })]}
+                        extensions={extensions}
                         basicSetup={{ autocompletion: true }}
                         width={width ? width.toString() + 'px' : '100%'}
                         height={height.toString()}

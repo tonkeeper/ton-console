@@ -4,6 +4,8 @@ import { CodeArea, CodeAreaFooter, CodeAreaGroup, useDebounce, usePrevious } fro
 import { analyticsQueryStore } from 'src/features';
 import { observer } from 'mobx-react-lite';
 import AnalyticsQueryControlPanel from './AnalyticsQueryControlPanel';
+import { PostgreSQL, sql } from '@codemirror/lang-sql';
+import { toJS } from 'mobx';
 
 const defaultRequest = 'SELECT ';
 
@@ -33,10 +35,18 @@ const AnalyticsQueryCode: FunctionComponent<ComponentProps<typeof Box>> = props 
         }
     }, [debouncedValue]);
 
+    const extensions = [
+        sql({
+            dialect: PostgreSQL,
+            schema: toJS(analyticsQueryStore.tablesSchema$.value),
+            upperCaseKeywords: true
+        })
+    ];
+
     return (
         <Box {...props}>
             <CodeAreaGroup>
-                <CodeArea value={value} onChange={onValueChange} />
+                <CodeArea value={value} onChange={onValueChange} extensions={extensions} />
                 <CodeAreaFooter>
                     <Flex align="center" justify="flex-end">
                         <AnalyticsQueryControlPanel />

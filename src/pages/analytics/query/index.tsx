@@ -23,6 +23,10 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
     const [queryResolved, setQueryResolved] = useState(false);
 
     useEffect(() => {
+        analyticsQueryStore.fetchAllTablesSchema();
+    }, []);
+
+    useEffect(() => {
         if (queryId) {
             setQueryResolved(false);
             analyticsQueryStore
