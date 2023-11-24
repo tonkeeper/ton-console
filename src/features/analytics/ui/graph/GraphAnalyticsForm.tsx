@@ -57,7 +57,13 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                 >
                     Only between these accounts
                 </Checkbox>
-                <InfoTooltip>Description</InfoTooltip>
+                <InfoTooltip>
+                    <Box textStyle="body2" maxW="300px">
+                        If selected, only transactions for which both the sender and recipient are
+                        listed below will be displayed. Otherwise, all transactions will be shown,
+                        either the sender or the recipient of which is specified in the list
+                    </Box>
+                </InfoTooltip>
             </FormControl>
             <Box flex="1">
                 <AutoSizer>
