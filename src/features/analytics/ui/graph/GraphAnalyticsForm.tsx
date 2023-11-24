@@ -1,5 +1,13 @@
 import { ComponentProps, FunctionComponent } from 'react';
-import { Box, Button, chakra, Checkbox, FormControl, FormErrorMessage } from '@chakra-ui/react';
+import {
+    Box,
+    Button,
+    chakra,
+    Checkbox,
+    Flex,
+    FormControl,
+    FormErrorMessage
+} from '@chakra-ui/react';
 import { InfoTooltip, NumberedTextArea } from 'src/shared';
 import { Observer, observer } from 'mobx-react-lite';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -86,13 +94,19 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                                 setTimeout(() => {
                                                     const value = getValues('addresses');
 
-                                                    setValue(
-                                                        'addresses',
-                                                        value
-                                                            .match(/[a-zA-Z0-9-_]{48}/g)
-                                                            ?.join('\n') || value,
-                                                        { shouldValidate: true }
-                                                    );
+                                                    if (
+                                                        value.match(
+                                                            /^([a-zA-Z0-9-_]{48}[^a-zA-Z0-9-_]+)*[a-zA-Z0-9-_]{48}\s*$/
+                                                        )
+                                                    ) {
+                                                        setValue(
+                                                            'addresses',
+                                                            value
+                                                                .match(/[a-zA-Z0-9-_]{48}/g)
+                                                                ?.join('\n') || value,
+                                                            { shouldValidate: true }
+                                                        );
+                                                    }
                                                 });
                                             }}
                                         />
@@ -101,14 +115,24 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                         </FormErrorMessage>
                                     </FormControl>
 
-                                    <Button
-                                        w="fit-content"
-                                        isDisabled={!dirtyFields.addresses}
-                                        isLoading={isFormDisabled}
-                                        type="submit"
+                                    <Flex
+                                        textStyle="label2"
+                                        align="center"
+                                        gap="3"
+                                        w={width}
+                                        color="text.secondary"
+                                        fontWeight="700"
                                     >
-                                        Send
-                                    </Button>
+                                        <Button
+                                            w="fit-content"
+                                            isDisabled={!dirtyFields.addresses}
+                                            isLoading={isFormDisabled}
+                                            type="submit"
+                                        >
+                                            Send
+                                        </Button>
+                                        <Box>The request can cost from 0.01 up to 1 TON</Box>
+                                    </Flex>
                                 </>
                             )}
                         </Observer>

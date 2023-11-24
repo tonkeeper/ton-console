@@ -82,7 +82,7 @@ const ItemRow: FunctionComponent<{
                 {query.status === 'success' || query.status === 'error' ? (
                     <Flex align="center" wrap="wrap" color="text.secondary">
                         {query.spentTimeMS < 1000 ? (
-                            '< 1s'
+                            '≈1s'
                         ) : (
                             <Span>{toTimeLeft(query.spentTimeMS)}</Span>
                         )}

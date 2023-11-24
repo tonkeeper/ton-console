@@ -1,11 +1,4 @@
-import {
-    ComponentProps,
-    FunctionComponent,
-    useCallback,
-    useEffect,
-    useLayoutEffect,
-    useState
-} from 'react';
+import { ComponentProps, FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { Box, Center, Spinner } from '@chakra-ui/react';
 import { Overlay, useIntervalUpdate, usePrevious } from 'src/shared';
 import { analyticsGraphQueryStore } from 'src/features';
@@ -22,18 +15,22 @@ const GraphPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
     const queryId = searchParams.get('id');
     const [queryResolved, setQueryResolved] = useState(false);
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (queryId) {
-            setQueryResolved(false);
-            analyticsGraphQueryStore
-                .loadQuery(queryId)
-                .then(() => setQueryResolved(true))
-                .catch(() => setSearchParams({}));
+            if (queryId !== analyticsGraphQueryStore.query$.value?.id) {
+                setQueryResolved(false);
+                analyticsGraphQueryStore
+                    .loadQuery(queryId)
+                    .then(() => setQueryResolved(true))
+                    .catch(() => setSearchParams({}));
+            } else {
+                setQueryResolved(true);
+            }
         } else {
             setQueryResolved(true);
             analyticsGraphQueryStore.clear();
         }
-    }, []);
+    }, [queryId]);
 
     const projectId = projectsStore.selectedProject?.id;
     const prevProjectId = usePrevious(projectId);
