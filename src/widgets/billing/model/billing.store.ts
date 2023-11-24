@@ -101,7 +101,7 @@ function mapFaucetPaymentToPayment(payment: FaucetPayment): Payment {
 function mapAnalyticsPaymentToPayment(payment: AnalyticsPayment): Payment {
     return {
         id: `analytics-${payment.id}`,
-        name: 'TON Analytics query',
+        name: `TON Analytics ${payment.subservice}`,
         date: payment.date,
         amount: payment.amount,
         amountUsdEquivalent: payment.amountUsdEquivalent

@@ -96,24 +96,30 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                                 },
                                                 required: 'This is required'
                                             })}
-                                            onPaste={() => {
-                                                setTimeout(() => {
+                                            onPaste={e => {
+                                                const pasted = e.clipboardData.getData('text');
+
+                                                const pastedCorrect =
+                                                    /^([a-zA-Z0-9-_]{48}[^a-zA-Z0-9-_]+)*[a-zA-Z0-9-_]{48}[^a-zA-Z0-9-_]*$/.test(
+                                                        pasted
+                                                    );
+
+                                                if (pastedCorrect) {
+                                                    e.preventDefault();
                                                     const value = getValues('addresses');
 
-                                                    if (
-                                                        value.match(
-                                                            /^([a-zA-Z0-9-_]{48}[^a-zA-Z0-9-_]+)*[a-zA-Z0-9-_]{48}\s*$/
-                                                        )
-                                                    ) {
-                                                        setValue(
-                                                            'addresses',
-                                                            value
-                                                                .match(/[a-zA-Z0-9-_]{48}/g)
-                                                                ?.join('\n') || value,
-                                                            { shouldValidate: true }
-                                                        );
-                                                    }
-                                                });
+                                                    const formattedPasted =
+                                                        pasted
+                                                            .match(/[a-zA-Z0-9-_]{48}/g)
+                                                            ?.join('\n') || pasted;
+                                                    setValue(
+                                                        'addresses',
+                                                        value
+                                                            ? value + '\n' + formattedPasted
+                                                            : formattedPasted,
+                                                        { shouldValidate: true }
+                                                    );
+                                                }
                                             }}
                                         />
                                         <FormErrorMessage w={width}>

@@ -55,6 +55,7 @@ class AnalyticsHistoryTableStore {
     loadFirstPage = this.queries$.createAsyncAction(
         async () => {
             this.loadNextPage.cancelAllPendingCalls();
+            this.totalQueries = 0;
 
             const response = await apiClient.api.getSqlHistoryFromStats({
                 project_id: projectsStore.selectedProject!.id,
@@ -115,7 +116,8 @@ function mapDTOPaymentAnalyticsPayment(payment: DTOCharge): AnalyticsPayment | n
         amount: tonAmount,
         amountUsdEquivalent: new UsdCurrencyAmount(
             tonAmount.amount.multipliedBy(payment.exchange_rate)
-        )
+        ),
+        subservice: 'query' // TODO
     };
 }
 
