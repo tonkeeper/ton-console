@@ -82,6 +82,7 @@ const FaucetPaymentDetailsModal: FunctionComponent<{
                                             amount={price.amount}
                                             currency={CRYPTO_CURRENCY.TON}
                                             justifyContent="flex-end"
+                                            leftSign="$"
                                         />
                                         <Box color="text.secondary">
                                             {price.stringCurrencyAmount}
