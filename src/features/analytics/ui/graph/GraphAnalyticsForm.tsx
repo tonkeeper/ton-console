@@ -26,7 +26,7 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
     } = useForm<{
         isBetweenAccountsOnly: boolean;
         addresses: string;
-    }>();
+    }>({ mode: 'all' });
     const [_, setSearchParams] = useSearchParams();
 
     const onSubmit = async (form: { isBetweenAccountsOnly: boolean; addresses: string }) => {
@@ -94,6 +94,7 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                                     message:
                                                         'Insert one address in user-friendly format on one line'
                                                 },
+
                                                 required: 'This is required'
                                             })}
                                             onPaste={e => {
@@ -105,25 +106,42 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                                     );
 
                                                 const textArea = e.target as HTMLTextAreaElement;
+                                                const isSelectedAllContent =
+                                                    textArea.selectionStart === 0 &&
+                                                    textArea.selectionEnd === textArea.textLength;
                                                 const isPastedToEnd =
                                                     textArea.selectionStart ===
                                                         textArea.selectionEnd &&
                                                     textArea.selectionEnd === textArea.textLength;
 
-                                                if (pastedCorrect && isPastedToEnd) {
+                                                if (
+                                                    pastedCorrect &&
+                                                    (isPastedToEnd || isSelectedAllContent)
+                                                ) {
                                                     e.preventDefault();
-                                                    const value = getValues('addresses');
+                                                    const value = isSelectedAllContent
+                                                        ? ''
+                                                        : getValues('addresses');
 
                                                     const formattedPasted =
                                                         pasted
                                                             .match(/[a-zA-Z0-9-_]{48}/g)
                                                             ?.join('\n') || pasted;
+
+                                                    const divider = value.endsWith('\n')
+                                                        ? ''
+                                                        : '\n';
+
                                                     setValue(
                                                         'addresses',
                                                         value
-                                                            ? value + '\n' + formattedPasted
+                                                            ? value + divider + formattedPasted
                                                             : formattedPasted,
-                                                        { shouldValidate: true, shouldDirty: true }
+                                                        {
+                                                            shouldValidate: true,
+                                                            shouldDirty: true,
+                                                            shouldTouch: true
+                                                        }
                                                     );
                                                 }
                                             }}
