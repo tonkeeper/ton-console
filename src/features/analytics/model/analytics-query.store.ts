@@ -16,6 +16,7 @@ import {
     AnalyticsTablesSchema
 } from './interfaces';
 import { projectsStore } from 'src/entities';
+import { analyticsHistoryTableStore } from 'src/features';
 
 class AnalyticsQueryStore {
     request$ = new Loadable<AnalyticsQueryTemplate | null>(null);
@@ -75,6 +76,8 @@ class AnalyticsQueryStore {
                 project_id: projectsStore.selectedProject!.id,
                 query: this.request$.value!.request
             });
+
+            await analyticsHistoryTableStore.fetchPaymentsHistory();
 
             return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
         },
