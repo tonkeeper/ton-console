@@ -12,7 +12,9 @@ export const GraphAddressesList: FunctionComponent<
                 listStyleType: 'none',
                 'li:before': {
                     content: 'counter(item) "  "',
-                    counterIncrement: 'item'
+                    counterIncrement: 'item',
+                    display: 'inline-block',
+                    width: '28px'
                 }
             }}
             textStyle="body2"

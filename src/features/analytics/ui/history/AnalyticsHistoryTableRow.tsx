@@ -110,10 +110,7 @@ const ItemRow: FunctionComponent<{
                         <>
                             Graph:&nbsp;
                             <Span color="accent.blue">
-                                {query.addresses
-                                    .slice(0, 9)
-                                    .map(a => sliceAddress(a.userFriendly))
-                                    .join(', ')}
+                                {query.addresses.map(a => sliceAddress(a.userFriendly)).join(', ')}
                             </Span>
                         </>
                     ) : (
