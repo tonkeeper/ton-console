@@ -104,7 +104,13 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                                         pasted
                                                     );
 
-                                                if (pastedCorrect) {
+                                                const textArea = e.target as HTMLTextAreaElement;
+                                                const isPastedToEnd =
+                                                    textArea.selectionStart ===
+                                                        textArea.selectionEnd &&
+                                                    textArea.selectionEnd === textArea.textLength;
+
+                                                if (pastedCorrect && isPastedToEnd) {
                                                     e.preventDefault();
                                                     const value = getValues('addresses');
 
@@ -117,7 +123,7 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                                         value
                                                             ? value + '\n' + formattedPasted
                                                             : formattedPasted,
-                                                        { shouldValidate: true }
+                                                        { shouldValidate: true, shouldDirty: true }
                                                     );
                                                 }
                                             }}
