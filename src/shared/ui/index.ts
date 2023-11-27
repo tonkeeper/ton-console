@@ -16,3 +16,5 @@ export * from './checkbox';
 export { DocsLink } from './DocsLink';
 export * from './options-input';
 export { IconButton } from './IconButton';
+export * from './code-area';
+export { NumberedTextArea } from './NumberedTextArea';

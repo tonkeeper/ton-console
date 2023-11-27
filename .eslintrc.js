@@ -104,19 +104,13 @@ module.exports = {
                         vars: 'all',
                         args: 'all',
                         ignoreRestSiblings: true,
-                        argsIgnorePattern: '^_'
+                        argsIgnorePattern: '^_',
+                        varsIgnorePattern: '^_'
                     }
                 ],
 
                 /* typescript */
                 '@typescript-eslint/no-use-before-define': 'off',
-                '@typescript-eslint/explicit-function-return-type': [
-                    'error',
-                    {
-                        allowExpressions: true,
-                        allowTypedFunctionExpressions: true
-                    }
-                ],
                 '@typescript-eslint/no-explicit-any': 'error',
                 '@typescript-eslint/no-inferrable-types': 'error',
                 '@typescript-eslint/naming-convention': [
@@ -134,6 +128,14 @@ module.exports = {
                 '@typescript-eslint/indent': 'off',
                 '@typescript-eslint/no-non-null-assertion': 'off',
                 '@typescript-eslint/no-redeclare': ['error', { ignoreDeclarationMerge: true }],
+                '@typescript-eslint/no-unused-vars': [
+                    'warn',
+                    {
+                        argsIgnorePattern: '^_',
+                        varsIgnorePattern: '^_',
+                        caughtErrorsIgnorePattern: '^_'
+                    }
+                ],
 
                 /* react */
                 'react/react-in-jsx-scope': 'off',

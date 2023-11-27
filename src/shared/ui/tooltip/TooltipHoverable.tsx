@@ -14,6 +14,7 @@ import {
     PopoverArrow,
     PopoverContent,
     PopoverTrigger,
+    Portal,
     useDisclosure
 } from '@chakra-ui/react';
 import { useIsTextTruncated } from 'src/shared';
@@ -32,9 +33,10 @@ export const TooltipHoverable: FunctionComponent<
         {
             host: ReactElement | string;
             canBeShown?: boolean;
+            inPortal?: boolean;
         } & ComponentProps<typeof Popover>
     >
-> = ({ host, canBeShown, children, ...rest }) => {
+> = ({ host, canBeShown, inPortal, children, ...rest }) => {
     const { ref, isTruncated } = useIsTextTruncated();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -71,30 +73,34 @@ export const TooltipHoverable: FunctionComponent<
         return <>{host}</>;
     }
 
+    const content = (
+        <PopoverContent
+            w="inherit"
+            minW="unset"
+            maxW="100%"
+            px="4"
+            py="3"
+            border="none"
+            borderRadius="lg"
+            whiteSpace="normal"
+            cursor="text"
+            filter="drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.04)) drop-shadow(0px 4px 20px rgba(0, 0, 0, 0.12))"
+            onClick={e => {
+                e.stopPropagation();
+                e.preventDefault();
+            }}
+            onMouseEnter={onOpen}
+            onMouseLeave={onClose}
+        >
+            {children}
+            <PopoverArrow />
+        </PopoverContent>
+    );
+
     return isTruncated || canBeShown ? (
         <Popover autoFocus={false} isOpen={isOpenDebounced} modifiers={defaultModifiers} {...rest}>
             <PopoverTrigger>{hostWithTrigger}</PopoverTrigger>
-            <PopoverContent
-                w="inherit"
-                minW="unset"
-                maxW="100%"
-                px="4"
-                py="3"
-                border="none"
-                borderRadius="lg"
-                whiteSpace="normal"
-                cursor="text"
-                filter="drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.04)) drop-shadow(0px 4px 20px rgba(0, 0, 0, 0.12))"
-                onClick={e => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                }}
-                onMouseEnter={onOpen}
-                onMouseLeave={onClose}
-            >
-                {children}
-                <PopoverArrow />
-            </PopoverContent>
+            {inPortal ? <Portal>{content}</Portal> : content}
         </Popover>
     ) : (
         hostWithRef

@@ -6,7 +6,9 @@ import {
     tonApiTiersStore,
     AppMessagesPayment,
     FaucetPayment,
-    faucetStore
+    faucetStore,
+    AnalyticsPayment,
+    analyticsHistoryTableStore
 } from 'src/features';
 import {
     BillingHistory,
@@ -37,14 +39,18 @@ class BillingStore {
         return tonApiTiersStore.paymentsHistory$.value
             .map(mapTonapiPaymentToPayment)
             .concat(appMessagesStore.paymentsHistory$.value.map(mapAppmessagesPaymentToPayment))
-            .concat(faucetStore.paymentsHistory$.value.map(mapFaucetPaymentToPayment));
+            .concat(faucetStore.paymentsHistory$.value.map(mapFaucetPaymentToPayment))
+            .concat(
+                analyticsHistoryTableStore.paymentsHistory$.value.map(mapAnalyticsPaymentToPayment)
+            );
     }
 
     private get paymentsHistoryLoading(): boolean {
         return (
             tonApiTiersStore.paymentsHistory$.isLoading ||
             appMessagesStore.paymentsHistory$.isLoading ||
-            faucetStore.paymentsHistory$.isLoading
+            faucetStore.paymentsHistory$.isLoading ||
+            analyticsHistoryTableStore.paymentsHistory$.isLoading
         );
     }
 
@@ -86,6 +92,16 @@ function mapFaucetPaymentToPayment(payment: FaucetPayment): Payment {
     return {
         id: `faucet-${payment.id}`,
         name: `Bought ${payment.boughtAmount.stringAmount} testnet TON`,
+        date: payment.date,
+        amount: payment.amount,
+        amountUsdEquivalent: payment.amountUsdEquivalent
+    };
+}
+
+function mapAnalyticsPaymentToPayment(payment: AnalyticsPayment): Payment {
+    return {
+        id: `analytics-${payment.id}`,
+        name: `TON Analytics ${payment.subservice}`,
         date: payment.date,
         amount: payment.amount,
         amountUsdEquivalent: payment.amountUsdEquivalent

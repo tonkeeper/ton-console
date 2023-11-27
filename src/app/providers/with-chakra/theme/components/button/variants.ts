@@ -68,11 +68,13 @@ const flat = {
     p: 0,
     h: 'fit-content'
 };
+const contrast = variant(button.contrast.background, button.contrast.foreground);
 
 export default {
     primary,
     secondary,
     overlay,
     danger,
-    flat
+    flat,
+    contrast
 };

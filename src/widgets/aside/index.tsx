@@ -8,12 +8,13 @@ import {
     InvoicesIcon24,
     MessageIcon24,
     SettingsIcon,
+    StatsIcon24,
     TextWithSkeleton,
     TonapiIcon
 } from 'src/shared';
 import { FunctionComponent } from 'react';
 import { Flex, Text } from '@chakra-ui/react';
-import { balanceStore } from 'src/entities';
+import { balanceStore, projectsStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { invoicesAppStore } from 'src/features';
 
@@ -44,6 +45,17 @@ const Aside: FunctionComponent = () => {
                     Payment Tracker
                 </DropDownMenuItem>
             )}
+            <DropDownMenuItemExpandable
+                leftIcon={<StatsIcon24 />}
+                content="TON Analytics"
+                linkTo="analytics"
+            >
+                <DropDownMenuItem linkTo="history">History</DropDownMenuItem>
+                <DropDownMenuItem linkTo="graph">Graph</DropDownMenuItem>
+                {projectsStore.selectedProject?.capabilities.stats.query && (
+                    <DropDownMenuItem linkTo="query">Query</DropDownMenuItem>
+                )}
+            </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>
                 Testnet Assets
             </DropDownMenuItem>
