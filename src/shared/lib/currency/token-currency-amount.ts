@@ -46,7 +46,7 @@ export class TokenCurrencyAmount extends BasicCurrencyAmount implements Currency
         decimalPlaces?: number | 'all';
         thousandSeparators?: boolean;
     }): string {
-        return `${this.toStringAmount(options)} ${this.stringCurrency}`;
+        return `${this.toStringAmount(options)}${String.fromCharCode(160)}${this.stringCurrency}`;
     }
 
     override toJSON(): TokenCurrencyAmountStruct & { $type: 'TokenCurrencyAmount' } {

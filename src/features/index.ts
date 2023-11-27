@@ -4,3 +4,4 @@ export * from './app-messages';
 export * from './invoices';
 export * from './faucet';
 export * from './marketing';
+export * from './analytics';

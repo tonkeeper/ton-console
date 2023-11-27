@@ -21,6 +21,9 @@ export default definePartsStyle({
         _hover: {
             borderColor: 'icon.secondary'
         },
+        _disabled: {
+            border: 'none'
+        },
         '> .chakra-icon': {
             visibility: 'hidden'
         },

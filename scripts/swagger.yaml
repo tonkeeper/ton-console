@@ -48,7 +48,7 @@ paths:
           description: "Ok"
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/admin/project/{id}/balance:
     get:
       summary: "Private method: Get project balance"
@@ -90,7 +90,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/auth/tg:
     post:
       summary: "Auth via telegram"
@@ -168,7 +168,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/account/logout:
     post:
       summary: "Logout from the system"
@@ -196,7 +196,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/project:
     post:
       summary: "Create project"
@@ -533,7 +533,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/messages/packages:
     get:
       summary: "Get messages packages"
@@ -824,7 +824,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/stats/ddl:
     get:
       summary: "Get stats db ddl"
@@ -842,17 +842,36 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/query/estimate:
+    post:
+      summary: "Estimate query"
+      operationId: estimateStatsQuery
+      tags:
+        - db
+      requestBody:
+        $ref: "#/components/requestBodies/StatsQuery"
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsEstimateQuery'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /api/v1/services/stats/query:
     post:
-      summary: "Send sql query to stats service"
-      operationId: sendSqlToStats
+      summary: "Send query to stats service"
+      operationId: sendQueryToStats
       tags:
         - stats_service
       requestBody:
-        $ref: "#/components/requestBodies/StatsSQLQuery"
+        $ref: "#/components/requestBodies/StatsQuery"
       responses:
         '201':
-          $ref: '#/components/responses/StatsSqlResult'
+          $ref: '#/components/responses/StatsQueryResult'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -871,7 +890,7 @@ paths:
         - $ref: '#/components/parameters/queryID'
       responses:
         '200':
-          $ref: '#/components/responses/StatsSqlResult'
+          $ref: '#/components/responses/StatsQueryResult'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -892,7 +911,7 @@ paths:
         - $ref: '#/components/parameters/queryLimit'
       responses:
         '200':
-          $ref: '#/components/responses/StatsSqlHistory'
+          $ref: '#/components/responses/StatsQueryHistory'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -911,9 +930,10 @@ paths:
         - $ref: '#/components/parameters/queryAddresses'
         - $ref: '#/components/parameters/queryOnlyBetween'
         - $ref: '#/components/parameters/queryProjectID'
+        - $ref: '#/components/parameters/queryRepeatInterval'
       responses:
         '200':
-          $ref: '#/components/responses/StatsSqlResult'
+          $ref: '#/components/responses/StatsQueryResult'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -941,7 +961,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/invoices/app:
     post:
       summary: "Create invoices app"
@@ -1430,7 +1450,16 @@ components:
       schema:
         type: string
         example: "EQ..fz,EQ...fa"
-  
+    queryRepeatInterval:
+      in: query
+      name: repeat_interval
+      required: false
+      description: "cyclic execution of requests"
+      schema:
+        type: integer
+        format: int32
+        default: 0
+
   requestBodies:
     TgAuth:
       description: "Data that is expected from Telegram"
@@ -1661,7 +1690,7 @@ components:
               info:
                 additionalProperties: true
                 example: { "first_key": "1", "second_key": 2 } # map[string]any
-    StatsSQLQuery:
+    StatsQuery:
       description: "Data that is expected"
       content:
         application/json:
@@ -1678,6 +1707,11 @@ components:
               query:
                 type: string
                 example: "select id from test"
+              repeat_interval:
+                type: integer
+                format: int32
+                example: 10
+                description: "cyclic execution of requests"
     InvoicesAppCreate:
       description: "Data that is expected"
       content:
@@ -1764,7 +1798,7 @@ components:
               webhook:
                 type: string
                 example: "https://mydapp.com/api/handle-invoice-change"
-  
+
   schemas:
     Ok:
       type: object
@@ -2012,6 +2046,7 @@ components:
             type: string
             enum:
               - invoices
+              - stats
         date_create:
           type: integer
           format: int64
@@ -2127,15 +2162,44 @@ components:
           type: integer
           format: int64
           example: 1690889913000
-    StatsSqlResult:
+    StatsQueryStatus:
+      type: string
+      enum:
+        - executing
+        - success
+        - error
+    StatsQueryResult:
       type: object
       required:
         - id
-        - success
+        - status
+        - date_create
       properties:
         id:
           type: string
           example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+        status:
+          $ref: '#/components/schemas/StatsQueryStatus'
+        query:
+          type: object
+          properties:
+            addresses:
+              type: array
+              items:
+                type: string
+            only_between:
+              type: boolean
+              example: false
+            sql:
+              type: string
+              example: "select id from accounts limit 1"
+        type:
+          type: string
+          enum:
+            - graph
+            - base_query
+        estimate:
+          $ref: '#/components/schemas/StatsEstimateQuery'
         url:
           type: string
           example: "https://sql.io/123.csv"
@@ -2143,14 +2207,40 @@ components:
           type: string
           example: "https://sql.io/123_meta.csv"
         spent_time:
-          type: number
-          example: 1.8
-        success:
-          type: boolean
-          example: true
+          type: integer
+          format: int64
+          example: 100
+        cost:
+          type: integer
+          format: int64
+          example: 1000000000
         error:
           type: string
           example: "invalid something"
+        all_data_in_preview:
+          type: boolean
+        preview:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
+    StatsEstimateQuery:
+      type: object
+      required:
+        - approximate_time
+        - approximate_cost
+      properties:
+        approximate_time:
+          type: integer
+          format: int64
+        approximate_cost:
+          type: integer
+          format: int64
     InvoicesInvoice:
       type: object
       required:
@@ -2253,7 +2343,7 @@ components:
           webhook:
             type: string
             example: "https://mydapp.com/api/handle-invoice-change"
-  
+
   responses:
     NotFound:
       description: "The specified resource was not found"
@@ -2645,25 +2735,36 @@ components:
             type: string
             format: binary
             example: create table test (...);
-    StatsSqlHistory:
-      description: "History of sql queries"
+    StatsQueryHistory:
+      description: "History of queries"
       content:
         application/json:
           schema:
             type: object
             required:
               - items
+              - count
             properties:
+              count:
+                type: integer
+                format: int32
+                example: 10
               items:
                 type: array
                 items:
-                  $ref: '#/components/schemas/StatsSqlResult'
-    StatsSqlResult:
-      description: "SQL result"
+                  $ref: '#/components/schemas/StatsQueryResult'
+    StatsQueryResult:
+      description: "Query result"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/StatsSqlResult'
+            $ref: '#/components/schemas/StatsQueryResult'
+    StatsEstimateQuery:
+      description: "Estimate query"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StatsEstimateQuery'
     InvoicesAppResp:
       description: "Invoices app"
       content:

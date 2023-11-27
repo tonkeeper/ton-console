@@ -5,14 +5,14 @@ export default {
         },
         body: {
             backgroundColor: 'background.page',
-            '-webkit-touch-callout': 'none'
+            WebkitTouchCallout: 'none'
         },
         img: {
-            '-webkit-user-select': 'none',
-            '-khtml-user-select': 'none',
-            '-moz-user-select:': 'none',
-            '-o-user-select': 'none',
-            'user-select': 'none'
+            WebkitUserSelect: 'none',
+            KhtmlUserSelect: 'none',
+            MozUserSelect: 'none',
+            OUserSelect: 'none',
+            userSelect: 'none'
         },
         '[data-tc-dropdown-button="true"]': {
             backgroundColor: 'background.contentTint',
@@ -23,6 +23,9 @@ export default {
             _active: {
                 transform: 'none'
             }
+        },
+        '[data-popper-arrow] > div': {
+            backgroundColor: 'background.content !important'
         }
     }
 };

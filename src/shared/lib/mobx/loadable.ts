@@ -102,7 +102,7 @@ export class Loadable<T> {
         options?: {
             notMutateState?: N;
             successToast?: UseToastOptions;
-            errorToast?: UseToastOptions;
+            errorToast?: UseToastOptions | ((e: unknown) => UseToastOptions);
             onError?: (e: unknown) => void;
             resetBeforeExecution?: boolean;
         }
@@ -201,13 +201,18 @@ export class Loadable<T> {
                 }
 
                 if (options?.errorToast) {
+                    let opts = options.errorToast;
+                    if (typeof options.errorToast === 'function') {
+                        opts = options.errorToast(e);
+                    }
+
                     const { toast } = createStandaloneToast();
                     toast({
                         title: 'Unknown error',
                         description: 'Unknown api error happened. Try again later',
                         status: 'error',
                         isClosable: true,
-                        ...options.errorToast
+                        ...opts
                     });
                 }
 

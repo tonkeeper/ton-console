@@ -265,19 +265,55 @@ export interface DTOMessagesApp {
     date_create: number;
 }
 
-export interface DTOStatsSqlResult {
+export enum DTOStatsQueryStatus {
+    DTOExecuting = 'executing',
+    DTOSuccess = 'success',
+    DTOError = 'error'
+}
+
+export interface DTOStatsQueryResult {
     /** @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b" */
     id: string;
+    status: DTOStatsQueryStatus;
+    query?: {
+        addresses?: string[];
+        /** @example false */
+        only_between?: boolean;
+        /** @example "select id from accounts limit 1" */
+        sql?: string;
+    };
+    type?: DTOStatsQueryResultType;
+    estimate?: DTOStatsEstimateQuery;
     /** @example "https://sql.io/123.csv" */
     url?: string;
     /** @example "https://sql.io/123_meta.csv" */
     meta_url?: string;
-    /** @example 1.8 */
+    /**
+     * @format int64
+     * @example 100
+     */
     spent_time?: number;
-    /** @example true */
-    success: boolean;
+    /**
+     * @format int64
+     * @example 1000000000
+     */
+    cost?: number;
     /** @example "invalid something" */
     error?: string;
+    all_data_in_preview?: boolean;
+    preview?: string[][];
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
+}
+
+export interface DTOStatsEstimateQuery {
+    /** @format int64 */
+    approximate_time: number;
+    /** @format int64 */
+    approximate_cost: number;
 }
 
 export interface DTOInvoicesInvoice {
@@ -365,7 +401,13 @@ export enum DTODepositType {
 }
 
 export enum DTOProjectCapabilities {
-    DTOInvoices = 'invoices'
+    DTOInvoices = 'invoices',
+    DTOStats = 'stats'
+}
+
+export enum DTOStatsQueryResultType {
+    DTOGraph = 'graph',
+    DTOBaseQuery = 'base_query'
 }
 
 /**
@@ -2053,12 +2095,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags stats_service
-         * @name SendSqlToStats
-         * @summary Send sql query to stats service
-         * @request POST:/api/v1/services/stats/query
+         * @tags db
+         * @name EstimateStatsQuery
+         * @summary Estimate query
+         * @request POST:/api/v1/services/stats/query/estimate
          */
-        sendSqlToStats: (
+        estimateStatsQuery: (
             data: {
                 /**
                  * @format uint32
@@ -2067,11 +2109,58 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 project_id: number;
                 /** @example "select id from test" */
                 query: string;
+                /**
+                 * cyclic execution of requests
+                 * @format int32
+                 * @example 10
+                 */
+                repeat_interval?: number;
             },
             params: RequestParams = {}
         ) =>
             this.request<
-                DTOStatsSqlResult,
+                DTOStatsEstimateQuery,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/stats/query/estimate`,
+                method: 'POST',
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags stats_service
+         * @name SendQueryToStats
+         * @summary Send query to stats service
+         * @request POST:/api/v1/services/stats/query
+         */
+        sendQueryToStats: (
+            data: {
+                /**
+                 * @format uint32
+                 * @example 1647024163
+                 */
+                project_id: number;
+                /** @example "select id from test" */
+                query: string;
+                /**
+                 * cyclic execution of requests
+                 * @format int32
+                 * @example 10
+                 */
+                repeat_interval?: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOStatsQueryResult,
                 {
                     /** Error message */
                     error: string;
@@ -2095,7 +2184,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          */
         getSqlResultFromStats: (id: string, params: RequestParams = {}) =>
             this.request<
-                DTOStatsSqlResult,
+                DTOStatsQueryResult,
                 {
                     /** Error message */
                     error: string;
@@ -2139,7 +2228,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 {
-                    items: DTOStatsSqlResult[];
+                    /**
+                     * @format int32
+                     * @example 10
+                     */
+                    count: number;
+                    items: DTOStatsQueryResult[];
                 },
                 {
                     /** Error message */
@@ -2176,11 +2270,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @format uint32
                  */
                 project_id: number;
+                /**
+                 * cyclic execution of requests
+                 * @format int32
+                 * @default 0
+                 */
+                repeat_interval?: number;
             },
             params: RequestParams = {}
         ) =>
             this.request<
-                DTOStatsSqlResult,
+                DTOStatsQueryResult,
                 {
                     /** Error message */
                     error: string;

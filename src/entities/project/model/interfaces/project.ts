@@ -6,5 +6,8 @@ export interface Project {
     creationDate: Date;
     capabilities: {
         invoices: boolean;
+        stats: {
+            query: boolean;
+        };
     };
 }
