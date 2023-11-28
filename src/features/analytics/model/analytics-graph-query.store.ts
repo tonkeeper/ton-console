@@ -84,7 +84,7 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
         return {
             ...basicQuery,
             status: 'success',
-            resultUrl: `https://cosmograph.app/run/?data=${encodeURIComponent(
+            resultUrl: `https://cosmograph.app/run/?nodeColor=color-node_color&nodeSize=size-node_value&data=${encodeURIComponent(
                 value.url!
             )}&meta=${encodeURIComponent(value.meta_url!)}`,
             spentTimeMS: value.spent_time!,
