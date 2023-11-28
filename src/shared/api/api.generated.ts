@@ -152,6 +152,7 @@ export interface DTOCharge {
      * @example 1000000
      */
     stats_price_per_second?: number;
+    stats_type_query?: DTOChargeStatsTypeQuery;
     /**
      * @format int64
      * @example 1000000000
@@ -398,6 +399,11 @@ export enum DTOErrorCode {
 export enum DTODepositType {
     DTOPromoCode = 'promo_code',
     DTODeposit = 'deposit'
+}
+
+export enum DTOChargeStatsTypeQuery {
+    DTOGraph = 'graph',
+    DTOBaseQuery = 'base_query'
 }
 
 export enum DTOProjectCapabilities {

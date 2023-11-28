@@ -3,6 +3,7 @@ import {
     apiClient,
     createImmediateReaction,
     DTOCharge,
+    DTOChargeStatsTypeQuery,
     DTOStatsQueryResult,
     DTOStatsQueryResultType,
     Loadable,
@@ -117,7 +118,8 @@ function mapDTOPaymentAnalyticsPayment(payment: DTOCharge): AnalyticsPayment | n
         amountUsdEquivalent: new UsdCurrencyAmount(
             tonAmount.amount.multipliedBy(payment.exchange_rate)
         ),
-        subservice: 'query' // TODO
+        subservice:
+            payment.stats_type_query === DTOChargeStatsTypeQuery.DTOGraph ? 'graph' : 'query'
     };
 }
 
