@@ -1,0 +1,56 @@
+diff --git a/node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.d.ts b/node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.d.ts
+index 330bb09..5ad9dc9 100644
+--- a/node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.d.ts
++++ b/node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.d.ts
+@@ -14,6 +14,7 @@ export type Props = {
+     nonce?: string;
+     onResize?: (size: Size) => void;
+     tagName?: string;
++    forceRender?: boolean;
+ } & Omit<HTMLAttributes<HTMLDivElement>, "children" | "onResize">;
+ type State = {
+     height: number;
+diff --git a/node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.js b/node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.js
+index 8f103c4..8c4673d 100644
+--- a/node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.js
++++ b/node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.js
+@@ -318,7 +318,7 @@ class $4fd1a97a17b80f9f$export$9d94f4ee1d930ff extends (0, $8zHUo$react.Componen
+         }
+     }
+     render() {
+-        const { children: children , defaultHeight: defaultHeight , defaultWidth: defaultWidth , disableHeight: disableHeight , disableWidth: disableWidth , nonce: nonce , onResize: onResize , style: style , tagName: tagName = "div" , ...rest } = this.props;
++        const { forceRender: forceRender, children: children , defaultHeight: defaultHeight , defaultWidth: defaultWidth , disableHeight: disableHeight , disableWidth: disableWidth , nonce: nonce , onResize: onResize , style: style , tagName: tagName = "div" , ...rest } = this.props;
+         const { height: height , scaledHeight: scaledHeight , scaledWidth: scaledWidth , width: width  } = this.state;
+         // Outer div should not force width/height since that may prevent containers from shrinking.
+         // Inner component should overflow and use calculated width/height.
+@@ -349,7 +349,7 @@ class $4fd1a97a17b80f9f$export$9d94f4ee1d930ff extends (0, $8zHUo$react.Componen
+                 ...style
+             },
+             ...rest
+-        }, !bailoutOnChildren && children(childParams));
++        }, (!bailoutOnChildren || !!forceRender) && children(childParams));
+     }
+ }
+ $4fd1a97a17b80f9f$var$_defineProperty($4fd1a97a17b80f9f$export$9d94f4ee1d930ff, "defaultProps", {
+diff --git a/node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.module.js b/node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.module.js
+index 43f5b7d..de4500e 100644
+--- a/node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.module.js
++++ b/node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.module.js
+@@ -308,7 +308,7 @@ class $6e2bb92d9db3b0c8$export$9d94f4ee1d930ff extends (0, $hgUW1$Component) {
+         }
+     }
+     render() {
+-        const { children: children , defaultHeight: defaultHeight , defaultWidth: defaultWidth , disableHeight: disableHeight , disableWidth: disableWidth , nonce: nonce , onResize: onResize , style: style , tagName: tagName = "div" , ...rest } = this.props;
++        const { forceRender: forceRender, children: children , defaultHeight: defaultHeight , defaultWidth: defaultWidth , disableHeight: disableHeight , disableWidth: disableWidth , nonce: nonce , onResize: onResize , style: style , tagName: tagName = "div" , ...rest } = this.props;
+         const { height: height , scaledHeight: scaledHeight , scaledWidth: scaledWidth , width: width  } = this.state;
+         // Outer div should not force width/height since that may prevent containers from shrinking.
+         // Inner component should overflow and use calculated width/height.
+@@ -339,7 +339,7 @@ class $6e2bb92d9db3b0c8$export$9d94f4ee1d930ff extends (0, $hgUW1$Component) {
+                 ...style
+             },
+             ...rest
+-        }, !bailoutOnChildren && children(childParams));
++        }, (!bailoutOnChildren || !!forceRender) && children(childParams));
+     }
+ }
+ $6e2bb92d9db3b0c8$var$_defineProperty($6e2bb92d9db3b0c8$export$9d94f4ee1d930ff, "defaultProps", {

@@ -1,27 +1,44 @@
 import { ComponentProps, FunctionComponent, useEffect, useState } from 'react';
 import { Box, Flex } from '@chakra-ui/react';
 import { CodeArea, CodeAreaFooter, CodeAreaGroup, useDebounce, usePrevious } from 'src/shared';
-import { analyticsQueryStore } from 'src/features';
+import {
+    analyticsGPTGenerationStore,
+    analyticsQueryGPTRequestStore,
+    analyticsQuerySQLRequestStore,
+    analyticsQueryStore
+} from 'src/features';
 import { observer } from 'mobx-react-lite';
 import AnalyticsQueryControlPanel from './AnalyticsQueryControlPanel';
 import { PostgreSQL, sql } from '@codemirror/lang-sql';
 import { toJS } from 'mobx';
 
-const defaultRequest = 'SELECT ';
+const defaultSQLRequest = 'SELECT ';
+const defaultGPTRequest = ' ';
 
-const AnalyticsQueryCode: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const AnalyticsQueryCode: FunctionComponent<
+    ComponentProps<typeof Box> & { type: 'sql' | 'gpt' }
+> = ({ type, ...props }) => {
+    const store = type === 'sql' ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
     const [value, setValue] = useState(
-        analyticsQueryStore.request$.value?.request || defaultRequest
+        type === 'gpt'
+            ? analyticsGPTGenerationStore.generatedSQL$.value || defaultGPTRequest
+            : store.request$.value?.request || defaultSQLRequest
     );
     const debouncedValue = useDebounce(value);
     const prevDebouncedValue = usePrevious(debouncedValue);
 
     const onValueChange = (val: string): void => {
         setValue(val);
-        if (analyticsQueryStore.request$.value) {
-            analyticsQueryStore.clearRequest();
+        if (store.request$.value) {
+            store.clear();
         }
     };
+
+    useEffect(() => {
+        if (type === 'gpt' && analyticsGPTGenerationStore.generatedSQL$.value) {
+            setValue(analyticsGPTGenerationStore.generatedSQL$.value);
+        }
+    }, [type, analyticsGPTGenerationStore.generatedSQL$.value]);
 
     useEffect(() => {
         if (!prevDebouncedValue) {
@@ -29,9 +46,9 @@ const AnalyticsQueryCode: FunctionComponent<ComponentProps<typeof Box>> = props 
         }
 
         if (debouncedValue) {
-            analyticsQueryStore.estimateRequest(debouncedValue, { cancelAllPreviousCalls: true });
+            store.estimateRequest(debouncedValue, { cancelAllPreviousCalls: true });
         } else {
-            analyticsQueryStore.clearRequest();
+            store.clear();
         }
     }, [debouncedValue]);
 
@@ -46,10 +63,15 @@ const AnalyticsQueryCode: FunctionComponent<ComponentProps<typeof Box>> = props 
     return (
         <Box {...props}>
             <CodeAreaGroup>
-                <CodeArea value={value} onChange={onValueChange} extensions={extensions} />
+                <CodeArea
+                    value={value}
+                    onChange={onValueChange}
+                    extensions={extensions}
+                    isLoading={type === 'gpt' && analyticsGPTGenerationStore.generateSQL.isLoading}
+                />
                 <CodeAreaFooter>
                     <Flex align="center" justify="flex-end">
-                        <AnalyticsQueryControlPanel />
+                        <AnalyticsQueryControlPanel type={type} />
                     </Flex>
                 </CodeAreaFooter>
             </CodeAreaGroup>

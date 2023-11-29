@@ -2338,6 +2338,45 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
+         * @tags stats_service
+         * @name StatsChatGptRequest
+         * @summary Send request to ChatGPT
+         * @request POST:/api/v1/services/stats/gpt
+         */
+        statsChatGptRequest: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: {
+                message: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    message: string;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/stats/gpt`,
+                method: 'POST',
+                query: query,
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
          * @tags invoices_service
          * @name CreateInvoicesApp
          * @summary Create invoices app

@@ -2,24 +2,35 @@ import { ComponentProps, FunctionComponent, useEffect } from 'react';
 import { Box, Button, Center, Flex, Skeleton } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { InfoIcon16, Span, TooltipHoverable, toTimeLeft } from 'src/shared';
-import { analyticsQueryStore } from 'src/features';
+import {
+    analyticsQueryGPTRequestStore,
+    analyticsQuerySQLRequestStore,
+    analyticsQueryStore
+} from 'src/features';
 import { useSearchParams } from 'react-router-dom';
 import { computed } from 'mobx';
 
-const AnalyticsQueryControlPanel: FunctionComponent<ComponentProps<typeof Box>> = props => {
-    const request = analyticsQueryStore.request$.value;
+const AnalyticsQueryControlPanel: FunctionComponent<
+    ComponentProps<typeof Box> & { type: 'sql' | 'gpt' }
+> = ({ type, ...props }) => {
+    const store = type === 'sql' ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
+    const request = store.request$.value;
     const [_, setSearchParams] = useSearchParams();
+
+    const requestEqQuery = computed(
+        () => store.request$.value?.request === analyticsQueryStore.query$.value?.request
+    ).get();
 
     const canProcess = computed(
         () =>
-            analyticsQueryStore.request$.value &&
-            !analyticsQueryStore.requestEqQuery &&
-            !analyticsQueryStore.request$.isLoading &&
+            store.request$.value &&
+            !requestEqQuery &&
+            !store.request$.isLoading &&
             !analyticsQueryStore.createQuery.isLoading
     );
 
     const onCreate = async (): Promise<void> => {
-        const query = await analyticsQueryStore.createQuery();
+        const query = await analyticsQueryStore.createQuery(store.request$.value!.request);
         setSearchParams({ id: query.id });
     };
 
@@ -39,12 +50,12 @@ const AnalyticsQueryControlPanel: FunctionComponent<ComponentProps<typeof Box>> 
 
     return (
         <Flex {...props} align="center">
-            {analyticsQueryStore.request$.isLoading && (
+            {store.request$.isLoading && (
                 <Skeleton display="inline-block" w="100px" h="20px" variant="dark" />
             )}
 
-            {!analyticsQueryStore.request$.isLoading &&
-                (analyticsQueryStore.request$.error ? (
+            {!store.request$.isLoading &&
+                (store.request$.error ? (
                     <TooltipHoverable
                         canBeShown
                         host={
@@ -53,9 +64,7 @@ const AnalyticsQueryControlPanel: FunctionComponent<ComponentProps<typeof Box>> 
                             </Center>
                         }
                     >
-                        <Span color="text.primary">
-                            {analyticsQueryStore.request$.error.toString()}
-                        </Span>
+                        <Span color="text.primary">{store.request$.error.toString()}</Span>
                     </TooltipHoverable>
                 ) : (
                     !!request && (
@@ -73,13 +82,8 @@ const AnalyticsQueryControlPanel: FunctionComponent<ComponentProps<typeof Box>> 
 
             <Button
                 ml="4"
-                isDisabled={
-                    !analyticsQueryStore.request$.value || analyticsQueryStore.requestEqQuery
-                }
-                isLoading={
-                    analyticsQueryStore.request$.isLoading ||
-                    analyticsQueryStore.createQuery.isLoading
-                }
+                isDisabled={!store.request$.value || requestEqQuery}
+                isLoading={store.request$.isLoading || analyticsQueryStore.createQuery.isLoading}
                 onClick={onCreate}
                 size="sm"
                 variant="contrast"

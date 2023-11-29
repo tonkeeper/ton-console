@@ -961,6 +961,27 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/gpt:
+    post:
+      summary: "Send request to ChatGPT"
+      operationId: statsChatGptRequest
+      tags:
+        - stats_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/StatsChatGpt"
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsChatGptAnswer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
   
   /api/v1/services/invoices/app:
     post:
@@ -1690,6 +1711,17 @@ components:
               info:
                 additionalProperties: true
                 example: { "first_key": "1", "second_key": 2 } # map[string]any
+    StatsChatGpt:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                type: string
     StatsQuery:
       description: "Data that is expected"
       content:
@@ -2445,6 +2477,17 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Charge'
+    StatsChatGptAnswer:
+      description: "Answer from ChatGPT"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                type: string
     ProjectTonApiStats:
       description: "Project TonApi stats"
       content:
