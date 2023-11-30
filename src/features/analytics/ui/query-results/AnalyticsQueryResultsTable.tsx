@@ -1,12 +1,12 @@
 import { ComponentProps, FunctionComponent, useRef, useState } from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box, Grid } from '@chakra-ui/react';
 import { VariableSizeGrid } from 'react-window';
 import { AnalyticsTableSource } from 'src/features';
 import { AnalyticsQueryResultsTableRow } from './AnalyticsQueryResultsTableRow';
-import AutoSizer from 'react-virtualized-auto-sizer';
 import { AnalyticsTableContext } from './analytics-table-context';
 import { AnalyticsQueryTableStructure } from './AnalyticsQueryTableStructure';
 import { getTextWidth, getTHWidth, removeOutliers } from './analytics-query-ui-utils';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 const MAX_INITIAL_COL_WIDTH = 500;
 
@@ -37,6 +37,9 @@ export const AnalyticsTable: FunctionComponent<
         gridRef.current?.resetAfterColumnIndex(i);
     };
 
+    const colsNumber = source.headings.length;
+    const rowsNumber = source.data.length;
+
     return (
         <AnalyticsTableContext.Provider
             value={{
@@ -48,26 +51,49 @@ export const AnalyticsTable: FunctionComponent<
                 setIColumnWidth
             }}
         >
-            <Box userSelect={isResizingProcess ? 'none' : 'auto'} {...rest}>
-                <AutoSizer>
-                    {({ width, height }) => (
-                        <VariableSizeGrid
-                            ref={gridRef}
-                            columnCount={source.headings.length}
-                            columnWidth={i => columnsWidths[i]}
-                            height={height || 300}
-                            rowCount={source.data.length}
-                            rowHeight={() => 35}
-                            width={width || 800}
-                            innerElementType={AnalyticsQueryTableStructure}
+            <AutoSizer disableHeight>
+                {({ width }) => (
+                    <Box
+                        overflowY="hidden"
+                        w={width}
+                        maxW={width}
+                        userSelect={isResizingProcess ? 'none' : 'auto'}
+                        {...rest}
+                    >
+                        <AnalyticsQueryTableStructure />
+                        <Grid
+                            templateRows={`repeat(${rowsNumber}, 35px)`}
+                            templateColumns={columnsWidths.map(w => w + 'px').join(' ')}
                         >
-                            {params => (
-                                <AnalyticsQueryResultsTableRow source={source} {...params} />
+                            {source.data.map((row, rowIndex) =>
+                                row.map((content, columnIndex) => (
+                                    <AnalyticsQueryResultsTableRow
+                                        key={rowIndex + '-' + columnIndex + content}
+                                        content={content}
+                                        pr={columnIndex === colsNumber - 1 ? 4 : 2}
+                                        pl={columnIndex === 0 ? 4 : 2}
+                                        borderRightWidth={
+                                            columnIndex === colsNumber - 1 ? '1px' : '0'
+                                        }
+                                        borderLeftWidth={columnIndex === 0 ? '1px' : '0'}
+                                        borderBottomLeftRadius={
+                                            rowIndex === rowsNumber - 1 && columnIndex === 0
+                                                ? 'sm'
+                                                : 'none'
+                                        }
+                                        borderBottomRightRadius={
+                                            rowIndex === rowsNumber - 1 &&
+                                            columnIndex === colsNumber - 1
+                                                ? 'sm'
+                                                : 'none'
+                                        }
+                                    />
+                                ))
                             )}
-                        </VariableSizeGrid>
-                    )}
-                </AutoSizer>
-            </Box>
+                        </Grid>
+                    </Box>
+                )}
+            </AutoSizer>
         </AnalyticsTableContext.Provider>
     );
 };
