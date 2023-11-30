@@ -72,7 +72,7 @@ const ItemRow: FunctionComponent<{
             onClick={onRowClick}
         >
             <Td
-                minW="148px"
+                minW="188px"
                 h={rowHeight}
                 maxH={rowHeight}
                 borderLeft="1px"

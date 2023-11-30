@@ -82,7 +82,7 @@ export const AnalyticsHistoryTableStructure = observer(
                             h={rowHeight}
                         >
                             <Th
-                                minW="148px"
+                                minW="188px"
                                 bg="background.contentTint"
                                 borderTop="1px"
                                 borderTopColor="background.contentTint"
