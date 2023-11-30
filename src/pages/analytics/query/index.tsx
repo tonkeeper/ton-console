@@ -10,8 +10,10 @@ import {
     TabPanels,
     Tabs
 } from '@chakra-ui/react';
-import { H4, Overlay, usePrevious } from 'src/shared';
+import { ButtonLink, ConsoleDocsIcon32, H4, Overlay, usePrevious } from 'src/shared';
 import {
+    ANALYTICS_LINKS,
+    analyticsGPTGenerationStore,
     AnalyticsQueryCode,
     AnalyticsQueryGTPGeneration,
     AnalyticsQueryResults,
@@ -29,6 +31,7 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
 
     useEffect(() => {
         analyticsQueryStore.fetchAllTablesSchema();
+        analyticsGPTGenerationStore.clear();
     }, []);
 
     useEffect(() => {
@@ -60,7 +63,20 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
         <Overlay display="flex" flexDirection="column">
             <H4 mb="4">New Request</H4>
             {queryResolved ? (
-                <Flex direction="column" flex="1">
+                <Flex pos="relative" direction="column" flex="1">
+                    <ButtonLink
+                        pos="absolute"
+                        top="-13px"
+                        right="0"
+                        leftIcon={<ConsoleDocsIcon32 w="20px" h="20px" />}
+                        size="sm"
+                        variant="secondary"
+                        zIndex="3"
+                        href={ANALYTICS_LINKS.INTRO}
+                        isExternal
+                    >
+                        Console Docs
+                    </ButtonLink>
                     <Tabs flexDir="column" flex="1" display="flex" mb="6">
                         <TabList w="auto" mx="-24px" px="6">
                             <Tab>SQL</Tab>

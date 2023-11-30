@@ -19,6 +19,11 @@ class AnalyticsGPTGenerationStore {
 
         return result.data.message;
     });
+
+    public clear() {
+        this.generateSQL.cancelAllPendingCalls();
+        this.generatedSQL$.clear();
+    }
 }
 
 export const analyticsGPTGenerationStore = new AnalyticsGPTGenerationStore();
