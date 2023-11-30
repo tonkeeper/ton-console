@@ -4,7 +4,8 @@ import { TextareaGroupContext } from './textarea-group-context';
 
 export const TextareaBody = forwardRef<ComponentProps<typeof Textarea>, typeof Textarea>(
     ({ onScroll, onFocus, onBlur, onChange, onKeyDown, ...props }, ref) => {
-        const { hasFooter, setShowScrollDivider, setFocused } = useContext(TextareaGroupContext);
+        const { hasFooter, hasRight, setShowScrollDivider, setFocused } =
+            useContext(TextareaGroupContext);
 
         const scrollHandler = (e: UIEvent<HTMLTextAreaElement>) => {
             onScroll?.(e);
@@ -52,6 +53,11 @@ export const TextareaBody = forwardRef<ComponentProps<typeof Textarea>, typeof T
                 onKeyDown={keyDownHandler}
                 onScroll={scrollHandler}
                 {...(hasFooter && { borderBottom: 'none !important;', borderBottomRadius: '0' })}
+                {...(hasRight && {
+                    borderRight: 'none !important;',
+                    borderBottomRightRadius: '0',
+                    borderTopRightRadius: '0'
+                })}
                 {...props}
             />
         );
