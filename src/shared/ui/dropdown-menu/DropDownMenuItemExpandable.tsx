@@ -6,6 +6,7 @@ import {
     PropsWithChildren,
     ReactElement,
     ReactNode,
+    useCallback,
     useEffect,
     useMemo,
     useState
@@ -19,7 +20,7 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 import { ArrowIcon } from 'src/shared';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export interface DropDownMenuItemExpandableProps extends PropsWithChildren {
     content: ReactNode;
@@ -60,23 +61,32 @@ export const DropDownMenuItemExpandable: FunctionComponent<
         });
     }, [path, props.children, props.layer]);
 
-    const { isOpen, onOpen, onToggle } = useDisclosure();
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const location = useLocation();
+    const navigate = useNavigate();
+    const isMathLocation = location.pathname.startsWith('/' + path);
 
     useEffect(() => {
-        const isMathLocation = location.pathname.startsWith('/' + path);
-
         if (isMathLocation) {
             onOpen();
+        } else {
+            onClose();
         }
-    }, [location.pathname, path]);
+    }, [isMathLocation, onOpen, onClose]);
 
     const index = useMemo(() => {
         return isOpen ? [0] : [];
     }, [isOpen]);
 
     useEffect(() => setShouldAnimate(true), []);
+
+    const onClick = useCallback(() => {
+        if (isMathLocation) {
+            return;
+        }
+        navigate(path!);
+    }, [isMathLocation, path, navigate]);
 
     return (
         <Accordion allowToggle index={index} reduceMotion={!shouldAnimate}>
@@ -94,7 +104,7 @@ export const DropDownMenuItemExpandable: FunctionComponent<
                     borderRadius="md"
                     _hover={_hover}
                     transition=""
-                    onClick={onToggle}
+                    onClick={onClick}
                 >
                     {props.leftIcon}
                     <Box textAlign="left" wordBreak="break-all" noOfLines={1}>
