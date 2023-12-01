@@ -41,7 +41,7 @@ const AnalyticsQueryCode: FunctionComponent<
     }, [type, analyticsGPTGenerationStore.generatedSQL$.value]);
 
     useEffect(() => {
-        if (!prevDebouncedValue) {
+        if (!prevDebouncedValue && type === 'sql') {
             return;
         }
 
@@ -50,7 +50,7 @@ const AnalyticsQueryCode: FunctionComponent<
         } else {
             store.clear();
         }
-    }, [debouncedValue]);
+    }, [debouncedValue, type]);
 
     const extensions = [
         sql({

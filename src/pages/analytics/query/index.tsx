@@ -22,6 +22,7 @@ import {
 } from 'src/features';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectsStore } from 'src/entities';
+import { observer } from 'mobx-react-lite';
 
 const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
     const navigate = useNavigate();
@@ -63,7 +64,7 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
         <Overlay display="flex" flexDirection="column">
             <H4 mb="4">New Request</H4>
             {queryResolved ? (
-                <Flex pos="relative" direction="column" flex="1">
+                <Flex pos="relative" direction="column">
                     <ButtonLink
                         pos="absolute"
                         top="-13px"
@@ -89,7 +90,9 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
                             <TabPanel flex="1">
                                 <Box w="100%">
                                     <AnalyticsQueryGTPGeneration mb="5" />
-                                    <AnalyticsQueryCode flex="1" type="gpt" />
+                                    {!!analyticsGPTGenerationStore.generatedSQL$.value && (
+                                        <AnalyticsQueryCode flex="1" type="gpt" />
+                                    )}
                                 </Box>
                             </TabPanel>
                         </TabPanels>
@@ -105,4 +108,4 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
     );
 };
 
-export default QueryPage;
+export default observer(QueryPage);

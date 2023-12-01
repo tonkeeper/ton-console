@@ -27,7 +27,10 @@ class AnalyticsQueryRequestStore {
 
     public estimateRequest = this.request$.createAsyncAction(async (request: string) => {
         try {
-            const result = await apiClient.api.estimateStatsQuery({ sql: request });
+            const result = await apiClient.api.estimateStatsQuery({
+                project_id: projectsStore.selectedProject!.id,
+                query: request
+            });
 
             return mapDTOStatsEstimateSQLToAnalyticsQuery(request, result.data);
         } catch (e) {

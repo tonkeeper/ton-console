@@ -2114,7 +2114,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @summary Estimate query
          * @request POST:/api/v1/services/stats/query/estimate
          */
-        estimateStatsQuery: (data: DTOStatsQuery, params: RequestParams = {}) =>
+        estimateStatsQuery: (
+            data: {
+                /**
+                 * @format uint32
+                 * @example 1647024163
+                 */
+                project_id: number;
+                /** @example "select id from test" */
+                query: string;
+                /**
+                 * cyclic execution of requests
+                 * @format int32
+                 * @example 10
+                 */
+                repeat_interval?: number;
+            },
+            params: RequestParams = {}
+        ) =>
             this.request<
                 DTOStatsEstimateQuery,
                 {
@@ -2138,7 +2155,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @summary Send query to stats service
          * @request POST:/api/v1/services/stats/query
          */
-        sendQueryToStats: (data: DTOStatsQuery, params: RequestParams = {}) =>
+        sendQueryToStats: (
+            data: {
+                /**
+                 * @format uint32
+                 * @example 1647024163
+                 */
+                project_id: number;
+                /** @example "select id from test" */
+                query: string;
+                /**
+                 * cyclic execution of requests
+                 * @format int32
+                 * @example 10
+                 */
+                repeat_interval?: number;
+            },
+            params: RequestParams = {}
+        ) =>
             this.request<
                 DTOStatsQueryResult,
                 {
