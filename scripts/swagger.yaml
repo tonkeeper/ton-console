@@ -899,6 +899,27 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+    patch:
+      summary: "Update query"
+      operationId: updateStatsQuery
+      tags:
+        - db
+      parameters:
+        - $ref: '#/components/parameters/queryID'
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/StatsQueryUpdate"
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsQuery'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /api/v1/services/stats/queries/history:
     get:
       summary: "Get sql history queries"
@@ -1722,6 +1743,22 @@ components:
             properties:
               message:
                 type: string
+              context:
+                type: string
+    StatsQueryUpdate:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - repeat_interval
+            properties:
+              repeat_interval:
+                type: integer
+                format: int32
+                example: 10
+                description: "cyclic execution of requests"
     StatsQuery:
       description: "Data that is expected"
       content:
@@ -2205,6 +2242,24 @@ components:
         - executing
         - success
         - error
+    StatsQuery:
+      type: object
+      properties:
+        addresses:
+          type: array
+          items:
+            type: string
+        only_between:
+          type: boolean
+          example: false
+        sql:
+          type: string
+          example: "select id from accounts limit 1"
+        repeat_interval:
+          type: integer
+          format: int32
+          example: 10
+          description: "cyclic execution of requests"
     StatsQueryResult:
       type: object
       required:
@@ -2218,18 +2273,7 @@ components:
         status:
           $ref: '#/components/schemas/StatsQueryStatus'
         query:
-          type: object
-          properties:
-            addresses:
-              type: array
-              items:
-                type: string
-            only_between:
-              type: boolean
-              example: false
-            sql:
-              type: string
-              example: "select id from accounts limit 1"
+          $ref: '#/components/schemas/StatsQuery'
         type:
           type: string
           enum:
@@ -2485,9 +2529,12 @@ components:
             type: object
             required:
               - message
+              - valid
             properties:
               message:
                 type: string
+              valid:
+                type: boolean
     ProjectTonApiStats:
       description: "Project TonApi stats"
       content:
@@ -2801,6 +2848,12 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/StatsQueryResult'
+    StatsQuery:
+      description: "Query"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StatsQuery'
     StatsQueryResult:
       description: "Query result"
       content:

@@ -9,16 +9,18 @@ class AnalyticsGPTGenerationStore {
         makeAutoObservable(this);
     }
 
-    public generateSQL = this.generatedSQL$.createAsyncAction(async (message: string) => {
-        const result = await apiClient.api.statsChatGptRequest(
-            {
-                project_id: projectsStore.selectedProject!.id
-            },
-            { message }
-        );
+    public generateSQL = this.generatedSQL$.createAsyncAction(
+        async (message: string, context?: string) => {
+            const result = await apiClient.api.statsChatGptRequest(
+                {
+                    project_id: projectsStore.selectedProject!.id
+                },
+                { message, context }
+            );
 
-        return result.data.message;
-    });
+            return result.data.message;
+        }
+    );
 
     public clear() {
         this.generateSQL.cancelAllPendingCalls();

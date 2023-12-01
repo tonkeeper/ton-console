@@ -40,10 +40,9 @@ class AnalyticsQueryStore {
     );
 
     createQuery = this.query$.createAsyncAction(
-        async (query: string) => {
+        async (sql: string) => {
             const result = await apiClient.api.sendQueryToStats({
-                project_id: projectsStore.selectedProject!.id,
-                query
+                sql
             });
 
             await analyticsHistoryTableStore.fetchPaymentsHistory();

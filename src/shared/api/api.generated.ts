@@ -272,17 +272,25 @@ export enum DTOStatsQueryStatus {
     DTOError = 'error'
 }
 
+export interface DTOStatsQuery {
+    addresses?: string[];
+    /** @example false */
+    only_between?: boolean;
+    /** @example "select id from accounts limit 1" */
+    sql?: string;
+    /**
+     * cyclic execution of requests
+     * @format int32
+     * @example 10
+     */
+    repeat_interval?: number;
+}
+
 export interface DTOStatsQueryResult {
     /** @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b" */
     id: string;
     status: DTOStatsQueryStatus;
-    query?: {
-        addresses?: string[];
-        /** @example false */
-        only_between?: boolean;
-        /** @example "select id from accounts limit 1" */
-        sql?: string;
-    };
+    query?: DTOStatsQuery;
     type?: DTOStatsQueryResultType;
     estimate?: DTOStatsEstimateQuery;
     /** @example "https://sql.io/123.csv" */
@@ -2106,24 +2114,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @summary Estimate query
          * @request POST:/api/v1/services/stats/query/estimate
          */
-        estimateStatsQuery: (
-            data: {
-                /**
-                 * @format uint32
-                 * @example 1647024163
-                 */
-                project_id: number;
-                /** @example "select id from test" */
-                query: string;
-                /**
-                 * cyclic execution of requests
-                 * @format int32
-                 * @example 10
-                 */
-                repeat_interval?: number;
-            },
-            params: RequestParams = {}
-        ) =>
+        estimateStatsQuery: (data: DTOStatsQuery, params: RequestParams = {}) =>
             this.request<
                 DTOStatsEstimateQuery,
                 {
@@ -2147,24 +2138,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @summary Send query to stats service
          * @request POST:/api/v1/services/stats/query
          */
-        sendQueryToStats: (
-            data: {
-                /**
-                 * @format uint32
-                 * @example 1647024163
-                 */
-                project_id: number;
-                /** @example "select id from test" */
-                query: string;
-                /**
-                 * cyclic execution of requests
-                 * @format int32
-                 * @example 10
-                 */
-                repeat_interval?: number;
-            },
-            params: RequestParams = {}
-        ) =>
+        sendQueryToStats: (data: DTOStatsQuery, params: RequestParams = {}) =>
             this.request<
                 DTOStatsQueryResult,
                 {
@@ -2200,6 +2174,49 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             >({
                 path: `/api/v1/services/stats/query/${id}`,
                 method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags db
+         * @name UpdateStatsQuery
+         * @summary Update query
+         * @request PATCH:/api/v1/services/stats/query/{id}
+         */
+        updateStatsQuery: (
+            id: string,
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: {
+                /**
+                 * cyclic execution of requests
+                 * @format int32
+                 * @example 10
+                 */
+                repeat_interval: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOStatsQuery,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/stats/query/${id}`,
+                method: 'PATCH',
+                query: query,
+                body: data,
                 ...params
             }),
 
@@ -2353,12 +2370,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             data: {
                 message: string;
+                context?: string;
             },
             params: RequestParams = {}
         ) =>
             this.request<
                 {
                     message: string;
+                    valid: boolean;
                 },
                 {
                     /** Error message */
