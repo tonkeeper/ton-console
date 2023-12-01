@@ -47,6 +47,7 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
                 .catch(() => setSearchParams({}));
         } else {
             analyticsQueryStore.clear();
+            analyticsQuerySQLRequestStore.clear();
             setQueryResolved(true);
         }
     }, []);
