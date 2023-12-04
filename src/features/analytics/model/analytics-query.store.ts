@@ -9,7 +9,7 @@ import {
 } from 'src/shared';
 import { AnalyticsQuery, AnalyticsTableSource, AnalyticsTablesSchema } from './interfaces';
 import { projectsStore } from 'src/entities';
-import { analyticsHistoryTableStore } from 'src/features';
+import { analyticsGPTGenerationStore, analyticsHistoryTableStore } from 'src/features';
 
 class AnalyticsQueryStore {
     query$ = new Loadable<AnalyticsQuery | null>(null);
@@ -43,7 +43,10 @@ class AnalyticsQueryStore {
         async (query: string) => {
             const result = await apiClient.api.sendQueryToStats({
                 project_id: projectsStore.selectedProject!.id,
-                query
+                query,
+                ...(query.trim() === analyticsGPTGenerationStore.generatedSQL$.value?.trim() && {
+                    gpt_message: analyticsGPTGenerationStore.gptPrompt
+                })
             });
 
             await analyticsHistoryTableStore.fetchPaymentsHistory();
@@ -82,6 +85,7 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         type: 'query',
         id: value.id,
         creationDate: new Date(value.date_create),
+        gptPrompt: value.query?.gpt_message,
         request: value.query!.sql!,
         estimatedTimeMS: value.estimate!.approximate_time,
         estimatedCost: new TonCurrencyAmount(value.estimate!.approximate_cost)

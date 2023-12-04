@@ -1767,7 +1767,6 @@ components:
             type: object
             required:
               - project_id
-              - query
             properties:
               project_id:
                 type: integer
@@ -1776,6 +1775,9 @@ components:
               query:
                 type: string
                 example: "select id from test"
+              gpt_message:
+                type: string
+                example: "give me random id from accounts table"
               repeat_interval:
                 type: integer
                 format: int32
@@ -2255,6 +2257,9 @@ components:
         sql:
           type: string
           example: "select id from accounts limit 1"
+        gpt_message:
+          type: string
+          example: "give me random id from accounts table"
         repeat_interval:
           type: integer
           format: int32
@@ -2306,6 +2311,9 @@ components:
             type: array
             items:
               type: string
+        is_gpt:
+          type: boolean
+          example: false
         date_create:
           type: integer
           format: int64

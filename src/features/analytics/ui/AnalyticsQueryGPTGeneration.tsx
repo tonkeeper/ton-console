@@ -28,6 +28,7 @@ const AnalyticsQueryGPTGeneration: FunctionComponent<ComponentProps<typeof Box>>
             return alert('Unknown command');
         }
 
+        analyticsGPTGenerationStore.gptPrompt = message;
         analyticsQueryGPTRequestStore.clear();
         analyticsGPTGenerationStore.generateSQL(message, context || undefined);
     };

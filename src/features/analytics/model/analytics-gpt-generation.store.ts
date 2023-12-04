@@ -5,6 +5,8 @@ import { projectsStore } from 'src/entities';
 class AnalyticsGPTGenerationStore {
     generatedSQL$ = new Loadable<string | null>(null);
 
+    gptPrompt = '';
+
     constructor() {
         makeAutoObservable(this);
     }
@@ -25,6 +27,7 @@ class AnalyticsGPTGenerationStore {
     public clear() {
         this.generateSQL.cancelAllPendingCalls();
         this.generatedSQL$.clear();
+        this.gptPrompt = '';
     }
 }
 

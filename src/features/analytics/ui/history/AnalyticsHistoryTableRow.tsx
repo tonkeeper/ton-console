@@ -105,7 +105,7 @@ const ItemRow: FunctionComponent<{
                 )}
             </Td>
             <Td w="100%" minW="300px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
-                <Box noOfLines={2}>
+                <Box wordBreak="break-word" noOfLines={2}>
                     {query.type === 'graph' ? (
                         <>
                             Graph:&nbsp;
@@ -114,7 +114,7 @@ const ItemRow: FunctionComponent<{
                             </Span>
                         </>
                     ) : (
-                        query.request
+                        query.gptPrompt || query.request
                     )}
                 </Box>
             </Td>

@@ -278,6 +278,8 @@ export interface DTOStatsQuery {
     only_between?: boolean;
     /** @example "select id from accounts limit 1" */
     sql?: string;
+    /** @example "give me random id from accounts table" */
+    gpt_message?: string;
     /**
      * cyclic execution of requests
      * @format int32
@@ -311,6 +313,8 @@ export interface DTOStatsQueryResult {
     error?: string;
     all_data_in_preview?: boolean;
     preview?: string[][];
+    /** @example false */
+    is_gpt?: boolean;
     /**
      * @format int64
      * @example 1690889913000
@@ -2122,7 +2126,9 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  */
                 project_id: number;
                 /** @example "select id from test" */
-                query: string;
+                query?: string;
+                /** @example "give me random id from accounts table" */
+                gpt_message?: string;
                 /**
                  * cyclic execution of requests
                  * @format int32
@@ -2163,7 +2169,9 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  */
                 project_id: number;
                 /** @example "select id from test" */
-                query: string;
+                query?: string;
+                /** @example "give me random id from accounts table" */
+                gpt_message?: string;
                 /**
                  * cyclic execution of requests
                  * @format int32
