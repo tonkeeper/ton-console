@@ -20,17 +20,18 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
     const {
         register,
         formState: { errors, dirtyFields },
-        handleSubmit,
-        setValue,
-        getValues
+        handleSubmit
     } = useForm<{
         isBetweenAccountsOnly: boolean;
         addresses: string;
-    }>({ mode: 'all' });
+    }>();
     const [_, setSearchParams] = useSearchParams();
 
     const onSubmit = async (form: { isBetweenAccountsOnly: boolean; addresses: string }) => {
-        const addresses = [...form.addresses.match(/[a-zA-Z0-9-_]{48}/g)!];
+        const addresses = form.addresses
+            .replaceAll(/[,; \t\v\f\r]/g, '')
+            .trim()
+            .split('\n');
         const query = await analyticsGraphQueryStore.createQuery({
             addresses,
             isBetweenSelectedOnly: form.isBetweenAccountsOnly
@@ -90,61 +91,13 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                             resize="none"
                                             {...register('addresses', {
                                                 pattern: {
-                                                    value: /^([a-zA-Z0-9-_]{48}\s+)*[a-zA-Z0-9-_]{48}\s*$/,
+                                                    value: /^([,; \t\v\f\r]*[a-zA-Z0-9_.:\-]+[,; \t\v\f\r]*\n)*[,; \t\v\f\r]*[a-zA-Z0-9_.:\-]+[,; \t\v\f\r]*\s*$/,
                                                     message:
-                                                        'Insert one address in user-friendly format on one line'
+                                                        'Insert one address or ton domain on one line'
                                                 },
 
                                                 required: 'This is required'
                                             })}
-                                            onPaste={e => {
-                                                const pasted = e.clipboardData.getData('text');
-
-                                                const pastedCorrect =
-                                                    /^([a-zA-Z0-9-_]{48}[^a-zA-Z0-9-_]+)*[a-zA-Z0-9-_]{48}[^a-zA-Z0-9-_]*$/.test(
-                                                        pasted
-                                                    );
-
-                                                const textArea = e.target as HTMLTextAreaElement;
-                                                const isSelectedAllContent =
-                                                    textArea.selectionStart === 0 &&
-                                                    textArea.selectionEnd === textArea.textLength;
-                                                const isPastedToEnd =
-                                                    textArea.selectionStart ===
-                                                        textArea.selectionEnd &&
-                                                    textArea.selectionEnd === textArea.textLength;
-
-                                                if (
-                                                    pastedCorrect &&
-                                                    (isPastedToEnd || isSelectedAllContent)
-                                                ) {
-                                                    e.preventDefault();
-                                                    const value = isSelectedAllContent
-                                                        ? ''
-                                                        : getValues('addresses');
-
-                                                    const formattedPasted =
-                                                        pasted
-                                                            .match(/[a-zA-Z0-9-_]{48}/g)
-                                                            ?.join('\n') || pasted;
-
-                                                    const divider = value.endsWith('\n')
-                                                        ? ''
-                                                        : '\n';
-
-                                                    setValue(
-                                                        'addresses',
-                                                        value
-                                                            ? value + divider + formattedPasted
-                                                            : formattedPasted,
-                                                        {
-                                                            shouldValidate: true,
-                                                            shouldDirty: true,
-                                                            shouldTouch: true
-                                                        }
-                                                    );
-                                                }
-                                            }}
                                         />
                                         <FormErrorMessage w={width}>
                                             {errors.addresses && errors.addresses.message}

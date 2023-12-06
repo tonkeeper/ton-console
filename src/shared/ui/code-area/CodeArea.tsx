@@ -1,18 +1,23 @@
-import { ComponentProps, FunctionComponent, useContext } from 'react';
+import { ComponentProps, FunctionComponent, useContext, useRef } from 'react';
 import { Box, useTheme } from '@chakra-ui/react';
 import CodeMirror from '@uiw/react-codemirror';
 import { draculaInit } from '@uiw/codemirror-theme-dracula/src';
 import { tags as t } from '@lezer/highlight';
 import { CodeAreaGroupContext } from './CodeAreaGroup';
-import AutoSizer from 'react-virtualized-auto-sizer';
 import type { Extension } from '@codemirror/state';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 export const CodeArea: FunctionComponent<
-    { value: string; onChange: (value: string) => void; extensions?: Extension[] } & ComponentProps<
-        typeof Box
-    >
-> = ({ value, onChange, extensions, ...rest }) => {
+    {
+        value: string;
+        onChange: (value: string) => void;
+        extensions?: Extension[];
+        isDisabled?: boolean;
+        isLoading?: boolean;
+    } & ComponentProps<typeof Box>
+> = ({ value, onChange, extensions, isDisabled, isLoading, ...rest }) => {
     const theme = useTheme();
+    const ref = useRef<HTMLDivElement | null>(null);
     const { hasFooter } = useContext(CodeAreaGroupContext);
 
     const { stringsColor, operatorsColor, ...codeAreaSettings } =
@@ -33,6 +38,7 @@ export const CodeArea: FunctionComponent<
     return (
         <Box
             {...rest}
+            ref={ref}
             sx={{
                 '.cm-editor, .cm-gutters': {
                     borderTopRadius: 'lg',
@@ -45,14 +51,25 @@ export const CodeArea: FunctionComponent<
                 },
                 '.cm-scroller': {
                     paddingTop: '2'
-                }
+                },
+                ...(isLoading && {
+                    '.cm-activeLine, .cm-activeLineGutter': {
+                        backgroundColor: 'transparent'
+                    },
+                    '.cm-line': {
+                        color: 'text.secondary'
+                    }
+                })
             }}
+            w="100%"
             h={height}
         >
-            <AutoSizer>
+            <AutoSizer forceRender>
                 {({ width }) => (
                     <CodeMirror
-                        value={value}
+                        readOnly={isDisabled || isLoading}
+                        editable={!isDisabled && !isLoading}
+                        value={isLoading ? 'Loading...' : value}
                         onChange={onChange}
                         theme={dracula}
                         extensions={extensions}
