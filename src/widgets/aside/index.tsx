@@ -51,10 +51,10 @@ const Aside: FunctionComponent = () => {
                 linkTo="analytics"
             >
                 <DropDownMenuItem linkTo="history">History</DropDownMenuItem>
-                <DropDownMenuItem linkTo="graph">Graph</DropDownMenuItem>
                 {projectsStore.selectedProject?.capabilities.stats.query && (
                     <DropDownMenuItem linkTo="query">Query</DropDownMenuItem>
                 )}
+                <DropDownMenuItem linkTo="graph">Graph</DropDownMenuItem>
             </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>
                 Testnet Assets

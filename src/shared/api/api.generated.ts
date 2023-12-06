@@ -152,6 +152,7 @@ export interface DTOCharge {
      * @example 1000000
      */
     stats_price_per_second?: number;
+    stats_type_query?: DTOChargeStatsTypeQuery;
     /**
      * @format int64
      * @example 1000000000
@@ -271,17 +272,27 @@ export enum DTOStatsQueryStatus {
     DTOError = 'error'
 }
 
+export interface DTOStatsQuery {
+    addresses?: string[];
+    /** @example false */
+    only_between?: boolean;
+    /** @example "select id from accounts limit 1" */
+    sql?: string;
+    /** @example "give me random id from accounts table" */
+    gpt_message?: string;
+    /**
+     * cyclic execution of requests
+     * @format int32
+     * @example 10
+     */
+    repeat_interval?: number;
+}
+
 export interface DTOStatsQueryResult {
     /** @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b" */
     id: string;
     status: DTOStatsQueryStatus;
-    query?: {
-        addresses?: string[];
-        /** @example false */
-        only_between?: boolean;
-        /** @example "select id from accounts limit 1" */
-        sql?: string;
-    };
+    query?: DTOStatsQuery;
     type?: DTOStatsQueryResultType;
     estimate?: DTOStatsEstimateQuery;
     /** @example "https://sql.io/123.csv" */
@@ -302,6 +313,8 @@ export interface DTOStatsQueryResult {
     error?: string;
     all_data_in_preview?: boolean;
     preview?: string[][];
+    /** @example false */
+    is_gpt?: boolean;
     /**
      * @format int64
      * @example 1690889913000
@@ -398,6 +411,12 @@ export enum DTOErrorCode {
 export enum DTODepositType {
     DTOPromoCode = 'promo_code',
     DTODeposit = 'deposit'
+}
+
+export enum DTOChargeStatsTypeQuery {
+    DTOGraph = 'graph',
+    DTOBaseQuery = 'base_query',
+    DTOChatGptQuery = 'chat_gpt_query'
 }
 
 export enum DTOProjectCapabilities {
@@ -2108,7 +2127,9 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  */
                 project_id: number;
                 /** @example "select id from test" */
-                query: string;
+                query?: string;
+                /** @example "give me random id from accounts table" */
+                gpt_message?: string;
                 /**
                  * cyclic execution of requests
                  * @format int32
@@ -2149,7 +2170,9 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  */
                 project_id: number;
                 /** @example "select id from test" */
-                query: string;
+                query?: string;
+                /** @example "give me random id from accounts table" */
+                gpt_message?: string;
                 /**
                  * cyclic execution of requests
                  * @format int32
@@ -2194,6 +2217,49 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             >({
                 path: `/api/v1/services/stats/query/${id}`,
                 method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags db
+         * @name UpdateStatsQuery
+         * @summary Update query
+         * @request PATCH:/api/v1/services/stats/query/{id}
+         */
+        updateStatsQuery: (
+            id: string,
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: {
+                /**
+                 * cyclic execution of requests
+                 * @format int32
+                 * @example 10
+                 */
+                repeat_interval: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOStatsQuery,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/stats/query/${id}`,
+                method: 'PATCH',
+                query: query,
+                body: data,
                 ...params
             }),
 
@@ -2324,6 +2390,96 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 }
             >({
                 path: `/api/v1/services/stats/payments/history`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags stats_service
+         * @name StatsChatGptRequest
+         * @summary Send request to ChatGPT
+         * @request POST:/api/v1/services/stats/gpt
+         */
+        statsChatGptRequest: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: {
+                message: string;
+                context?: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    message: string;
+                    valid: boolean;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/stats/gpt`,
+                method: 'POST',
+                query: query,
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags stats_service
+         * @name GetStatsChatGptPrice
+         * @summary Price per request for ChatGPT
+         * @request GET:/api/v1/services/stats/price/gpt
+         */
+        getStatsChatGptPrice: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /**
+                     * @format int32
+                     * @example 10
+                     */
+                    free_requests: number;
+                    /**
+                     * @format int32
+                     * @example 100
+                     */
+                    used: number;
+                    /**
+                     * @format int64
+                     * @example 1000000
+                     */
+                    price: number;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/stats/price/gpt`,
                 method: 'GET',
                 query: query,
                 ...params

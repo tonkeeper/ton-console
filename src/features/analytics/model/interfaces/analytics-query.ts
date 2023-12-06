@@ -16,6 +16,7 @@ export interface AnalyticsQueryBasic extends AnalyticsQueryTemplate {
     type: 'query';
     id: string;
     status: 'executing' | 'success' | 'error';
+    gptPrompt?: string;
     creationDate: Date;
 }
 

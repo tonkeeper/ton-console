@@ -1,33 +1,20 @@
 import { makeAutoObservable } from 'mobx';
 import {
     apiClient,
-    createAsyncAction,
     createReaction,
-    DTOStatsEstimateQuery,
     DTOStatsQueryResult,
     DTOStatsQueryStatus,
     Loadable,
     TonCurrencyAmount
 } from 'src/shared';
-import {
-    AnalyticsQuery,
-    AnalyticsQueryTemplate,
-    AnalyticsTableSource,
-    AnalyticsTablesSchema
-} from './interfaces';
+import { AnalyticsQuery, AnalyticsTableSource, AnalyticsTablesSchema } from './interfaces';
 import { projectsStore } from 'src/entities';
-import { analyticsHistoryTableStore } from 'src/features';
+import { analyticsGPTGenerationStore, analyticsHistoryTableStore } from 'src/features';
 
 class AnalyticsQueryStore {
-    request$ = new Loadable<AnalyticsQueryTemplate | null>(null);
-
     query$ = new Loadable<AnalyticsQuery | null>(null);
 
     tablesSchema$ = new Loadable<AnalyticsTablesSchema | undefined>(undefined);
-
-    get requestEqQuery(): boolean {
-        return this.request$.value?.request === this.query$.value?.request;
-    }
 
     constructor() {
         makeAutoObservable(this);
@@ -52,29 +39,14 @@ class AnalyticsQueryStore {
         { resetBeforeExecution: true }
     );
 
-    public estimateRequest = this.request$.createAsyncAction(async (request: string) => {
-        try {
-            const result = await apiClient.api.estimateStatsQuery({
-                project_id: projectsStore.selectedProject!.id,
-                query: request
-            });
-
-            return mapDTOStatsEstimateSQLToAnalyticsQuery(request, result.data);
-        } catch (e) {
-            const errText =
-                (
-                    e as { response: { data: { error: string } } }
-                )?.response?.data?.error?.toString() || 'Unknown error';
-
-            throw new Error(errText);
-        }
-    });
-
     createQuery = this.query$.createAsyncAction(
-        async () => {
+        async (query: string) => {
             const result = await apiClient.api.sendQueryToStats({
                 project_id: projectsStore.selectedProject!.id,
-                query: this.request$.value!.request
+                query,
+                ...(query.trim() === analyticsGPTGenerationStore.generatedSQL$.value?.trim() && {
+                    gpt_message: analyticsGPTGenerationStore.gptPrompt
+                })
             });
 
             await analyticsHistoryTableStore.fetchPaymentsHistory();
@@ -95,48 +67,17 @@ class AnalyticsQueryStore {
         return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
     });
 
-    loadQueryAndRequest = createAsyncAction(async (id: string) => {
-        this.clearRequest();
-        this.query$.clear();
-
-        this.request$.setStartLoading();
-        this.query$.setStartLoading();
-
-        const result = await apiClient.api.getSqlResultFromStats(id);
-        const query = mapDTOStatsSqlResultToAnalyticsQuery(result.data);
-
-        this.request$.setValue({
-            estimatedTimeMS: query.estimatedTimeMS,
-            estimatedCost: query.estimatedCost,
-            request: query.request
-        });
-
-        this.query$.setValue(query);
-
-        this.request$.setEndLoading();
-        this.query$.setEndLoading();
-    });
-
-    clearRequest = (): void => {
-        this.estimateRequest.cancelAllPendingCalls();
-        this.request$.clear();
-    };
+    loadQuery = this.query$.createAsyncAction(
+        async (id: string) => {
+            const result = await apiClient.api.getSqlResultFromStats(id);
+            return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
+        },
+        { resetBeforeExecution: true }
+    );
 
     clear(): void {
-        this.request$.clear();
         this.query$.clear();
     }
-}
-
-function mapDTOStatsEstimateSQLToAnalyticsQuery(
-    request: string,
-    value: DTOStatsEstimateQuery
-): AnalyticsQueryTemplate {
-    return {
-        request,
-        estimatedTimeMS: value.approximate_time,
-        estimatedCost: new TonCurrencyAmount(value.approximate_cost)
-    };
 }
 
 export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult): AnalyticsQuery {
@@ -144,6 +85,7 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         type: 'query',
         id: value.id,
         creationDate: new Date(value.date_create),
+        gptPrompt: value.query?.gpt_message,
         request: value.query!.sql!,
         estimatedTimeMS: value.estimate!.approximate_time,
         estimatedCost: new TonCurrencyAmount(value.estimate!.approximate_cost)

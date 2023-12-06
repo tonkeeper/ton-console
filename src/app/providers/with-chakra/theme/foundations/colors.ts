@@ -6,7 +6,7 @@ const colors = {
         accent: '#2E84E5'
     },
     background: {
-        page: '#F1F3F5',
+        page: '#ECEEF0',
         content: '#FFFFFF',
         contentTint: '#F1F3F5',
         overlay: 'rgba(0, 0, 0, 0.4)',

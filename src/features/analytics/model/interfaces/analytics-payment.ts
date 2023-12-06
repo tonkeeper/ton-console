@@ -5,5 +5,5 @@ export interface AnalyticsPayment {
     amount: TonCurrencyAmount;
     amountUsdEquivalent: UsdCurrencyAmount;
     date: Date;
-    subservice: 'query' | 'graph';
+    subservice: 'query' | 'graph' | 'gpt generation';
 }
