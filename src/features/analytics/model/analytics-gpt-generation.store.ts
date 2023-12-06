@@ -1,4 +1,4 @@
-import { autorun, makeAutoObservable } from 'mobx';
+import { makeAutoObservable } from 'mobx';
 import { apiClient, createImmediateReaction, Loadable, TonCurrencyAmount } from 'src/shared';
 import { projectsStore } from 'src/entities';
 import { analyticsHistoryTableStore, GptGenerationPricing } from 'src/features';
@@ -70,5 +70,3 @@ function mapStatsChatGptPriceToGptGenerationPricing(
 }
 
 export const analyticsGPTGenerationStore = new AnalyticsGPTGenerationStore();
-
-autorun(() => console.log(analyticsGPTGenerationStore.gptPricing$.value?.freeRequestsNumber));
