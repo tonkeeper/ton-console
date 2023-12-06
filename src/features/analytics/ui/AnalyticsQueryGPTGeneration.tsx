@@ -2,8 +2,7 @@ import { ComponentProps, FunctionComponent, useState } from 'react';
 import { Box, Button, Textarea } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { analyticsGPTGenerationStore, analyticsQueryGPTRequestStore } from '../model';
-import { TextareaBody, TextareaGroup, useLocalStorage } from 'src/shared';
-import { TextareaRight } from 'src/shared/ui/textarea/TextareaRight';
+import { Span, TextareaBody, TextareaFooter, TextareaGroup, useLocalStorage } from 'src/shared';
 
 const SHOW_CONTEXT_CMD = 'run:show_context';
 const HIDE_CONTEXT_CMD = 'run:hide_context';
@@ -33,6 +32,18 @@ const AnalyticsQueryGPTGeneration: FunctionComponent<ComponentProps<typeof Box>>
         analyticsGPTGenerationStore.generateSQL(message, context || undefined);
     };
 
+    let price = null;
+    const gptPricing = analyticsGPTGenerationStore.gptPricing$.value;
+    if (gptPricing) {
+        if (gptPricing.freeRequestsNumber > gptPricing.usedFreeRequest) {
+            price = `${
+                gptPricing.freeRequestsNumber - gptPricing.usedFreeRequest
+            } free requests left`;
+        } else {
+            price = gptPricing.requestPrice.toStringCurrencyAmount();
+        }
+    }
+
     return (
         <Box {...props}>
             {showContext && (
@@ -56,7 +67,17 @@ const AnalyticsQueryGPTGeneration: FunctionComponent<ComponentProps<typeof Box>>
                     spellCheck={false}
                     rows={4}
                 />
-                <TextareaRight display="flex" alignItems="flex-end">
+                <TextareaFooter
+                    display="flex"
+                    justifyContent="flex-end"
+                    alignItems="center"
+                    gap="3"
+                >
+                    {!!price && (
+                        <Span color="text.secondary" textStyle="label2">
+                            {price}
+                        </Span>
+                    )}
                     <Button
                         isDisabled={!message}
                         isLoading={analyticsGPTGenerationStore.generateSQL.isLoading}
@@ -65,7 +86,7 @@ const AnalyticsQueryGPTGeneration: FunctionComponent<ComponentProps<typeof Box>>
                     >
                         Generate
                     </Button>
-                </TextareaRight>
+                </TextareaFooter>
             </TextareaGroup>
         </Box>
     );

@@ -415,7 +415,8 @@ export enum DTODepositType {
 
 export enum DTOChargeStatsTypeQuery {
     DTOGraph = 'graph',
-    DTOBaseQuery = 'base_query'
+    DTOBaseQuery = 'base_query',
+    DTOChatGptQuery = 'chat_gpt_query'
 }
 
 export enum DTOProjectCapabilities {
@@ -2432,6 +2433,55 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 method: 'POST',
                 query: query,
                 body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags stats_service
+         * @name GetStatsChatGptPrice
+         * @summary Price per request for ChatGPT
+         * @request GET:/api/v1/services/stats/price/gpt
+         */
+        getStatsChatGptPrice: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /**
+                     * @format int32
+                     * @example 10
+                     */
+                    free_requests: number;
+                    /**
+                     * @format int32
+                     * @example 100
+                     */
+                    used: number;
+                    /**
+                     * @format int64
+                     * @example 1000000
+                     */
+                    price: number;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/stats/price/gpt`,
+                method: 'GET',
+                query: query,
                 ...params
             }),
 
