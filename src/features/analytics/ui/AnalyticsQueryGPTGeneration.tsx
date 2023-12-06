@@ -40,7 +40,7 @@ const AnalyticsQueryGPTGeneration: FunctionComponent<ComponentProps<typeof Box>>
                 gptPricing.freeRequestsNumber - gptPricing.usedFreeRequest
             } free requests left`;
         } else {
-            price = gptPricing.requestPrice.toStringCurrencyAmount();
+            price = `Costs up to ${gptPricing.requestPrice.stringCurrencyAmount}`;
         }
     }
 

@@ -1,7 +1,7 @@
-import { makeAutoObservable } from 'mobx';
+import { autorun, makeAutoObservable } from 'mobx';
 import { apiClient, createImmediateReaction, Loadable, TonCurrencyAmount } from 'src/shared';
 import { projectsStore } from 'src/entities';
-import { GptGenerationPricing } from 'src/features';
+import { analyticsHistoryTableStore, GptGenerationPricing } from 'src/features';
 
 class AnalyticsGPTGenerationStore {
     generatedSQL$ = new Loadable<string | null>(null);
@@ -16,9 +16,11 @@ class AnalyticsGPTGenerationStore {
         createImmediateReaction(
             () => projectsStore.selectedProject,
             project => {
+                this.gptPricing$.clear();
+                this.fetchPrice.cancelAllPendingCalls();
                 this.clear();
 
-                if (project) {
+                if (project?.capabilities.stats.query) {
                     this.fetchPrice();
                 }
             }
@@ -41,14 +43,17 @@ class AnalyticsGPTGenerationStore {
                 { message, context }
             );
 
-            await this.fetchPrice();
+            await Promise.all([
+                analyticsHistoryTableStore.fetchPaymentsHistory(),
+                this.fetchPrice()
+            ]);
+
             return result.data.message;
         }
     );
 
     public clear() {
         this.generateSQL.cancelAllPendingCalls();
-        this.gptPricing$.clear();
         this.generatedSQL$.clear();
         this.gptPrompt = '';
     }
@@ -65,3 +70,5 @@ function mapStatsChatGptPriceToGptGenerationPricing(
 }
 
 export const analyticsGPTGenerationStore = new AnalyticsGPTGenerationStore();
+
+autorun(() => console.log(analyticsGPTGenerationStore.gptPricing$.value?.freeRequestsNumber));

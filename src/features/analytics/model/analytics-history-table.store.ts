@@ -109,6 +109,12 @@ function mapDTOStatsResultToAnalyticsHistoryResult(
     return mapDTOStatsSqlResultToAnalyticsQuery(value);
 }
 
+const subservices = {
+    [DTOChargeStatsTypeQuery.DTOGraph]: 'graph',
+    [DTOChargeStatsTypeQuery.DTOBaseQuery]: 'query',
+    [DTOChargeStatsTypeQuery.DTOChatGptQuery]: 'gpt generation'
+} as const;
+
 function mapDTOPaymentAnalyticsPayment(payment: DTOCharge): AnalyticsPayment | null {
     const tonAmount = new TonCurrencyAmount(payment.amount);
     return {
@@ -118,8 +124,7 @@ function mapDTOPaymentAnalyticsPayment(payment: DTOCharge): AnalyticsPayment | n
         amountUsdEquivalent: new UsdCurrencyAmount(
             tonAmount.amount.multipliedBy(payment.exchange_rate)
         ),
-        subservice:
-            payment.stats_type_query === DTOChargeStatsTypeQuery.DTOGraph ? 'graph' : 'query'
+        subservice: subservices[payment.stats_type_query!]
     };
 }
 
