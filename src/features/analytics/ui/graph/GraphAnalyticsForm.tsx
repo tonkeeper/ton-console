@@ -74,17 +74,18 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                 <>
                                     <FormControl mb="6" isInvalid={!!errors.addresses}>
                                         <NumberedTextArea
+                                            minRows={3}
                                             isDisabled={isFormDisabled}
                                             wrapperProps={{
                                                 height: 'fit-content',
                                                 width,
                                                 maxHeight: height
                                             }}
-                                            placeholder="Enter address in user-friendly format"
+                                            placeholder="Address"
                                             maxRows={
                                                 height
                                                     ? Math.floor(
-                                                          (height - 40) / textAreaLineHeight
+                                                          (height - 100) / textAreaLineHeight
                                                       ) - 1
                                                     : 4
                                             }
@@ -99,9 +100,17 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                                 required: 'This is required'
                                             })}
                                         />
-                                        <FormErrorMessage w={width}>
+                                        <FormErrorMessage pos="static" w={width}>
                                             {errors.addresses && errors.addresses.message}
                                         </FormErrorMessage>
+                                        <Box
+                                            textStyle="body3"
+                                            w={width}
+                                            mt="2"
+                                            color="text.secondary"
+                                        >
+                                            Enter up to 10 addresses
+                                        </Box>
                                     </FormControl>
 
                                     <Flex

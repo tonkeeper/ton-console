@@ -1,12 +1,14 @@
-import { ChangeEvent, ComponentProps, useRef, useState, UIEvent, useEffect } from 'react';
+import { ChangeEvent, ComponentProps, useRef, useState, UIEvent, useLayoutEffect } from 'react';
 import { Box, forwardRef, Textarea } from '@chakra-ui/react';
 import { mergeRefs } from 'src/shared';
 import ResizeTextarea from 'react-textarea-autosize';
 
 export const NumberedTextArea = forwardRef<
-    ComponentProps<typeof Textarea> & { wrapperProps?: ComponentProps<typeof Box> },
+    ComponentProps<typeof Textarea> & {
+        wrapperProps?: ComponentProps<typeof Box>;
+    } & ComponentProps<typeof ResizeTextarea>,
     typeof Textarea
->(({ onChange, onScroll, wrapperProps, ...rest }, ref) => {
+>(({ onChange, onScroll, wrapperProps, minRows, ...rest }, ref) => {
     const [linesNumber, setLinesNumber] = useState(1);
     const internalTextareaRef = useRef<HTMLTextAreaElement | null>(null);
     const linesRef = useRef<HTMLDivElement | null>(null);
@@ -18,7 +20,9 @@ export const NumberedTextArea = forwardRef<
         fontFamily: 'inherit'
     });
 
-    useEffect(() => {
+    useLayoutEffect(() => {
+        setLinesNumber(minRows || 1);
+
         const textAreaStyles = internalTextareaRef.current
             ? getComputedStyle(internalTextareaRef.current)
             : null;
@@ -33,13 +37,13 @@ export const NumberedTextArea = forwardRef<
         }
     }, []);
 
-    const lines = internalTextareaRef.current?.value.split('\n').length;
-    if (lines && lines !== linesNumber) {
-        setLinesNumber(lines);
-    }
-
     const onTextAreaChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
-        setLinesNumber(e.target.value.split('\n').length);
+        let rows = e.target.value.split('\n').length;
+        if (minRows && rows < minRows) {
+            rows = minRows;
+        }
+
+        setLinesNumber(rows);
         onChange?.(e);
     };
 
@@ -78,6 +82,7 @@ export const NumberedTextArea = forwardRef<
                 minH="unset"
                 maxH="100%"
                 pl="44px"
+                minRows={minRows}
                 onChange={onTextAreaChange}
                 onScroll={onTextareaScroll}
             />
