@@ -31,7 +31,13 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
         const addresses = form.addresses
             .replaceAll(/[,; \t\v\f\r]/g, '')
             .trim()
-            .split('\n');
+            .split('\n')
+            .map(value => {
+                if (/^[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-.]+$/.test(value)) {
+                    return value.toLowerCase();
+                }
+                return value;
+            });
         const query = await analyticsGraphQueryStore.createQuery({
             addresses,
             isBetweenSelectedOnly: form.isBetweenAccountsOnly
