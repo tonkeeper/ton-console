@@ -103,7 +103,7 @@ const AnalyticsQueryControlPanel: FunctionComponent<
             >
                 Run
             </Button>
-            <ExplainSQLModal isOpen={isOpen} onClose={onClose} />
+            <ExplainSQLModal type={type} isOpen={isOpen} onClose={onClose} />
         </Flex>
     );
 };
