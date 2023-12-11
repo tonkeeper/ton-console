@@ -61,7 +61,8 @@ function mapDTOStatsEstimateSQLToAnalyticsQuery(
     return {
         request,
         estimatedTimeMS: value.approximate_time,
-        estimatedCost: new TonCurrencyAmount(value.approximate_cost)
+        estimatedCost: new TonCurrencyAmount(value.approximate_cost),
+        explanation: value.explain!
     };
 }
 

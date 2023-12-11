@@ -88,7 +88,8 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         gptPrompt: value.query?.gpt_message,
         request: value.query!.sql!,
         estimatedTimeMS: value.estimate!.approximate_time,
-        estimatedCost: new TonCurrencyAmount(value.estimate!.approximate_cost)
+        estimatedCost: new TonCurrencyAmount(value.estimate!.approximate_cost),
+        explanation: value.estimate!.explain!
     } as const;
 
     if (value.status === DTOStatsQueryStatus.DTOExecuting) {

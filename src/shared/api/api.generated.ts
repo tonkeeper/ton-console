@@ -240,6 +240,32 @@ export interface DTOMessagesPackage {
     usd_price: number;
 }
 
+export interface DTOStatsDashboard {
+    id: string;
+    /** @example "Test" */
+    name?: string;
+    /**
+     * @format uint32
+     * @example 1647024163
+     */
+    project_id: number;
+    query_ids?: string[];
+    /** @example false */
+    public: boolean;
+    /** @example {"first_key":"1","second_key":2} */
+    attributes?: any;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_change: number;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
+}
+
 export interface DTOMessagesApp {
     /**
      * @format uint32
@@ -327,6 +353,7 @@ export interface DTOStatsEstimateQuery {
     approximate_time: number;
     /** @format int64 */
     approximate_cost: number;
+    explain?: string;
 }
 
 export interface DTOInvoicesInvoice {
@@ -2114,7 +2141,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags db
+         * @tags stats_service
          * @name EstimateStatsQuery
          * @summary Estimate query
          * @request POST:/api/v1/services/stats/query/estimate
@@ -2223,7 +2250,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags db
+         * @tags stats_service
          * @name UpdateStatsQuery
          * @summary Update query
          * @request PATCH:/api/v1/services/stats/query/{id}
@@ -2480,6 +2507,166 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 }
             >({
                 path: `/api/v1/services/stats/price/gpt`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags stats_service
+         * @name CreateStatsDashboard
+         * @summary Create dashboard
+         * @request POST:/api/v1/services/stats/dashboard
+         */
+        createStatsDashboard: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: {
+                /** @example "Test" */
+                name?: string;
+                /** @default false */
+                public?: boolean;
+                /** @default true */
+                active?: boolean;
+                /** @example {"first_key":"1","second_key":2} */
+                attributes?: any;
+                query_ids?: string[];
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOStatsDashboard,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/stats/dashboard`,
+                method: 'POST',
+                query: query,
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags stats_service
+         * @name GetStatsDashboard
+         * @summary Get dashboard
+         * @request GET:/api/v1/services/stats/dashboard/{id}
+         */
+        getStatsDashboard: (
+            id: string,
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOStatsDashboard,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/stats/dashboard/${id}`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags stats_service
+         * @name UpdateStatsDashboard
+         * @summary Update dashboard
+         * @request PATCH:/api/v1/services/stats/dashboard/{id}
+         */
+        updateStatsDashboard: (
+            id: string,
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: {
+                /** @example "Test" */
+                name?: string;
+                /** @default false */
+                public?: boolean;
+                /** @default true */
+                active?: boolean;
+                /** @example {"first_key":"1","second_key":2} */
+                attributes?: any;
+                query_ids?: string[];
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOStatsDashboard,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/stats/dashboard/${id}`,
+                method: 'PATCH',
+                query: query,
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags stats_service
+         * @name GetStatsDashboards
+         * @summary Get dashboards
+         * @request GET:/api/v1/services/stats/dashboards
+         */
+        getStatsDashboards: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: DTOStatsDashboard[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/stats/dashboards`,
                 method: 'GET',
                 query: query,
                 ...params

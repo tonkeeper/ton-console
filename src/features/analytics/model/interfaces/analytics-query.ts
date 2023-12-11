@@ -10,6 +10,7 @@ export interface AnalyticsQueryTemplate {
     request: string;
     estimatedTimeMS: number;
     estimatedCost: TonCurrencyAmount;
+    explanation: string;
 }
 
 export interface AnalyticsQueryBasic extends AnalyticsQueryTemplate {
