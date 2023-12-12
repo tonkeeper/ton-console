@@ -1,7 +1,8 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Pad } from './Pad';
-import { Spinner, Text, Tooltip, useClipboard } from '@chakra-ui/react';
+import { Spinner, Text, Tooltip, useClipboard, useToken } from '@chakra-ui/react';
 import { CopyIcon16, CopyIcon24 } from './icons';
+import { hexToRGBA } from 'src/shared';
 
 export const CopyPad: FunctionComponent<
     ComponentProps<typeof Pad> & {
@@ -14,6 +15,7 @@ export const CopyPad: FunctionComponent<
     }
 > = ({ text, iconAlign, isLoading, size, variant, textStyles, ...rest }) => {
     const { hasCopied, onCopy } = useClipboard(text);
+    const bg = useToken('colors', 'background.page');
 
     return (
         <Tooltip
@@ -34,6 +36,7 @@ export const CopyPad: FunctionComponent<
                 opacity={isLoading ? '0.48' : '1'}
                 onClick={isLoading ? () => {} : onCopy}
                 wordBreak="break-word"
+                position="relative"
                 _hover={
                     !isLoading && {
                         svg: {
@@ -61,9 +64,21 @@ export const CopyPad: FunctionComponent<
                 )}
 
                 {size === 'sm' ? (
-                    <CopyIcon16 alignSelf={iconAlign === 'start' ? 'flex-start' : 'center'} />
+                    <CopyIcon16
+                        bgColor={hexToRGBA(bg, 0.8)}
+                        position="sticky"
+                        right="0"
+                        borderRadius="sm"
+                        alignSelf={iconAlign === 'start' ? 'flex-start' : 'center'}
+                    />
                 ) : (
-                    <CopyIcon24 alignSelf={iconAlign === 'start' ? 'flex-start' : 'center'} />
+                    <CopyIcon24
+                        bgColor={hexToRGBA(bg, 0.8)}
+                        position="sticky"
+                        right="0"
+                        borderRadius="sm"
+                        alignSelf={iconAlign === 'start' ? 'flex-start' : 'center'}
+                    />
                 )}
             </Pad>
         </Tooltip>
