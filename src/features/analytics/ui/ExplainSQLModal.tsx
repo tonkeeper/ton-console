@@ -40,6 +40,7 @@ const ExplainSQLModal: FunctionComponent<{
                 <ModalBody py="0">
                     <Pad
                         mb="4"
+                        maxH="300px"
                         w="100%"
                         px="4"
                         py="3"
@@ -78,6 +79,7 @@ const ExplainSQLModal: FunctionComponent<{
                         />
                     </Pad>
                     <CopyPad
+                        maxH="400px"
                         iconAlign="start"
                         w="100%"
                         whiteSpace="pre"

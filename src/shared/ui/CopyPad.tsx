@@ -68,6 +68,7 @@ export const CopyPad: FunctionComponent<
                         bgColor={hexToRGBA(bg, 0.8)}
                         position="sticky"
                         right="0"
+                        top={iconAlign === 'start' ? '0' : 'calc(50% - 8px)'}
                         borderRadius="sm"
                         alignSelf={iconAlign === 'start' ? 'flex-start' : 'center'}
                     />
@@ -77,6 +78,7 @@ export const CopyPad: FunctionComponent<
                         position="sticky"
                         right="0"
                         borderRadius="sm"
+                        top={iconAlign === 'start' ? '0' : 'calc(50% - 12px)'}
                         alignSelf={iconAlign === 'start' ? 'flex-start' : 'center'}
                     />
                 )}
