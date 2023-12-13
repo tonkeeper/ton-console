@@ -38,7 +38,6 @@ export const DappVerification: FunctionComponent<
             </Text>
             <CopyPad
                 whiteSpace="pre-wrap"
-                w="fit-content"
                 mb="2"
                 iconAlign="start"
                 text={'{\n' + '    "payload": "' + pendingDapp.token + '"\n' + '}'}
