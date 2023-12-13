@@ -86,7 +86,7 @@ const ItemRow: FunctionComponent<{
                         ) : (
                             <Span>{toTimeLeft(query.spentTimeMS)}</Span>
                         )}
-                        &nbsp;· {query.cost.toStringCurrencyAmount({ decimalPlaces: 'all' })}
+                        &nbsp;· {query.cost.stringCurrencyAmount}
                     </Flex>
                 ) : (
                     formattedDuration
