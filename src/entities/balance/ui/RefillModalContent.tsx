@@ -37,7 +37,7 @@ const RefillModalContent: FunctionComponent<{
                                 value={createTransferLink({ address: depositAddress })}
                             />
                         </Pad>
-                        <CopyPad text={depositAddress} />
+                        <CopyPad iconPosition="static" text={depositAddress} />
                     </>
                 )}
             </ModalBody>

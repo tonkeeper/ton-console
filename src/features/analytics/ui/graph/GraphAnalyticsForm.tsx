@@ -72,7 +72,7 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                     </Box>
                 </InfoTooltip>
             </FormControl>
-            <Box flex="1">
+            <Box flex="1" overflowX="auto">
                 <AutoSizer>
                     {({ height, width }) => (
                         <Observer>
@@ -85,6 +85,7 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                             wrapperProps={{
                                                 height: 'fit-content',
                                                 width,
+                                                minW: '700px',
                                                 maxHeight: height
                                             }}
                                             placeholder="Address"

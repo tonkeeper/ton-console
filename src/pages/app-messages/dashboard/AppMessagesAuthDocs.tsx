@@ -56,7 +56,7 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                     push API request.
                 </Text>
             </Box>
-            <Tabs mb="4">
+            <Tabs mb="4" isLazy={true}>
                 <TabList pl="6">
                     <Tab>Message User</Tab>
                     <Tab>Message All Users</Tab>

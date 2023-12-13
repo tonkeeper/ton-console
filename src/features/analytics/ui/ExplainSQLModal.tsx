@@ -83,8 +83,8 @@ const ExplainSQLModal: FunctionComponent<{
                         iconAlign="start"
                         w="100%"
                         whiteSpace="pre"
+                        iconPosition="sticky"
                         text={text.trim()}
-                        overflow="auto"
                     />
                 </ModalBody>
                 <ModalFooter>
