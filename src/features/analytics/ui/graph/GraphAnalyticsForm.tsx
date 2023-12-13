@@ -33,7 +33,7 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
             .trim()
             .split('\n')
             .map(value => {
-                if (/^[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-.]+$/.test(value)) {
+                if (/^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-.]+$/.test(value)) {
                     return value.toLowerCase();
                 }
                 return value;
@@ -45,7 +45,9 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
         setSearchParams({ id: query.id });
     };
 
-    const isFormDisabled = analyticsGraphQueryStore.query$.value?.status === 'executing';
+    const isFormDisabled =
+        analyticsGraphQueryStore.query$.value?.status === 'executing' ||
+        analyticsGraphQueryStore.createQuery.isLoading;
 
     return (
         <chakra.form
