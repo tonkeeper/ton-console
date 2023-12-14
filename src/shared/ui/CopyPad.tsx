@@ -14,6 +14,7 @@ export const CopyPad: FunctionComponent<
         size?: 'sm' | 'md';
         variant?: 'primary' | 'flat';
     }
+    // eslint-disable-next-line complexity
 > = ({ text, iconAlign, iconPosition, isLoading, size, variant, textStyles, ...rest }) => {
     const { hasCopied, onCopy } = useClipboard(text);
     const bg = useToken('colors', 'background.page');
@@ -58,7 +59,7 @@ export const CopyPad: FunctionComponent<
                 opacity={isLoading ? '0.48' : '1'}
                 onClick={isLoading ? () => {} : onCopy}
                 position="relative"
-                height={height + 'px'}
+                {...(iconPosition === 'sticky' && { height: height + 'px' })}
                 pr={variant === 'flat' ? '0' : '2.5'}
                 px={variant === 'flat' ? '0' : '4'}
                 py={variant === 'flat' ? '0' : '3'}
@@ -101,17 +102,17 @@ export const CopyPad: FunctionComponent<
                 )}
                 <Box
                     ref={inner}
-                    pos="absolute"
+                    pos={iconPosition === 'sticky' ? 'absolute' : 'static'}
                     top="0"
                     left="0"
                     overflow="auto"
                     w="100%"
                     h="fit-content"
                     maxH={maxHeight}
-                    pt={pt}
+                    pt={iconPosition === 'sticky' ? pt : 0}
                     pr={prWithIcon}
-                    pb={pb}
-                    pl={pl}
+                    pb={iconPosition === 'sticky' ? pb : 0}
+                    pl={iconPosition === 'sticky' ? pl : 0}
                     whiteSpace="inherit"
                     wordBreak="break-word"
                 >
