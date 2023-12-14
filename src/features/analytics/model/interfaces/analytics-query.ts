@@ -1,4 +1,5 @@
 import { TonCurrencyAmount } from 'src/shared';
+import { AnalyticsGraphQuery } from 'src/features';
 
 export interface AnalyticsTableSource {
     headings: string[];
@@ -58,3 +59,17 @@ export type AnalyticsQuery =
     | AnalyticsQueryPending
     | AnalyticsQuerySuccessful
     | AnalyticsQueryErrored;
+
+export function isAnalyticsRepeatingQuery(
+    value: AnalyticsQuery | AnalyticsRepeatingQuery | AnalyticsGraphQuery
+): value is AnalyticsRepeatingQuery {
+    return 'lastQuery' in value;
+}
+
+export interface AnalyticsRepeatingQuery {
+    lastQuery: AnalyticsQuery;
+    lastQueryDate: Date;
+    repeatFrequencyMs: number;
+    totalRepetitions: number;
+    totalCost: TonCurrencyAmount;
+}

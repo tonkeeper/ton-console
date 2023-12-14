@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, reaction } from 'mobx';
 import {
     apiClient,
     createImmediateReaction,
@@ -10,15 +10,28 @@ import {
     TonCurrencyAmount,
     UsdCurrencyAmount
 } from 'src/shared';
-import { AnalyticsGraphQuery, AnalyticsPayment, AnalyticsQuery } from './interfaces';
+import {
+    AnalyticsGraphQuery,
+    AnalyticsPayment,
+    AnalyticsQuery,
+    AnalyticsQueryType,
+    AnalyticsRepeatingQuery,
+    AnalyticsTablePagination
+} from './interfaces';
 import { projectsStore } from 'src/entities';
 import { mapDTOStatsSqlResultToAnalyticsQuery } from './analytics-query.store';
 import { mapDTOStatsGraphResultToAnalyticsGraphQuery } from './analytics-graph-query.store';
 
 class AnalyticsHistoryTableStore {
-    queries$ = new Loadable<(AnalyticsQuery | AnalyticsGraphQuery)[]>([]);
+    queries$ = new Loadable<(AnalyticsQuery | AnalyticsRepeatingQuery | AnalyticsGraphQuery)[]>([]);
 
     paymentsHistory$ = new Loadable<AnalyticsPayment[]>([]);
+
+    pagination: AnalyticsTablePagination = {
+        filter: {
+            onlyRepeating: false
+        }
+    };
 
     private totalQueries = 0;
 
@@ -34,17 +47,31 @@ class AnalyticsHistoryTableStore {
 
     constructor() {
         makeAutoObservable(this);
+        let dispose: (() => void) | undefined;
 
         createImmediateReaction(
             () => projectsStore.selectedProject,
             project => {
+                dispose?.();
                 this.clearState();
+                this.pagination = {
+                    filter: {
+                        onlyRepeating: false
+                    }
+                };
                 this.loadFirstPage.cancelAllPendingCalls();
                 this.loadNextPage.cancelAllPendingCalls();
 
                 if (project) {
                     this.loadFirstPage();
                     this.fetchPaymentsHistory();
+
+                    dispose = reaction(
+                        () => JSON.stringify(this.pagination),
+                        () => {
+                            this.loadFirstPage({ cancelPreviousCall: true });
+                        }
+                    );
                 }
             }
         );
@@ -92,6 +119,23 @@ class AnalyticsHistoryTableStore {
 
         return response.data.history.map(payment => mapDTOPaymentAnalyticsPayment(payment));
     });
+
+    toggleFilterByType = (type: AnalyticsQueryType): void => {
+        const typeActive = this.pagination.filter.type?.includes(type);
+        if (typeActive) {
+            this.pagination.filter.type = this.pagination.filter.type?.filter(i => i !== type);
+        } else {
+            this.pagination.filter.type = (this.pagination.filter.type || []).concat(type);
+        }
+    };
+
+    toggleFilterByRepeating = (): void => {
+        this.pagination.filter.onlyRepeating = !this.pagination.filter.onlyRepeating;
+    };
+
+    clearFilterByType = (): void => {
+        this.pagination.filter.type = undefined;
+    };
 
     clearState(): void {
         this.paymentsHistory$.clear();
