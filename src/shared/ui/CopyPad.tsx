@@ -84,7 +84,7 @@ export const CopyPad: FunctionComponent<
                 {size === 'sm' ? (
                     <CopyIcon16
                         zIndex="2"
-                        bgColor={hexToRGBA(bg, 0.8)}
+                        bgColor={variant === 'flat' ? 'unset' : hexToRGBA(bg, 0.8)}
                         borderRadius="sm"
                         pos="absolute"
                         top={iconAlign === 'start' ? pt : 'calc(50% - 8px)'}
@@ -93,7 +93,7 @@ export const CopyPad: FunctionComponent<
                 ) : (
                     <CopyIcon24
                         zIndex="2"
-                        bgColor={hexToRGBA(bg, 0.8)}
+                        bgColor={variant === 'flat' ? 'unset' : hexToRGBA(bg, 0.8)}
                         borderRadius="sm"
                         pos="absolute"
                         top={iconAlign === 'start' ? pt : 'calc(50% - 12px)'}
