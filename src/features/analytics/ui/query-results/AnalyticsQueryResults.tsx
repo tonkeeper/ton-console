@@ -7,6 +7,7 @@ import { AnalyticsQueryResultsCountdown } from './AnalyticsQueryResultsCountdown
 import { toJS } from 'mobx';
 import { AnalyticsTable } from './AnalyticsQueryResultsTable';
 import RepeatRequestModal from './RepeatRequestModal';
+import { formatRepeatInterval } from '../utils';
 
 const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = props => {
     const query = analyticsQueryStore.query$.value;
@@ -18,6 +19,8 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
         }
     }, [query?.status]);
     useIntervalUpdate(callback, 1000);
+
+    const repeatInterval = formatRepeatInterval(query?.repeatFrequencyMs);
 
     return (
         <Flex direction="column" {...props}>
@@ -36,12 +39,18 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
                         )}
                         <Flex gap="2" ml="auto">
                             <Button
+                                isLoading={analyticsQueryStore.isQueryIntervalUpdateLoading}
                                 leftIcon={<RefreshIcon16 color="icon.primary" />}
                                 onClick={onOpen}
                                 size="sm"
                                 variant="secondary"
                             >
                                 Repeat Request
+                                {!!query.repeatFrequencyMs && (
+                                    <Span color="text.secondary">
+                                        &nbsp;·&nbsp;{repeatInterval}
+                                    </Span>
+                                )}
                             </Button>
                             <ButtonLink
                                 leftIcon={<DownloadIcon16 />}

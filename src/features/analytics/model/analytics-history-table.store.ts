@@ -15,7 +15,7 @@ import {
     AnalyticsPayment,
     AnalyticsQuery,
     AnalyticsQueryType,
-    AnalyticsRepeatingQuery,
+    AnalyticsRepeatingQueryAggregated,
     AnalyticsTablePagination
 } from './interfaces';
 import { projectsStore } from 'src/entities';
@@ -23,7 +23,9 @@ import { mapDTOStatsSqlResultToAnalyticsQuery } from './analytics-query.store';
 import { mapDTOStatsGraphResultToAnalyticsGraphQuery } from './analytics-graph-query.store';
 
 class AnalyticsHistoryTableStore {
-    queries$ = new Loadable<(AnalyticsQuery | AnalyticsRepeatingQuery | AnalyticsGraphQuery)[]>([]);
+    queries$ = new Loadable<
+        (AnalyticsQuery | AnalyticsRepeatingQueryAggregated | AnalyticsGraphQuery)[]
+    >([]);
 
     paymentsHistory$ = new Loadable<AnalyticsPayment[]>([]);
 

@@ -5,8 +5,8 @@ import {
     AnalyticsGraphQuery,
     analyticsHistoryTableStore,
     AnalyticsQuery,
-    AnalyticsRepeatingQuery,
-    isAnalyticsRepeatingQuery
+    AnalyticsRepeatingQueryAggregated,
+    isAnalyticsRepeatingQueryAggregated
 } from '../../model';
 import {
     TooltipHoverable,
@@ -22,7 +22,7 @@ import { toJS } from 'mobx';
 import { AnalyticsHistoryTableContext } from './analytics-history-table-context';
 import { AnalyticsQueryStatusBadge } from './AnalyticsQueryStatusBadge';
 import { useNavigate } from 'react-router-dom';
-import { toStructTimeLeft } from 'src/shared/lib/format/date';
+import { formatRepeatInterval } from '../utils';
 
 const LoadingRow: FunctionComponent<{ style: React.CSSProperties }> = ({
     style: { top, ...style }
@@ -45,7 +45,7 @@ const LoadingRow: FunctionComponent<{ style: React.CSSProperties }> = ({
 };
 
 const ItemRow: FunctionComponent<{
-    query: AnalyticsQuery | AnalyticsRepeatingQuery | AnalyticsGraphQuery;
+    query: AnalyticsQuery | AnalyticsRepeatingQueryAggregated | AnalyticsGraphQuery;
     style: React.CSSProperties;
 }> = observer(({ query: q, style }) => {
     const navigate = useNavigate();
@@ -54,7 +54,7 @@ const ItemRow: FunctionComponent<{
     //  const { onCopy: onCopyRequest, hasCopied: hasCopiedRequest } = useClipboard(query.request);
     const { rowHeight } = useContext(AnalyticsHistoryTableContext);
 
-    const isRepeating = isAnalyticsRepeatingQuery(q);
+    const isRepeating = isAnalyticsRepeatingQueryAggregated(q);
 
     const query = isRepeating ? q.lastQuery : q;
 
@@ -71,18 +71,9 @@ const ItemRow: FunctionComponent<{
         navigate(`../${path}?id=${query.id}`);
     };
 
-    let repeatInterval = '';
-    if (isRepeating) {
-        const repTimeStruct = toStructTimeLeft(q.repeatFrequencyMs);
-        const hours = repTimeStruct.hours + repTimeStruct.days * 24;
-        const minutes = repTimeStruct.seconds ? repTimeStruct.minutes + 1 : repTimeStruct.minutes;
-
-        if (!hours) {
-            repeatInterval = `${minutes} min`;
-        } else {
-            repeatInterval = `${hours} h ${minutes} min`;
-        }
-    }
+    const repeatInterval = formatRepeatInterval(
+        'repeatFrequencyMs' in q ? q.repeatFrequencyMs : undefined
+    );
 
     const secondsBeforeNextRepetition = isRepeating
         ? Math.floor((renderTime + q.repeatFrequencyMs - query.creationDate.getTime()) / 1000)
@@ -199,7 +190,7 @@ const AnalyticsHistoryTableRow: FunctionComponent<{
 }> = ({ index, style }) => {
     if (analyticsHistoryTableStore.isItemLoaded(index)) {
         const query = toJS(analyticsHistoryTableStore.queries$.value[index]);
-        const id = isAnalyticsRepeatingQuery(query) ? query.lastQuery.id : query.id;
+        const id = isAnalyticsRepeatingQueryAggregated(query) ? query.lastQuery.id : query.id;
         return <ItemRow key={id} style={style} query={query} />;
     }
 

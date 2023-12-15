@@ -20,6 +20,7 @@ export interface AnalyticsQueryBasic extends AnalyticsQueryTemplate {
     status: 'executing' | 'success' | 'error';
     gptPrompt?: string;
     creationDate: Date;
+    repeatFrequencyMs?: number;
 }
 
 export interface AnalyticsQueryCompleted extends AnalyticsQueryBasic {
@@ -55,21 +56,21 @@ export function isAnalyticsQuerySuccessful(
     return query.status === 'success';
 }
 
+export function isAnalyticsRepeatingQueryAggregated(
+    value: AnalyticsQuery | AnalyticsRepeatingQueryAggregated | AnalyticsGraphQuery
+): value is AnalyticsRepeatingQueryAggregated {
+    return 'lastQueryDate' in value;
+}
+
 export type AnalyticsQuery =
     | AnalyticsQueryPending
     | AnalyticsQuerySuccessful
     | AnalyticsQueryErrored;
 
-export function isAnalyticsRepeatingQuery(
-    value: AnalyticsQuery | AnalyticsRepeatingQuery | AnalyticsGraphQuery
-): value is AnalyticsRepeatingQuery {
-    return 'lastQuery' in value;
-}
-
-export interface AnalyticsRepeatingQuery {
+export type AnalyticsRepeatingQueryAggregated = {
     lastQuery: AnalyticsQuery;
     lastQueryDate: Date;
     repeatFrequencyMs: number;
     totalRepetitions: number;
     totalCost: TonCurrencyAmount;
-}
+};
