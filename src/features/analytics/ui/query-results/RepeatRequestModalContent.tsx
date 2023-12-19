@@ -14,10 +14,11 @@ import {
     Portal,
     FormErrorMessage
 } from '@chakra-ui/react';
-import { ArrowIcon, MenuButtonDefault, toBinaryRadio } from 'src/shared';
+import { ArrowIcon, isNumber, MenuButtonDefault, mergeRefs, toBinaryRadio } from 'src/shared';
 import { Controller, useForm } from 'react-hook-form';
 import { observer } from 'mobx-react-lite';
 import { AnalyticsQuery, analyticsQueryStore } from '../../model';
+import { useIMask } from 'react-imask';
 
 type TimeInterval = 'day' | 'hour' | 'minute';
 
@@ -113,6 +114,37 @@ const RepeatRequestModalContent: FunctionComponent<{
         onClose();
     };
 
+    const { ref: maskRef } = useIMask({
+        mask: Number,
+        scale: 0,
+        signed: false,
+        thousandsSeparator: '',
+        padFractionalZeros: false,
+        normalizeZeros: true,
+        radix: '.',
+        mapToRadix: ['.', ','],
+        min: 1
+    });
+
+    const { ref: hookFormRef, ...hookFormRest } = register('frequency', {
+        required: repeatValue ? 'This field is required' : false,
+        validate(value) {
+            if (!repeatValue) {
+                return;
+            }
+
+            if (!isNumber(value)) {
+                return 'This field must be a number';
+            }
+
+            value = Number(value);
+
+            if (value < 1 || !Number.isInteger(value)) {
+                return 'This field must be a positive integer';
+            }
+        }
+    });
+
     return (
         <chakra.form noValidate onSubmit={handleSubmit(onSubmit)} id={formId}>
             <FormControl mb="2" isRequired>
@@ -139,13 +171,12 @@ const RepeatRequestModalContent: FunctionComponent<{
             <FormControl mb="5" pl="6" isInvalid={!!errors.frequency} isRequired>
                 <InputGroup w="200px">
                     <Input
+                        ref={mergeRefs(hookFormRef, maskRef)}
                         pr={pr + 'px'}
                         isDisabled={!repeatValue}
                         placeholder="1"
                         type="number"
-                        {...register('frequency', {
-                            required: repeatValue ? 'This field is required' : false
-                        })}
+                        {...hookFormRest}
                     />
                     <InputRightElement w="fit-content" pr="1px">
                         <Menu placement="bottom-end">
