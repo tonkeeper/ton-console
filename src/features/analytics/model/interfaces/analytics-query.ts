@@ -1,4 +1,5 @@
 import { TonCurrencyAmount } from 'src/shared';
+import { AnalyticsGraphQuery } from 'src/features';
 
 export interface AnalyticsTableSource {
     headings: string[];
@@ -19,6 +20,7 @@ export interface AnalyticsQueryBasic extends AnalyticsQueryTemplate {
     status: 'executing' | 'success' | 'error';
     gptPrompt?: string;
     creationDate: Date;
+    repeatFrequencyMs?: number;
 }
 
 export interface AnalyticsQueryCompleted extends AnalyticsQueryBasic {
@@ -54,7 +56,21 @@ export function isAnalyticsQuerySuccessful(
     return query.status === 'success';
 }
 
+export function isAnalyticsRepeatingQueryAggregated(
+    value: AnalyticsQuery | AnalyticsRepeatingQueryAggregated | AnalyticsGraphQuery
+): value is AnalyticsRepeatingQueryAggregated {
+    return 'lastQueryDate' in value;
+}
+
 export type AnalyticsQuery =
     | AnalyticsQueryPending
     | AnalyticsQuerySuccessful
     | AnalyticsQueryErrored;
+
+export type AnalyticsRepeatingQueryAggregated = {
+    lastQuery: AnalyticsQuery;
+    lastQueryDate: Date;
+    repeatFrequencyMs: number;
+    totalRepetitions: number;
+    totalCost: TonCurrencyAmount;
+};

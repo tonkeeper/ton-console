@@ -16,6 +16,10 @@ class AnalyticsQueryStore {
 
     tablesSchema$ = new Loadable<AnalyticsTablesSchema | undefined>(undefined);
 
+    get isQueryIntervalUpdateLoading(): boolean {
+        return this.setRepeatOnQuery.isLoading || this.removeRepeatOnQuery.isLoading;
+    }
+
     constructor() {
         makeAutoObservable(this);
 
@@ -61,6 +65,63 @@ class AnalyticsQueryStore {
         }
     );
 
+    setRepeatOnQuery = this.query$.createAsyncAction(
+        async (repeatIntervalS: number) => {
+            const result = await apiClient.api.updateStatsQuery(
+                this.query$.value!.id,
+                {
+                    project_id: projectsStore.selectedProject!.id
+                },
+                { repeat_interval: repeatIntervalS }
+            );
+            this.query$.value!.repeatFrequencyMs = result.data.repeat_interval! * 1000;
+        },
+        {
+            successToast: {
+                title: 'Query repeat interval updated successfully',
+                status: 'success',
+                isClosable: true
+            },
+            errorToast: e => ({
+                title: 'Query repeat interval update error',
+                description:
+                    (e as { response: { data: { error: string } } }).response?.data?.error ||
+                    'Unknown api error happened. Try again later',
+                status: 'error',
+                isClosable: true
+            })
+        }
+    );
+
+    removeRepeatOnQuery = this.query$.createAsyncAction(
+        async () => {
+            await apiClient.api.updateStatsQuery(
+                this.query$.value!.id,
+                {
+                    project_id: projectsStore.selectedProject!.id
+                },
+                { repeat_interval: 0 }
+            );
+
+            delete this.query$.value!.repeatFrequencyMs;
+        },
+        {
+            successToast: {
+                title: 'Query repeating stopped successfully',
+                status: 'success',
+                isClosable: true
+            },
+            errorToast: e => ({
+                title: 'Query repeat interval update error',
+                description:
+                    (e as { response: { data: { error: string } } }).response?.data?.error ||
+                    'Unknown api error happened. Try again later',
+                status: 'error',
+                isClosable: true
+            })
+        }
+    );
+
     refetchQuery = this.query$.createAsyncAction(async () => {
         const result = await apiClient.api.getSqlResultFromStats(this.query$.value!.id);
 
@@ -89,7 +150,10 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         request: value.query!.sql!,
         estimatedTimeMS: value.estimate!.approximate_time,
         estimatedCost: new TonCurrencyAmount(value.estimate!.approximate_cost),
-        explanation: value.estimate!.explain!
+        explanation: value.estimate!.explain!,
+        ...(value.query?.repeat_interval && {
+            repeatFrequencyMs: value.query?.repeat_interval * 1000
+        })
     } as const;
 
     if (value.status === DTOStatsQueryStatus.DTOExecuting) {
