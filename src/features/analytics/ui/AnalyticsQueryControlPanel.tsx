@@ -1,5 +1,5 @@
 import { ComponentProps, FunctionComponent, useEffect } from 'react';
-import { Box, Button, Center, Flex, Skeleton } from '@chakra-ui/react';
+import { Box, Button, Center, Flex, Skeleton, useDisclosure } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { InfoIcon16, Span, TooltipHoverable, toTimeLeft } from 'src/shared';
 import {
@@ -9,10 +9,12 @@ import {
 } from 'src/features';
 import { useSearchParams } from 'react-router-dom';
 import { computed } from 'mobx';
+import ExplainSQLModal from './ExplainSQLModal';
 
 const AnalyticsQueryControlPanel: FunctionComponent<
     ComponentProps<typeof Box> & { type: 'sql' | 'gpt' }
 > = ({ type, ...props }) => {
+    const { isOpen, onClose, onOpen } = useDisclosure();
     const store = type === 'sql' ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
     const request = store.request$.value;
     const [_, setSearchParams] = useSearchParams();
@@ -49,7 +51,18 @@ const AnalyticsQueryControlPanel: FunctionComponent<
     }, []);
 
     return (
-        <Flex {...props} align="center">
+        <Flex {...props} align="center" justify="flex-end" w="100%">
+            {!!request && !store.request$.error && !store.request$.isLoading && (
+                <Button
+                    minH="unset"
+                    mr="auto"
+                    color="button.primary.foreground"
+                    onClick={onOpen}
+                    variant="flat"
+                >
+                    Explain
+                </Button>
+            )}
             {store.request$.isLoading && (
                 <Skeleton display="inline-block" w="100px" h="20px" variant="dark" />
             )}
@@ -90,6 +103,7 @@ const AnalyticsQueryControlPanel: FunctionComponent<
             >
                 Run
             </Button>
+            <ExplainSQLModal type={type} isOpen={isOpen} onClose={onClose} />
         </Flex>
     );
 };

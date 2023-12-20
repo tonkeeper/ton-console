@@ -847,7 +847,7 @@ paths:
       summary: "Estimate query"
       operationId: estimateStatsQuery
       tags:
-        - db
+        - stats_service
       requestBody:
         $ref: "#/components/requestBodies/StatsQueryReq"
       responses:
@@ -903,7 +903,7 @@ paths:
       summary: "Update query"
       operationId: updateStatsQuery
       tags:
-        - db
+        - stats_service
       parameters:
         - $ref: '#/components/parameters/queryID'
         - $ref: '#/components/parameters/queryProjectID'
@@ -1014,6 +1014,87 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/StatsChatGptPrice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/dashboard:
+    post:
+      summary: "Create dashboard"
+      operationId: createStatsDashboard
+      tags:
+        - stats_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/StatsDashboardReq"
+      responses:
+        '201':
+          $ref: '#/components/responses/StatsDashboard'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/dashboard/{id}:
+    get:
+      summary: "Get dashboard"
+      operationId: getStatsDashboard
+      tags:
+        - stats_service
+      parameters:
+        - $ref: '#/components/parameters/dashboardID'
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsDashboard'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      summary: "Update dashboard"
+      operationId: updateStatsDashboard
+      tags:
+        - stats_service
+      parameters:
+        - $ref: '#/components/parameters/dashboardID'
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/StatsDashboardReq"
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsDashboard'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/stats/dashboards:
+    get:
+      summary: "Get dashboards"
+      operationId: getStatsDashboards
+      tags:
+        - stats_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/StatsDashboards'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -1379,6 +1460,14 @@ components:
       schema:
         type: string
         example: "60ffb075"
+    dashboardID:
+      description: Dashboard ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
     queryProjectID:
       description: Project ID
       in: query
@@ -1841,8 +1930,6 @@ components:
               recipient_address:
                 type: string
                 example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-    #              refunded:
-    #                type: boolean
     InvoiceCreate:
       description: "Data that is expected"
       content:
@@ -1888,6 +1975,29 @@ components:
               webhook:
                 type: string
                 example: "https://mydapp.com/api/handle-invoice-change"
+    StatsDashboardReq:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Test"
+              public:
+                type: boolean
+                default: false
+              active:
+                type: boolean
+                default: true
+              attributes:
+                additionalProperties: true
+                example: { "first_key": "1", "second_key": 2 }
+              query_ids:
+                type: array
+                items:
+                  type: string
   
   schemas:
     Ok:
@@ -2224,6 +2334,42 @@ components:
         usd_price:
           type: number
           example: 100
+    StatsDashboard:
+      type: object
+      required:
+        - id
+        - project_id
+        - public
+        - date_change
+        - date_create
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          example: "Test"
+        project_id:
+          type: integer
+          format: uint32
+          example: 1647024163
+        query_ids:
+          type: array
+          items:
+            type: string
+        public:
+          type: boolean
+          example: false
+        attributes:
+          additionalProperties: true
+          example: { "first_key": "1", "second_key": 2 }
+        date_change:
+          type: integer
+          format: int64
+          example: 1690889913000
+        date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
     MessagesApp:
       type: object
       required:
@@ -2350,6 +2496,8 @@ components:
         approximate_cost:
           type: integer
           format: int64
+        explain:
+          type: string
     InvoicesInvoice:
       type: object
       required:
@@ -2598,6 +2746,25 @@ components:
               stats:
                 additionalProperties: true
                 example: { }
+    StatsDashboard:
+      description: "Dashboard"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StatsDashboard'
+    StatsDashboards:
+      description: "Dashboards"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - items
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatsDashboard'
     DepositsHistory:
       description: "Deposits history"
       content:
