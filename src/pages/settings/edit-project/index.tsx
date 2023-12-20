@@ -47,6 +47,7 @@ const EditProjectPage: FunctionComponent = () => {
                         mb="4"
                         variant="flat"
                         size="sm"
+                        pr="1"
                         textStyles={{ textStyle: 'label1' }}
                         text={projectsStore.selectedProject?.id.toString() || ''}
                     />

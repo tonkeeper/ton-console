@@ -18,7 +18,7 @@ import { observer } from 'mobx-react-lite';
 const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
     return (
         <Box {...props}>
-            <Tabs mb="4">
+            <Tabs mb="4" isLazy={true}>
                 <TabList w="auto" mx="-6" pl="6">
                     <Tab>Create Invoice</Tab>
                     <Tab>GET Invoice</Tab>

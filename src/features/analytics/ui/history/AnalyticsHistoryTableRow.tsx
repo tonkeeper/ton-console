@@ -1,19 +1,28 @@
 import { FunctionComponent, useContext } from 'react';
-import { Box, Center, Flex, Spinner, Td, Tr, useConst } from '@chakra-ui/react';
+import { Box, Button, Center, Flex, Spinner, Td, Tr, useConst } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { AnalyticsGraphQuery, analyticsHistoryTableStore, AnalyticsQuery } from '../../model';
+import {
+    AnalyticsGraphQuery,
+    analyticsHistoryTableStore,
+    AnalyticsQuery,
+    AnalyticsRepeatingQueryAggregated,
+    isAnalyticsRepeatingQueryAggregated
+} from '../../model';
 import {
     TooltipHoverable,
     toTimeLeft,
     toDateTime,
     useCountup,
     Span,
-    sliceAddress
+    sliceAddress,
+    InfoTooltip,
+    useCountdown
 } from 'src/shared';
 import { toJS } from 'mobx';
 import { AnalyticsHistoryTableContext } from './analytics-history-table-context';
 import { AnalyticsQueryStatusBadge } from './AnalyticsQueryStatusBadge';
 import { useNavigate } from 'react-router-dom';
+import { formatRepeatInterval } from '../utils';
 
 const LoadingRow: FunctionComponent<{ style: React.CSSProperties }> = ({
     style: { top, ...style }
@@ -36,14 +45,18 @@ const LoadingRow: FunctionComponent<{ style: React.CSSProperties }> = ({
 };
 
 const ItemRow: FunctionComponent<{
-    query: AnalyticsQuery | AnalyticsGraphQuery;
+    query: AnalyticsQuery | AnalyticsRepeatingQueryAggregated | AnalyticsGraphQuery;
     style: React.CSSProperties;
-}> = observer(({ query, style }) => {
+}> = observer(({ query: q, style }) => {
     const navigate = useNavigate();
     const renderTime = useConst(Date.now());
 
     //  const { onCopy: onCopyRequest, hasCopied: hasCopiedRequest } = useClipboard(query.request);
     const { rowHeight } = useContext(AnalyticsHistoryTableContext);
+
+    const isRepeating = isAnalyticsRepeatingQueryAggregated(q);
+
+    const query = isRepeating ? q.lastQuery : q;
 
     const passedSeconds =
         query.status === 'executing'
@@ -57,6 +70,16 @@ const ItemRow: FunctionComponent<{
         const path = query.type === 'graph' ? 'graph' : 'query';
         navigate(`../${path}?id=${query.id}`);
     };
+
+    const repeatInterval = formatRepeatInterval(
+        'repeatFrequencyMs' in q ? q.repeatFrequencyMs : undefined
+    );
+
+    const secondsBeforeNextRepetition = isRepeating
+        ? Math.floor((q.lastQueryDate.getTime() + q.repeatFrequencyMs - renderTime) / 1000)
+        : 0;
+
+    const beforeNextRepetition = useCountdown(secondsBeforeNextRepetition);
 
     return (
         <Tr
@@ -72,21 +95,59 @@ const ItemRow: FunctionComponent<{
             onClick={onRowClick}
         >
             <Td
-                minW="188px"
+                minW="246px"
                 h={rowHeight}
                 maxH={rowHeight}
                 borderLeft="1px"
                 borderLeftColor="background.contentTint"
                 boxSizing="content-box"
             >
-                {query.status === 'success' || query.status === 'error' ? (
+                {isRepeating ? (
+                    <Flex align="center" wrap="wrap" color="text.secondary">
+                        Every {repeatInterval}
+                        <InfoTooltip ml="2px">
+                            <Box w="280px" color="text.primary">
+                                <Flex justify="space-between" mb="3">
+                                    <Span color="text.secondary">Periodicity</Span>
+                                    <Span>Every {repeatInterval}</Span>
+                                </Flex>
+                                <Flex justify="space-between" mb="3">
+                                    <Span color="text.secondary">Number of repetitions</Span>
+                                    <Span>{q.totalRepetitions}</Span>
+                                </Flex>
+                                <Flex justify="space-between" mb="3">
+                                    <Span color="text.secondary">Recent request</Span>
+                                    <Span>{toDateTime(q.lastQueryDate)}</Span>
+                                </Flex>
+                                <Flex align="center">
+                                    <Span color="text.secondary">Next</Span>
+                                    <Box ml="auto">
+                                        <Span>{toTimeLeft(beforeNextRepetition * 1000)}</Span>
+                                        {beforeNextRepetition === 0 && (
+                                            <Button
+                                                ml="2"
+                                                onClick={() =>
+                                                    analyticsHistoryTableStore.loadFirstPage()
+                                                }
+                                                size="sm"
+                                            >
+                                                Refresh
+                                            </Button>
+                                        )}
+                                    </Box>
+                                </Flex>
+                            </Box>
+                        </InfoTooltip>
+                        &nbsp;· {q.totalCost.stringCurrencyAmount}
+                    </Flex>
+                ) : query.status === 'success' || query.status === 'error' ? (
                     <Flex align="center" wrap="wrap" color="text.secondary">
                         {query.spentTimeMS < 1000 ? (
                             '≈1s'
                         ) : (
                             <Span>{toTimeLeft(query.spentTimeMS)}</Span>
                         )}
-                        &nbsp;· {query.cost.toStringCurrencyAmount({ decimalPlaces: 'all' })}
+                        &nbsp;· {query.cost.stringCurrencyAmount}
                     </Flex>
                 ) : (
                     formattedDuration
@@ -142,7 +203,8 @@ const AnalyticsHistoryTableRow: FunctionComponent<{
 }> = ({ index, style }) => {
     if (analyticsHistoryTableStore.isItemLoaded(index)) {
         const query = toJS(analyticsHistoryTableStore.queries$.value[index]);
-        return <ItemRow key={query.id} style={style} query={query} />;
+        const id = isAnalyticsRepeatingQueryAggregated(query) ? query.lastQuery.id : query.id;
+        return <ItemRow key={id} style={style} query={query} />;
     }
 
     return <LoadingRow style={style} />;
