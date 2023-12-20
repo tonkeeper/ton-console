@@ -147,12 +147,28 @@ class AnalyticsHistoryTableStore {
 
 function mapDTOStatsResultToAnalyticsHistoryResult(
     value: DTOStatsQueryResult
-): AnalyticsQuery | AnalyticsGraphQuery {
+): AnalyticsQuery | AnalyticsGraphQuery | AnalyticsRepeatingQueryAggregated {
     if (value.type === DTOStatsQueryResultType.DTOGraph) {
         return mapDTOStatsGraphResultToAnalyticsGraphQuery(value);
     }
 
-    return mapDTOStatsSqlResultToAnalyticsQuery(value);
+    if (!value.query?.repeat_interval) {
+        return mapDTOStatsSqlResultToAnalyticsQuery(value);
+    }
+
+    return mapDTOStatsQueryResultToAnalyticsQueryAggregated(value);
+}
+
+function mapDTOStatsQueryResultToAnalyticsQueryAggregated(
+    value: DTOStatsQueryResult
+): AnalyticsRepeatingQueryAggregated {
+    return {
+        lastQuery: mapDTOStatsSqlResultToAnalyticsQuery(value),
+        lastQueryDate: new Date(value.last_repeat_date!),
+        repeatFrequencyMs: value.query!.repeat_interval! * 1000,
+        totalCost: new TonCurrencyAmount(value.total_cost!),
+        totalRepetitions: value.total_repetitions!
+    };
 }
 
 const subservices = {

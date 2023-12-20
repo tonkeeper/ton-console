@@ -332,6 +332,21 @@ export interface DTOStatsQueryResult {
     spent_time?: number;
     /**
      * @format int64
+     * @example 1690889913000
+     */
+    last_repeat_date?: number;
+    /**
+     * @format int32
+     * @example 5
+     */
+    total_repetitions?: number;
+    /**
+     * @format int64
+     * @example 1000000000
+     */
+    total_cost?: number;
+    /**
+     * @format int64
      * @example 1000000000
      */
     cost?: number;

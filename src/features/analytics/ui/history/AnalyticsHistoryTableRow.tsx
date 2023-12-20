@@ -1,5 +1,5 @@
 import { FunctionComponent, useContext } from 'react';
-import { Box, Center, Flex, Spinner, Td, Tr, useConst } from '@chakra-ui/react';
+import { Box, Button, Center, Flex, Spinner, Td, Tr, useConst } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import {
     AnalyticsGraphQuery,
@@ -76,7 +76,7 @@ const ItemRow: FunctionComponent<{
     );
 
     const secondsBeforeNextRepetition = isRepeating
-        ? Math.floor((renderTime + q.repeatFrequencyMs - query.creationDate.getTime()) / 1000)
+        ? Math.floor((q.lastQueryDate.getTime() + q.repeatFrequencyMs - renderTime) / 1000)
         : 0;
 
     const beforeNextRepetition = useCountdown(secondsBeforeNextRepetition);
@@ -95,7 +95,7 @@ const ItemRow: FunctionComponent<{
             onClick={onRowClick}
         >
             <Td
-                minW="188px"
+                minW="246px"
                 h={rowHeight}
                 maxH={rowHeight}
                 borderLeft="1px"
@@ -105,8 +105,8 @@ const ItemRow: FunctionComponent<{
                 {isRepeating ? (
                     <Flex align="center" wrap="wrap" color="text.secondary">
                         Every {repeatInterval}
-                        <InfoTooltip>
-                            <Box w="280px">
+                        <InfoTooltip ml="2px">
+                            <Box w="280px" color="text.primary">
                                 <Flex justify="space-between" mb="3">
                                     <Span color="text.secondary">Periodicity</Span>
                                     <Span>Every {repeatInterval}</Span>
@@ -119,9 +119,22 @@ const ItemRow: FunctionComponent<{
                                     <Span color="text.secondary">Recent request</Span>
                                     <Span>{toDateTime(q.lastQueryDate)}</Span>
                                 </Flex>
-                                <Flex justify="space-between">
+                                <Flex align="center">
                                     <Span color="text.secondary">Next</Span>
-                                    <Span>{toTimeLeft(beforeNextRepetition * 1000)}</Span>
+                                    <Box ml="auto">
+                                        <Span>{toTimeLeft(beforeNextRepetition * 1000)}</Span>
+                                        {beforeNextRepetition === 0 && (
+                                            <Button
+                                                ml="2"
+                                                onClick={() =>
+                                                    analyticsHistoryTableStore.loadFirstPage()
+                                                }
+                                                size="sm"
+                                            >
+                                                Refresh
+                                            </Button>
+                                        )}
+                                    </Box>
                                 </Flex>
                             </Box>
                         </InfoTooltip>

@@ -10,9 +10,9 @@ export function formatRepeatInterval(frequencyMS?: number): string {
         if (!hours) {
             repeatInterval = `${minutes} min`;
         } else if (minutes) {
-            repeatInterval = `${hours} h ${minutes} min`;
+            repeatInterval = `${hours}h ${minutes}min`;
         } else {
-            repeatInterval = `${hours} h`;
+            repeatInterval = `${hours}h`;
         }
     }
 
