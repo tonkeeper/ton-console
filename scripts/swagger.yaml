@@ -2462,6 +2462,18 @@ components:
           type: integer
           format: int64
           example: 100
+        last_repeat_date:
+          type: integer
+          format: int64
+          example: 1690889913000
+        total_repetitions:
+          type: integer
+          format: int32
+          example: 5
+        total_cost:
+          type: integer
+          format: int64
+          example: 1000000000
         cost:
           type: integer
           format: int64

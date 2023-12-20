@@ -47,16 +47,7 @@ function addStartZero(value: number): string {
     return strValue;
 }
 export function toTimeLeft(ms: number): string {
-    const days = Math.floor(ms / msInDay);
-    ms = ms - msInDay * days;
-
-    const hours = Math.floor(ms / msInHour);
-    ms = ms - msInHour * hours;
-
-    const minutes = Math.floor(ms / msInMin);
-    ms = ms - msInMin * minutes;
-
-    const seconds = Math.floor(ms / msInSec);
+    const { days, hours, minutes, seconds } = toStructTimeLeft(ms);
 
     let result = '';
     if (days) {
@@ -76,4 +67,28 @@ export function toTimeLeft(ms: number): string {
     result += `${addStartZero(minutes)}:${addStartZero(seconds)}`;
 
     return result;
+}
+
+export function toStructTimeLeft(ms: number): {
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+} {
+    const days = Math.floor(ms / msInDay);
+    ms = ms - msInDay * days;
+
+    const hours = Math.floor(ms / msInHour);
+    ms = ms - msInHour * hours;
+
+    const minutes = Math.floor(ms / msInMin);
+    ms = ms - msInMin * minutes;
+
+    const seconds = Math.floor(ms / msInSec);
+    return {
+        days,
+        hours,
+        minutes,
+        seconds
+    };
 }

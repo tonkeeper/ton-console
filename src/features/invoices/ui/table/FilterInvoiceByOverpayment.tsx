@@ -8,6 +8,7 @@ const FilterInvoiceByOverpayment: FunctionComponent<ComponentProps<typeof Checkb
         <Checkbox
             h="fit-content"
             checked={invoicesTableStore.pagination.filter.overpayment}
+            defaultChecked={invoicesTableStore.pagination.filter.overpayment}
             onChange={() => invoicesTableStore.toggleFilterByOverpayment()}
             {...props}
         >
