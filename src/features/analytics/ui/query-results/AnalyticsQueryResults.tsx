@@ -1,11 +1,12 @@
 import { ComponentProps, FunctionComponent, useCallback } from 'react';
-import { Box, Center, Flex, Spinner } from '@chakra-ui/react';
+import { Box, Center, Flex, Grid, GridItem, Spinner } from '@chakra-ui/react';
 import { ButtonLink, DownloadIcon16, Span, useIntervalUpdate } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { analyticsQueryStore, isAnalyticsQuerySuccessful } from '../../model';
 import { AnalyticsQueryResultsCountdown } from './AnalyticsQueryResultsCountdown';
 import { toJS } from 'mobx';
 import { AnalyticsTable } from './AnalyticsQueryResultsTable';
+import { AreaChartCard } from './charts/AreaChartCard';
 
 const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = props => {
     const query = analyticsQueryStore.query$.value;
@@ -45,6 +46,18 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
                     </Flex>
                 )}
             </Flex>
+            <Grid gap="5" templateColumns="1fr 1fr" mb="4">
+                <GridItem>
+                    <AreaChartCard onClose={() => {}} data={{ points: [], xAxisKey: '' }} />
+                </GridItem>
+                <GridItem>
+                    <AreaChartCard onClose={() => {}} data={{ points: [], xAxisKey: '' }} />
+                </GridItem>
+                <GridItem gridColumn="span 2">
+                    <AreaChartCard onClose={() => {}} data={{ points: [], xAxisKey: '' }} />
+                </GridItem>
+            </Grid>
+
             {query?.status !== 'success' && (
                 <Center h="10">
                     {!query && 'No data available'}
