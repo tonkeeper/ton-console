@@ -7,12 +7,20 @@ import {
     Loadable,
     TonCurrencyAmount
 } from 'src/shared';
-import { AnalyticsQuery, AnalyticsTableSource, AnalyticsTablesSchema } from './interfaces';
+import {
+    AnalyticsQuery,
+    AnalyticsQuerySuccessful,
+    AnalyticsTableSource,
+    AnalyticsTablesSchema
+} from './interfaces';
 import { projectsStore } from 'src/entities';
 import { analyticsGPTGenerationStore, analyticsHistoryTableStore } from 'src/features';
+import { parse } from 'csv-parse/sync';
 
 class AnalyticsQueryStore {
     query$ = new Loadable<AnalyticsQuery | null>(null);
+
+    chartsDatasource$ = new Loadable<Record<string, number>[] | null>(null);
 
     tablesSchema$ = new Loadable<AnalyticsTablesSchema | undefined>(undefined);
 
@@ -28,6 +36,21 @@ class AnalyticsQueryStore {
             (_, prevId) => {
                 if (prevId) {
                     this.clear();
+                }
+            }
+        );
+
+        createReaction(
+            () =>
+                (this.query$.value?.id || '').toString() +
+                (this.query$.value?.status || '').toString(),
+            () => {
+                this.updateChartDatasource.cancelAllPendingCalls();
+
+                if (this.query$.value?.status === 'success') {
+                    this.updateChartDatasource();
+                } else {
+                    this.chartsDatasource$.setValue(null);
                 }
             }
         );
@@ -136,6 +159,11 @@ class AnalyticsQueryStore {
         { resetBeforeExecution: true }
     );
 
+    updateChartDatasource = this.chartsDatasource$.createAsyncAction(() => {
+        const query = this.query$.value! as AnalyticsQuerySuccessful;
+        return downloadAndParseCSV(query.csvUrl);
+    });
+
     clear(): void {
         this.query$.clear();
     }
@@ -181,6 +209,41 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         spentTimeMS: value.spent_time!,
         errorReason: value.error!
     };
+}
+
+async function downloadAndParseCSV(url: string): Promise<Record<string, number>[]> {
+    const preFetched = await fetch(url);
+    console.log(preFetched.headers.get('content-length')); // TODO check content-length
+
+    const result = await preFetched.text();
+
+    const numericFields = new Map<string | number, boolean>();
+    const parsed: Record<string, string | number>[] = parse(result, {
+        columns: true,
+        skip_empty_lines: true,
+        cast(value, ctx) {
+            const parsedValue = parseFloat(value);
+            if (isFinite(parsedValue)) {
+                if (!numericFields.has(ctx.column)) {
+                    numericFields.set(ctx.column, true);
+                }
+                numericFields.get(ctx.column);
+                return parsedValue;
+            }
+
+            numericFields.set(ctx.column, false);
+
+            return value;
+        }
+    });
+
+    const numericColumnsList = Array.from(numericFields.entries())
+        .filter(([_, value]) => value)
+        .map(([key, _]) => key);
+
+    return parsed.map(row =>
+        Object.fromEntries(numericColumnsList.map(key => [key, row[key]]))
+    ) as Record<string, number>[];
 }
 
 function parsePreview(value: string[][], isAllDataPresented: boolean): AnalyticsTableSource {

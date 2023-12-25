@@ -11,28 +11,45 @@ import {
     XAxis,
     YAxis
 } from 'recharts';
-import { AreaChartData } from 'src/features';
-import { hexToRGBA, lightHashString, toColor } from 'src/shared';
+import { hashString, hexToRGBA, toColor } from 'src/shared';
+import { AreaChartOptions } from '../../../model';
 
 export const AreaChartCard: FunctionComponent<
-    ComponentProps<typeof Box> & { onClose: () => void; data: AreaChartData }
-> = ({ onClose, data, ...rest }) => {
-    const [areas, colors] = useMemo(() => {
-        const allAreas = Object.keys(data.points[0]);
-        const _areas = allAreas.filter(a => a !== data.xAxisKey);
+    ComponentProps<typeof Box> & {
+        onClose: () => void;
+        dataSource: Record<string, number>[];
+        options?: AreaChartOptions;
+    }
+> = ({ onClose, dataSource, options, ...rest }) => {
+    const [areas, colors, xKey] = useMemo(() => {
+        const allAreas = Object.keys(dataSource[0]);
+        const _xKey = options?.xAxisKey || allAreas[0];
+        const _areas = allAreas.filter(a => a !== _xKey);
         const _colors = _areas.map(a =>
-            toColor(Math.abs(lightHashString(a) ^ 255), { min: 30, max: 215 })
+            toColor(hashString(a) ^ 255, {
+                min: 30,
+                max: 215
+            })
         );
-        return [_areas, _colors];
-    }, [data.points, data.xAxisKey]);
+        return [_areas, _colors, _xKey];
+    }, [dataSource, options?.xAxisKey]);
 
     return (
-        <ChartCard label="Area chart" onClose={onClose} {...rest}>
+        <ChartCard
+            label="Area chart"
+            onClose={onClose}
+            sx={{
+                '.recharts-tooltip-wrapper': {
+                    outline: 'none'
+                }
+            }}
+            {...rest}
+        >
             <ResponsiveContainer width="100%" height={280}>
                 <AreaChart
                     width={500}
                     height={280}
-                    data={data.points}
+                    data={dataSource}
                     margin={{
                         top: 10,
                         right: 30,
@@ -41,7 +58,7 @@ export const AreaChartCard: FunctionComponent<
                     }}
                 >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey={data.xAxisKey} />
+                    <XAxis dataKey={xKey} />
                     <YAxis />
                     <Tooltip />
                     {areas.map((area, index) => (
@@ -50,8 +67,8 @@ export const AreaChartCard: FunctionComponent<
                             type="monotone"
                             dataKey={area}
                             stackId="1"
-                            stroke={hexToRGBA(colors[index], 0.8)}
-                            fill={colors[index]}
+                            stroke={colors[index]}
+                            fill={hexToRGBA(colors[index], 0.6)}
                         />
                     ))}
                     <Legend />

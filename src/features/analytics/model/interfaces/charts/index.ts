@@ -1,1 +1,1 @@
-export * from './area-chart-data';
+export * from './area-chart-options';

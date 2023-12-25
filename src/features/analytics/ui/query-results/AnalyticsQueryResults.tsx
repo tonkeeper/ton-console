@@ -76,17 +76,22 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
                     </Flex>
                 )}
             </Flex>
-            <Grid gap="5" templateColumns="1fr 1fr" mb="4">
-                <GridItem>
-                    <AreaChartCard onClose={() => {}} data={{ points: [], xAxisKey: '' }} />
-                </GridItem>
-                <GridItem>
-                    <AreaChartCard onClose={() => {}} data={{ points: [], xAxisKey: '' }} />
-                </GridItem>
-                <GridItem gridColumn="span 2">
-                    <AreaChartCard onClose={() => {}} data={{ points: [], xAxisKey: '' }} />
-                </GridItem>
-            </Grid>
+            {analyticsQueryStore.chartsDatasource$.isLoading ? (
+                <Center h="280px">
+                    <Spinner />
+                </Center>
+            ) : analyticsQueryStore.chartsDatasource$.value ? (
+                <Grid gap="5" templateColumns="1fr 1fr" mb="4">
+                    <GridItem gridColumn="span 2">
+                        <AreaChartCard
+                            onClose={() => {}}
+                            dataSource={toJS(analyticsQueryStore.chartsDatasource$.value)}
+                        />
+                    </GridItem>
+                </Grid>
+            ) : (
+                <Box>Charts loading error</Box>
+            )}
 
             {query?.status !== 'success' && (
                 <Center h="10">
