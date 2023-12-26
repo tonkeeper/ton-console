@@ -152,7 +152,7 @@ export interface DTOCharge {
      * @example 1000000
      */
     stats_price_per_second?: number;
-    stats_type_query?: DTOChargeStatsTypeQuery;
+    stats_type_query?: DTOStatsQueryType;
     /**
      * @format int64
      * @example 1000000000
@@ -319,7 +319,7 @@ export interface DTOStatsQueryResult {
     id: string;
     status: DTOStatsQueryStatus;
     query?: DTOStatsQuery;
-    type?: DTOStatsQueryResultType;
+    type?: DTOStatsQueryType;
     estimate?: DTOStatsEstimateQuery;
     /** @example "https://sql.io/123.csv" */
     url?: string;
@@ -369,6 +369,12 @@ export interface DTOStatsEstimateQuery {
     /** @format int64 */
     approximate_cost: number;
     explain?: string;
+}
+
+export enum DTOStatsQueryType {
+    DTOGraph = 'graph',
+    DTOBaseQuery = 'base_query',
+    DTOChatGptQuery = 'chat_gpt_query'
 }
 
 export interface DTOInvoicesInvoice {
@@ -455,20 +461,9 @@ export enum DTODepositType {
     DTODeposit = 'deposit'
 }
 
-export enum DTOChargeStatsTypeQuery {
-    DTOGraph = 'graph',
-    DTOBaseQuery = 'base_query',
-    DTOChatGptQuery = 'chat_gpt_query'
-}
-
 export enum DTOProjectCapabilities {
     DTOInvoices = 'invoices',
     DTOStats = 'stats'
-}
-
-export enum DTOStatsQueryResultType {
-    DTOGraph = 'graph',
-    DTOBaseQuery = 'base_query'
 }
 
 /**
@@ -2331,6 +2326,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @example 50
                  */
                 limit?: number;
+                type?: DTOStatsQueryType[];
+                is_repetitive?: boolean;
             },
             params: RequestParams = {}
         ) =>

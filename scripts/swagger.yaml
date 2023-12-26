@@ -930,6 +930,8 @@ paths:
         - $ref: '#/components/parameters/queryProjectID'
         - $ref: '#/components/parameters/queryOffset'
         - $ref: '#/components/parameters/queryLimit'
+        - $ref: '#/components/parameters/queryStatsType'
+        - $ref: '#/components/parameters/queryStatsIsRepetitive'
       responses:
         '200':
           $ref: '#/components/responses/StatsQueryHistory'
@@ -1609,6 +1611,20 @@ components:
         type: integer
         format: int32
         default: 0
+    queryStatsType:
+      in: query
+      name: type
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/StatsQueryType'
+    queryStatsIsRepetitive:
+      in: query
+      name: is_repetitive
+      required: false
+      schema:
+        type: boolean
   
   requestBodies:
     TgAuth:
@@ -2199,11 +2215,7 @@ components:
           format: uint32
           example: 1000000
         stats_type_query:
-          type: string
-          enum:
-            - graph
-            - base_query
-            - chat_gpt_query
+          $ref: '#/components/schemas/StatsQueryType'
         amount:
           type: integer
           format: int64
@@ -2446,10 +2458,7 @@ components:
         query:
           $ref: '#/components/schemas/StatsQuery'
         type:
-          type: string
-          enum:
-            - graph
-            - base_query
+          $ref: '#/components/schemas/StatsQueryType'
         estimate:
           $ref: '#/components/schemas/StatsEstimateQuery'
         url:
@@ -2510,6 +2519,12 @@ components:
           format: int64
         explain:
           type: string
+    StatsQueryType:
+      type: string
+      enum:
+        - graph
+        - base_query
+        - chat_gpt_query
     InvoicesInvoice:
       type: object
       required:
