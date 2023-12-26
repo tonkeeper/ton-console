@@ -2,28 +2,28 @@ import { ComponentProps, FunctionComponent, useMemo } from 'react';
 import { Box } from '@chakra-ui/react';
 import { ChartCard } from './ChartCard';
 import {
-    Area,
-    AreaChart,
     CartesianGrid,
     Legend,
+    Line,
+    LineChart,
     ResponsiveContainer,
     Tooltip,
     XAxis,
     YAxis
 } from 'recharts';
 import { hashString, hexToRGBA, toColor } from 'src/shared';
-import { AreaChartOptions } from '../../../model';
+import { LineChartOptions } from '../../../model';
 
-export const AreaChartCard: FunctionComponent<
+export const LineChartCard: FunctionComponent<
     ComponentProps<typeof Box> & {
         onClose: () => void;
         dataSource: Record<string, number>[];
-        options?: Omit<AreaChartOptions, 'type'>;
+        options?: Omit<LineChartOptions, 'type'>;
     }
 > = ({ onClose, dataSource, options, ...rest }) => {
     const [areas, colors, xKey] = useMemo(() => {
         const allAreas = Object.keys(dataSource[0]);
-        const _xKey = options?.xAxisKey || allAreas[0];
+        const _xKey = allAreas[0];
         const _areas = allAreas.filter(a => a !== _xKey);
         const _colors = _areas.map(a =>
             toColor(hashString(a) ^ 255, {
@@ -32,7 +32,7 @@ export const AreaChartCard: FunctionComponent<
             })
         );
         return [_areas, _colors, _xKey];
-    }, [dataSource, options?.xAxisKey]);
+    }, [dataSource]);
 
     return (
         <ChartCard
@@ -46,8 +46,8 @@ export const AreaChartCard: FunctionComponent<
             {...rest}
         >
             <ResponsiveContainer width="99%" minWidth="0" height={280}>
-                <AreaChart
-                    width={300}
+                <LineChart
+                    width={500}
                     height={280}
                     data={dataSource}
                     margin={{
@@ -62,17 +62,16 @@ export const AreaChartCard: FunctionComponent<
                     <YAxis />
                     <Tooltip />
                     {areas.map((area, index) => (
-                        <Area
+                        <Line
                             key={area}
                             type="monotone"
                             dataKey={area}
-                            stackId="1"
                             stroke={colors[index]}
                             fill={hexToRGBA(colors[index], 0.6)}
                         />
                     ))}
                     <Legend />
-                </AreaChart>
+                </LineChart>
             </ResponsiveContainer>
         </ChartCard>
     );

@@ -6,7 +6,15 @@ export const ChartCard: FunctionComponent<
     PropsWithChildren<ComponentProps<typeof Box>> & { label: string; onClose: () => void }
 > = ({ label, children, onClose, ...rest }) => {
     return (
-        <Box h="100%" px="5" py="4" bg="background.contentTint" borderRadius="md" {...rest}>
+        <Box
+            maxW="100%"
+            h="100%"
+            px="5"
+            py="4"
+            bg="background.contentTint"
+            borderRadius="md"
+            {...rest}
+        >
             <Flex align="center" justify="space-between" mb="2">
                 <Span textStyle="label1" color="text.secondary">
                     {label}

@@ -8,10 +8,13 @@ import {
     TonCurrencyAmount
 } from 'src/shared';
 import {
+    AnalyticsChart,
+    AnalyticsChartOptions,
     AnalyticsQuery,
     AnalyticsQuerySuccessful,
     AnalyticsTableSource,
-    AnalyticsTablesSchema
+    AnalyticsTablesSchema,
+    isAnalyticsQuerySuccessful
 } from './interfaces';
 import { projectsStore } from 'src/entities';
 import { analyticsGPTGenerationStore, analyticsHistoryTableStore } from 'src/features';
@@ -65,6 +68,26 @@ class AnalyticsQueryStore {
         },
         { resetBeforeExecution: true }
     );
+
+    addChart = this.query$.createAsyncAction(async (chart: AnalyticsChartOptions) => {
+        if (!isAnalyticsQuerySuccessful(this.query$.value!)) {
+            return;
+        }
+
+        if (this.query$.value.charts.some(c => c.type === chart.type)) {
+            throw new Error(`Chart ${chart.type} already exists`);
+        }
+
+        this.query$.value.charts.push(chart);
+    });
+
+    removeChart = this.query$.createAsyncAction(async (chartType: AnalyticsChart) => {
+        if (!isAnalyticsQuerySuccessful(this.query$.value!)) {
+            return;
+        }
+
+        this.query$.value.charts = this.query$.value.charts.filter(c => c.type !== chartType);
+    });
 
     createQuery = this.query$.createAsyncAction(
         async (query: string) => {
@@ -198,7 +221,8 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
             cost: new TonCurrencyAmount(value.cost!),
             spentTimeMS: value.spent_time!,
             csvUrl: value.url!,
-            preview: parsePreview(value.preview!, !!value.all_data_in_preview)
+            preview: parsePreview(value.preview!, !!value.all_data_in_preview),
+            charts: [] // TODO
         };
     }
 

@@ -1,5 +1,6 @@
 import { TonCurrencyAmount } from 'src/shared';
-import { AnalyticsGraphQuery } from 'src/features';
+import { AnalyticsChartsConfig } from './charts';
+import { AnalyticsGraphQuery } from './analytics-graph-query';
 
 export interface AnalyticsTableSource {
     headings: string[];
@@ -33,6 +34,7 @@ export interface AnalyticsQuerySuccessful extends AnalyticsQueryCompleted {
     status: 'success';
     csvUrl: string;
     preview: AnalyticsTableSource;
+    charts: AnalyticsChartsConfig;
 }
 
 export interface AnalyticsQueryErrored extends AnalyticsQueryCompleted {

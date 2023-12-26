@@ -44,3 +44,7 @@ export { DoneIconCircle24 } from './DoneIconCircle24';
 export { ErrorIconCircle24 } from './ErrorIconCircle24';
 export { EmptyFolderIcon48 } from './EmptyFolderIcon48';
 export { CloseIcon24 } from './CloseIcon24';
+export { ChartAreaIcon24 } from './ChartAreaIcon24';
+export { ChartLineIcon24 } from './ChartLineIcon24';
+export { ChartPieIcon24 } from './ChartPieIcon24';
+export { ChartBarIcon24 } from './ChartBarIcon24';

@@ -12,18 +12,18 @@ import {
     YAxis
 } from 'recharts';
 import { hashString, hexToRGBA, toColor } from 'src/shared';
-import { AreaChartOptions } from '../../../model';
+import { PieChartOptions } from '../../../model';
 
-export const AreaChartCard: FunctionComponent<
+export const PieChartCard: FunctionComponent<
     ComponentProps<typeof Box> & {
         onClose: () => void;
         dataSource: Record<string, number>[];
-        options?: Omit<AreaChartOptions, 'type'>;
+        options?: Omit<PieChartOptions, 'type'>;
     }
 > = ({ onClose, dataSource, options, ...rest }) => {
     const [areas, colors, xKey] = useMemo(() => {
         const allAreas = Object.keys(dataSource[0]);
-        const _xKey = options?.xAxisKey || allAreas[0];
+        const _xKey = allAreas[0];
         const _areas = allAreas.filter(a => a !== _xKey);
         const _colors = _areas.map(a =>
             toColor(hashString(a) ^ 255, {
@@ -32,7 +32,7 @@ export const AreaChartCard: FunctionComponent<
             })
         );
         return [_areas, _colors, _xKey];
-    }, [dataSource, options?.xAxisKey]);
+    }, [dataSource]);
 
     return (
         <ChartCard
@@ -47,7 +47,7 @@ export const AreaChartCard: FunctionComponent<
         >
             <ResponsiveContainer width="99%" minWidth="0" height={280}>
                 <AreaChart
-                    width={300}
+                    width={500}
                     height={280}
                     data={dataSource}
                     margin={{
