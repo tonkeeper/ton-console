@@ -3,9 +3,8 @@ import {
     apiClient,
     createImmediateReaction,
     DTOCharge,
-    DTOChargeStatsTypeQuery,
     DTOStatsQueryResult,
-    DTOStatsQueryResultType,
+    DTOStatsQueryType,
     Loadable,
     TonCurrencyAmount,
     UsdCurrencyAmount
@@ -90,7 +89,9 @@ class AnalyticsHistoryTableStore {
             const response = await apiClient.api.getSqlHistoryFromStats({
                 project_id: projectsStore.selectedProject!.id,
                 limit: this.pageSize,
-                offset: this.queries$.value.length
+                offset: this.queries$.value.length,
+                ...(this.pagination.filter.onlyRepeating && { is_repetitive: true }),
+                type: mapTypeToTypeDTO(this.pagination.filter.type)
             });
 
             const queries = response.data.items.map(mapDTOStatsResultToAnalyticsHistoryResult);
@@ -105,7 +106,9 @@ class AnalyticsHistoryTableStore {
         const response = await apiClient.api.getSqlHistoryFromStats({
             project_id: projectsStore.selectedProject!.id,
             limit: this.pageSize,
-            offset: this.queries$.value.length
+            offset: this.queries$.value.length,
+            ...(this.pagination.filter.onlyRepeating && { is_repetitive: true }),
+            type: mapTypeToTypeDTO(this.pagination.filter.type)
         });
 
         const queries = response.data.items.map(mapDTOStatsResultToAnalyticsHistoryResult);
@@ -148,15 +151,15 @@ class AnalyticsHistoryTableStore {
 function mapDTOStatsResultToAnalyticsHistoryResult(
     value: DTOStatsQueryResult
 ): AnalyticsQuery | AnalyticsGraphQuery | AnalyticsRepeatingQueryAggregated {
-    if (value.type === DTOStatsQueryResultType.DTOGraph) {
+    if (value.type === DTOStatsQueryType.DTOGraph) {
         return mapDTOStatsGraphResultToAnalyticsGraphQuery(value);
     }
 
-    if (!value.query?.repeat_interval) {
-        return mapDTOStatsSqlResultToAnalyticsQuery(value);
+    if ((value.total_repetitions && value.total_repetitions > 1) || value.query?.repeat_interval) {
+        return mapDTOStatsQueryResultToAnalyticsQueryAggregated(value);
     }
 
-    return mapDTOStatsQueryResultToAnalyticsQueryAggregated(value);
+    return mapDTOStatsSqlResultToAnalyticsQuery(value);
 }
 
 function mapDTOStatsQueryResultToAnalyticsQueryAggregated(
@@ -172,9 +175,9 @@ function mapDTOStatsQueryResultToAnalyticsQueryAggregated(
 }
 
 const subservices = {
-    [DTOChargeStatsTypeQuery.DTOGraph]: 'graph',
-    [DTOChargeStatsTypeQuery.DTOBaseQuery]: 'query',
-    [DTOChargeStatsTypeQuery.DTOChatGptQuery]: 'gpt generation'
+    [DTOStatsQueryType.DTOGraph]: 'graph',
+    [DTOStatsQueryType.DTOBaseQuery]: 'query',
+    [DTOStatsQueryType.DTOChatGptQuery]: 'gpt generation'
 } as const;
 
 function mapDTOPaymentAnalyticsPayment(payment: DTOCharge): AnalyticsPayment | null {
@@ -188,6 +191,16 @@ function mapDTOPaymentAnalyticsPayment(payment: DTOCharge): AnalyticsPayment | n
         ),
         subservice: subservices[payment.stats_type_query!]
     };
+}
+
+function mapTypeToTypeDTO(type: AnalyticsQueryType[] | undefined): DTOStatsQueryType[] | undefined {
+    const mappingTypeToTypeDTO = {
+        sql: DTOStatsQueryType.DTOBaseQuery,
+        graph: DTOStatsQueryType.DTOGraph,
+        gpt: DTOStatsQueryType.DTOChatGptQuery
+    };
+
+    return type?.length ? type.map(v => mappingTypeToTypeDTO[v]) : undefined;
 }
 
 export const analyticsHistoryTableStore = new AnalyticsHistoryTableStore();

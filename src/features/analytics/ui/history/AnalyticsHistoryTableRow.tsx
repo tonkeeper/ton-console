@@ -54,9 +54,10 @@ const ItemRow: FunctionComponent<{
     //  const { onCopy: onCopyRequest, hasCopied: hasCopiedRequest } = useClipboard(query.request);
     const { rowHeight } = useContext(AnalyticsHistoryTableContext);
 
-    const isRepeating = isAnalyticsRepeatingQueryAggregated(q);
+    const isAggregated = isAnalyticsRepeatingQueryAggregated(q);
+    const isCurrentlyRepeating = isAggregated && q.repeatFrequencyMs;
 
-    const query = isRepeating ? q.lastQuery : q;
+    const query = isAggregated ? q.lastQuery : q;
 
     const passedSeconds =
         query.status === 'executing'
@@ -75,7 +76,7 @@ const ItemRow: FunctionComponent<{
         'repeatFrequencyMs' in q ? q.repeatFrequencyMs : undefined
     );
 
-    const secondsBeforeNextRepetition = isRepeating
+    const secondsBeforeNextRepetition = isCurrentlyRepeating
         ? Math.floor((q.lastQueryDate.getTime() + q.repeatFrequencyMs - renderTime) / 1000)
         : 0;
 
@@ -102,44 +103,51 @@ const ItemRow: FunctionComponent<{
                 borderLeftColor="background.contentTint"
                 boxSizing="content-box"
             >
-                {isRepeating ? (
-                    <Flex align="center" wrap="wrap" color="text.secondary">
-                        Every {repeatInterval}
-                        <InfoTooltip ml="2px">
-                            <Box w="280px" color="text.primary">
-                                <Flex justify="space-between" mb="3">
-                                    <Span color="text.secondary">Periodicity</Span>
-                                    <Span>Every {repeatInterval}</Span>
-                                </Flex>
-                                <Flex justify="space-between" mb="3">
-                                    <Span color="text.secondary">Number of repetitions</Span>
-                                    <Span>{q.totalRepetitions}</Span>
-                                </Flex>
-                                <Flex justify="space-between" mb="3">
-                                    <Span color="text.secondary">Recent request</Span>
-                                    <Span>{toDateTime(q.lastQueryDate)}</Span>
-                                </Flex>
-                                <Flex align="center">
-                                    <Span color="text.secondary">Next</Span>
-                                    <Box ml="auto">
-                                        <Span>{toTimeLeft(beforeNextRepetition * 1000)}</Span>
-                                        {beforeNextRepetition === 0 && (
-                                            <Button
-                                                ml="2"
-                                                onClick={() =>
-                                                    analyticsHistoryTableStore.loadFirstPage()
-                                                }
-                                                size="sm"
-                                            >
-                                                Refresh
-                                            </Button>
-                                        )}
-                                    </Box>
-                                </Flex>
-                            </Box>
-                        </InfoTooltip>
-                        &nbsp;· {q.totalCost.stringCurrencyAmount}
-                    </Flex>
+                {isAggregated ? (
+                    isCurrentlyRepeating ? (
+                        <Flex align="center" wrap="wrap" color="text.secondary">
+                            Every {repeatInterval}
+                            <InfoTooltip ml="2px">
+                                <Box w="280px" color="text.primary">
+                                    <Flex justify="space-between" mb="3">
+                                        <Span color="text.secondary">Periodicity</Span>
+                                        <Span>Every {repeatInterval}</Span>
+                                    </Flex>
+                                    <Flex justify="space-between" mb="3">
+                                        <Span color="text.secondary">Number of repetitions</Span>
+                                        <Span>{q.totalRepetitions}</Span>
+                                    </Flex>
+                                    <Flex justify="space-between" mb="3">
+                                        <Span color="text.secondary">Recent request</Span>
+                                        <Span>{toDateTime(q.lastQueryDate)}</Span>
+                                    </Flex>
+                                    <Flex align="center">
+                                        <Span color="text.secondary">Next</Span>
+                                        <Box ml="auto">
+                                            <Span>{toTimeLeft(beforeNextRepetition * 1000)}</Span>
+                                            {beforeNextRepetition === 0 && (
+                                                <Button
+                                                    ml="2"
+                                                    onClick={() =>
+                                                        analyticsHistoryTableStore.loadFirstPage()
+                                                    }
+                                                    size="sm"
+                                                >
+                                                    Refresh
+                                                </Button>
+                                            )}
+                                        </Box>
+                                    </Flex>
+                                </Box>
+                            </InfoTooltip>
+                            &nbsp;· {q.totalCost.stringCurrencyAmount}
+                        </Flex>
+                    ) : (
+                        <Flex align="center" wrap="wrap" color="text.secondary">
+                            <Span>{q.totalRepetitions} times</Span>
+                            &nbsp;· {q.totalCost.stringCurrencyAmount} total
+                        </Flex>
+                    )
                 ) : query.status === 'success' || query.status === 'error' ? (
                     <Flex align="center" wrap="wrap" color="text.secondary">
                         {query.spentTimeMS < 1000 ? (
