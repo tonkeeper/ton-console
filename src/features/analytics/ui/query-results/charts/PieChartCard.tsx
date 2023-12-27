@@ -1,18 +1,11 @@
 import { ComponentProps, FunctionComponent, useMemo } from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import { ChartCard } from './ChartCard';
-import {
-    Area,
-    AreaChart,
-    CartesianGrid,
-    Legend,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis
-} from 'recharts';
-import { hashString, hexToRGBA, toColor } from 'src/shared';
+import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
+import { hashString, toColor } from 'src/shared';
 import { PieChartOptions } from '../../../model';
+
+const RADIAN = Math.PI / 180;
 
 export const PieChartCard: FunctionComponent<
     ComponentProps<typeof Box> & {
@@ -20,23 +13,62 @@ export const PieChartCard: FunctionComponent<
         dataSource: Record<string, number>[];
         options?: Omit<PieChartOptions, 'type'>;
     }
-> = ({ onClose, dataSource, options, ...rest }) => {
-    const [areas, colors, xKey] = useMemo(() => {
-        const allAreas = Object.keys(dataSource[0]);
-        const _xKey = allAreas[0];
-        const _areas = allAreas.filter(a => a !== _xKey);
-        const _colors = _areas.map(a =>
-            toColor(hashString(a) ^ 255, {
+> = ({ onClose, dataSource, ...rest }) => {
+    const [data, colors, canBuildChart] = useMemo(() => {
+        if (dataSource.length !== 1) {
+            return [[], [], false];
+        }
+
+        const record = dataSource[0];
+        const keys = Object.keys(record);
+        const _data = Object.values(record).map((value, index) => ({ name: keys[index], value }));
+        const _colors = keys.map(key =>
+            toColor(hashString(key) ^ 255, {
                 min: 30,
                 max: 215
             })
         );
-        return [_areas, _colors, _xKey];
+
+        return [_data, _colors, true];
     }, [dataSource]);
+
+    const renderCustomizedLabel = ({
+        cx,
+        cy,
+        midAngle,
+        innerRadius,
+        outerRadius,
+        percent,
+        index
+    }: {
+        cx: number;
+        cy: number;
+        midAngle: number;
+        innerRadius: number;
+        outerRadius: number;
+        percent: number;
+        index: number;
+    }) => {
+        const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+        const x = cx + radius * Math.cos(-midAngle * RADIAN) * 2.5;
+        const y = cy + radius * Math.sin(-midAngle * RADIAN) * 2.5;
+
+        return (
+            <text
+                x={x}
+                y={y}
+                fill={colors[index]}
+                textAnchor={x > cx ? 'start' : 'end'}
+                dominantBaseline="central"
+            >
+                {data[index].name} {`${(percent * 100).toFixed(0)}%`}
+            </text>
+        );
+    };
 
     return (
         <ChartCard
-            label="Area chart"
+            label="Pie chart"
             onClose={onClose}
             sx={{
                 '.recharts-tooltip-wrapper': {
@@ -45,35 +77,33 @@ export const PieChartCard: FunctionComponent<
             }}
             {...rest}
         >
-            <ResponsiveContainer width="99%" minWidth="0" height={280}>
-                <AreaChart
-                    width={500}
-                    height={280}
-                    data={dataSource}
-                    margin={{
-                        top: 10,
-                        right: 30,
-                        left: 0,
-                        bottom: 0
-                    }}
-                >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey={xKey} />
-                    <YAxis />
-                    <Tooltip />
-                    {areas.map((area, index) => (
-                        <Area
-                            key={area}
-                            type="monotone"
-                            dataKey={area}
-                            stackId="1"
-                            stroke={colors[index]}
-                            fill={hexToRGBA(colors[index], 0.6)}
-                        />
-                    ))}
-                    <Legend />
-                </AreaChart>
-            </ResponsiveContainer>
+            {canBuildChart ? (
+                <ResponsiveContainer width="99%" minWidth="0" height={280}>
+                    <PieChart width={400} height={400}>
+                        <Pie
+                            data={data}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={renderCustomizedLabel}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                        >
+                            {data.map((_, index) => (
+                                <Cell key={`cell-${index}`} fill={colors[index]} />
+                            ))}
+                        </Pie>
+                    </PieChart>
+                </ResponsiveContainer>
+            ) : (
+                <Flex justify="center" direction="column" gap="3" h="280px" color="accent.red">
+                    <Box>Error: can&apos;t build a pie chart using this datasource.</Box>
+                    <Box>
+                        Make sure your data source contains exactly one row with numeric values
+                    </Box>
+                </Flex>
+            )}
         </ChartCard>
     );
 };

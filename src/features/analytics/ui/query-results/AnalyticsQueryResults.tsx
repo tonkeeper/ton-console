@@ -175,7 +175,7 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
                     })}
                 </Grid>
             ) : (
-                <Box>Charts loading error</Box>
+                query?.status === 'success' && <Box>Charts loading error</Box>
             )}
 
             {query?.status !== 'success' && (

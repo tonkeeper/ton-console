@@ -21,22 +21,22 @@ export const LineChartCard: FunctionComponent<
         options?: Omit<LineChartOptions, 'type'>;
     }
 > = ({ onClose, dataSource, options, ...rest }) => {
-    const [areas, colors, xKey] = useMemo(() => {
-        const allAreas = Object.keys(dataSource[0]);
-        const _xKey = allAreas[0];
-        const _areas = allAreas.filter(a => a !== _xKey);
-        const _colors = _areas.map(a =>
+    const [lines, colors, xKey] = useMemo(() => {
+        const allLines = Object.keys(dataSource[0]);
+        const _xKey = allLines[0];
+        const _lines = allLines.filter(a => a !== _xKey);
+        const _colors = _lines.map(a =>
             toColor(hashString(a) ^ 255, {
                 min: 30,
                 max: 215
             })
         );
-        return [_areas, _colors, _xKey];
+        return [_lines, _colors, _xKey];
     }, [dataSource]);
 
     return (
         <ChartCard
-            label="Area chart"
+            label="Line chart"
             onClose={onClose}
             sx={{
                 '.recharts-tooltip-wrapper': {
@@ -61,11 +61,11 @@ export const LineChartCard: FunctionComponent<
                     <XAxis dataKey={xKey} />
                     <YAxis />
                     <Tooltip />
-                    {areas.map((area, index) => (
+                    {lines.map((line, index) => (
                         <Line
-                            key={area}
+                            key={line}
                             type="monotone"
-                            dataKey={area}
+                            dataKey={line}
                             stroke={colors[index]}
                             fill={hexToRGBA(colors[index], 0.6)}
                         />

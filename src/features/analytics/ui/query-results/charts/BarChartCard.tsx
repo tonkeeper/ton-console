@@ -2,8 +2,8 @@ import { ComponentProps, FunctionComponent, useMemo } from 'react';
 import { Box } from '@chakra-ui/react';
 import { ChartCard } from './ChartCard';
 import {
-    Area,
-    AreaChart,
+    Bar,
+    BarChart,
     CartesianGrid,
     Legend,
     ResponsiveContainer,
@@ -11,7 +11,7 @@ import {
     XAxis,
     YAxis
 } from 'recharts';
-import { hashString, hexToRGBA, toColor } from 'src/shared';
+import { hashString, toColor } from 'src/shared';
 import { BarChartOptions } from '../../../model';
 
 export const BarChartCard: FunctionComponent<
@@ -21,22 +21,22 @@ export const BarChartCard: FunctionComponent<
         options?: Omit<BarChartOptions, 'type'>;
     }
 > = ({ onClose, dataSource, options, ...rest }) => {
-    const [areas, colors, xKey] = useMemo(() => {
-        const allAreas = Object.keys(dataSource[0]);
-        const _xKey = allAreas[0];
-        const _areas = allAreas.filter(a => a !== _xKey);
-        const _colors = _areas.map(a =>
+    const [barKinds, colors, xKey] = useMemo(() => {
+        const allBarKinds = Object.keys(dataSource[0]);
+        const _xKey = options?.xAxisKey || allBarKinds[0];
+        const _barKinds = allBarKinds.filter(a => a !== _xKey);
+        const _colors = _barKinds.map(a =>
             toColor(hashString(a) ^ 255, {
                 min: 30,
                 max: 215
             })
         );
-        return [_areas, _colors, _xKey];
-    }, [dataSource]);
+        return [_barKinds, _colors, _xKey];
+    }, [dataSource, options?.xAxisKey]);
 
     return (
         <ChartCard
-            label="Area chart"
+            label="Bar chart"
             onClose={onClose}
             sx={{
                 '.recharts-tooltip-wrapper': {
@@ -46,7 +46,7 @@ export const BarChartCard: FunctionComponent<
             {...rest}
         >
             <ResponsiveContainer width="99%" minWidth="0" height={280}>
-                <AreaChart
+                <BarChart
                     width={500}
                     height={280}
                     data={dataSource}
@@ -61,18 +61,11 @@ export const BarChartCard: FunctionComponent<
                     <XAxis dataKey={xKey} />
                     <YAxis />
                     <Tooltip />
-                    {areas.map((area, index) => (
-                        <Area
-                            key={area}
-                            type="monotone"
-                            dataKey={area}
-                            stackId="1"
-                            stroke={colors[index]}
-                            fill={hexToRGBA(colors[index], 0.6)}
-                        />
+                    {barKinds.map((barKind, index) => (
+                        <Bar key={barKind} dataKey={barKind} fill={colors[index]} />
                     ))}
                     <Legend />
-                </AreaChart>
+                </BarChart>
             </ResponsiveContainer>
         </ChartCard>
     );
