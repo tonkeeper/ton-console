@@ -72,16 +72,20 @@ export const TonApiTierCard: FunctionComponent<
                     <ListItem display="flex">
                         <ListIcon as={TickIcon} color="accent.green" />
                         <Box textStyle="body2" color="text.primary">
-                            {tier.description.realtimeConnectionsLimit} realtime connections, watch
-                            up to {tier.description.entitiesPerRealtimeConnectionLimit} accounts for
-                            each{' '}
+                            {tier.description.realtimeConnectionsLimit} realtime connections&nbsp;
                             <Span whiteSpace="nowrap">
-                                connection&nbsp;
                                 <InfoTooltip>
                                     Subscribe to any TON account changes using server sent events or
                                     websockets
                                 </InfoTooltip>
                             </Span>
+                        </Box>
+                    </ListItem>
+                    <ListItem display="flex">
+                        <ListIcon as={TickIcon} color="accent.green" />
+                        <Box textStyle="body2" color="text.primary">
+                            Watch up to {tier.description.entitiesPerRealtimeConnectionLimit}{' '}
+                            accounts for each connection
                         </Box>
                     </ListItem>
                     {tier.description.mempool && (
