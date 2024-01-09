@@ -73,7 +73,19 @@ export const AnalyticsHistoryTableStructure = observer(
                 >
                     <Thead>
                         <Tr
-                            sx={{ th: { px: 2, zIndex: 2 } }}
+                            sx={{
+                                th: { px: 2, zIndex: 2 },
+                                '&::after': {
+                                    content: '""',
+                                    display: 'block',
+                                    position: 'absolute',
+                                    left: 0,
+                                    right: 0,
+                                    top: 0,
+                                    height: rowHeight,
+                                    background: 'white'
+                                }
+                            }}
                             pos="sticky"
                             zIndex="4"
                             top="0"
@@ -82,6 +94,8 @@ export const AnalyticsHistoryTableStructure = observer(
                             h={rowHeight}
                         >
                             <Th
+                                pos="relative"
+                                zIndex={1}
                                 minW="246px"
                                 bg="background.contentTint"
                                 borderTop="1px"
@@ -93,10 +107,18 @@ export const AnalyticsHistoryTableStructure = observer(
                             >
                                 Duration/Value
                             </Th>
-                            <Th minW="108px" bg="background.contentTint" boxSizing="content-box">
+                            <Th
+                                pos="relative"
+                                zIndex={1}
+                                minW="108px"
+                                bg="background.contentTint"
+                                boxSizing="content-box"
+                            >
                                 Status
                             </Th>
                             <Th
+                                pos="relative"
+                                zIndex={1}
                                 w="100%"
                                 minW="300px"
                                 bg="background.contentTint"
@@ -105,6 +127,8 @@ export const AnalyticsHistoryTableStructure = observer(
                                 Request
                             </Th>
                             <Th
+                                pos="relative"
+                                zIndex={1}
                                 w="120px"
                                 minW="120px"
                                 maxW="120px"
