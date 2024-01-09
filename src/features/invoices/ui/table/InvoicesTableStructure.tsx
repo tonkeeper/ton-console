@@ -68,7 +68,19 @@ export const InvoicesTableStructure = observer(
                 >
                     <Thead>
                         <Tr
-                            sx={{ th: { px: 2, zIndex: 2 } }}
+                            sx={{
+                                th: { px: 2, zIndex: 2 },
+                                '&::after': {
+                                    content: '""',
+                                    display: 'block',
+                                    position: 'absolute',
+                                    left: 0,
+                                    right: 0,
+                                    top: 0,
+                                    height: rawHeight,
+                                    background: 'white'
+                                }
+                            }}
                             pos="sticky"
                             zIndex="4"
                             top="0"
@@ -77,6 +89,8 @@ export const InvoicesTableStructure = observer(
                             h={rawHeight}
                         >
                             <Th
+                                pos="relative"
+                                zIndex={1}
                                 minW="100px"
                                 bg="background.contentTint"
                                 borderTop="1px"
@@ -88,22 +102,42 @@ export const InvoicesTableStructure = observer(
                             >
                                 ID
                             </Th>
-                            <Th minW="320px" bg="background.contentTint" boxSizing="content-box">
+                            <Th
+                                pos="relative"
+                                zIndex={1}
+                                minW="320px"
+                                bg="background.contentTint"
+                                boxSizing="content-box"
+                            >
                                 <InvoicesTableColumnLabel column="status">
                                     Status
                                 </InvoicesTableColumnLabel>
                             </Th>
-                            <Th minW="160px" bg="background.contentTint" boxSizing="content-box">
+                            <Th
+                                pos="relative"
+                                zIndex={1}
+                                minW="160px"
+                                bg="background.contentTint"
+                                boxSizing="content-box"
+                            >
                                 <InvoicesTableColumnLabel column="amount">
                                     Amount
                                 </InvoicesTableColumnLabel>
                             </Th>
-                            <Th minW="180px" bg="background.contentTint" boxSizing="content-box">
+                            <Th
+                                pos="relative"
+                                zIndex={1}
+                                minW="180px"
+                                bg="background.contentTint"
+                                boxSizing="content-box"
+                            >
                                 <InvoicesTableColumnLabel column="creation-date">
                                     Creation Date
                                 </InvoicesTableColumnLabel>
                             </Th>
                             <Th
+                                pos="relative"
+                                zIndex={1}
                                 w="100%"
                                 minW="300px"
                                 bg="background.contentTint"

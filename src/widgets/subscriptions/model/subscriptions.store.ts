@@ -29,7 +29,7 @@ class SubscriptionsStore {
 function mapTonapiTierToSubscription(tier: Required<TonApiSelectedTier>): Subscription {
     return {
         id: `tonapi-${tier.id}`,
-        plan: `TON API «${tier.name}»`,
+        plan: `TonAPI ${tier.name}`,
         interval: 'Monthly',
         renewsDate: tier.renewsDate,
         price: tier.price,
