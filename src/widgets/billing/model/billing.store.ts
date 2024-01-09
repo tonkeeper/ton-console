@@ -71,7 +71,7 @@ class BillingStore {
 function mapTonapiPaymentToPayment(payment: TonApiPayment): Payment {
     return {
         id: `tonapi-${payment.id}`,
-        name: `TON API «${payment.tier.name}»`,
+        name: `TonAPI ${payment.tier.name}`,
         date: payment.date,
         amount: payment.amount,
         amountUsdEquivalent: payment.amountUsdEquivalent
@@ -81,7 +81,7 @@ function mapTonapiPaymentToPayment(payment: TonApiPayment): Payment {
 function mapAppmessagesPaymentToPayment(payment: AppMessagesPayment): Payment {
     return {
         id: `app messages-${payment.id}`,
-        name: `messages package «${payment.package.name}»`,
+        name: `Messages package ${payment.package.name}`,
         date: payment.date,
         amount: payment.amount,
         amountUsdEquivalent: payment.amountUsdEquivalent
