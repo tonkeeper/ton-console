@@ -4,6 +4,7 @@ import { H4, Overlay } from 'src/shared';
 import {
     CreateInvoiceModal,
     FilterInvoiceByOverpayment,
+    FilterInvoiceByPeriod,
     FilterInvoiceByStatus,
     InvoicesProjectInfo,
     InvoicesSearchInput,
@@ -24,6 +25,7 @@ const ManageInvoicesPage: FunctionComponent = () => {
             <Flex align="center" gap="4" mb="9">
                 <InvoicesSearchInput w="264px" />
                 <FilterInvoiceByStatus />
+                <FilterInvoiceByPeriod />
                 <FilterInvoiceByOverpayment />
                 <Button h="44px" ml="auto" onClick={onOpen} variant="primary">
                     New Invoice

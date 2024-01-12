@@ -1,4 +1,4 @@
-const monthesNames = [
+const monthsNamesShort = [
     'Jan',
     'Feb',
     'Mar',
@@ -13,13 +13,40 @@ const monthesNames = [
     'Dec'
 ];
 
+export const monthsNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+] as const;
+
+export type MonthName = (typeof monthsNames)[number];
+
+export function DDMMYYYYToDate(value: string): Date {
+    const [day, month, year] = value.split('.');
+    return new Date(+year, +month - 1, +day);
+}
+
+export function DateToDDMMYYYY(date: Date): string {
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' } as const;
+    return date.toLocaleDateString(navigator.language, options);
+}
+
 export function toDateTime(date: Date, options?: { includeYear?: boolean }): string {
     return `${toDate(date, options)}, ${toTime(date)}`;
 }
 
 export function toDate(date: Date, options?: { includeYear?: boolean }): string {
     const day = date.getDate();
-    const month = monthesNames[date.getMonth()];
+    const month = monthsNamesShort[date.getMonth()];
     const dateString = `${day} ${month}`;
 
     if (!options?.includeYear) {

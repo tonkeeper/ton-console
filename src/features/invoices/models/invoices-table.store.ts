@@ -17,6 +17,7 @@ import {
     InvoicesTablePagination,
     InvoiceStatus,
     InvoiceTableColumn,
+    InvoiceTableFiltration,
     InvoiceTableSort,
     InvoiceTableSortColumn
 } from './interfaces';
@@ -138,6 +139,8 @@ class InvoicesTableStore {
                 ? DTOGetInvoicesParamsTypeOrder.DTOAsc
                 : DTOGetInvoicesParamsTypeOrder.DTODesc;
 
+        // TODO add filtration by period
+
         return apiClient.api.getInvoices({
             app_id: invoicesAppStore.invoicesApp$.value!.id,
             ...(options?.offset !== undefined && { offset: options.offset }),
@@ -224,6 +227,14 @@ class InvoicesTableStore {
         } else {
             this.pagination.filter.status = (this.pagination.filter.status || []).concat(status);
         }
+    };
+
+    setFilterByPeriod = (value: InvoiceTableFiltration['period']): void => {
+        this.pagination.filter.period = value;
+    };
+
+    clearFilterByPeriod = (): void => {
+        this.pagination.filter.period = undefined;
     };
 
     toggleFilterByOverpayment = (): void => {

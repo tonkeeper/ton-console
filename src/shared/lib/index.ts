@@ -14,3 +14,4 @@ export * from './react';
 export * from './form';
 export * from './env';
 export * from './address';
+export * from './number';
