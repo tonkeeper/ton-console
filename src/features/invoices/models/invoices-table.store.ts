@@ -1,12 +1,14 @@
 import { makeAutoObservable, reaction } from 'mobx';
 import {
     apiClient,
+    backendBaseURL,
     createImmediateReaction,
-    DTOGetInvoicesParamsFieldOrder,
     DTOGetInvoicesParamsTypeOrder,
+    DTOInvoiceFieldOrder,
     DTOInvoicesInvoice,
     DTOInvoiceStatus,
     Loadable,
+    monthsNames,
     TonAddress,
     TonCurrencyAmount
 } from 'src/shared';
@@ -19,7 +21,8 @@ import {
     InvoiceTableColumn,
     InvoiceTableFiltration,
     InvoiceTableSort,
-    InvoiceTableSortColumn
+    InvoiceTableSortColumn,
+    isCustomFiltrationPeriod
 } from './interfaces';
 import { invoicesAppStore } from './invoices-app.store';
 
@@ -56,6 +59,41 @@ class InvoicesTableStore {
             !this.pagination.filter.id &&
             !this.pagination.filter.overpayment
         );
+    }
+
+    get downloadInvoicesLink(): string {
+        const path = '/api/v1/services/invoices/export';
+        const url = new URL(path, backendBaseURL);
+        url.searchParams.append('app_id', invoicesAppStore.invoicesApp$.value!.id.toString());
+
+        if (this.pagination.filter.id !== undefined) {
+            url.searchParams.append('search_id', this.pagination.filter.id);
+        }
+        const sortByColumn = mapSortColumnToFieldOrder[this.pagination.sort.column];
+        const sortOrder =
+            this.pagination.sort.direction === 'asc'
+                ? DTOGetInvoicesParamsTypeOrder.DTOAsc
+                : DTOGetInvoicesParamsTypeOrder.DTODesc;
+        url.searchParams.append('field_order', sortByColumn);
+        url.searchParams.append('type_order', sortOrder);
+
+        if (this.pagination.filter.status?.length) {
+            this.pagination.filter.status.forEach(i => {
+                url.searchParams.append('filter_status', mapInvoiceStatusToInvoiceDTOStatus[i]);
+            });
+        }
+
+        if (this.pagination.filter.overpayment) {
+            url.searchParams.append('overpayment', true.toString());
+        }
+
+        const period = preriodToDTO(this.pagination.filter.period);
+        if (period) {
+            url.searchParams.append('start', period.start.toString());
+            url.searchParams.append('end', period.end.toString());
+        }
+
+        return url.toString();
     }
 
     constructor() {
@@ -139,7 +177,7 @@ class InvoicesTableStore {
                 ? DTOGetInvoicesParamsTypeOrder.DTOAsc
                 : DTOGetInvoicesParamsTypeOrder.DTODesc;
 
-        // TODO add filtration by period
+        const period = preriodToDTO(this.pagination.filter.period);
 
         return apiClient.api.getInvoices({
             app_id: invoicesAppStore.invoicesApp$.value!.id,
@@ -149,7 +187,8 @@ class InvoicesTableStore {
             field_order: sortByColumn,
             type_order: sortOrder,
             filter_status: filterByStatus,
-            ...(this.pagination.filter.overpayment && { overpayment: true })
+            ...(this.pagination.filter.overpayment && { overpayment: true }),
+            ...period
         });
     }
 
@@ -307,12 +346,33 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
     return { ...commonInvoice, status };
 }
 
-const mapSortColumnToFieldOrder: Record<InvoiceTableSortColumn, DTOGetInvoicesParamsFieldOrder> = {
-    id: DTOGetInvoicesParamsFieldOrder.DTOId,
-    description: DTOGetInvoicesParamsFieldOrder.DTODescription,
-    amount: DTOGetInvoicesParamsFieldOrder.DTOAmount,
-    status: DTOGetInvoicesParamsFieldOrder.DTOStatus,
-    'creation-date': DTOGetInvoicesParamsFieldOrder.DTODateCreate
+const mapSortColumnToFieldOrder: Record<InvoiceTableSortColumn, DTOInvoiceFieldOrder> = {
+    id: DTOInvoiceFieldOrder.DTOId,
+    description: DTOInvoiceFieldOrder.DTODescription,
+    amount: DTOInvoiceFieldOrder.DTOAmount,
+    status: DTOInvoiceFieldOrder.DTOStatus,
+    'creation-date': DTOInvoiceFieldOrder.DTODateCreate
+};
+
+const preriodToDTO = (
+    savedPeriod: InvoiceTableFiltration['period']
+): { start: number; end: number } | undefined => {
+    if (!savedPeriod) {
+        return undefined;
+    }
+
+    if (isCustomFiltrationPeriod(savedPeriod)) {
+        return {
+            start: savedPeriod.from.getTime() / 1000,
+            end: savedPeriod.to.getTime() / 1000
+        };
+    } else {
+        const monthIndex = monthsNames.indexOf(savedPeriod.month);
+        return {
+            start: new Date(savedPeriod.year, monthIndex, 1).getTime() / 1000,
+            end: new Date(savedPeriod.year, monthIndex + 1, 0).getTime() / 1000
+        };
+    }
 };
 
 export const invoicesTableStore = new InvoicesTableStore();

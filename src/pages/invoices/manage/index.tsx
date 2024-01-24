@@ -9,6 +9,7 @@ import {
     InvoicesProjectInfo,
     InvoicesSearchInput,
     InvoicesTable,
+    invoicesTableStore,
     RefreshInvoicesTableButton
 } from 'src/features';
 import { Box, Button, Flex, useDisclosure } from '@chakra-ui/react';
@@ -39,11 +40,10 @@ const ManageInvoicesPage: FunctionComponent = () => {
                     leftIcon={<DownloadIcon16 />}
                     size="sm"
                     variant="flat"
-                    href="#"
+                    href={invoicesTableStore.downloadInvoicesLink}
                     isExternal
                     download="invoices.csv"
                 >
-                    {/*TODO*/}
                     Download CSV
                 </ButtonLink>
             </Flex>

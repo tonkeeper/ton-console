@@ -25,7 +25,7 @@ const BalancePage: FunctionComponent = () => {
 
     const onRefreshClick = useCallback(() => {
         subscriptionsStore.fetchSubscriptions();
-        billingStore.fetchBillingHistory();
+        billingStore.loadFirstPage();
     }, []);
 
     const refreshLoading = useMemo(() => {
@@ -34,7 +34,7 @@ const BalancePage: FunctionComponent = () => {
 
     return (
         <>
-            <Overlay h="fit-content" p="0">
+            <Overlay h="fit-content" p="0" display="flex" flexDirection="column">
                 <Box pt="5" pb="6" px="6">
                     <Flex align="center" gap="2" mb="1">
                         <H2 minW={h2Width} display="flex" alignItems="center" gap="2">

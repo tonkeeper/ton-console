@@ -1,111 +1,77 @@
 import { makeAutoObservable } from 'mobx';
 import { createAsyncAction } from 'src/shared';
-import {
-    appMessagesStore,
-    TonApiPayment,
-    tonApiTiersStore,
-    AppMessagesPayment,
-    FaucetPayment,
-    faucetStore,
-    AnalyticsPayment,
-    analyticsHistoryTableStore
-} from 'src/features';
-import {
-    BillingHistory,
-    BillingHistoryPaymentItem,
-    BillingHistoryRefillItem,
-    Payment
-} from './interfaces';
+import { BillingHistory, BillingHistoryPaymentItem, BillingHistoryRefillItem } from './interfaces';
 import { balanceStore } from 'src/entities';
+import { paymentsTableStore } from './payments-table.store';
 
 class BillingStore {
+    get isResolved() {
+        return balanceStore.portfolio$.isResolved && paymentsTableStore.charges$.isResolved;
+    }
+
+    get totalItems() {
+        return balanceStore.refills.length + paymentsTableStore.totalPayments;
+    }
+
+    get tableContentLength(): number {
+        return paymentsTableStore.hasNextPage
+            ? this.billingHistory.length + 1
+            : this.billingHistory.length;
+    }
+
     get billingHistory(): BillingHistory {
         const refills: BillingHistoryRefillItem[] = balanceStore.refills.map(item => ({
             ...item,
             action: 'refill'
         }));
-        const payments: BillingHistoryPaymentItem[] = this.paymentsHistory.map(item => ({
+        const payments: BillingHistoryPaymentItem[] = paymentsTableStore.payments.map(item => ({
             ...item,
             action: 'payment'
         }));
-        return [...refills, ...payments].sort((a, b) => (a.date < b.date ? 1 : -1));
+        const history = [...refills, ...payments].sort((a, b) => (a.date < b.date ? 1 : -1));
+        if (payments.length !== paymentsTableStore.totalPayments) {
+            let lastPaymentIndex = 0;
+            history.forEach((item, index) => {
+                if (item.action === 'payment') {
+                    lastPaymentIndex = index;
+                }
+            });
+
+            return history.slice(0, lastPaymentIndex + 1);
+        }
+
+        return history;
     }
 
     get billingHistoryLoading(): boolean {
-        return this.paymentsHistoryLoading || balanceStore.portfolio$.isLoading;
-    }
-
-    private get paymentsHistory(): Payment[] {
-        return tonApiTiersStore.paymentsHistory$.value
-            .map(mapTonapiPaymentToPayment)
-            .concat(appMessagesStore.paymentsHistory$.value.map(mapAppmessagesPaymentToPayment))
-            .concat(faucetStore.paymentsHistory$.value.map(mapFaucetPaymentToPayment))
-            .concat(
-                analyticsHistoryTableStore.paymentsHistory$.value.map(mapAnalyticsPaymentToPayment)
-            );
-    }
-
-    private get paymentsHistoryLoading(): boolean {
-        return (
-            tonApiTiersStore.paymentsHistory$.isLoading ||
-            appMessagesStore.paymentsHistory$.isLoading ||
-            faucetStore.paymentsHistory$.isLoading ||
-            analyticsHistoryTableStore.paymentsHistory$.isLoading
-        );
+        return paymentsTableStore.charges$.isLoading || balanceStore.portfolio$.isLoading;
     }
 
     constructor() {
         makeAutoObservable(this);
     }
 
-    fetchBillingHistory = createAsyncAction(async () => {
+    loadFirstPage = createAsyncAction(async () => {
+        paymentsTableStore.loadFirstPage.cancelAllPendingCalls();
+
+        await Promise.all([balanceStore.fetchPortfolio(), paymentsTableStore.loadFirstPage()]);
+    });
+
+    loadNextPage = createAsyncAction(async () => {
+        paymentsTableStore.loadNextPage.cancelAllPendingCalls();
+        await paymentsTableStore.loadNextPage();
+    });
+
+    updateCurrentListSilently = createAsyncAction(async () => {
+        paymentsTableStore.updateCurrentListSilently.cancelAllPendingCalls();
         await Promise.all([
             balanceStore.fetchPortfolio(),
-            tonApiTiersStore.fetchPaymentsHistory(),
-            appMessagesStore.fetchPaymentsHistory(),
-            faucetStore.fetchPaymentsHistory()
+            paymentsTableStore.updateCurrentListSilently()
         ]);
     });
-}
 
-function mapTonapiPaymentToPayment(payment: TonApiPayment): Payment {
-    return {
-        id: `tonapi-${payment.id}`,
-        name: `TonAPI ${payment.tier.name}`,
-        date: payment.date,
-        amount: payment.amount,
-        amountUsdEquivalent: payment.amountUsdEquivalent
-    };
-}
-
-function mapAppmessagesPaymentToPayment(payment: AppMessagesPayment): Payment {
-    return {
-        id: `app messages-${payment.id}`,
-        name: `Messages package ${payment.package.name}`,
-        date: payment.date,
-        amount: payment.amount,
-        amountUsdEquivalent: payment.amountUsdEquivalent
-    };
-}
-
-function mapFaucetPaymentToPayment(payment: FaucetPayment): Payment {
-    return {
-        id: `faucet-${payment.id}`,
-        name: `Bought ${payment.boughtAmount.stringAmount} testnet TON`,
-        date: payment.date,
-        amount: payment.amount,
-        amountUsdEquivalent: payment.amountUsdEquivalent
-    };
-}
-
-function mapAnalyticsPaymentToPayment(payment: AnalyticsPayment): Payment {
-    return {
-        id: `analytics-${payment.id}`,
-        name: `TON Analytics ${payment.subservice}`,
-        date: payment.date,
-        amount: payment.amount,
-        amountUsdEquivalent: payment.amountUsdEquivalent
-    };
+    isItemLoaded = (index: number): boolean =>
+        !paymentsTableStore.hasNextPage || index < this.billingHistory.length;
 }
 
 export const billingStore = new BillingStore();
