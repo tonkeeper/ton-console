@@ -23,6 +23,10 @@ const BalancePage: FunctionComponent = () => {
         }
     }, [balanceStore.balances[0]?.stringAmount]);
 
+    useEffect(() => {
+        billingStore.loadFirstPage();
+    }, []);
+
     const onRefreshClick = useCallback(() => {
         subscriptionsStore.fetchSubscriptions();
         billingStore.loadFirstPage();

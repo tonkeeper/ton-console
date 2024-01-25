@@ -2,16 +2,13 @@ import { makeAutoObservable, reaction } from 'mobx';
 import {
     apiClient,
     createImmediateReaction,
-    DTOCharge,
     DTOStatsQueryResult,
     DTOStatsQueryType,
     Loadable,
-    TonCurrencyAmount,
-    UsdCurrencyAmount
+    TonCurrencyAmount
 } from 'src/shared';
 import {
     AnalyticsGraphQuery,
-    AnalyticsPayment,
     AnalyticsQuery,
     AnalyticsQueryType,
     AnalyticsRepeatingQueryAggregated,
@@ -25,8 +22,6 @@ class AnalyticsHistoryTableStore {
     queries$ = new Loadable<
         (AnalyticsQuery | AnalyticsRepeatingQueryAggregated | AnalyticsGraphQuery)[]
     >([]);
-
-    paymentsHistory$ = new Loadable<AnalyticsPayment[]>([]);
 
     pagination: AnalyticsTablePagination = {
         filter: {
@@ -65,7 +60,6 @@ class AnalyticsHistoryTableStore {
 
                 if (project) {
                     this.loadFirstPage();
-                    this.fetchPaymentsHistory();
 
                     dispose = reaction(
                         () => JSON.stringify(this.pagination),
@@ -117,14 +111,6 @@ class AnalyticsHistoryTableStore {
         return this.queries$.value.concat(queries);
     });
 
-    fetchPaymentsHistory = this.paymentsHistory$.createAsyncAction(async () => {
-        const response = await apiClient.api.getProjectStatsPaymentsHistory({
-            project_id: projectsStore.selectedProject!.id
-        });
-
-        return response.data.history.map(payment => mapDTOPaymentAnalyticsPayment(payment));
-    });
-
     toggleFilterByType = (type: AnalyticsQueryType): void => {
         const typeActive = this.pagination.filter.type?.includes(type);
         if (typeActive) {
@@ -143,7 +129,6 @@ class AnalyticsHistoryTableStore {
     };
 
     clearState(): void {
-        this.paymentsHistory$.clear();
         this.queries$.clear();
     }
 }
@@ -171,25 +156,6 @@ function mapDTOStatsQueryResultToAnalyticsQueryAggregated(
         repeatFrequencyMs: value.query!.repeat_interval! * 1000,
         totalCost: new TonCurrencyAmount(value.total_cost!),
         totalRepetitions: value.total_repetitions!
-    };
-}
-
-const subservices = {
-    [DTOStatsQueryType.DTOGraph]: 'graph',
-    [DTOStatsQueryType.DTOBaseQuery]: 'query',
-    [DTOStatsQueryType.DTOChatGptQuery]: 'gpt generation'
-} as const;
-
-function mapDTOPaymentAnalyticsPayment(payment: DTOCharge): AnalyticsPayment | null {
-    const tonAmount = new TonCurrencyAmount(payment.amount);
-    return {
-        id: payment.id,
-        date: new Date(payment.date_create),
-        amount: tonAmount,
-        amountUsdEquivalent: new UsdCurrencyAmount(
-            tonAmount.amount.multipliedBy(payment.exchange_rate)
-        ),
-        subservice: subservices[payment.stats_type_query!]
     };
 }
 
