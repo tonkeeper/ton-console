@@ -127,6 +127,7 @@ export interface DTODeposit {
 export interface DTOCharge {
     /** @example "742af494-e2cd-441f-98e8-ac6075280eff" */
     id: string;
+    service: DTOServiceName;
     /**
      * @format uint32
      * @example 1
@@ -375,6 +376,13 @@ export enum DTOStatsQueryType {
     DTOGraph = 'graph',
     DTOBaseQuery = 'base_query',
     DTOChatGptQuery = 'chat_gpt_query'
+}
+
+export enum DTOServiceName {
+    DTOMessages = 'messages',
+    DTOStats = 'stats',
+    DTOTonapi = 'tonapi',
+    DTOTestnet = 'testnet'
 }
 
 export interface DTOInvoicesInvoice {

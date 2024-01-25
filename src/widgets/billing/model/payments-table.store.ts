@@ -3,6 +3,7 @@ import {
     apiClient,
     createImmediateReaction,
     DTOCharge,
+    DTOServiceName,
     DTOStatsQueryType,
     Loadable,
     TonCurrencyAmount,
@@ -37,21 +38,17 @@ class PaymentsTableStore {
 
         return this.charges$.value
             .map(charge => {
-                if (charge.tier_id !== undefined) {
-                    // TODO
-                    return mapChargeToTonapiPayment(charge, tonapiTiers);
-                }
-
-                if (charge.messages_package_id !== undefined) {
-                    return mapChargeToAppMessagesPayment(charge, appMessagesPackages);
-                }
-
-                if (charge.testnet_price_multiplicator !== undefined) {
-                    return mapChargeToFaucetPayment(charge, tonRate);
-                }
-
-                if (charge.stats_type_query !== undefined) {
-                    return mapChargeToAnalyticsPayment(charge);
+                switch (charge.service) {
+                    case DTOServiceName.DTOTonapi:
+                        return mapChargeToTonapiPayment(charge, tonapiTiers);
+                    case DTOServiceName.DTOMessages:
+                        return mapChargeToAppMessagesPayment(charge, appMessagesPackages);
+                    case DTOServiceName.DTOTestnet:
+                        return mapChargeToFaucetPayment(charge, tonRate);
+                    case DTOServiceName.DTOStats:
+                        return mapChargeToAnalyticsPayment(charge);
+                    default:
+                        return null;
                 }
             })
             .filter(x => !!x) as Payment[];

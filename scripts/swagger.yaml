@@ -2284,6 +2284,7 @@ components:
       type: object
       required:
         - id
+        - service
         - amount
         - exchange_rate
         - date_create
@@ -2291,6 +2292,8 @@ components:
         id:
           type: string
           example: "742af494-e2cd-441f-98e8-ac6075280eff"
+        service:
+          $ref: '#/components/schemas/ServiceName'
         tier_id:
           type: integer
           format: uint32
@@ -2621,7 +2624,14 @@ components:
       enum:
         - graph
         - base_query
-        - chat_gpt_query
+        - chat_gpt_query    
+    ServiceName:
+      type: string
+      enum:
+        - messages
+        - stats
+        - tonapi
+        - testnet
     InvoicesInvoice:
       type: object
       required:
