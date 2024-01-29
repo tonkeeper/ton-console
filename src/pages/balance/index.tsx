@@ -25,6 +25,7 @@ const BalancePage: FunctionComponent = () => {
 
     useEffect(() => {
         billingStore.loadFirstPage();
+        return billingStore.clear;
     }, []);
 
     const onRefreshClick = useCallback(() => {

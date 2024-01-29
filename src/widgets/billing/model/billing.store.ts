@@ -47,6 +47,10 @@ class BillingStore {
         return paymentsTableStore.charges$.isLoading || balanceStore.portfolio$.isLoading;
     }
 
+    get isPageLoading() {
+        return this.loadFirstPage.isLoading || this.loadNextPage.isLoading;
+    }
+
     constructor() {
         makeAutoObservable(this);
     }
@@ -72,6 +76,10 @@ class BillingStore {
 
     isItemLoaded = (index: number): boolean =>
         !paymentsTableStore.hasNextPage || index < this.billingHistory.length;
+
+    clear() {
+        paymentsTableStore.clearState();
+    }
 }
 
 export const billingStore = new BillingStore();

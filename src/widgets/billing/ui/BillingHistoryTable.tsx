@@ -1,6 +1,6 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Box } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
+import { Observer, observer } from 'mobx-react-lite';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
@@ -27,7 +27,7 @@ const BillingHistoryTable: FunctionComponent<ComponentProps<typeof Box>> = props
                     isItemLoaded={billingStore.isItemLoaded}
                     itemCount={billingStore.totalItems}
                     loadMoreItems={
-                        billingStore.loadNextPage.isLoading || !billingStore.isResolved
+                        billingStore.isPageLoading || !billingStore.isResolved
                             ? () => {}
                             : () => billingStore.loadNextPage()
                     }
@@ -35,17 +35,21 @@ const BillingHistoryTable: FunctionComponent<ComponentProps<typeof Box>> = props
                     {({ onItemsRendered, ref }) => (
                         <AutoSizer>
                             {({ height, width }) => (
-                                <FixedSizeList
-                                    height={height!}
-                                    width={width!}
-                                    itemCount={billingStore.tableContentLength}
-                                    onItemsRendered={onItemsRendered}
-                                    itemSize={parseInt(rowHeight)}
-                                    innerElementType={BillingTableStructure}
-                                    ref={ref}
-                                >
-                                    {BillingTableRow}
-                                </FixedSizeList>
+                                <Observer>
+                                    {() => (
+                                        <FixedSizeList
+                                            height={height!}
+                                            width={width!}
+                                            itemCount={billingStore.tableContentLength}
+                                            onItemsRendered={onItemsRendered}
+                                            itemSize={parseInt(rowHeight)}
+                                            innerElementType={BillingTableStructure}
+                                            ref={ref}
+                                        >
+                                            {BillingTableRow}
+                                        </FixedSizeList>
+                                    )}
+                                </Observer>
                             )}
                         </AutoSizer>
                     )}

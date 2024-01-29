@@ -19,13 +19,7 @@ const EmptyTable: FunctionComponent<PropsWithChildren> = ({ children }) => {
     const { rowHeight } = useContext(BillingHistoryTableContext);
     return (
         <Tr h={rowHeight} maxH={rowHeight}>
-            <Td
-                h="192px"
-                border="1px"
-                borderColor="background.contentTint"
-                borderTop="0"
-                colSpan={5}
-            >
+            <Td border="1px" borderColor="background.contentTint" borderTop="0" colSpan={5}>
                 <Center textStyle="body2" color="text.secondary" fontFamily="body">
                     {children}
                 </Center>
