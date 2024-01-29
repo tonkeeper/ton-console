@@ -1441,8 +1441,6 @@ paths:
       operationId: exportInvoicesCsv
       parameters:
         - $ref: '#/components/parameters/queryAppID'
-        - $ref: '#/components/parameters/queryLimit'
-        - $ref: '#/components/parameters/queryOffset'
         - $ref: '#/components/parameters/queryFieldOrder'
         - $ref: '#/components/parameters/queryTypeOrder'
         - $ref: '#/components/parameters/queryInvoicesSearchID'

@@ -3405,17 +3405,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @format uint32
                  */
                 app_id: number;
-                /**
-                 * Limit
-                 * @default 100
-                 * @example 50
-                 */
-                limit?: number;
-                /**
-                 * Offset
-                 * @example 100
-                 */
-                offset?: number;
                 /** Field */
                 field_order?: DTOInvoiceFieldOrder;
                 /**

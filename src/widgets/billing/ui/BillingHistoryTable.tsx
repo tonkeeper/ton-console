@@ -12,17 +12,13 @@ import BillingTableRow from './BillingTableRow';
 const BillingHistoryTable: FunctionComponent<ComponentProps<typeof Box>> = props => {
     const rowHeight = '48px';
 
+    const minH = billingStore.isResolved
+        ? Math.min(parseInt(rowHeight) * (billingStore.billingHistory.length + 1) + 6, 800) + 'px'
+        : '102px';
+
     return (
         <BillingHistoryTableContext.Provider value={{ rowHeight }}>
-            <Box
-                minH={
-                    Math.min(
-                        parseInt(rowHeight) * (billingStore.billingHistory.length + 1) + 6,
-                        800
-                    ) + 'px'
-                }
-                {...props}
-            >
+            <Box minH={minH} {...props}>
                 <InfiniteLoader
                     isItemLoaded={billingStore.isItemLoaded}
                     itemCount={billingStore.totalItems}

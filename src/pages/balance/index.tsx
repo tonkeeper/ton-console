@@ -24,6 +24,7 @@ const BalancePage: FunctionComponent = () => {
     }, [balanceStore.balances[0]?.stringAmount]);
 
     useEffect(() => {
+        billingStore.clear();
         billingStore.loadFirstPage();
         return billingStore.clear;
     }, []);
