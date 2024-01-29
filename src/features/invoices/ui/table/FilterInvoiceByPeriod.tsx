@@ -135,9 +135,9 @@ const MenuInput: FunctionComponent<
     const {
         role,
         ref: menuRef,
-        onMouseEnter,
-        onMouseMove,
-        onClick,
+        onMouseEnter: _,
+        onMouseMove: __,
+        onClick: ___,
         ...rest
     } = useMenuItem(restProps);
     const { ref: maskRef, value } = useIMask({
@@ -216,10 +216,10 @@ const MenuInput: FunctionComponent<
                         const [fromStr, toStr] = value.split(' - ');
                         const from = DDMMYYYYToDate(fromStr);
                         const to = DDMMYYYYToDate(toStr);
-                        if (from >= to) {
+                        if (from > to) {
                             return toast({
                                 title: 'Error',
-                                description: "'From' date must be less than 'To' date",
+                                description: "'From' date must be less or equal to the 'To' date",
                                 status: 'error',
                                 isClosable: true
                             });

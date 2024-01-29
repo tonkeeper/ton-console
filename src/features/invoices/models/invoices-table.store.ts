@@ -362,15 +362,18 @@ const preriodToDTO = (
     }
 
     if (isCustomFiltrationPeriod(savedPeriod)) {
+        const end = new Date(savedPeriod.to);
+        end.setDate(end.getDate() + 1); // savedPeriod.to is inclusive
+
         return {
             start: savedPeriod.from.getTime() / 1000,
-            end: savedPeriod.to.getTime() / 1000
+            end: end.getTime() / 1000
         };
     } else {
         const monthIndex = monthsNames.indexOf(savedPeriod.month);
         return {
             start: new Date(savedPeriod.year, monthIndex, 1).getTime() / 1000,
-            end: new Date(savedPeriod.year, monthIndex + 1, 0).getTime() / 1000
+            end: new Date(savedPeriod.year, monthIndex + 1, 1).getTime() / 1000
         };
     }
 };

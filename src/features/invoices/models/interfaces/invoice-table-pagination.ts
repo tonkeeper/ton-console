@@ -14,7 +14,7 @@ export type InvoiceTableFiltration = {
           }
         | {
               from: Date;
-              to: Date;
+              to: Date; // inclusive
           };
     overpayment: boolean;
 };
