@@ -37,7 +37,7 @@ export function DDMMYYYYToDate(value: string): Date {
 
 export function DateToDDMMYYYY(date: Date): string {
     const options = { day: '2-digit', month: '2-digit', year: 'numeric' } as const;
-    return date.toLocaleDateString(navigator.language, options);
+    return date.toLocaleDateString('ru', options); // To get "dd.mm.yyyy" format
 }
 
 export function toDateTime(date: Date, options?: { includeYear?: boolean }): string {
