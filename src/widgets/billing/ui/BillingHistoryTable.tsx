@@ -1,103 +1,57 @@
-import {
-    Center,
-    Link,
-    Spinner,
-    Table,
-    TableContainer,
-    Tbody,
-    Td,
-    Th,
-    Thead,
-    Tr,
-    chakra
-} from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent } from 'react';
-import { explorer, shortAddress, toDateTime } from 'src/shared';
-import { observer } from 'mobx-react-lite';
-import { billingStore } from 'src/widgets/billing';
+import { Box } from '@chakra-ui/react';
+import { Observer, observer } from 'mobx-react-lite';
+import { FixedSizeList } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import InfiniteLoader from 'react-window-infinite-loader';
+import { BillingTableStructure } from './BillingTableStructure';
+import { BillingHistoryTableContext } from './BillingHistoryTableContext';
+import { billingStore } from '../model';
+import BillingTableRow from './BillingTableRow';
 
-const BillingHistoryTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
-    if (billingStore.billingHistoryLoading) {
-        return (
-            <Center h="100px">
-                <Spinner />
-            </Center>
-        );
-    }
+const BillingHistoryTable: FunctionComponent<ComponentProps<typeof Box>> = props => {
+    const rowHeight = '48px';
+
+    const minH = billingStore.isResolved
+        ? Math.min(parseInt(rowHeight) * (billingStore.billingHistory.length + 1) + 6, 800) + 'px'
+        : '102px';
 
     return (
-        <TableContainer
-            minH="100px"
-            border="1px"
-            borderColor="background.contentTint"
-            borderRadius="sm"
-            {...props}
-        >
-            <Table variant="simple">
-                <Thead>
-                    <Tr>
-                        <Th>History</Th>
-                        <Th>Action</Th>
-                        <Th w="100%" textAlign="right">
-                            Amount
-                        </Th>
-                    </Tr>
-                </Thead>
-                <Tbody>
-                    {billingStore.billingHistory.map(historyItem => (
-                        <Tr key={historyItem.id}>
-                            <Td>{toDateTime(historyItem.date)}</Td>
-
-                            {historyItem.action === 'payment' ? (
-                                <>
-                                    <Td>{historyItem.name}</Td>
-                                    <Td textAlign="right">
-                                        -{historyItem.amount.stringCurrencyAmount}
-                                        {historyItem.amountUsdEquivalent && (
-                                            <>
-                                                &nbsp;
-                                                <chakra.span color="text.secondary">
-                                                    (
-                                                    {
-                                                        historyItem.amountUsdEquivalent
-                                                            .stringCurrencyAmount
-                                                    }
-                                                    )
-                                                </chakra.span>
-                                            </>
-                                        )}
-                                    </Td>
-                                </>
-                            ) : (
-                                <>
-                                    <Td>
-                                        {historyItem.type === 'deposit' ? (
-                                            <>
-                                                Refill from{' '}
-                                                <Link
-                                                    color="text.accent"
-                                                    href={explorer.accountLink(
-                                                        historyItem.fromAddress
-                                                    )}
-                                                    isExternal
-                                                >
-                                                    {shortAddress(historyItem.fromAddress)}
-                                                </Link>
-                                            </>
-                                        ) : (
-                                            'Refill with promo code'
-                                        )}
-                                    </Td>
-                                    <Td color="accent.green" textAlign="right">
-                                        +{historyItem.amount.stringCurrencyAmount}
-                                    </Td>
-                                </>
+        <BillingHistoryTableContext.Provider value={{ rowHeight }}>
+            <Box minH={minH} {...props}>
+                <InfiniteLoader
+                    isItemLoaded={billingStore.isItemLoaded}
+                    itemCount={billingStore.totalItems}
+                    loadMoreItems={
+                        billingStore.isPageLoading || !billingStore.isResolved
+                            ? () => {}
+                            : () => billingStore.loadNextPage()
+                    }
+                >
+                    {({ onItemsRendered, ref }) => (
+                        <AutoSizer>
+                            {({ height, width }) => (
+                                <Observer>
+                                    {() => (
+                                        <FixedSizeList
+                                            height={height!}
+                                            width={width!}
+                                            itemCount={billingStore.tableContentLength}
+                                            onItemsRendered={onItemsRendered}
+                                            itemSize={parseInt(rowHeight)}
+                                            innerElementType={BillingTableStructure}
+                                            ref={ref}
+                                        >
+                                            {BillingTableRow}
+                                        </FixedSizeList>
+                                    )}
+                                </Observer>
                             )}
-                        </Tr>
-                    ))}
-                </Tbody>
-            </Table>
-        </TableContainer>
+                        </AutoSizer>
+                    )}
+                </InfiniteLoader>
+            </Box>
+        </BillingHistoryTableContext.Provider>
     );
 };
 

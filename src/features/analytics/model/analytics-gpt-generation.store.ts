@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 import { apiClient, createImmediateReaction, Loadable, TonCurrencyAmount } from 'src/shared';
 import { projectsStore } from 'src/entities';
-import { analyticsHistoryTableStore, GptGenerationPricing } from 'src/features';
+import { GptGenerationPricing } from 'src/features';
 
 class AnalyticsGPTGenerationStore {
     generatedSQL$ = new Loadable<string | null>(null);
@@ -43,10 +43,7 @@ class AnalyticsGPTGenerationStore {
                 { message, context }
             );
 
-            await Promise.all([
-                analyticsHistoryTableStore.fetchPaymentsHistory(),
-                this.fetchPrice()
-            ]);
+            await this.fetchPrice();
 
             return result.data.message;
         }
