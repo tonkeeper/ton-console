@@ -12,3 +12,7 @@ export function replaceIfNotEqual<T extends object, P extends keyof T>(
 
     object[property] = value;
 }
+
+export function isObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null;
+}

@@ -9,7 +9,7 @@ import {
 } from 'src/shared';
 import { AnalyticsQuery, AnalyticsTableSource, AnalyticsTablesSchema } from './interfaces';
 import { projectsStore } from 'src/entities';
-import { analyticsGPTGenerationStore, analyticsHistoryTableStore } from 'src/features';
+import { analyticsGPTGenerationStore } from 'src/features';
 
 class AnalyticsQueryStore {
     query$ = new Loadable<AnalyticsQuery | null>(null);
@@ -52,8 +52,6 @@ class AnalyticsQueryStore {
                     gpt_message: analyticsGPTGenerationStore.gptPrompt
                 })
             });
-
-            await analyticsHistoryTableStore.fetchPaymentsHistory();
 
             return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
         },

@@ -127,6 +127,7 @@ export interface DTODeposit {
 export interface DTOCharge {
     /** @example "742af494-e2cd-441f-98e8-ac6075280eff" */
     id: string;
+    service: DTOServiceName;
     /**
      * @format uint32
      * @example 1
@@ -377,6 +378,13 @@ export enum DTOStatsQueryType {
     DTOChatGptQuery = 'chat_gpt_query'
 }
 
+export enum DTOServiceName {
+    DTOMessages = 'messages',
+    DTOStats = 'stats',
+    DTOTonapi = 'tonapi',
+    DTOTestnet = 'testnet'
+}
+
 export interface DTOInvoicesInvoice {
     /** @example "60ffb075" */
     id: string;
@@ -443,6 +451,19 @@ export enum DTOInvoiceStatus {
     DTOExpired = 'expired'
 }
 
+/** @example "id" */
+export enum DTOInvoiceFieldOrder {
+    DTOId = 'id',
+    DTOAmount = 'amount',
+    DTOStatus = 'status',
+    DTOLifeTime = 'life_time',
+    DTODescription = 'description',
+    DTOPayToAddress = 'pay_to_address',
+    DTOPaidByAddress = 'paid_by_address',
+    DTODateCreate = 'date_create',
+    DTODatePaid = 'date_paid'
+}
+
 export type DTOInvoicesAppWebhooks = {
     id: string;
     /** @example "https://mydapp.com/api/handle-invoice-change" */
@@ -467,26 +488,19 @@ export enum DTOProjectCapabilities {
 }
 
 /**
- * Field
- * @example "id"
+ * Type order
+ * @example "desc"
  */
-export enum DTOGetInvoicesParamsFieldOrder {
-    DTOId = 'id',
-    DTOAmount = 'amount',
-    DTOStatus = 'status',
-    DTOLifeTime = 'life_time',
-    DTODescription = 'description',
-    DTOPayToAddress = 'pay_to_address',
-    DTOPaidByAddress = 'paid_by_address',
-    DTODateCreate = 'date_create',
-    DTODatePaid = 'date_paid'
+export enum DTOGetInvoicesParamsTypeOrder {
+    DTOAsc = 'asc',
+    DTODesc = 'desc'
 }
 
 /**
  * Type order
  * @example "desc"
  */
-export enum DTOGetInvoicesParamsTypeOrder {
+export enum DTOExportInvoicesCsvParamsTypeOrder {
     DTOAsc = 'asc',
     DTODesc = 'desc'
 }
@@ -804,6 +818,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 }
             >({
                 path: `/api/v1/admin/project/${id}/charge`,
+                method: 'POST',
+                body: data,
+                ...params
+            }),
+
+        /**
+         * @description Private method
+         *
+         * @tags admin
+         * @name AdminMessagesChargeProject
+         * @summary Private method: Messages charge project
+         * @request POST:/api/v1/admin/messages/charge
+         */
+        adminMessagesChargeProject: (
+            data: {
+                /**
+                 * @format uint32
+                 * @example 1647024163
+                 */
+                app_id: number;
+                /**
+                 * @format int32
+                 * @example 10000000
+                 */
+                success_delivery: number;
+                /** @example "test message" */
+                message: string;
+                /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+                address?: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/admin/messages/charge`,
                 method: 'POST',
                 body: data,
                 ...params
@@ -1150,6 +1206,50 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
+         * @tags project
+         * @name ProjectPaymentsHistory
+         * @summary Get project payments history
+         * @request GET:/api/v1/project/{id}/payments/history
+         */
+        projectPaymentsHistory: (
+            id: number,
+            query?: {
+                /**
+                 * Offset
+                 * @example 100
+                 */
+                offset?: number;
+                /**
+                 * Limit
+                 * @default 100
+                 * @example 50
+                 */
+                limit?: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @format uint64 */
+                    count: number;
+                    history: DTOCharge[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/project/${id}/payments/history`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
          * @tags tonapi_service
          * @name GetProjectTonApiTokens
          * @summary Get project TonAPI tokens
@@ -1466,6 +1566,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 {
+                    /** @format uint64 */
+                    count: number;
                     history: DTOCharge[];
                 },
                 {
@@ -1624,6 +1726,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 {
+                    /** @format uint64 */
+                    count: number;
                     history: DTOCharge[];
                 },
                 {
@@ -1991,10 +2095,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             params: RequestParams = {}
         ) =>
             this.request<
-                {
-                    /** @example 1000 */
-                    success_delivery: number;
-                },
+                DTOOk,
                 {
                     /** Error message */
                     error: string;
@@ -2110,6 +2211,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 {
+                    /** @format uint64 */
+                    count: number;
                     history: DTOCharge[];
                 },
                 {
@@ -2419,6 +2522,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 {
+                    /** @format uint64 */
+                    count: number;
                     history: DTOCharge[];
                 },
                 {
@@ -3063,11 +3168,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @example 100
                  */
                 offset?: number;
-                /**
-                 * Field
-                 * @example "id"
-                 */
-                field_order?: DTOGetInvoicesParamsFieldOrder;
+                /** Field */
+                field_order?: DTOInvoiceFieldOrder;
                 /**
                  * Type order
                  * @example "desc"
@@ -3085,6 +3187,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @default false
                  */
                 overpayment?: boolean;
+                /**
+                 * Start date
+                 * @format int64
+                 */
+                start?: number;
+                /**
+                 * End date
+                 * @format int64
+                 */
+                end?: number;
             },
             params: RequestParams = {}
         ) =>
@@ -3273,6 +3385,68 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 }
             >({
                 path: `/api/v1/services/invoices/stats`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags invoices_service
+         * @name ExportInvoicesCsv
+         * @summary Export invoices to csv file
+         * @request GET:/api/v1/services/invoices/export
+         */
+        exportInvoicesCsv: (
+            query: {
+                /**
+                 * App ID
+                 * @format uint32
+                 */
+                app_id: number;
+                /** Field */
+                field_order?: DTOInvoiceFieldOrder;
+                /**
+                 * Type order
+                 * @example "desc"
+                 */
+                type_order?: DTOExportInvoicesCsvParamsTypeOrder;
+                /**
+                 * Search ID
+                 * @minLength 1
+                 */
+                search_id?: string;
+                /** Filter status */
+                filter_status?: DTOInvoiceStatus[];
+                /**
+                 * Overpayment
+                 * @default false
+                 */
+                overpayment?: boolean;
+                /**
+                 * Start date
+                 * @format int64
+                 */
+                start?: number;
+                /**
+                 * End date
+                 * @format int64
+                 */
+                end?: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                File,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/invoices/export`,
                 method: 'GET',
                 query: query,
                 ...params

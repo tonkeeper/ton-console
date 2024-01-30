@@ -10,7 +10,6 @@ import {
 } from 'src/shared';
 import { AnalyticsGraphQuery, AnalyticsGraphQueryBasic } from './interfaces';
 import { projectsStore } from 'src/entities';
-import { analyticsHistoryTableStore } from 'src/features';
 
 class AnalyticsGraphQueryStore {
     query$ = new Loadable<AnalyticsGraphQuery | null>(null);
@@ -35,8 +34,6 @@ class AnalyticsGraphQueryStore {
                 addresses: form.addresses.join(','),
                 only_between: form.isBetweenSelectedOnly
             });
-
-            await analyticsHistoryTableStore.fetchPaymentsHistory();
 
             return mapDTOStatsGraphResultToAnalyticsGraphQuery(result.data);
         },
