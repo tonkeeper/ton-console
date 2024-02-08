@@ -174,7 +174,10 @@ export const ApiKeyForm: FunctionComponent<
                                 variant="withDescription"
                             >
                                 <Box textStyle="label2" mb="0.5">
-                                    Unlimited:
+                                    Unlimited:{' '}
+                                    <Span color="text.secondary" textStyle="body2">
+                                        Suitable for backend and scripts
+                                    </Span>
                                 </Box>
                                 <Box textStyle="body2" color="text.secondary">
                                     This key has no inherent limitations and is determined solely by
@@ -184,7 +187,10 @@ export const ApiKeyForm: FunctionComponent<
                             </Radio>
                             <Radio alignItems="flex-start" value="true" variant="withDescription">
                                 <Box textStyle="label2" mb="0.5">
-                                    Limited by IP:
+                                    Limited by IP:{' '}
+                                    <Span color="text.secondary" textStyle="body2">
+                                        Suitable for frontend
+                                    </Span>
                                 </Box>
                                 <Box textStyle="body2" color="text.secondary">
                                     This key is subject to additional restrictions based on the
