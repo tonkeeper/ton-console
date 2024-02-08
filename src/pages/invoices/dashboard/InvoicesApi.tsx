@@ -11,7 +11,7 @@ import {
     Text,
     UnorderedList
 } from '@chakra-ui/react';
-import { CopyPad, DocsLink } from 'src/shared';
+import { CopyPad, CardLink } from 'src/shared';
 import { invoicesAppStore, INVOICES_LINKS } from 'src/features';
 import { observer } from 'mobx-react-lite';
 
@@ -74,7 +74,7 @@ const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
                     </TabPanel>
                 </TabPanels>
             </Tabs>
-            <DocsLink href={INVOICES_LINKS.USAGE} mb="1" />
+            <CardLink href={INVOICES_LINKS.USAGE} mb="1" />
         </Box>
     );
 };

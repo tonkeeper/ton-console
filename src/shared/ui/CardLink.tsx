@@ -1,10 +1,10 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren, useId } from 'react';
+import { ComponentProps, FunctionComponent, PropsWithChildren, ReactNode, useId } from 'react';
 import { Box, Card, CardBody, Link, Text } from '@chakra-ui/react';
 import { ArrowIcon, ConsoleDocsIcon32, EXTERNAL_LINKS } from 'src/shared';
 
-export const DocsLink: FunctionComponent<
-    PropsWithChildren<ComponentProps<typeof Card> & { href?: string }>
-> = ({ children, ...rest }) => {
+export const CardLink: FunctionComponent<
+    PropsWithChildren<ComponentProps<typeof Card> & { href?: string; icon?: ReactNode }>
+> = ({ children, icon, ...rest }) => {
     const arrowId = useId();
 
     return (
@@ -25,15 +25,21 @@ export const DocsLink: FunctionComponent<
             {...rest}
         >
             <CardBody display="flex" pb="0" px="0">
-                <ConsoleDocsIcon32 mr="3" alignSelf="center" />
+                <Box alignSelf="center" mr="3">
+                    {icon || <ConsoleDocsIcon32 />}
+                </Box>
+
                 <Box flex="1">
-                    <Text textStyle="label1" textDecoration="none">
-                        Ton Console Docs
-                    </Text>
                     {children || (
-                        <Text textStyle="body2" color="text.secondary" textDecoration="none">
-                            Software guides for Ton Apps products
-                        </Text>
+                        <>
+                            <Text textStyle="label1" textDecoration="none">
+                                Ton Console Docs
+                            </Text>
+
+                            <Text textStyle="body2" color="text.secondary" textDecoration="none">
+                                Software guides for Ton Apps products
+                            </Text>
+                        </>
                     )}
                 </Box>
                 <ArrowIcon
