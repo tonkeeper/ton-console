@@ -17,7 +17,7 @@ import {
     isAnalyticsQuerySuccessful
 } from './interfaces';
 import { projectsStore } from 'src/entities';
-import { analyticsGPTGenerationStore, analyticsHistoryTableStore } from 'src/features';
+import { analyticsGPTGenerationStore } from 'src/features';
 import { parse } from 'csv-parse/sync';
 
 class AnalyticsQueryStore {
@@ -98,8 +98,6 @@ class AnalyticsQueryStore {
                     gpt_message: analyticsGPTGenerationStore.gptPrompt
                 })
             });
-
-            await analyticsHistoryTableStore.fetchPaymentsHistory();
 
             return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
         },

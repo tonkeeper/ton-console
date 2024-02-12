@@ -6,6 +6,7 @@ import { TonApiTier, tonApiTiersStore } from '../model';
 import { TonApiTierCard } from './TonApiTierCard';
 import { RefillModal } from 'src/entities';
 import { ButtonLink, EXTERNAL_LINKS } from 'src/shared';
+import { TonApiUnlimitedTierCard } from 'src/features';
 
 const TonApiTiersList: FunctionComponent = () => {
     const [selectedTier, setSelectedTier] = useState<TonApiTier | undefined>();
@@ -55,7 +56,7 @@ const TonApiTiersList: FunctionComponent = () => {
 
     return (
         <>
-            <Grid gap="4" templateColumns="repeat(auto-fit, minmax(250px, 1fr))">
+            <Grid gap="4" autoRows="1fr" templateColumns="repeat(auto-fit, minmax(300px, 1fr))">
                 {tonApiTiersStore.tiers$.value.map(tier => {
                     const isCurrentSubscription = currentTier?.id === tier.id;
 
@@ -93,6 +94,10 @@ const TonApiTiersList: FunctionComponent = () => {
                         </GridItem>
                     );
                 })}
+
+                <GridItem>
+                    <TonApiUnlimitedTierCard h="100%" />
+                </GridItem>
             </Grid>
             <TonApiPaymentDetailsModal
                 isOpen={!!selectedTier}

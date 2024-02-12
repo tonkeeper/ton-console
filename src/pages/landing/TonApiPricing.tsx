@@ -1,6 +1,6 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Box, forwardRef, Grid } from '@chakra-ui/react';
-import { TonApiTierCard, tonApiTiersStore } from 'src/features';
+import { TonApiTierCard, tonApiTiersStore, TonApiUnlimitedTierCard } from 'src/features';
 import { observer } from 'mobx-react-lite';
 import { H3, H3Thin } from 'src/shared';
 
@@ -15,15 +15,10 @@ const TonApiPricing: FunctionComponent<ComponentProps<typeof Box>> = forwardRef(
                 TON API Pricing
             </H3>
             <Grid
-                justifyContent="center"
                 gap="4"
-                templateColumns="repeat(4, 1fr)"
+                autoRows="1fr"
+                templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
                 w="100%"
-                gridTemplate={{
-                    base: 'auto / 1fr',
-                    lg: '1fr 1fr / 1fr 1fr',
-                    xl: '1fr / repeat(4, 1fr)'
-                }}
             >
                 {tonApiTiersStore.tiers$.value.map(tier => (
                     <TonApiTierCard
@@ -34,6 +29,12 @@ const TonApiPricing: FunctionComponent<ComponentProps<typeof Box>> = forwardRef(
                         zeroTonPricePlaceholder={<H3Thin mb="6" mt="1" color="text.secondary" />}
                     />
                 ))}
+
+                <TonApiUnlimitedTierCard
+                    h="100%"
+                    variant="elevated"
+                    buttonProps={{ variant: 'contrast' }}
+                />
             </Grid>
         </Box>
     );

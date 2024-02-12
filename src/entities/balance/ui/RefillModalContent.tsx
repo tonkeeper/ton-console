@@ -1,11 +1,14 @@
 import { FunctionComponent } from 'react';
 import {
+    Box,
     Button,
+    Center,
     ModalBody,
     ModalCloseButton,
     ModalContent,
     ModalFooter,
     ModalHeader,
+    Spinner,
     Text
 } from '@chakra-ui/react';
 import { CopyPad, createTransferLink, H4, Pad } from 'src/shared';
@@ -28,18 +31,36 @@ const RefillModalContent: FunctionComponent<{
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody pt="0" pb="4">
-                {depositAddress && (
-                    <>
-                        <Pad mb="4" display="flex" alignItems="center" justifyContent="center">
-                            <QRCodeSVG
-                                bgColor="transparent"
-                                size={180}
-                                value={createTransferLink({ address: depositAddress })}
-                            />
-                        </Pad>
-                        <CopyPad iconPosition="static" text={depositAddress} />
-                    </>
-                )}
+                <>
+                    {balanceStore.depositAddress$.isLoading ? (
+                        <Center h="80px">
+                            <Spinner />
+                        </Center>
+                    ) : balanceStore.depositAddress$.error ? (
+                        <Box color="accent.orange">
+                            <Box>Balance refill is not available right now.</Box>
+                            <Box>Please try again later.</Box>
+                        </Box>
+                    ) : (
+                        !!depositAddress && (
+                            <>
+                                <Pad
+                                    mb="4"
+                                    display="flex"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                >
+                                    <QRCodeSVG
+                                        bgColor="transparent"
+                                        size={180}
+                                        value={createTransferLink({ address: depositAddress })}
+                                    />
+                                </Pad>
+                                <CopyPad iconPosition="static" text={depositAddress} />
+                            </>
+                        )
+                    )}
+                </>
             </ModalBody>
 
             <ModalFooter gap="3" pt="0">

@@ -14,7 +14,7 @@ import {
     UnorderedList,
     useDisclosure
 } from '@chakra-ui/react';
-import { CopyPad, DocsLink } from 'src/shared';
+import { CopyPad, CardLink } from 'src/shared';
 import {
     APP_MESSAGES_LINKS,
     appMessagesStore,
@@ -126,7 +126,7 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
                     </TabPanel>
                 </TabPanels>
             </Tabs>
-            <DocsLink href={APP_MESSAGES_LINKS.USAGE} mb="1" mx="6" />
+            <CardLink href={APP_MESSAGES_LINKS.USAGE} mb="1" mx="6" />
         </Box>
     );
 };

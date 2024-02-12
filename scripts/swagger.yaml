@@ -90,6 +90,26 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/admin/messages/charge:
+    post:
+      summary: "Private method: Messages charge project"
+      description: "Private method"
+      operationId: adminMessagesChargeProject
+      tags:
+        - admin
+      requestBody:
+        $ref: "#/components/requestBodies/MessagesProjectCharge"
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
   
   /api/v1/auth/tg:
     post:
@@ -331,6 +351,27 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/project/{id}/payments/history:
+    get:
+      summary: "Get project payments history"
+      operationId: projectPaymentsHistory
+      tags:
+        - project
+      parameters:
+        - $ref: '#/components/parameters/projectID'
+        - $ref: '#/components/parameters/queryOffset'
+        - $ref: '#/components/parameters/queryLimit'
+      responses:
+        '200':
+          $ref: '#/components/responses/PaymentsHistory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
   /api/v1/services/tonapi/tokens:
     get:
@@ -518,8 +559,8 @@ paths:
         - tonapi_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
-        - $ref: '#/components/parameters/queryStartDate'
-        - $ref: '#/components/parameters/queryEndDate'
+        - $ref: '#/components/parameters/queryStartDateRequired'
+        - $ref: '#/components/parameters/queryEndDateRequired'
         - $ref: '#/components/parameters/queryStep'
         - $ref: '#/components/parameters/queryDetailed'
       responses:
@@ -757,7 +798,7 @@ paths:
         $ref: "#/components/requestBodies/ProjectMessagesSendPush"
       responses:
         '200':
-          $ref: '#/components/responses/MessagesSuccessDeliveryPush'
+          $ref: '#/components/responses/Ok'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -1305,6 +1346,8 @@ paths:
         - $ref: '#/components/parameters/queryInvoicesSearchID'
         - $ref: '#/components/parameters/queryFilterStatus'
         - $ref: '#/components/parameters/queryFilterOverpayment'
+        - $ref: '#/components/parameters/queryStartDate'
+        - $ref: '#/components/parameters/queryEndDate'
       responses:
         '200':
           $ref: '#/components/responses/Invoices'
@@ -1386,6 +1429,30 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/InvoicesStats'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/invoices/export:
+    get:
+      summary: "Export invoices to csv file"
+      operationId: exportInvoicesCsv
+      parameters:
+        - $ref: '#/components/parameters/queryAppID'
+        - $ref: '#/components/parameters/queryFieldOrder'
+        - $ref: '#/components/parameters/queryTypeOrder'
+        - $ref: '#/components/parameters/queryInvoicesSearchID'
+        - $ref: '#/components/parameters/queryFilterStatus'
+        - $ref: '#/components/parameters/queryFilterOverpayment'
+        - $ref: '#/components/parameters/queryStartDate'
+        - $ref: '#/components/parameters/queryEndDate'
+      tags:
+        - invoices_service
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoicesExport'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -1526,18 +1593,7 @@ components:
       name: field_order
       required: false
       schema:
-        type: string
-        example: "id"
-        enum:
-          - id
-          - amount
-          - status
-          - life_time
-          - description
-          - pay_to_address
-          - paid_by_address
-          - date_create
-          - date_paid
+        $ref: '#/components/schemas/InvoiceFieldOrder'
     queryTypeOrder:
       description: Type order
       in: query
@@ -1557,7 +1613,7 @@ components:
       schema:
         type: integer
         format: uint32
-    queryStartDate:
+    queryStartDateRequired:
       description: Start date
       in: query
       name: start
@@ -1565,11 +1621,25 @@ components:
       schema:
         type: integer
         format: int64
-    queryEndDate:
+    queryEndDateRequired:
       description: End date
       in: query
       name: end
       required: true
+      schema:
+        type: integer
+        format: int64    
+    queryStartDate:
+      description: Start date
+      in: query
+      name: start
+      schema:
+        type: integer
+        format: int64
+    queryEndDate:
+      description: End date
+      in: query
+      name: end
       schema:
         type: integer
         format: int64
@@ -1835,6 +1905,31 @@ components:
                 format: int64
                 description: "nano ton are expected"
                 example: 1000000000
+    MessagesProjectCharge:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - app_id
+              - success_delivery
+              - message
+            properties:
+              app_id:
+                type: integer
+                format: uint32
+                example: 1647024163
+              success_delivery:
+                type: integer
+                format: int32
+                example: 10000000
+              message:
+                type: string
+                example: "test message"
+              address:
+                type: string
+                example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
     ProjectCharge:
       description: "Data that is expected"
       content:
@@ -2187,6 +2282,7 @@ components:
       type: object
       required:
         - id
+        - service
         - amount
         - exchange_rate
         - date_create
@@ -2194,6 +2290,8 @@ components:
         id:
           type: string
           example: "742af494-e2cd-441f-98e8-ac6075280eff"
+        service:
+          $ref: '#/components/schemas/ServiceName'
         tier_id:
           type: integer
           format: uint32
@@ -2524,7 +2622,14 @@ components:
       enum:
         - graph
         - base_query
-        - chat_gpt_query
+        - chat_gpt_query    
+    ServiceName:
+      type: string
+      enum:
+        - messages
+        - stats
+        - tonapi
+        - testnet
     InvoicesInvoice:
       type: object
       required:
@@ -2614,6 +2719,19 @@ components:
         - paid
         - cancelled
         - expired
+    InvoiceFieldOrder:
+      type: string
+      example: "id"
+      enum:
+        - id
+        - amount
+        - status
+        - life_time
+        - description
+        - pay_to_address
+        - paid_by_address
+        - date_create
+        - date_paid
     InvoicesAppWebhooks:
       type: array
       items:
@@ -2719,7 +2837,11 @@ components:
             type: object
             required:
               - history
+              - count
             properties:
+              count:
+                type: integer
+                format: uint64
               history:
                 type: array
                 items:
@@ -3209,3 +3331,15 @@ components:
                     type: integer
                     format: uint64
                     example: 1000000000
+    InvoicesExport:
+      description: "Invoices CSV"
+      headers:
+        Content-Disposition:
+          schema:
+            type: string
+            example: "attachment; filename=file.csv"
+      content:
+        application/csv:
+          schema:
+            type: string
+            format: binary

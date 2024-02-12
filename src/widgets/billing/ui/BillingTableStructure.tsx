@@ -11,26 +11,16 @@ import {
     Center
 } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent, PropsWithChildren, useContext, useRef } from 'react';
-import { analyticsHistoryTableStore } from '../../model';
 import { observer } from 'mobx-react-lite';
-import { AnalyticsHistoryTableContext } from './analytics-history-table-context';
-import { EmptyFolderIcon48 } from 'src/shared';
+import { BillingHistoryTableContext } from './BillingHistoryTableContext';
+import { billingStore } from 'src/widgets';
 
-const EmptyTable: FunctionComponent<PropsWithChildren<ComponentProps<typeof Box>>> = ({
-    children,
-    ...props
-}) => {
-    const { rowHeight } = useContext(AnalyticsHistoryTableContext);
+const EmptyTable: FunctionComponent<PropsWithChildren> = ({ children }) => {
+    const { rowHeight } = useContext(BillingHistoryTableContext);
     return (
         <Tr h={rowHeight} maxH={rowHeight}>
-            <Td
-                h="192px"
-                border="1px"
-                borderColor="background.contentTint"
-                borderTop="0"
-                colSpan={4}
-            >
-                <Center textStyle="body2" color="text.secondary" fontFamily="body" {...props}>
+            <Td border="1px" borderColor="background.contentTint" borderTop="0" colSpan={5}>
+                <Center textStyle="body2" color="text.secondary" fontFamily="body">
                     {children}
                 </Center>
             </Td>
@@ -38,26 +28,20 @@ const EmptyTable: FunctionComponent<PropsWithChildren<ComponentProps<typeof Box>
     );
 };
 
-export const AnalyticsHistoryTableStructure = observer(
+export const BillingTableStructure = observer(
     forwardRef<PropsWithChildren<ComponentProps<typeof Box>>, typeof Box>(
         ({ children, ...rest }, ref) => {
             let body = children;
-            const { rowHeight } = useContext(AnalyticsHistoryTableContext);
+            const { rowHeight } = useContext(BillingHistoryTableContext);
 
-            if (!analyticsHistoryTableStore.queries$.isResolved) {
+            if (!billingStore.isResolved) {
                 body = (
                     <EmptyTable>
                         <Spinner />
                     </EmptyTable>
                 );
-            } else if (!analyticsHistoryTableStore.queries$.value.length) {
-                body = (
-                    <EmptyTable display="flex" flexDirection="column">
-                        <EmptyFolderIcon48 />
-                        <Box>No history yet</Box>
-                        <Box>Your requests will show up here.</Box>
-                    </EmptyTable>
-                );
+            } else if (!billingStore.billingHistory.length) {
+                body = <EmptyTable>No billing history yet</EmptyTable>;
             }
 
             const tbodyRef = useRef<HTMLTableSectionElement | null>(null);
@@ -96,7 +80,7 @@ export const AnalyticsHistoryTableStructure = observer(
                             <Th
                                 pos="relative"
                                 zIndex={1}
-                                minW="246px"
+                                minW="150px"
                                 bg="background.contentTint"
                                 borderTop="1px"
                                 borderTopColor="background.contentTint"
@@ -105,34 +89,22 @@ export const AnalyticsHistoryTableStructure = observer(
                                 borderTopLeftRadius="sm"
                                 boxSizing="content-box"
                             >
-                                Duration/Value
+                                History
                             </Th>
                             <Th
                                 pos="relative"
                                 zIndex={1}
-                                minW="108px"
+                                minW="320px"
                                 bg="background.contentTint"
                                 boxSizing="content-box"
                             >
-                                Status
+                                Action
                             </Th>
                             <Th
                                 pos="relative"
                                 zIndex={1}
                                 w="100%"
                                 minW="300px"
-                                bg="background.contentTint"
-                                boxSizing="content-box"
-                            >
-                                Request
-                            </Th>
-                            <Th
-                                pos="relative"
-                                zIndex={1}
-                                w="120px"
-                                minW="120px"
-                                maxW="120px"
-                                textAlign="right"
                                 bg="background.contentTint"
                                 borderTop="1px"
                                 borderTopColor="background.contentTint"
@@ -141,7 +113,7 @@ export const AnalyticsHistoryTableStructure = observer(
                                 borderTopRightRadius="sm"
                                 boxSizing="content-box"
                             >
-                                Date
+                                Amount
                             </Th>
                         </Tr>
                     </Thead>

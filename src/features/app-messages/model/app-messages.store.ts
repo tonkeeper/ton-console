@@ -1,17 +1,13 @@
 import { makeAutoObservable } from 'mobx';
 import {
     apiClient,
-    awaitValueResolved,
     createImmediateReaction,
-    DTOCharge,
     DTOMessagesPackage,
     Loadable,
-    notNull,
-    TonCurrencyAmount,
     UsdCurrencyAmount
 } from 'src/shared';
 import { dappStore, projectsStore } from 'src/entities';
-import { AppMessagesPackage, AppMessagesPayment, AppMessagesStats } from './interfaces';
+import { AppMessagesPackage, AppMessagesStats } from './interfaces';
 
 class AppMessagesStore {
     packages$ = new Loadable<AppMessagesPackage[]>([]);
@@ -19,8 +15,6 @@ class AppMessagesStore {
     balance$ = new Loadable<number>(0);
 
     stats$ = new Loadable<AppMessagesStats | null>(null);
-
-    paymentsHistory$ = new Loadable<AppMessagesPayment[]>([]);
 
     dappToken$ = new Loadable<string | null>(null);
 
@@ -36,7 +30,6 @@ class AppMessagesStore {
 
                 if (project) {
                     this.fetchBalance();
-                    this.fetchPaymentsHistory();
                 }
             }
         );
@@ -98,17 +91,6 @@ class AppMessagesStore {
         }
     );
 
-    fetchPaymentsHistory = this.paymentsHistory$.createAsyncAction(async () => {
-        const packages = await awaitValueResolved(this.packages$);
-        const history = await apiClient.api.getProjectMessagesPaymentsHistory({
-            project_id: projectsStore.selectedProject!.id
-        });
-
-        return history.data.history
-            .map(item => mapDTOChargeToAppmessagesPayment(packages, item))
-            .filter(notNull);
-    });
-
     fetchDappToken = this.dappToken$.createAsyncAction(async () => {
         const response = await apiClient.api.getProjectMessagesAppToken({
             app_id: dappStore.dapps$.value[0].id
@@ -136,7 +118,6 @@ class AppMessagesStore {
     );
 
     clearState = (): void => {
-        this.paymentsHistory$.clear();
         this.balance$.clear();
     };
 
@@ -152,29 +133,6 @@ function mapDTOPackageToAppmessagesPackage(dtoPackage: DTOMessagesPackage): AppM
         price: new UsdCurrencyAmount(dtoPackage.usd_price),
         name: dtoPackage.name,
         id: dtoPackage.id
-    };
-}
-
-function mapDTOChargeToAppmessagesPayment(
-    packages: AppMessagesPackage[],
-    dtoCharge: DTOCharge
-): AppMessagesPayment | null {
-    const boughtPackage = packages.find(item => item.id === dtoCharge.messages_package_id);
-
-    if (!boughtPackage) {
-        return null;
-    }
-
-    const tonAmount = new TonCurrencyAmount(dtoCharge.amount);
-
-    return {
-        id: dtoCharge.id,
-        package: boughtPackage,
-        date: new Date(dtoCharge.date_create),
-        amount: tonAmount,
-        amountUsdEquivalent: new UsdCurrencyAmount(
-            tonAmount.amount.multipliedBy(dtoCharge.exchange_rate)
-        )
     };
 }
 

@@ -48,3 +48,4 @@ export { ChartAreaIcon24 } from './ChartAreaIcon24';
 export { ChartLineIcon24 } from './ChartLineIcon24';
 export { ChartPieIcon24 } from './ChartPieIcon24';
 export { ChartBarIcon24 } from './ChartBarIcon24';
+export { TonConsoleWhiteIcon20 } from './TonConsoleWhiteIcon20';
