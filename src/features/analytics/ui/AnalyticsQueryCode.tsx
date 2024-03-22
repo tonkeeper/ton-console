@@ -35,7 +35,7 @@ const AnalyticsQueryCode: FunctionComponent<
     const onValueChange = (val: string): void => {
         setValue(val);
         if (store.request$.value) {
-            store.clear();
+            store.clearRequest();
         }
     };
 
@@ -47,9 +47,9 @@ const AnalyticsQueryCode: FunctionComponent<
 
     useEffect(() => {
         if (debouncedValue) {
-            store.estimateRequest(debouncedValue, { cancelAllPreviousCalls: true });
+            store.estimateRequest(debouncedValue, undefined, { cancelAllPreviousCalls: true });
         } else {
-            store.clear();
+            store.clearRequest();
         }
     }, [debouncedValue]);
 

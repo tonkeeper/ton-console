@@ -2,17 +2,29 @@ import { makeAutoObservable } from 'mobx';
 import {
     apiClient,
     createReaction,
+    DTOChain,
     DTOStatsQueryResult,
     DTOStatsQueryStatus,
     Loadable,
     TonCurrencyAmount
 } from 'src/shared';
-import { AnalyticsQuery, AnalyticsTableSource, AnalyticsTablesSchema } from './interfaces';
+import {
+    AnalyticsChart,
+    AnalyticsChartOptions,
+    AnalyticsQuery,
+    AnalyticsQuerySuccessful,
+    AnalyticsTableSource,
+    AnalyticsTablesSchema,
+    isAnalyticsQuerySuccessful
+} from './interfaces';
 import { projectsStore } from 'src/entities';
 import { analyticsGPTGenerationStore } from 'src/features';
+import { parse } from 'csv-parse/sync';
 
 class AnalyticsQueryStore {
     query$ = new Loadable<AnalyticsQuery | null>(null);
+
+    chartsDatasource$ = new Loadable<Record<string, number>[] | null>(null);
 
     tablesSchema$ = new Loadable<AnalyticsTablesSchema | undefined>(undefined);
 
@@ -31,6 +43,21 @@ class AnalyticsQueryStore {
                 }
             }
         );
+
+        createReaction(
+            () =>
+                (this.query$.value?.id || '').toString() +
+                (this.query$.value?.status || '').toString(),
+            () => {
+                this.updateChartDatasource.cancelAllPendingCalls();
+
+                if (this.query$.value?.status === 'success') {
+                    this.updateChartDatasource();
+                } else {
+                    this.chartsDatasource$.setValue(null);
+                }
+            }
+        );
     }
 
     public fetchAllTablesSchema = this.tablesSchema$.createAsyncAction(
@@ -43,15 +70,41 @@ class AnalyticsQueryStore {
         { resetBeforeExecution: true }
     );
 
+    addChart = this.query$.createAsyncAction(async (chart: AnalyticsChartOptions) => {
+        if (!isAnalyticsQuerySuccessful(this.query$.value!)) {
+            return;
+        }
+
+        if (this.query$.value.charts.some(c => c.type === chart.type)) {
+            throw new Error(`Chart ${chart.type} already exists`);
+        }
+
+        this.query$.value.charts.push(chart);
+    });
+
+    removeChart = this.query$.createAsyncAction(async (chartType: AnalyticsChart) => {
+        if (!isAnalyticsQuerySuccessful(this.query$.value!)) {
+            return;
+        }
+
+        this.query$.value.charts = this.query$.value.charts.filter(c => c.type !== chartType);
+    });
+
     createQuery = this.query$.createAsyncAction(
-        async (query: string) => {
-            const result = await apiClient.api.sendQueryToStats({
-                project_id: projectsStore.selectedProject!.id,
-                query,
-                ...(query.trim() === analyticsGPTGenerationStore.generatedSQL$.value?.trim() && {
-                    gpt_message: analyticsGPTGenerationStore.gptPrompt
-                })
-            });
+        async (query: string, network: 'mainnet' | 'testnet') => {
+            const result = await apiClient.api.sendQueryToStats(
+                {
+                    project_id: projectsStore.selectedProject!.id,
+                    query,
+                    ...(query.trim() ===
+                        analyticsGPTGenerationStore.generatedSQL$.value?.trim() && {
+                        gpt_message: analyticsGPTGenerationStore.gptPrompt
+                    })
+                },
+                {
+                    chain: network === 'testnet' ? DTOChain.DTOTestnet : DTOChain.DTOMainnet
+                }
+            );
 
             return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
         },
@@ -134,6 +187,11 @@ class AnalyticsQueryStore {
         { resetBeforeExecution: true }
     );
 
+    updateChartDatasource = this.chartsDatasource$.createAsyncAction(() => {
+        const query = this.query$.value! as AnalyticsQuerySuccessful;
+        return downloadAndParseCSV(query.csvUrl);
+    });
+
     clear(): void {
         this.query$.clear();
     }
@@ -151,7 +209,8 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         explanation: value.estimate!.explain!,
         ...(value.query?.repeat_interval && {
             repeatFrequencyMs: value.query?.repeat_interval * 1000
-        })
+        }),
+        network: value.testnet ? 'testnet' : 'mainnet'
     } as const;
 
     if (value.status === DTOStatsQueryStatus.DTOExecuting) {
@@ -168,7 +227,8 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
             cost: new TonCurrencyAmount(value.cost!),
             spentTimeMS: value.spent_time!,
             csvUrl: value.url!,
-            preview: parsePreview(value.preview!, !!value.all_data_in_preview)
+            preview: parsePreview(value.preview!, !!value.all_data_in_preview),
+            charts: [] // TODO
         };
     }
 
@@ -179,6 +239,41 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         spentTimeMS: value.spent_time!,
         errorReason: value.error!
     };
+}
+
+async function downloadAndParseCSV(url: string): Promise<Record<string, number>[]> {
+    const preFetched = await fetch(url);
+    console.log(preFetched.headers.get('content-length')); // TODO check content-length
+
+    const result = await preFetched.text();
+
+    const numericFields = new Map<string | number, boolean>();
+    const parsed: Record<string, string | number>[] = parse(result, {
+        columns: true,
+        skip_empty_lines: true,
+        cast(value, ctx) {
+            const parsedValue = parseFloat(value);
+            if (isFinite(parsedValue)) {
+                if (!numericFields.has(ctx.column)) {
+                    numericFields.set(ctx.column, true);
+                }
+                numericFields.get(ctx.column);
+                return parsedValue;
+            }
+
+            numericFields.set(ctx.column, false);
+
+            return value;
+        }
+    });
+
+    const numericColumnsList = Array.from(numericFields.entries())
+        .filter(([_, value]) => value)
+        .map(([key, _]) => key);
+
+    return parsed.map(row =>
+        Object.fromEntries(numericColumnsList.map(key => [key, row[key]]))
+    ) as Record<string, number>[];
 }
 
 function parsePreview(value: string[][], isAllDataPresented: boolean): AnalyticsTableSource {
