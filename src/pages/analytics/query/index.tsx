@@ -3,6 +3,9 @@ import {
     Box,
     Center,
     Flex,
+    Menu,
+    MenuItem,
+    MenuList,
     Spinner,
     Tab,
     TabList,
@@ -10,11 +13,22 @@ import {
     TabPanels,
     Tabs
 } from '@chakra-ui/react';
-import { ButtonLink, ConsoleDocsIcon32, H4, Overlay, usePrevious } from 'src/shared';
+import {
+    ArrowIcon,
+    ButtonLink,
+    ConsoleDocsIcon32,
+    H4,
+    MenuButtonDefault,
+    Overlay,
+    Span,
+    TickIcon,
+    usePrevious
+} from 'src/shared';
 import {
     ANALYTICS_LINKS,
     analyticsGPTGenerationStore,
     AnalyticsQueryCode,
+    analyticsQueryGPTRequestStore,
     AnalyticsQueryGTPGeneration,
     AnalyticsQueryResults,
     analyticsQuerySQLRequestStore,
@@ -54,6 +68,9 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
 
     const projectId = projectsStore.selectedProject?.id;
     const prevProjectId = usePrevious(projectId);
+    const [tabIndex, setTabIndex] = useState(0);
+    const requestTemplateStore =
+        tabIndex === 0 ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
 
     useEffect(() => {
         if (prevProjectId !== undefined && projectId !== prevProjectId) {
@@ -63,7 +80,36 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
 
     return (
         <Overlay display="flex" flexDirection="column">
-            <H4 mb="4">New Request</H4>
+            <Flex align="center" gap="3" mb="4">
+                <H4>New Request</H4>
+                <Menu placement="bottom">
+                    <MenuButtonDefault
+                        variant="flat"
+                        aria-label="network"
+                        rightIcon={<ArrowIcon />}
+                        textStyle="label2"
+                        color="text.secondary"
+                    >
+                        <Span textTransform="capitalize">{requestTemplateStore.network}</Span>
+                    </MenuButtonDefault>
+                    <MenuList w="122px">
+                        <MenuItem
+                            gap="2"
+                            onClick={() => requestTemplateStore.setNetwork('mainnet')}
+                        >
+                            <Span textStyle="label2">Mainnet</Span>
+                            {requestTemplateStore.network === 'mainnet' && <TickIcon />}
+                        </MenuItem>
+                        <MenuItem
+                            gap="2"
+                            onClick={() => requestTemplateStore.setNetwork('testnet')}
+                        >
+                            <Span textStyle="label2">Testnet</Span>
+                            {requestTemplateStore.network === 'testnet' && <TickIcon />}
+                        </MenuItem>
+                    </MenuList>
+                </Menu>
+            </Flex>
             {queryResolved ? (
                 <Flex pos="relative" direction="column">
                     <ButtonLink
@@ -79,7 +125,7 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
                     >
                         Console Docs
                     </ButtonLink>
-                    <Tabs flexDir="column" flex="1" display="flex" mb="6">
+                    <Tabs flexDir="column" flex="1" display="flex" mb="6" onChange={setTabIndex}>
                         <TabList w="auto" mx="-24px" px="6">
                             <Tab>SQL</Tab>
                             <Tab>ChatGPT</Tab>

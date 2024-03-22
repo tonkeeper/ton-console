@@ -20,7 +20,9 @@ const AnalyticsQueryControlPanel: FunctionComponent<
     const [_, setSearchParams] = useSearchParams();
 
     const requestEqQuery = computed(
-        () => store.request$.value?.request === analyticsQueryStore.query$.value?.request
+        () =>
+            store.request$.value?.request === analyticsQueryStore.query$.value?.request &&
+            store.network === analyticsQueryStore.query$.value?.network
     ).get();
 
     const canProcess = computed(
@@ -32,7 +34,10 @@ const AnalyticsQueryControlPanel: FunctionComponent<
     );
 
     const onCreate = async (): Promise<void> => {
-        const query = await analyticsQueryStore.createQuery(store.request$.value!.request);
+        const query = await analyticsQueryStore.createQuery(
+            store.request$.value!.request,
+            store.request$.value!.network
+        );
         setSearchParams({ id: query.id });
     };
 

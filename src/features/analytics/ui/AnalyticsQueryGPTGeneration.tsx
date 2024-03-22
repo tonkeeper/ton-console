@@ -28,7 +28,7 @@ const AnalyticsQueryGPTGeneration: FunctionComponent<ComponentProps<typeof Box>>
         }
 
         analyticsGPTGenerationStore.gptPrompt = message;
-        analyticsQueryGPTRequestStore.clear();
+        analyticsQueryGPTRequestStore.clearRequest();
         analyticsGPTGenerationStore.generateSQL(message, context || undefined);
     };
 
