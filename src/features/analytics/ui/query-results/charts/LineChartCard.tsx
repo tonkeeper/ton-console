@@ -53,7 +53,7 @@ export const LineChartCard: FunctionComponent<
                     margin={{
                         top: 10,
                         right: 30,
-                        left: 0,
+                        left: 20,
                         bottom: 0
                     }}
                 >
