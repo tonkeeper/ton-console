@@ -23,6 +23,7 @@ import { AnalyticsHistoryTableContext } from './analytics-history-table-context'
 import { AnalyticsQueryStatusBadge } from './AnalyticsQueryStatusBadge';
 import { useNavigate } from 'react-router-dom';
 import { formatRepeatInterval } from '../utils';
+import { TestnetBadge } from 'src/features/analytics/ui/history/TestnetBadge';
 
 const LoadingRow: FunctionComponent<{ style: React.CSSProperties }> = ({
     style: { top, ...style }
@@ -174,18 +175,25 @@ const ItemRow: FunctionComponent<{
                 )}
             </Td>
             <Td w="100%" minW="300px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
-                <Box wordBreak="break-word" noOfLines={2}>
-                    {query.type === 'graph' ? (
-                        <>
-                            Graph:&nbsp;
-                            <Span color="accent.blue">
-                                {query.addresses.map(a => sliceAddress(a.userFriendly)).join(', ')}
-                            </Span>
-                        </>
-                    ) : (
-                        query.gptPrompt || query.request
+                <Flex gap="2">
+                    <Box wordBreak="break-word" noOfLines={2}>
+                        {query.type === 'graph' ? (
+                            <>
+                                Graph:&nbsp;
+                                <Span color="accent.blue">
+                                    {query.addresses
+                                        .map(a => sliceAddress(a.userFriendly))
+                                        .join(', ')}
+                                </Span>
+                            </>
+                        ) : (
+                            query.gptPrompt || query.request
+                        )}
+                    </Box>
+                    {query.type !== 'graph' && query.network === 'testnet' && (
+                        <TestnetBadge flexShrink={0} alignSelf="center" />
                     )}
-                </Box>
+                </Flex>
             </Td>
             <Td
                 w="120px"

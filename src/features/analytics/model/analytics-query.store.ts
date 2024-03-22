@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import {
     apiClient,
     createReaction,
+    DTOChain,
     DTOStatsQueryResult,
     DTOStatsQueryStatus,
     Loadable,
@@ -90,14 +91,20 @@ class AnalyticsQueryStore {
     });
 
     createQuery = this.query$.createAsyncAction(
-        async (query: string) => {
-            const result = await apiClient.api.sendQueryToStats({
-                project_id: projectsStore.selectedProject!.id,
-                query,
-                ...(query.trim() === analyticsGPTGenerationStore.generatedSQL$.value?.trim() && {
-                    gpt_message: analyticsGPTGenerationStore.gptPrompt
-                })
-            });
+        async (query: string, network: 'mainnet' | 'testnet') => {
+            const result = await apiClient.api.sendQueryToStats(
+                {
+                    project_id: projectsStore.selectedProject!.id,
+                    query,
+                    ...(query.trim() ===
+                        analyticsGPTGenerationStore.generatedSQL$.value?.trim() && {
+                        gpt_message: analyticsGPTGenerationStore.gptPrompt
+                    })
+                },
+                {
+                    chain: network === 'testnet' ? DTOChain.DTOTestnet : DTOChain.DTOMainnet
+                }
+            );
 
             return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
         },
@@ -202,7 +209,8 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         explanation: value.estimate!.explain!,
         ...(value.query?.repeat_interval && {
             repeatFrequencyMs: value.query?.repeat_interval * 1000
-        })
+        }),
+        network: value.testnet ? 'testnet' : 'mainnet'
     } as const;
 
     if (value.status === DTOStatsQueryStatus.DTOExecuting) {

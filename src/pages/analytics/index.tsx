@@ -7,7 +7,7 @@ import { projectsStore } from 'src/entities';
 const GraphPage = lazy(() => import('./graph'));
 const HistoryPage = lazy(() => import('./history'));
 const QueryPage = lazy(() => import('./query'));
-const DashboardPage = lazy(() => import('./dashboard'));
+// const DashboardPage = lazy(() => import('./dashboard'));
 
 const QueryGuard = observer(() => {
     if (!projectsStore.selectedProject?.capabilities.stats.query) {
@@ -17,13 +17,13 @@ const QueryGuard = observer(() => {
     return <QueryPage />;
 });
 
-const DashboardGuard = observer(() => {
+/*const DashboardGuard = observer(() => {
     if (!projectsStore.selectedProject?.capabilities.stats.query) {
         return <Navigate to=".." replace />;
     }
 
     return <DashboardPage />;
-});
+});*/
 
 const AnalyticsRouting = (
     <>
@@ -51,14 +51,14 @@ const AnalyticsRouting = (
                 </Suspense>
             }
         />
-        <Route
+        {/* <Route
             path="dashboard"
             element={
                 <Suspense>
                     <DashboardGuard />
                 </Suspense>
             }
-        />
+        />*/}
 
         <Route index element={<Navigate to="history" replace />} />
         <Route path="*" element={<Navigate to="history" replace />} />

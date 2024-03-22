@@ -13,6 +13,7 @@ export interface AnalyticsQueryTemplate {
     estimatedTimeMS: number;
     estimatedCost: TonCurrencyAmount;
     explanation: string;
+    network: 'mainnet' | 'testnet';
 }
 
 export interface AnalyticsQueryBasic extends AnalyticsQueryTemplate {

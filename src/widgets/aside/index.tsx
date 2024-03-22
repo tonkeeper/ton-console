@@ -50,9 +50,9 @@ const Aside: FunctionComponent = () => {
                 content="TON Analytics"
                 linkTo="analytics"
             >
-                {projectsStore.selectedProject?.capabilities.stats.query && (
+                {/*{projectsStore.selectedProject?.capabilities.stats.query && (
                     <DropDownMenuItem linkTo="dashboard">Dashboard</DropDownMenuItem>
-                )}
+                )}*/}
                 <DropDownMenuItem linkTo="history">History</DropDownMenuItem>
                 {projectsStore.selectedProject?.capabilities.stats.query && (
                     <DropDownMenuItem linkTo="query">Query</DropDownMenuItem>

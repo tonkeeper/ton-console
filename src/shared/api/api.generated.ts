@@ -58,6 +58,46 @@ export interface DTOUser {
     date_create: number;
 }
 
+export interface DTOTgAuth {
+    /**
+     * @format int64
+     * @example 1261871881
+     */
+    id: number;
+    /** @example "Test" */
+    first_name?: string;
+    /** @example "Test" */
+    last_name?: string;
+    /** @example "https://test_image.png" */
+    photo_url?: string;
+    /** @example "test" */
+    username?: string;
+    /** @example "cd0e201bf7328535343301f428e51f01084a3e2a3822f4843d86b540bbebfe15" */
+    hash: string;
+    /**
+     * @format int64
+     * @example 1678275313
+     */
+    auth_date: number;
+}
+
+export interface DTOTonConnectProof {
+    /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+    address: string;
+    proof: {
+        /**
+         * @format int64
+         * @example "1678275313"
+         */
+        timestamp?: number;
+        domain?: string;
+        signature?: string;
+        /** @example "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa" */
+        payload?: string;
+        state_init?: string;
+    };
+}
+
 export interface DTOTier {
     /**
      * @format uint32
@@ -77,6 +117,27 @@ export interface DTOTier {
     usd_price: number;
 }
 
+export interface DTOProServiceTier {
+    /**
+     * @format uint32
+     * @example 1
+     */
+    id: number;
+    /** @example "Test tier" */
+    name: string;
+    /** @example "Test tier description" */
+    description?: string;
+    /**
+     * nanoton
+     * @example "1000000000"
+     */
+    amount: string;
+}
+
+export interface DTOProServiceState {
+    state: string;
+}
+
 export interface DTOAppTier {
     /**
      * @format uint32
@@ -94,6 +155,30 @@ export interface DTOAppTier {
     /** @example 10 */
     entity_per_conn: number;
     capabilities: string[];
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    next_payment?: number;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
+}
+
+export interface DTOProServiceAppTier {
+    /**
+     * @format uint32
+     * @example 1
+     */
+    id: number;
+    /** @example "Test tier" */
+    name: string;
+    /** @example "Test description" */
+    description?: string;
+    /** @example "1000000000" */
+    amount: string;
     /**
      * @format int64
      * @example 1690889913000
@@ -156,6 +241,18 @@ export interface DTOCharge {
     stats_type_query?: DTOStatsQueryType;
     /**
      * @format int64
+     * @example 1000000
+     */
+    cnft_indexing_price?: number;
+    /**
+     * @format uint32
+     * @example 1000000
+     */
+    cnft_count?: number;
+    /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+    cnft_collections?: string;
+    /**
+     * @format int64
      * @example 1000000000
      */
     amount: number;
@@ -194,6 +291,17 @@ export interface DTOProject {
      * @example 1690889913000
      */
     date_create: number;
+}
+
+export interface DTOProServiceDashboardColumn {
+    id: DTOProServiceDashboardColumnID;
+    /** @example "Total TON" */
+    name: string;
+    column_type: DTOProServiceDashboardColumnType;
+    /** @example false */
+    checked_default: boolean;
+    /** @example false */
+    only_pro: boolean;
 }
 
 export interface DTOProjectTonApiToken {
@@ -356,6 +464,8 @@ export interface DTOStatsQueryResult {
     all_data_in_preview?: boolean;
     preview?: string[][];
     /** @example false */
+    testnet: boolean;
+    /** @example false */
     is_gpt?: boolean;
     /**
      * @format int64
@@ -378,11 +488,82 @@ export enum DTOStatsQueryType {
     DTOChatGptQuery = 'chat_gpt_query'
 }
 
+/** @default "en" */
+export enum DTOLang {
+    DTOEn = 'en',
+    DTORu = 'ru'
+}
+
 export enum DTOServiceName {
     DTOMessages = 'messages',
     DTOStats = 'stats',
     DTOTonapi = 'tonapi',
-    DTOTestnet = 'testnet'
+    DTOTestnet = 'testnet',
+    DTOPro = 'pro',
+    DTOCnft = 'cnft'
+}
+
+export enum DTOProServiceDashboardColumnID {
+    DTOAddress = 'address',
+    DTOTotalBalance = 'total_balance',
+    DTOTotalTon = 'total_ton',
+    DTOSendCurrentMonth = 'send_current_month',
+    DTOSendLastMonth = 'send_last_month',
+    DTOReceiveCurrentMonth = 'receive_current_month',
+    DTOReceiveLastMonth = 'receive_last_month'
+}
+
+export enum DTOProServiceDashboardColumnType {
+    DTOString = 'string',
+    DTOAddress = 'address',
+    DTONumericFiat = 'numeric_fiat',
+    DTONumericCrypto = 'numeric_crypto'
+}
+
+export interface DTOCnftCollection {
+    /** @example "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
+    account: string;
+    /** @example "name" */
+    name: string;
+    /** @example "description" */
+    description?: string;
+    /** @example "https://tonapi.io/collection.png" */
+    image?: string;
+    /** @format uint32 */
+    nft_counts: number;
+    /** @format uint32 */
+    minted_counts: number;
+    /** @format uint32 */
+    paid_indexing_counts: number;
+}
+
+export interface DTOProServiceInvoiceWebhook {
+    /** @example "60ffb075" */
+    id: string;
+    /** @example "1000000000" */
+    amount: string;
+    /** @example "Test description" */
+    description: string;
+    status: DTOInvoiceStatus;
+    /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+    pay_to_address: string;
+    /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
+    paid_by_address?: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_change: number;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_expire: number;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 export interface DTOInvoicesInvoice {
@@ -401,6 +582,8 @@ export interface DTOInvoicesInvoice {
     paid_by_address?: string;
     /** @example "https://app.tonkeeper.com/transfer/UQ....UQ" */
     payment_link: string;
+    /** @example {"first_key":"1","second_key":2} */
+    info?: any;
     /**
      * @format int64
      * @example 1690889913000
@@ -451,6 +634,12 @@ export enum DTOInvoiceStatus {
     DTOExpired = 'expired'
 }
 
+/** @default "mainnet" */
+export enum DTOChain {
+    DTOMainnet = 'mainnet',
+    DTOTestnet = 'testnet'
+}
+
 /** @example "id" */
 export enum DTOInvoiceFieldOrder {
     DTOId = 'id',
@@ -469,6 +658,51 @@ export type DTOInvoicesAppWebhooks = {
     /** @example "https://mydapp.com/api/handle-invoice-change" */
     webhook: string;
 }[];
+
+export interface DTOProServiceDashboardCellAddress {
+    column_id: DTOProServiceDashboardColumnID;
+    type: DTOProServiceDashboardColumnType;
+    raw: string;
+}
+
+export interface DTOProServiceDashboardCellNumericCrypto {
+    column_id: DTOProServiceDashboardColumnID;
+    type: DTOProServiceDashboardColumnType;
+    value: string;
+    /** @format int */
+    decimals: number;
+    symbol: string;
+}
+
+export interface DTOProServiceDashboardCellNumericFiat {
+    column_id: DTOProServiceDashboardColumnID;
+    type: DTOProServiceDashboardColumnType;
+    value: string;
+    fiat: DTOFiatCurrencies;
+}
+
+export interface DTOProServiceDashboardCellString {
+    column_id: DTOProServiceDashboardColumnID;
+    type: DTOProServiceDashboardColumnType;
+    value: string;
+}
+
+/** @default "USD" */
+export enum DTOFiatCurrencies {
+    DTO_USD = 'USD',
+    DTO_EUR = 'EUR',
+    DTO_RUB = 'RUB',
+    DTO_AED = 'AED',
+    DTO_KZT = 'KZT',
+    DTO_UAH = 'UAH',
+    DTO_GBP = 'GBP',
+    DTO_CHF = 'CHF',
+    DTO_CNY = 'CNY',
+    DTO_KRW = 'KRW',
+    DTO_IDR = 'IDR',
+    DTO_INR = 'INR',
+    DTO_JPY = 'JPY'
+}
 
 /** backend error code */
 export enum DTOErrorCode {
@@ -845,8 +1079,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 success_delivery: number;
                 /** @example "test message" */
                 message: string;
-                /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-                address?: string;
+                addresses?: string[];
             },
             params: RequestParams = {}
         ) =>
@@ -873,31 +1106,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @summary Auth via telegram
          * @request POST:/api/v1/auth/tg
          */
-        authViaTg: (
-            data: {
-                /**
-                 * @format int64
-                 * @example 1261871881
-                 */
-                id: number;
-                /** @example "Test" */
-                first_name?: string;
-                /** @example "Test" */
-                last_name?: string;
-                /** @example "https://test_image.png" */
-                photo_url?: string;
-                /** @example "test" */
-                username?: string;
-                /** @example "cd0e201bf7328535343301f428e51f01084a3e2a3822f4843d86b540bbebfe15" */
-                hash: string;
-                /**
-                 * @format int64
-                 * @example 1678275313
-                 */
-                auth_date: number;
-            },
-            params: RequestParams = {}
-        ) =>
+        authViaTg: (data: DTOTgAuth, params: RequestParams = {}) =>
             this.request<
                 DTOOk,
                 {
@@ -910,7 +1119,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/v1/auth/tg`,
                 method: 'POST',
                 body: data,
-                format: 'json',
                 ...params
             }),
 
@@ -948,25 +1156,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @summary Auth via TON Connect
          * @request POST:/api/v1/auth/proof/check
          */
-        authViaTonConnect: (
-            data: {
-                /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
-                address: string;
-                proof: {
-                    /**
-                     * @format int64
-                     * @example "1678275313"
-                     */
-                    timestamp?: number;
-                    domain?: string;
-                    signature?: string;
-                    /** @example "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa" */
-                    payload?: string;
-                    state_init?: string;
-                };
-            },
-            params: RequestParams = {}
-        ) =>
+        authViaTonConnect: (data: DTOTonConnectProof, params: RequestParams = {}) =>
             this.request<
                 DTOOk,
                 {
@@ -979,7 +1169,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/v1/auth/proof/check`,
                 method: 'POST',
                 body: data,
-                format: 'json',
                 ...params
             }),
 
@@ -1003,7 +1192,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             >({
                 path: `/api/v1/account/logout`,
                 method: 'POST',
-                format: 'json',
                 ...params
             }),
 
@@ -1547,43 +1735,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
-         * No description
-         *
-         * @tags tonapi_service
-         * @name GetProjectTonApiPaymentsHistory
-         * @summary Get project TonAPI payments history
-         * @request GET:/api/v1/services/tonapi/payments/history
-         */
-        getProjectTonApiPaymentsHistory: (
-            query: {
-                /**
-                 * Project ID
-                 * @format uint32
-                 */
-                project_id: number;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    /** @format uint64 */
-                    count: number;
-                    history: DTOCharge[];
-                },
-                {
-                    /** Error message */
-                    error: string;
-                    /** backend error code */
-                    code: number;
-                }
-            >({
-                path: `/api/v1/services/tonapi/payments/history`,
-                method: 'GET',
-                query: query,
-                ...params
-            }),
-
-        /**
          * @description To filter the stats, are expected start and end query parameters in unix format, where end is the day closer to the current one, for example start=1675958400&end=1676908800,
          *
          * @tags tonapi_service
@@ -1703,43 +1854,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 method: 'POST',
                 query: query,
                 body: data,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags messages_service
-         * @name GetProjectMessagesPaymentsHistory
-         * @summary Get project messages payments history
-         * @request GET:/api/v1/services/messages/payments/history
-         */
-        getProjectMessagesPaymentsHistory: (
-            query: {
-                /**
-                 * Project ID
-                 * @format uint32
-                 */
-                project_id: number;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    /** @format uint64 */
-                    count: number;
-                    history: DTOCharge[];
-                },
-                {
-                    /** Error message */
-                    error: string;
-                    /** backend error code */
-                    code: number;
-                }
-            >({
-                path: `/api/v1/services/messages/payments/history`,
-                method: 'GET',
-                query: query,
                 ...params
             }),
 
@@ -2086,6 +2200,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @example "https://my_app.com/event"
                  */
                 link?: string;
+                addresses?: string[];
                 /**
                  * If the address has not been transmitted, then push messages will be sent to all users
                  * @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
@@ -2194,49 +2309,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
-         * @tags testnet_service
-         * @name GetProjectTestnetPaymentsHistory
-         * @summary Get project testnet payments history
-         * @request GET:/api/v1/services/testnet/payments/history
-         */
-        getProjectTestnetPaymentsHistory: (
-            query: {
-                /**
-                 * Project ID
-                 * @format uint32
-                 */
-                project_id: number;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    /** @format uint64 */
-                    count: number;
-                    history: DTOCharge[];
-                },
-                {
-                    /** Error message */
-                    error: string;
-                    /** backend error code */
-                    code: number;
-                }
-            >({
-                path: `/api/v1/services/testnet/payments/history`,
-                method: 'GET',
-                query: query,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
          * @tags stats_service
          * @name GetStatsDdl
          * @summary Get stats db ddl
          * @request GET:/api/v1/services/stats/ddl
          */
-        getStatsDdl: (params: RequestParams = {}) =>
+        getStatsDdl: (
+            query?: {
+                /** chain */
+                chain?: DTOChain;
+            },
+            params: RequestParams = {}
+        ) =>
             this.request<
                 File,
                 {
@@ -2248,6 +2332,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             >({
                 path: `/api/v1/services/stats/ddl`,
                 method: 'GET',
+                query: query,
                 ...params
             }),
 
@@ -2277,6 +2362,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  */
                 repeat_interval?: number;
             },
+            query?: {
+                /** chain */
+                chain?: DTOChain;
+            },
             params: RequestParams = {}
         ) =>
             this.request<
@@ -2290,6 +2379,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             >({
                 path: `/api/v1/services/stats/query/estimate`,
                 method: 'POST',
+                query: query,
                 body: data,
                 ...params
             }),
@@ -2320,6 +2410,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  */
                 repeat_interval?: number;
             },
+            query?: {
+                /** chain */
+                chain?: DTOChain;
+            },
             params: RequestParams = {}
         ) =>
             this.request<
@@ -2333,6 +2427,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             >({
                 path: `/api/v1/services/stats/query`,
                 method: 'POST',
+                query: query,
                 body: data,
                 ...params
             }),
@@ -2466,6 +2561,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          */
         getGraphFromStats: (
             query: {
+                /** chain */
+                chain?: DTOChain;
                 /**
                  * Addresses
                  * @example "EQ..fz,EQ...fa"
@@ -2506,43 +2603,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags stats_service
-         * @name GetProjectStatsPaymentsHistory
-         * @summary Get project stats payments history
-         * @request GET:/api/v1/services/stats/payments/history
-         */
-        getProjectStatsPaymentsHistory: (
-            query: {
-                /**
-                 * Project ID
-                 * @format uint32
-                 */
-                project_id: number;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    /** @format uint64 */
-                    count: number;
-                    history: DTOCharge[];
-                },
-                {
-                    /** Error message */
-                    error: string;
-                    /** backend error code */
-                    code: number;
-                }
-            >({
-                path: `/api/v1/services/stats/payments/history`,
-                method: 'GET',
-                query: query,
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags stats_service
          * @name StatsChatGptRequest
          * @summary Send request to ChatGPT
          * @request POST:/api/v1/services/stats/gpt
@@ -2554,6 +2614,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @format uint32
                  */
                 project_id: number;
+                /** chain */
+                chain?: DTOChain;
             },
             data: {
                 message: string;
@@ -3447,6 +3509,558 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 }
             >({
                 path: `/api/v1/services/invoices/export`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name ProServiceAuthGeneratePayload
+         * @summary Generating payload for TonConnect
+         * @request POST:/api/v1/services/pro/auth/proof/payload
+         */
+        proServiceAuthGeneratePayload: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    /** @example "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa" */
+                    payload: string;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/auth/proof/payload`,
+                method: 'POST',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name ProServiceTonConnectAuth
+         * @summary Auth via TonConnect
+         * @request POST:/api/v1/services/pro/auth/proof/check
+         */
+        proServiceTonConnectAuth: (data: DTOTonConnectProof, params: RequestParams = {}) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/auth/proof/check`,
+                method: 'POST',
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name ProServiceLogout
+         * @summary Logout from the system
+         * @request POST:/api/v1/services/pro/logout
+         */
+        proServiceLogout: (params: RequestParams = {}) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/logout`,
+                method: 'POST',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name ProServiceGetUserInfo
+         * @summary Get user info
+         * @request GET:/api/v1/services/pro/user/info
+         */
+        proServiceGetUserInfo: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    pub_key?: string;
+                    version?: string;
+                    /** @format uint32 */
+                    user_id?: number;
+                    /** @format int64 */
+                    tg_id?: number;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/user/info`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name GetProServiceTiers
+         * @summary Get active tiers
+         * @request GET:/api/v1/services/pro/tiers
+         */
+        getProServiceTiers: (
+            query?: {
+                /** Lang */
+                lang?: DTOLang;
+                /** Promo code */
+                promo_code?: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: DTOProServiceTier[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/tiers`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name CreateProServiceInvoice
+         * @summary Creating an invoice for Pro tier payment
+         * @request POST:/api/v1/services/pro/invoice
+         */
+        createProServiceInvoice: (
+            data: {
+                /**
+                 * @format uint32
+                 * @example 1
+                 */
+                tier_id: number;
+                promo_code?: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOInvoicesInvoice,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/invoice`,
+                method: 'POST',
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name GetProServiceInvoice
+         * @summary Get info about the invoice
+         * @request GET:/api/v1/services/pro/invoice/{id}
+         */
+        getProServiceInvoice: (id: string, params: RequestParams = {}) =>
+            this.request<
+                DTOInvoicesInvoice,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/invoice/${id}`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name ProServiceInvoiceWebhook
+         * @summary The invoice webhook
+         * @request POST:/api/v1/services/pro/invoice/webhook
+         */
+        proServiceInvoiceWebhook: (data: DTOProServiceInvoiceWebhook, params: RequestParams = {}) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/invoice/webhook`,
+                method: 'POST',
+                body: data,
+                type: ContentType.Json,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name ProServiceVerify
+         * @summary Verify Pro tier subscription
+         * @request GET:/api/v1/services/pro/verify
+         */
+        proServiceVerify: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    /** @example true */
+                    valid: boolean;
+                    /** @example true */
+                    is_trial: boolean;
+                    /** @example true */
+                    used_trial: boolean;
+                    /**
+                     * @format int64
+                     * @example 1678275313
+                     */
+                    next_charge?: number;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/verify`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name ProServiceTrial
+         * @summary Activate pro trial period
+         * @request POST:/api/v1/services/pro/trial
+         */
+        proServiceTrial: (data: DTOTgAuth, params: RequestParams = {}) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/trial`,
+                method: 'POST',
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name ProServiceDashboardColumns
+         * @summary Get dashboard columns
+         * @request GET:/api/v1/services/pro/dashboard/columns
+         */
+        proServiceDashboardColumns: (
+            query?: {
+                /** Lang */
+                lang?: DTOLang;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: DTOProServiceDashboardColumn[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/dashboard/columns`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name ProServiceDashboardData
+         * @summary Get dashboard data
+         * @request POST:/api/v1/services/pro/dashboard/data
+         */
+        proServiceDashboardData: (
+            data: {
+                /** @maxItems 500 */
+                accounts: string[];
+                columns: string[];
+            },
+            query?: {
+                /** Lang */
+                lang?: DTOLang;
+                /** Currency */
+                currency?: DTOFiatCurrencies;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: (
+                        | DTOProServiceDashboardCellString
+                        | DTOProServiceDashboardCellAddress
+                        | DTOProServiceDashboardCellNumericCrypto
+                        | DTOProServiceDashboardCellNumericFiat
+                    )[][];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/dashboard/data`,
+                method: 'POST',
+                query: query,
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name ProServiceGetState
+         * @summary Get the state
+         * @request GET:/api/v1/services/pro/state
+         */
+        proServiceGetState: (params: RequestParams = {}) =>
+            this.request<
+                DTOProServiceState,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/state`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name ProServiceUpdateState
+         * @summary Update the state
+         * @request PATCH:/api/v1/services/pro/state
+         */
+        proServiceUpdateState: (data: DTOProServiceState, params: RequestParams = {}) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/state`,
+                method: 'PATCH',
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags pro_service
+         * @name ProServiceDeleteState
+         * @summary Delete the state
+         * @request DELETE:/api/v1/services/pro/state
+         */
+        proServiceDeleteState: (params: RequestParams = {}) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/pro/state`,
+                method: 'DELETE',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags cnft_service
+         * @name CnftConfig
+         * @summary Compress NFT config
+         * @request GET:/api/v1/services/cnft/config
+         */
+        cnftConfig: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    /**
+                     * @format uint64
+                     * @example 100000000
+                     */
+                    price_per_nft: number;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/cnft/config`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags cnft_service
+         * @name GetInfoCnftCollectionAccount
+         * @summary Get info about compress collection account
+         * @request POST:/api/v1/services/cnft/collection/{account}
+         */
+        getInfoCnftCollectionAccount: (account: string, params: RequestParams = {}) =>
+            this.request<
+                DTOCnftCollection,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/cnft/collection/${account}`,
+                method: 'POST',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags cnft_service
+         * @name IndexingCnftCollection
+         * @summary Indexing compress NFTs
+         * @request POST:/api/v1/services/cnft/indexing
+         */
+        indexingCnftCollection: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: {
+                /** @example "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
+                account: string;
+                /** @format uint32 */
+                count: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOCnftCollection,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/cnft/indexing`,
+                method: 'POST',
+                query: query,
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags cnft_service
+         * @name CnftPaidCollections
+         * @summary Get paid compress NFT collections
+         * @request GET:/api/v1/services/cnft/paid/collections
+         */
+        cnftPaidCollections: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: DTOCnftCollection[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/cnft/paid/collections`,
                 method: 'GET',
                 query: query,
                 ...params
