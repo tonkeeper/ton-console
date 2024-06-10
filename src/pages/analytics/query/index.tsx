@@ -1,4 +1,4 @@
-import { FC, useEffect, useState, useCallback } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
     Box,
     BoxProps,
@@ -47,6 +47,11 @@ const QueryPage: FC<BoxProps> = () => {
     const queryId = searchParams.get('id');
     const queryType = searchParams.get('type');
     const queryNetwork = searchParams.get('network');
+    const queryQuery = searchParams.get('query');
+
+    const decodedQuery = (queryQuery && decodeURIComponent(queryQuery)) ?? undefined;
+    const [initialQueryGPT] = useState(queryType === 'gpt' ? decodedQuery : undefined);
+    const [initialQuerySQL] = useState(queryType !== 'gpt' ? decodedQuery : undefined);
     const [queryResolved, setQueryResolved] = useState(false);
 
     useEffect(() => {
@@ -61,34 +66,34 @@ const QueryPage: FC<BoxProps> = () => {
                     analyticsQuerySQLRequestStore.setRequest(value);
                     setQueryResolved(true);
                 })
-                .catch(() => updateSearchParams({ id: null }));
+                .catch(() => updateSearchParams({ id: null, type: 'sql' }));
         } else {
             analyticsQueryStore.clear();
             analyticsQuerySQLRequestStore.clear();
             setQueryResolved(true);
         }
-    }, []);
+
+        updateSearchParams({ query: null });
+    }, [updateSearchParams]);
+
+    useEffect(() => {
+        const typedNetwork = queryNetwork as DTOChain;
+        const isValidNetwork = Object.values(DTOChain).includes(typedNetwork);
+        const validNetwork = isValidNetwork ? typedNetwork : DTOChain.DTOMainnet;
+
+        analyticsQuerySQLRequestStore.setNetwork(validNetwork);
+        analyticsQueryGPTRequestStore.setNetwork(validNetwork);
+    }, [queryNetwork, analyticsQuerySQLRequestStore, analyticsQueryGPTRequestStore]);
 
     const projectId = projectsStore.selectedProject?.id;
     const prevProjectId = usePrevious(projectId);
     const tabIndex = queryType === 'gpt' ? 1 : 0;
-
-    const setTabIndex = useCallback((index: number) => {
+    const setTabIndex = (index: number) =>
         updateSearchParams({ type: index === 1 ? 'gpt' : 'sql' });
-    }, []);
 
     const requestTemplateStore =
         tabIndex === 0 ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
-
-    useEffect(() => {
-        const networkString = queryNetwork ?? '';
-        const typedNetwork = networkString as DTOChain;
-        const validNetwork = Object.values(DTOChain).includes(typedNetwork)
-            ? typedNetwork
-            : DTOChain.DTOMainnet;
-
-        requestTemplateStore.setNetwork(validNetwork);
-    }, [queryNetwork, requestTemplateStore]);
+    const network = requestTemplateStore.network;
 
     useEffect(() => {
         if (prevProjectId !== undefined && projectId !== prevProjectId) {
@@ -108,7 +113,7 @@ const QueryPage: FC<BoxProps> = () => {
                         textStyle="label2"
                         color="text.secondary"
                     >
-                        <Span textTransform="capitalize">{requestTemplateStore.network}</Span>
+                        <Span textTransform="capitalize">{network}</Span>
                     </MenuButtonDefault>
                     <MenuList w="122px">
                         <MenuItem
@@ -116,14 +121,14 @@ const QueryPage: FC<BoxProps> = () => {
                             onClick={() => updateSearchParams({ network: DTOChain.DTOMainnet })}
                         >
                             <Span textStyle="label2">Mainnet</Span>
-                            {requestTemplateStore.network === DTOChain.DTOMainnet && <TickIcon />}
+                            {network === DTOChain.DTOMainnet && <TickIcon />}
                         </MenuItem>
                         <MenuItem
                             gap="2"
                             onClick={() => updateSearchParams({ network: DTOChain.DTOTestnet })}
                         >
                             <Span textStyle="label2">Testnet</Span>
-                            {requestTemplateStore.network === DTOChain.DTOTestnet && <TickIcon />}
+                            {network === DTOChain.DTOTestnet && <TickIcon />}
                         </MenuItem>
                     </MenuList>
                 </Menu>
@@ -157,11 +162,18 @@ const QueryPage: FC<BoxProps> = () => {
                         </TabList>
                         <TabPanels>
                             <TabPanel flex="1">
-                                <AnalyticsQueryCode flex="1" type="sql" />
+                                <AnalyticsQueryCode
+                                    flex="1"
+                                    type="sql"
+                                    defaultRequest={initialQuerySQL}
+                                />
                             </TabPanel>
                             <TabPanel flex="1">
                                 <Box w="100%">
-                                    <AnalyticsQueryGTPGeneration mb="5" />
+                                    <AnalyticsQueryGTPGeneration
+                                        mb="5"
+                                        defaultRequest={initialQueryGPT}
+                                    />
                                     {!!analyticsGPTGenerationStore.generatedSQL$.value && (
                                         <AnalyticsQueryCode flex="1" type="gpt" />
                                     )}

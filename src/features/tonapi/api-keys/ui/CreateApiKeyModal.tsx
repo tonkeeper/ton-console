@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useEffect } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import {
     Button,
     Modal,
@@ -15,7 +15,7 @@ import { ApiKeyForm } from './ApiKeyForm';
 import { tonApiTiersStore } from '../../tier';
 import { FormProvider, useForm } from 'react-hook-form';
 
-const CreateApiKeyModal: FunctionComponent<{ isOpen: boolean; onClose: () => void }> = props => {
+const CreateApiKeyModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'create-api-key-form';
 
     const methods = useForm<CreateApiKeyForm>();

@@ -76,7 +76,6 @@ class AnalyticsQueryRequestStore {
     clear(): void {
         this.estimateRequest.cancelAllPendingCalls();
         this.request$.clear();
-        this._network = DTOChain.DTOMainnet;
     }
 
     clearRequest(): void {

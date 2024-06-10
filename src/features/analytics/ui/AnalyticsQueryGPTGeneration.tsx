@@ -1,5 +1,5 @@
-import { ComponentProps, FunctionComponent, useState } from 'react';
-import { Box, Button, Textarea } from '@chakra-ui/react';
+import { FC, useState } from 'react';
+import { Box, BoxProps, Button, Textarea } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { analyticsGPTGenerationStore, analyticsQueryGPTRequestStore } from '../model';
 import { Span, TextareaBody, TextareaFooter, TextareaGroup, useLocalStorage } from 'src/shared';
@@ -7,8 +7,12 @@ import { Span, TextareaBody, TextareaFooter, TextareaGroup, useLocalStorage } fr
 const SHOW_CONTEXT_CMD = 'run:show_context';
 const HIDE_CONTEXT_CMD = 'run:hide_context';
 
-const AnalyticsQueryGPTGeneration: FunctionComponent<ComponentProps<typeof Box>> = props => {
-    const [message, setMessage] = useState('');
+interface AnalyticsQueryGPTGenerationProps extends BoxProps {
+    defaultRequest?: string;
+}
+
+const AnalyticsQueryGPTGeneration: FC<AnalyticsQueryGPTGenerationProps> = props => {
+    const [message, setMessage] = useState(props.defaultRequest ?? '');
     const [context, setContext] = useState('');
     const [showContext, setShowContext] = useLocalStorage('analytics:showContext', false);
 
