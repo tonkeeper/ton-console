@@ -24,7 +24,8 @@ import {
     Overlay,
     Span,
     TickIcon,
-    usePrevious
+    usePrevious,
+    useSearchParams
 } from 'src/shared';
 import {
     ANALYTICS_LINKS,
@@ -36,32 +37,13 @@ import {
     analyticsQuerySQLRequestStore,
     analyticsQueryStore
 } from 'src/features';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { projectsStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 
-const useSearchParamsLocal = () => {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const updateSearchParams = useCallback(
-        (params: Record<string, string | null>) => {
-            const updatedParams = new URLSearchParams(searchParams);
-            Object.entries(params).forEach(([key, value]) => {
-                if (value === null) {
-                    updatedParams.delete(key);
-                    return;
-                }
-                updatedParams.set(key, value);
-            });
-            setSearchParams(updatedParams);
-        },
-        [searchParams, setSearchParams]
-    );
-    return { searchParams, setSearchParams, updateSearchParams };
-};
-
 const QueryPage: FC<BoxProps> = () => {
     const navigate = useNavigate();
-    const { searchParams, updateSearchParams } = useSearchParamsLocal();
+    const { searchParams, updateSearchParams } = useSearchParams();
     const queryId = searchParams.get('id');
     const queryType = searchParams.get('type');
     const queryNetwork = searchParams.get('network');
