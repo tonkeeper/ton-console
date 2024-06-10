@@ -210,7 +210,7 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         ...(value.query?.repeat_interval && {
             repeatFrequencyMs: value.query?.repeat_interval * 1000
         }),
-        network: value.testnet ? 'testnet' : 'mainnet'
+        network: value.testnet ? DTOChain.DTOTestnet : DTOChain.DTOMainnet
     } as const;
 
     if (value.status === DTOStatsQueryStatus.DTOExecuting) {

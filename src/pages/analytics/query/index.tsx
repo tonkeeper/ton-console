@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState, useCallback } from 'react';
 import {
     Box,
     BoxProps,
@@ -18,6 +18,7 @@ import {
     ArrowIcon,
     ButtonLink,
     ConsoleDocsIcon32,
+    DTOChain,
     H4,
     MenuButtonDefault,
     Overlay,
@@ -39,11 +40,31 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectsStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 
+const useSearchParamsLocal = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const updateSearchParams = useCallback(
+        (params: Record<string, string | null>) => {
+            const updatedParams = new URLSearchParams(searchParams);
+            Object.entries(params).forEach(([key, value]) => {
+                if (value === null) {
+                    updatedParams.delete(key);
+                    return;
+                }
+                updatedParams.set(key, value);
+            });
+            setSearchParams(updatedParams);
+        },
+        [searchParams, setSearchParams]
+    );
+    return { searchParams, setSearchParams, updateSearchParams };
+};
+
 const QueryPage: FC<BoxProps> = () => {
     const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const { searchParams, updateSearchParams } = useSearchParamsLocal();
     const queryId = searchParams.get('id');
     const queryType = searchParams.get('type');
+    const queryNetwork = searchParams.get('network');
     const [queryResolved, setQueryResolved] = useState(false);
 
     useEffect(() => {
@@ -58,7 +79,7 @@ const QueryPage: FC<BoxProps> = () => {
                     analyticsQuerySQLRequestStore.setRequest(value);
                     setQueryResolved(true);
                 })
-                .catch(() => setSearchParams({}));
+                .catch(() => updateSearchParams({ id: null }));
         } else {
             analyticsQueryStore.clear();
             analyticsQuerySQLRequestStore.clear();
@@ -70,12 +91,22 @@ const QueryPage: FC<BoxProps> = () => {
     const prevProjectId = usePrevious(projectId);
     const tabIndex = queryType === 'gpt' ? 1 : 0;
 
-    const setTabIndex = React.useCallback((index: number) => {
-        setSearchParams({ type: index === 1 ? 'gpt' : 'sql' });
+    const setTabIndex = useCallback((index: number) => {
+        updateSearchParams({ type: index === 1 ? 'gpt' : 'sql' });
     }, []);
 
     const requestTemplateStore =
         tabIndex === 0 ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
+
+    useEffect(() => {
+        const networkString = queryNetwork ?? '';
+        const typedNetwork = networkString as DTOChain;
+        const validNetwork = Object.values(DTOChain).includes(typedNetwork)
+            ? typedNetwork
+            : DTOChain.DTOMainnet;
+
+        requestTemplateStore.setNetwork(validNetwork);
+    }, [queryNetwork, requestTemplateStore]);
 
     useEffect(() => {
         if (prevProjectId !== undefined && projectId !== prevProjectId) {
@@ -100,17 +131,17 @@ const QueryPage: FC<BoxProps> = () => {
                     <MenuList w="122px">
                         <MenuItem
                             gap="2"
-                            onClick={() => requestTemplateStore.setNetwork('mainnet')}
+                            onClick={() => updateSearchParams({ network: DTOChain.DTOMainnet })}
                         >
                             <Span textStyle="label2">Mainnet</Span>
-                            {requestTemplateStore.network === 'mainnet' && <TickIcon />}
+                            {requestTemplateStore.network === DTOChain.DTOMainnet && <TickIcon />}
                         </MenuItem>
                         <MenuItem
                             gap="2"
-                            onClick={() => requestTemplateStore.setNetwork('testnet')}
+                            onClick={() => updateSearchParams({ network: DTOChain.DTOTestnet })}
                         >
                             <Span textStyle="label2">Testnet</Span>
-                            {requestTemplateStore.network === 'testnet' && <TickIcon />}
+                            {requestTemplateStore.network === DTOChain.DTOTestnet && <TickIcon />}
                         </MenuItem>
                     </MenuList>
                 </Menu>

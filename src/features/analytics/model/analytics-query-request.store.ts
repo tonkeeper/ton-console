@@ -5,7 +5,6 @@ import {
     DTOChain,
     DTOStatsEstimateQuery,
     Loadable,
-    Network,
     TonCurrencyAmount
 } from 'src/shared';
 import { AnalyticsQueryTemplate } from './interfaces';
@@ -14,9 +13,9 @@ import { projectsStore } from 'src/entities';
 class AnalyticsQueryRequestStore {
     request$ = new Loadable<AnalyticsQueryTemplate | null>(null);
 
-    private _network: Network = 'mainnet';
+    private _network = DTOChain.DTOMainnet;
 
-    get network(): Network {
+    get network(): DTOChain {
         return this._network;
     }
 
@@ -34,10 +33,10 @@ class AnalyticsQueryRequestStore {
     }
 
     public estimateRequest = this.request$.createAsyncAction(
-        async (request: string, network?: Network) => {
+        async (request: string, network?: DTOChain) => {
             try {
                 const chain =
-                    (network || this.network) === 'testnet'
+                    (network || this.network) === DTOChain.DTOTestnet
                         ? DTOChain.DTOTestnet
                         : DTOChain.DTOMainnet;
                 const result = await apiClient.api.estimateStatsQuery(
@@ -60,7 +59,7 @@ class AnalyticsQueryRequestStore {
         }
     );
 
-    public setNetwork = this.request$.createAsyncAction(async (network: Network) => {
+    public setNetwork = this.request$.createAsyncAction(async (network: DTOChain) => {
         this.estimateRequest.cancelAllPendingCalls();
         this._network = network;
         if (this.request$.value && this.request$.value.network !== network) {
@@ -77,7 +76,7 @@ class AnalyticsQueryRequestStore {
     clear(): void {
         this.estimateRequest.cancelAllPendingCalls();
         this.request$.clear();
-        this._network = 'mainnet';
+        this._network = DTOChain.DTOMainnet;
     }
 
     clearRequest(): void {
@@ -88,7 +87,7 @@ class AnalyticsQueryRequestStore {
 
 function mapDTOStatsEstimateSQLToAnalyticsQuery(
     request: string,
-    network: Network,
+    network: DTOChain,
     value: DTOStatsEstimateQuery
 ): AnalyticsQueryTemplate {
     return {
