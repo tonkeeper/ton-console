@@ -1,6 +1,7 @@
-import { ComponentProps, FunctionComponent, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import {
     Box,
+    BoxProps,
     Center,
     Flex,
     Menu,
@@ -38,18 +39,17 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectsStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 
-const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
+const QueryPage: FC<BoxProps> = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const queryId = searchParams.get('id');
+    const queryType = searchParams.get('type');
     const [queryResolved, setQueryResolved] = useState(false);
 
     useEffect(() => {
         analyticsQueryStore.fetchAllTablesSchema();
         analyticsGPTGenerationStore.clear();
-    }, []);
 
-    useEffect(() => {
         if (queryId) {
             setQueryResolved(false);
             analyticsQueryStore
@@ -68,7 +68,12 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
 
     const projectId = projectsStore.selectedProject?.id;
     const prevProjectId = usePrevious(projectId);
-    const [tabIndex, setTabIndex] = useState(0);
+    const tabIndex = queryType === 'gpt' ? 1 : 0;
+
+    const setTabIndex = React.useCallback((index: number) => {
+        setSearchParams({ type: index === 1 ? 'gpt' : 'sql' });
+    }, []);
+
     const requestTemplateStore =
         tabIndex === 0 ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
 
@@ -125,7 +130,14 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
                     >
                         Console Docs
                     </ButtonLink>
-                    <Tabs flexDir="column" flex="1" display="flex" mb="6" onChange={setTabIndex}>
+                    <Tabs
+                        flexDir="column"
+                        flex="1"
+                        display="flex"
+                        mb="6"
+                        index={tabIndex}
+                        onChange={setTabIndex}
+                    >
                         <TabList w="auto" mx="-24px" px="6">
                             <Tab>SQL</Tab>
                             <Tab>ChatGPT</Tab>
