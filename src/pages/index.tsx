@@ -10,6 +10,7 @@ import InvoicesRouting from './invoices';
 import { LayoutSolid } from 'src/pages/layouts/LayoutSolid';
 import { LayoutWithAside } from 'src/pages/layouts/LayoutWithAside';
 import AnalyticsRouting from 'src/pages/analytics';
+import NftRouting from 'src/pages/nft';
 import { isDevelopmentMode } from 'src/shared';
 
 const LandingPage = lazy(() => import('./landing'));
@@ -116,6 +117,7 @@ const Routing: FunctionComponent = () => {
                     }
                 />
                 <Route path="analytics">{AnalyticsRouting}</Route>
+                <Route path="nft">{NftRouting}</Route>
                 <Route path="settings">{SettingsRouting}</Route>
                 <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="*" element={<Navigate to="dashboard" replace />} />

@@ -17,6 +17,7 @@ import { Flex, Text } from '@chakra-ui/react';
 import { balanceStore, projectsStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { invoicesAppStore } from 'src/features';
+import { NftIcon24 } from 'src/shared/ui/icons/NftIcon24';
 
 const Aside: FunctionComponent = () => {
     return (
@@ -58,6 +59,9 @@ const Aside: FunctionComponent = () => {
                     <DropDownMenuItem linkTo="query">Query</DropDownMenuItem>
                 )}
                 <DropDownMenuItem linkTo="graph">Graph</DropDownMenuItem>
+            </DropDownMenuItemExpandable>
+            <DropDownMenuItemExpandable leftIcon={<NftIcon24 />} content="NFT" linkTo="nft">
+                <DropDownMenuItem linkTo="cnft">cNFT</DropDownMenuItem>
             </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>
                 Testnet Assets
