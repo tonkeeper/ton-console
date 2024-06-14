@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     chakra,
     FormControl,
@@ -10,14 +10,12 @@ import {
     StyleProps
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { apiClient, isAddersValid, mergeRefs, Span, tonMask } from 'src/shared';
+import { isAddersValid, isNumber, mergeRefs, Span, tonMask } from 'src/shared';
 import { useIMask } from 'react-imask';
+import { cnftStore, IndexingCnftCollectionDataT } from '../../model/cnft.store';
+import BigNumber from 'bignumber.js';
 
-export type IndexingCnftCollectionDataT = Parameters<
-    typeof apiClient.api.indexingCnftCollection
->[1];
-
-export const CNFTAddForm: FunctionComponent<
+export const CNFTAddForm: FC<
     StyleProps & {
         id?: string;
         onSubmit: SubmitHandler<IndexingCnftCollectionDataT>;
@@ -30,8 +28,18 @@ export const CNFTAddForm: FunctionComponent<
     const {
         handleSubmit,
         register,
+        watch,
         formState: { errors }
     } = useForm<IndexingCnftCollectionDataT>({});
+
+    const inputCount = watch('count');
+    const pricePerNFT = cnftStore.pricePerNFT;
+    const canCalculatePrice =
+        pricePerNFT && isNumber(inputCount) && Number(inputCount) && Number(inputCount) >= 0.01;
+
+    const price = canCalculatePrice
+        ? new BigNumber(Number(inputCount)).multipliedBy(pricePerNFT).dividedBy(1e9)
+        : undefined;
 
     const { ref: maskRef } = useIMask({
         ...tonMask,
@@ -41,10 +49,11 @@ export const CNFTAddForm: FunctionComponent<
     const { ref: hookFormRef, ...registerAmountRest } = register('count', {
         required: 'This is required',
         validate: value => {
-            if (!value || value < 1) {
-                return 'Amount should be greater than 0';
+            if (!value) {
+                return 'Amount should be greater than 1';
             }
-        }
+        },
+        valueAsNumber: true
     });
 
     return (
@@ -79,7 +88,7 @@ export const CNFTAddForm: FunctionComponent<
                     />
                     <InputRightElement justifyContent="start" w="50%" borderLeftWidth={1}>
                         <Span textStyle="body2" color="text.secondary" pl={4}>
-                            Price:
+                            Price: {price ? `${price.toString()} TON` : ''}
                         </Span>
                     </InputRightElement>
                 </InputGroup>

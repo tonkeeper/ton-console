@@ -9,14 +9,22 @@ import {
     ModalOverlay
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { CNFTAddForm, type IndexingCnftCollectionDataT } from './CNFTAddForm';
+import { CNFTAddForm } from './CNFTAddForm';
+import { IndexingCnftCollectionDataT, cnftStore } from '../../model/cnft.store';
 
 const CNFTAddModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'cnft-add-form';
 
     const methods = useForm<IndexingCnftCollectionDataT>({});
+
+    const onSubmit = useCallback(
+        (form: IndexingCnftCollectionDataT): void => {
+            cnftStore.addCNFT(form);
+        },
+        [props.onClose]
+    );
 
     return (
         <Modal scrollBehavior="inside" {...props}>
@@ -26,7 +34,7 @@ const CNFTAddModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
                 <ModalCloseButton />
                 <ModalBody py="0">
                     <FormProvider {...methods}>
-                        <CNFTAddForm id={formId} onSubmit={() => {}} />
+                        <CNFTAddForm id={formId} onSubmit={onSubmit} />
                     </FormProvider>
                 </ModalBody>
 
