@@ -10,7 +10,7 @@ import {
     StyleProps
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { isAddersValid, isNumber, mergeRefs, Span, TonCurrencyAmount, tonMask } from 'src/shared';
+import { isAddersValid, isNumber, mergeRefs, Span, TonCurrencyAmount } from 'src/shared';
 import { useIMask } from 'react-imask';
 import { cnftStore, IndexingCnftCollectionDataT } from '../../model/cnft.store';
 
@@ -47,15 +47,21 @@ export const CNFTAddForm: FC<
             : undefined;
 
     const { ref: maskRef } = useIMask({
-        ...tonMask,
-        min: 0
+        mask: Number,
+        scale: 0,
+        signed: false,
+        normalizeZeros: true,
+        radix: '.',
+        mapToRadix: [','],
+        min: 0,
+        max: 1000000000
     });
 
     const { ref: hookFormRef, ...registerAmountRest } = register('count', {
         required: 'This is required',
         validate: value => {
             if (!value) {
-                return 'Amount should be greater than 1';
+                return 'Amount should be greater than 0';
             }
         },
         valueAsNumber: true
