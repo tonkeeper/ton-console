@@ -41,8 +41,9 @@ export const CNFTAddForm: FC<
 
     const priceString =
         canCalculatePrice && pricePerNFT
-            ? new TonCurrencyAmount(pricePerNFT.amount.multipliedBy(inputCount))
-                  .stringCurrencyAmount
+            ? TonCurrencyAmount.fromRelativeAmount(
+                  pricePerNFT.amount.multipliedBy(inputCount)
+              ).toStringCurrencyAmount({ decimalPlaces: 4 })
             : undefined;
 
     const { ref: maskRef } = useIMask({
