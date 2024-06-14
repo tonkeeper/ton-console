@@ -3,7 +3,7 @@ import {
     apiClient,
     backendBaseURL,
     createImmediateReaction,
-    DTOGetInvoicesParamsTypeOrder,
+    DTOGetInvoicesParamsTypeOrderEnum,
     DTOInvoiceFieldOrder,
     DTOInvoicesInvoice,
     DTOInvoiceStatus,
@@ -72,8 +72,8 @@ class InvoicesTableStore {
         const sortByColumn = mapSortColumnToFieldOrder[this.pagination.sort.column];
         const sortOrder =
             this.pagination.sort.direction === 'asc'
-                ? DTOGetInvoicesParamsTypeOrder.DTOAsc
-                : DTOGetInvoicesParamsTypeOrder.DTODesc;
+                ? DTOGetInvoicesParamsTypeOrderEnum.DTOAsc
+                : DTOGetInvoicesParamsTypeOrderEnum.DTODesc;
         url.searchParams.append('field_order', sortByColumn);
         url.searchParams.append('type_order', sortOrder);
 
@@ -174,8 +174,8 @@ class InvoicesTableStore {
         const sortByColumn = mapSortColumnToFieldOrder[this.pagination.sort.column];
         const sortOrder =
             this.pagination.sort.direction === 'asc'
-                ? DTOGetInvoicesParamsTypeOrder.DTOAsc
-                : DTOGetInvoicesParamsTypeOrder.DTODesc;
+                ? DTOGetInvoicesParamsTypeOrderEnum.DTOAsc
+                : DTOGetInvoicesParamsTypeOrderEnum.DTODesc;
 
         const period = preriodToDTO(this.pagination.filter.period);
 

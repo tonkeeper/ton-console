@@ -18,7 +18,7 @@ export interface DTOError {
     /** Error message */
     error: string;
     /** backend error code */
-    code: DTOErrorCode;
+    code: DTOErrorCodeEnum;
 }
 
 export interface DTOUser {
@@ -192,7 +192,7 @@ export interface DTOProServiceAppTier {
 }
 
 export interface DTODeposit {
-    type: DTODepositType;
+    type: DTODepositTypeEnum;
     /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
     deposit_address?: string;
     /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
@@ -285,7 +285,7 @@ export interface DTOProject {
     name: string;
     /** @example "https://tonapi.io/static/test.png" */
     avatar?: string;
-    capabilities: DTOProjectCapabilities[];
+    capabilities: DTOProjectCapabilitiesEnum[];
     /**
      * @format int64
      * @example 1690889913000
@@ -316,6 +316,7 @@ export interface DTOProjectTonApiToken {
     limit_rps?: number;
     /** @example "AE5TZRWIIOR2O2YAAAAGFP2HEWFZJYBP222A567CBF6JIL7S4RIZSCOAZRZOEW7AKMRICGQ" */
     token: string;
+    origins: string[];
     /**
      * @format int64
      * @example 1690889913000
@@ -520,6 +521,14 @@ export enum DTOProServiceDashboardColumnType {
     DTONumericCrypto = 'numeric_crypto'
 }
 
+export interface DTOCnftConfig {
+    /**
+     * @format uint64
+     * @example 100000000
+     */
+    price_per_nft: number;
+}
+
 export interface DTOCnftCollection {
     /** @example "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
     account: string;
@@ -705,18 +714,18 @@ export enum DTOFiatCurrencies {
 }
 
 /** backend error code */
-export enum DTOErrorCode {
+export enum DTOErrorCodeEnum {
     DTOValue1 = 1,
     DTOValue2 = 2,
     DTOValue3 = 3
 }
 
-export enum DTODepositType {
+export enum DTODepositTypeEnum {
     DTOPromoCode = 'promo_code',
     DTODeposit = 'deposit'
 }
 
-export enum DTOProjectCapabilities {
+export enum DTOProjectCapabilitiesEnum {
     DTOInvoices = 'invoices',
     DTOStats = 'stats'
 }
@@ -725,7 +734,7 @@ export enum DTOProjectCapabilities {
  * Type order
  * @example "desc"
  */
-export enum DTOGetInvoicesParamsTypeOrder {
+export enum DTOGetInvoicesParamsTypeOrderEnum {
     DTOAsc = 'asc',
     DTODesc = 'desc'
 }
@@ -734,18 +743,19 @@ export enum DTOGetInvoicesParamsTypeOrder {
  * Type order
  * @example "desc"
  */
-export enum DTOExportInvoicesCsvParamsTypeOrder {
+export enum DTOExportInvoicesCsvParamsTypeOrderEnum {
     DTOAsc = 'asc',
     DTODesc = 'desc'
 }
 
-import axios, {
+import type {
     AxiosInstance,
     AxiosRequestConfig,
     AxiosResponse,
     HeadersDefaults,
     ResponseType
 } from 'axios';
+import axios from 'axios';
 
 export type QueryParamsType = Record<string | number, any>;
 
@@ -1491,6 +1501,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 name: string;
                 /** @example 5 */
                 limit_rps?: number | null;
+                origins?: string[];
             },
             params: RequestParams = {}
         ) =>
@@ -1534,6 +1545,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 name: string;
                 /** @example 5 */
                 limit_rps?: number | null;
+                origins?: string[];
             },
             params: RequestParams = {}
         ) =>
@@ -3236,7 +3248,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * Type order
                  * @example "desc"
                  */
-                type_order?: DTOGetInvoicesParamsTypeOrder;
+                type_order?: DTOGetInvoicesParamsTypeOrderEnum;
                 /**
                  * Search ID
                  * @minLength 1
@@ -3473,7 +3485,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * Type order
                  * @example "desc"
                  */
-                type_order?: DTOExportInvoicesCsvParamsTypeOrder;
+                type_order?: DTOExportInvoicesCsvParamsTypeOrderEnum;
                 /**
                  * Search ID
                  * @minLength 1
@@ -3949,13 +3961,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          */
         cnftConfig: (params: RequestParams = {}) =>
             this.request<
-                {
-                    /**
-                     * @format uint64
-                     * @example 100000000
-                     */
-                    price_per_nft: number;
-                },
+                DTOCnftConfig,
                 {
                     /** Error message */
                     error: string;
@@ -3974,7 +3980,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @tags cnft_service
          * @name GetInfoCnftCollectionAccount
          * @summary Get info about compress collection account
-         * @request POST:/api/v1/services/cnft/collection/{account}
+         * @request GET:/api/v1/services/cnft/collection/{account}
          */
         getInfoCnftCollectionAccount: (account: string, params: RequestParams = {}) =>
             this.request<
@@ -3987,7 +3993,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 }
             >({
                 path: `/api/v1/services/cnft/collection/${account}`,
-                method: 'POST',
+                method: 'GET',
                 ...params
             }),
 
