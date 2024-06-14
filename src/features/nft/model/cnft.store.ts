@@ -1,37 +1,34 @@
 import { AxiosError } from 'axios';
 import { makeAutoObservable } from 'mobx';
 import { projectsStore } from 'src/entities';
-import { DTOCnftConfig, Loadable, apiClient } from 'src/shared';
+import { DTOCnftCollection, Loadable, TonCurrencyAmount, apiClient } from 'src/shared';
 
 export type IndexingCnftCollectionDataT = Parameters<
     typeof apiClient.api.indexingCnftCollection
 >[1];
 
 class CNFTStore {
-    cnftConfig$ = new Loadable<DTOCnftConfig | null>(null);
+    pricePerNFT$ = new Loadable<TonCurrencyAmount | undefined>(undefined);
 
-    get pricePerNFT(): number | null {
-        return this.cnftConfig$.value?.price_per_nft ?? null;
-    }
+    history$ = new Loadable<DTOCnftCollection[]>([]);
 
     constructor() {
         makeAutoObservable(this);
         this.loadConfig();
     }
 
-    loadConfig = this.cnftConfig$.createAsyncAction(async () => {
+    loadConfig = this.pricePerNFT$.createAsyncAction(async () => {
         const response = await apiClient.api.cnftConfig();
-
-        this.cnftConfig$.value = response.data;
-        return response.data;
+        return TonCurrencyAmount.fromRelativeAmount(response.data.price_per_nft);
     });
 
-    addCNFT = this.cnftConfig$.createAsyncAction(
+    addCNFT = this.history$.createAsyncAction(
         async (data: IndexingCnftCollectionDataT) => {
-            return apiClient.api.indexingCnftCollection(
+            const res = await apiClient.api.indexingCnftCollection(
                 { project_id: projectsStore.selectedProject!.id },
                 data
             );
+            return this.history$.value.concat(res.data);
         },
         {
             successToast: {
@@ -50,7 +47,8 @@ class CNFTStore {
     );
 
     clearState(): void {
-        this.cnftConfig$.clear();
+        this.pricePerNFT$.clear();
+        this.history$.clear();
     }
 }
 
