@@ -10,10 +10,9 @@ import {
     StyleProps
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { isAddersValid, isNumber, mergeRefs, Span, tonMask } from 'src/shared';
+import { isAddersValid, isNumber, mergeRefs, Span, TonCurrencyAmount, tonMask } from 'src/shared';
 import { useIMask } from 'react-imask';
 import { cnftStore, IndexingCnftCollectionDataT } from '../../model/cnft.store';
-import BigNumber from 'bignumber.js';
 
 export const CNFTAddForm: FC<
     StyleProps & {
@@ -33,13 +32,18 @@ export const CNFTAddForm: FC<
     } = useForm<IndexingCnftCollectionDataT>({});
 
     const inputCount = watch('count');
-    const pricePerNFT = cnftStore.pricePerNFT;
+    const pricePerNFT = cnftStore.pricePerNFT$.value;
     const canCalculatePrice =
-        pricePerNFT && isNumber(inputCount) && Number(inputCount) && Number(inputCount) >= 0.01;
+        cnftStore.pricePerNFT$.isResolved &&
+        inputCount > 0 &&
+        isNumber(inputCount) &&
+        inputCount >= 0.01;
 
-    const price = canCalculatePrice
-        ? new BigNumber(Number(inputCount)).multipliedBy(pricePerNFT).dividedBy(1e9)
-        : undefined;
+    const priceString =
+        canCalculatePrice && pricePerNFT
+            ? new TonCurrencyAmount(pricePerNFT.amount.multipliedBy(inputCount))
+                  .stringCurrencyAmount
+            : undefined;
 
     const { ref: maskRef } = useIMask({
         ...tonMask,
@@ -81,14 +85,13 @@ export const CNFTAddForm: FC<
                 <InputGroup>
                     <Input
                         ref={mergeRefs(maskRef, hookFormRef)}
-                        borderRightRadius={0}
                         autoComplete="off"
                         id="count"
                         {...registerAmountRest}
                     />
                     <InputRightElement justifyContent="start" w="50%" borderLeftWidth={1}>
                         <Span textStyle="body2" color="text.secondary" pl={4}>
-                            Price: {price ? `${price.toString()} TON` : ''}
+                            Price: {priceString}
                         </Span>
                     </InputRightElement>
                 </InputGroup>
