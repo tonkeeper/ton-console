@@ -10,7 +10,8 @@ import {
     StyleProps
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { apiClient, isAddersValid, Span } from 'src/shared';
+import { apiClient, isAddersValid, mergeRefs, Span, tonMask } from 'src/shared';
+import { useIMask } from 'react-imask';
 
 export type IndexingCnftCollectionDataT = Parameters<
     typeof apiClient.api.indexingCnftCollection
@@ -31,6 +32,20 @@ export const CNFTAddForm: FunctionComponent<
         register,
         formState: { errors }
     } = useForm<IndexingCnftCollectionDataT>({});
+
+    const { ref: maskRef } = useIMask({
+        ...tonMask,
+        min: 0
+    });
+
+    const { ref: hookFormRef, ...registerAmountRest } = register('count', {
+        required: 'This is required',
+        validate: value => {
+            if (!value || value < 1) {
+                return 'Amount should be greater than 0';
+            }
+        }
+    });
 
     return (
         <chakra.form id={id} w="100%" onSubmit={handleSubmit(submitHandler)} noValidate {...rest}>
@@ -56,17 +71,11 @@ export const CNFTAddForm: FunctionComponent<
                 <FormLabel htmlFor="count">Amount</FormLabel>
                 <InputGroup>
                     <Input
+                        ref={mergeRefs(maskRef, hookFormRef)}
                         borderRightRadius={0}
                         autoComplete="off"
                         id="count"
-                        {...register('count', {
-                            required: 'This is required',
-                            validate: value => {
-                                if (!value || value < 1) {
-                                    return 'Amount should be greater than 0';
-                                }
-                            }
-                        })}
+                        {...registerAmountRest}
                     />
                     <InputRightElement justifyContent="start" w="50%" borderLeftWidth={1}>
                         <Span textStyle="body2" color="text.secondary" pl={4}>
@@ -75,7 +84,7 @@ export const CNFTAddForm: FunctionComponent<
                     </InputRightElement>
                 </InputGroup>
                 <FormErrorMessage pos="static">
-                    {errors.account && errors.account.message}
+                    {errors.count && errors.count.message}
                 </FormErrorMessage>
             </FormControl>
         </chakra.form>
