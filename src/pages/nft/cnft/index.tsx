@@ -2,10 +2,11 @@ import { Box, Button, Flex, useDisclosure } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { ComponentProps, FunctionComponent, useEffect } from 'react';
 import { analyticsHistoryTableStore } from 'src/features';
+import CNFTAddModal from 'src/features/nft/ui/cnft/CNFTAddModal';
 import { H4, Overlay } from 'src/shared';
 
 const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
-    const { onOpen } = useDisclosure();
+    const { isOpen, onClose, onOpen } = useDisclosure();
     useEffect(() => {
         analyticsHistoryTableStore.loadFirstPage();
     }, []);
@@ -18,6 +19,7 @@ const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
                     Add cNFT
                 </Button>
             </Flex>
+            <CNFTAddModal isOpen={isOpen} onClose={onClose} />
         </Overlay>
     );
 };
