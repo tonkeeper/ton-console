@@ -1,15 +1,11 @@
-import { Box, Button, Flex, useDisclosure } from '@chakra-ui/react';
+import { Button, Flex, useDisclosure, Text, BoxProps } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { ComponentProps, FunctionComponent, useEffect } from 'react';
-import { analyticsHistoryTableStore } from 'src/features';
+import { FC } from 'react';
 import CNFTAddModal from 'src/features/nft/ui/cnft/CNFTAddModal';
-import { H4, Overlay } from 'src/shared';
+import { H3, H4, InvoiceIcon40, Overlay } from 'src/shared';
 
-const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
+const CnftPage: FC<BoxProps> = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
-    useEffect(() => {
-        analyticsHistoryTableStore.loadFirstPage();
-    }, []);
 
     return (
         <Overlay display="flex" flexDirection="column">
@@ -20,8 +16,21 @@ const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
                 </Button>
             </Flex>
             <CNFTAddModal isOpen={isOpen} onClose={onClose} />
+            <Overlay pt="60px" display="flex" flexDirection="column" alignItems="center">
+                <InvoiceIcon40 mb="5" />
+                <H3 mb="4">Track added cNFT</H3>
+                <Text
+                    textStyle="body2"
+                    maxW="392px"
+                    mb="9"
+                    color="text.secondary"
+                    textAlign="center"
+                >
+                    This feature is under development. Please check back later.
+                </Text>
+            </Overlay>
         </Overlay>
     );
 };
 
-export default observer(HistoryPage);
+export default observer(CnftPage);
