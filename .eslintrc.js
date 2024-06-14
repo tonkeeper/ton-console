@@ -2,7 +2,7 @@ var isFixMode = process.argv.includes('--fix');
 
 module.exports = {
     root: true,
-    ignorePatterns: ['node_modules', 'dist'],
+    ignorePatterns: ['node_modules', 'dist', 'scripts/swagger.ts'],
     extends: ['plugin:prettier/recommended', 'prettier'],
     rules: {
         /* common */
@@ -139,12 +139,13 @@ module.exports = {
 
                 /* react */
                 'react/react-in-jsx-scope': 'off',
-                'i18next/no-literal-string': [
-                    'warn',
-                    {
-                        exclude: ['Ton Console']
-                    }
-                ],
+                'i18next/no-literal-string': 'off',
+                // [
+                //     'warn',
+                //     {
+                //         exclude: ['Ton Console']
+                //     }
+                // ],
                 'react-hooks/rules-of-hooks': 'error',
                 'react-hooks/exhaustive-deps': 'off',
 

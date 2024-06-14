@@ -114,8 +114,9 @@ paths:
   /api/v1/auth/tg:
     post:
       summary: "Auth via telegram"
-      description: "The token is recorded in the database and in the user's cookies. 
-      If the user logs in under different browsers, then each authorization will have its own token."
+      description: >
+        The token is recorded in the database and in the user's cookies. 
+        If the user logs in under different browsers, then each authorization will have its own token.
       operationId: authViaTG
       tags:
         - auth
@@ -152,8 +153,9 @@ paths:
   /api/v1/auth/proof/check:
     post:
       summary: "Auth via TON Connect"
-      description: "The token is recorded in the database and in the user's cookies. 
-      If the user logs in under different browsers, then each authorization will have its own token."
+      description: >
+        The token is recorded in the database and in the user's cookies. 
+        If the user logs in under different browsers, then each authorization will have its own token.
       operationId: authViaTonConnect
       tags:
         - auth
@@ -1668,7 +1670,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/cnft/collection/{account}:
-    post:
+    get:
       summary: "Get info about compress collection account"
       operationId: getInfoCnftCollectionAccount
       tags:
@@ -2028,6 +2030,10 @@ components:
                 type: number
                 example: 5
                 nullable: true
+              origins:
+                type: array
+                items:
+                  type: string
     TonConnectProofExpected:
       description: "Data that is expected"
       content:
@@ -2853,6 +2859,7 @@ components:
         - id
         - name
         - token
+        - origins
         - date_create
       properties:
         id:
@@ -2868,6 +2875,10 @@ components:
         token:
           type: string
           example: "AE5TZRWIIOR2O2YAAAAGFP2HEWFZJYBP222A567CBF6JIL7S4RIZSCOAZRZOEW7AKMRICGQ"
+        origins:
+          type: array
+          items:
+            type: string
         date_create:
           type: integer
           format: int64
@@ -3139,6 +3150,15 @@ components:
         - "address"
         - "numeric_fiat"
         - "numeric_crypto"
+    CnftConfig:
+      type: object
+      required:
+        - price_per_nft
+      properties:
+        price_per_nft:
+          type: integer
+          format: uint64
+          example: 100000000
     CnftCollection:
       type: object
       required:
@@ -4217,14 +4237,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            required:
-              - price_per_nft
-            properties:
-              price_per_nft:
-                type: integer
-                format: uint64
-                example: 100000000
+            $ref: '#/components/schemas/CnftConfig'
     CnftPaidCollections:
       description: "Paid compress NFT collections"
       content:
