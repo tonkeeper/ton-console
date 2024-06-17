@@ -1654,8 +1654,8 @@ paths:
   
   /api/v1/services/cnft/config:
     get:
-      summary: "Compress NFT config"
-      operationId: cnftConfig
+      summary: "Get cNFT config"
+      operationId: getCNftConfig
       tags:
         - cnft_service
       responses:
@@ -1671,8 +1671,8 @@ paths:
           $ref: '#/components/responses/InternalError'
   /api/v1/services/cnft/collection/{account}:
     get:
-      summary: "Get info about compress collection account"
-      operationId: getInfoCnftCollectionAccount
+      summary: "Get info about cNFT collection account"
+      operationId: getInfoCNftCollectionAccount
       tags:
         - cnft_service
       parameters:
@@ -1690,8 +1690,8 @@ paths:
           $ref: '#/components/responses/InternalError'
   /api/v1/services/cnft/indexing:
     post:
-      summary: "Indexing compress NFTs"
-      operationId: indexingCnftCollection
+      summary: "Indexing cNFTs"
+      operationId: indexingCNftCollection
       tags:
         - cnft_service
       parameters:
@@ -1709,17 +1709,17 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /api/v1/services/cnft/paid/collections:
+  /api/v1/services/cnft/paid:
     get:
-      summary: "Get paid compress NFT collections"
-      operationId: cnftPaidCollections
+      summary: "Get paid cNFT collections"
+      operationId: getPaidCNftCollections
       tags:
         - cnft_service
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       responses:
         '200':
-          $ref: '#/components/responses/CnftPaidCollections'
+          $ref: '#/components/responses/CnftCollections'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -3150,23 +3150,14 @@ components:
         - "address"
         - "numeric_fiat"
         - "numeric_crypto"
-    CnftConfig:
-      type: object
-      required:
-        - price_per_nft
-      properties:
-        price_per_nft:
-          type: integer
-          format: uint64
-          example: 100000000
     CnftCollection:
       type: object
       required:
         - account
         - name
-        - nft_counts
-        - minted_counts
-        - paid_indexing_counts
+        - nft_count
+        - minted_count
+        - paid_indexing_count
       properties:
         account:
           type: string
@@ -3180,13 +3171,13 @@ components:
         image:
           type: string
           example: "https://tonapi.io/collection.png"
-        nft_counts:
+        nft_count:
           type: integer
           format: uint32
-        minted_counts:
+        minted_count:
           type: integer
           format: uint32
-        paid_indexing_counts:
+        paid_indexing_count:
           type: integer
           format: uint32
     ProServiceInvoiceWebhook:
@@ -4237,9 +4228,16 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/CnftConfig'
-    CnftPaidCollections:
-      description: "Paid compress NFT collections"
+            type: object
+            required:
+              - price_per_nft
+            properties:
+              price_per_nft:
+                type: integer
+                format: uint64
+                example: 100000000
+    CnftCollections:
+      description: "Get cNFT collections"
       content:
         application/json:
           schema:
