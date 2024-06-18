@@ -1,4 +1,4 @@
-import { DTOChain, TonCurrencyAmount } from 'src/shared';
+import { Network, TonCurrencyAmount } from 'src/shared';
 import { AnalyticsChartsConfig } from './charts';
 import { AnalyticsGraphQuery } from './analytics-graph-query';
 
@@ -13,7 +13,7 @@ export interface AnalyticsQueryTemplate {
     estimatedTimeMS: number;
     estimatedCost: TonCurrencyAmount;
     explanation: string;
-    network: DTOChain;
+    network: Network;
 }
 
 export interface AnalyticsQueryBasic extends AnalyticsQueryTemplate {

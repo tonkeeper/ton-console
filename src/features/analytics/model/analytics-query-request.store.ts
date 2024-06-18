@@ -5,17 +5,19 @@ import {
     DTOChain,
     DTOStatsEstimateQuery,
     Loadable,
+    Network,
     TonCurrencyAmount
 } from 'src/shared';
 import { AnalyticsQueryTemplate } from './interfaces';
 import { projectsStore } from 'src/entities';
+import { DTOChainNetworkMap } from 'src/shared/lib/blockchain/network';
 
 class AnalyticsQueryRequestStore {
     request$ = new Loadable<AnalyticsQueryTemplate | null>(null);
 
-    private _network = DTOChain.DTOMainnet;
+    private _network = Network.MAINNET;
 
-    get network(): DTOChain {
+    get network(): Network {
         return this._network;
     }
 
@@ -33,10 +35,10 @@ class AnalyticsQueryRequestStore {
     }
 
     public estimateRequest = this.request$.createAsyncAction(
-        async (request: string, network?: DTOChain) => {
+        async (request: string, network?: Network) => {
             try {
                 const chain =
-                    (network || this.network) === DTOChain.DTOTestnet
+                    (network || this.network) === Network.TESTNET
                         ? DTOChain.DTOTestnet
                         : DTOChain.DTOMainnet;
                 const result = await apiClient.api.estimateStatsQuery(
@@ -59,7 +61,7 @@ class AnalyticsQueryRequestStore {
         }
     );
 
-    public setNetwork = this.request$.createAsyncAction(async (network: DTOChain) => {
+    public setNetwork = this.request$.createAsyncAction(async (network: Network) => {
         this.estimateRequest.cancelAllPendingCalls();
         this._network = network;
         if (this.request$.value && this.request$.value.network !== network) {
@@ -91,7 +93,7 @@ function mapDTOStatsEstimateSQLToAnalyticsQuery(
 ): AnalyticsQueryTemplate {
     return {
         request,
-        network,
+        network: DTOChainNetworkMap[network],
         estimatedTimeMS: value.approximate_time,
         estimatedCost: new TonCurrencyAmount(value.approximate_cost),
         explanation: value.explain!
