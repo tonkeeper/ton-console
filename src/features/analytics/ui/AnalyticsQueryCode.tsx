@@ -1,5 +1,5 @@
-import { ComponentProps, FunctionComponent, useEffect, useState } from 'react';
-import { Box, Flex } from '@chakra-ui/react';
+import { FC, useEffect, useState } from 'react';
+import { Box, BoxProps, Flex } from '@chakra-ui/react';
 import { CodeArea, CodeAreaFooter, CodeAreaGroup, useDebounce } from 'src/shared';
 import {
     analyticsGPTGenerationStore,
@@ -21,14 +21,21 @@ const defaultSQLRequest = `select human_readable from blockchain.accounts a join
 on a.id = t.owner_account_id`;
 const defaultGPTRequest = ' ';
 
-const AnalyticsQueryCode: FunctionComponent<
-    ComponentProps<typeof Box> & { type: 'sql' | 'gpt' }
-> = ({ type, ...props }) => {
+interface AnalyticsQueryCodeProps extends BoxProps {
+    type: 'sql' | 'gpt';
+    defaultRequest?: string;
+}
+
+const AnalyticsQueryCode: FC<AnalyticsQueryCodeProps> = ({
+    type,
+    defaultRequest: defaultRequest,
+    ...props
+}) => {
     const store = type === 'sql' ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
     const [value, setValue] = useState(
         type === 'gpt'
-            ? analyticsGPTGenerationStore.generatedSQL$.value || defaultGPTRequest
-            : store.request$.value?.request || defaultSQLRequest
+            ? analyticsGPTGenerationStore.generatedSQL$.value ?? defaultRequest ?? defaultGPTRequest
+            : store.request$.value?.request ?? defaultRequest ?? defaultSQLRequest
     );
     const debouncedValue = useDebounce(value);
 

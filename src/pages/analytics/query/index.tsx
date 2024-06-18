@@ -1,6 +1,7 @@
-import { ComponentProps, FunctionComponent, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
     Box,
+    BoxProps,
     Center,
     Flex,
     Menu,
@@ -17,12 +18,15 @@ import {
     ArrowIcon,
     ButtonLink,
     ConsoleDocsIcon32,
+    DTOChain,
     H4,
     MenuButtonDefault,
+    Network,
     Overlay,
     Span,
     TickIcon,
-    usePrevious
+    usePrevious,
+    useSearchParams
 } from 'src/shared';
 import {
     ANALYTICS_LINKS,
@@ -34,22 +38,27 @@ import {
     analyticsQuerySQLRequestStore,
     analyticsQueryStore
 } from 'src/features';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { projectsStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 
-const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
+const QueryPage: FC<BoxProps> = () => {
     const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const { searchParams, updateSearchParams } = useSearchParams();
     const queryId = searchParams.get('id');
+    const queryType = searchParams.get('type');
+    const queryNetwork = searchParams.get('network');
+    const queryQuery = searchParams.get('query');
+
+    const decodedQuery = (queryQuery && decodeURIComponent(queryQuery)) ?? undefined;
+    const [initialQueryGPT] = useState(queryType === 'gpt' ? decodedQuery : undefined);
+    const [initialQuerySQL] = useState(queryType !== 'gpt' ? decodedQuery : undefined);
     const [queryResolved, setQueryResolved] = useState(false);
 
     useEffect(() => {
         analyticsQueryStore.fetchAllTablesSchema();
         analyticsGPTGenerationStore.clear();
-    }, []);
 
-    useEffect(() => {
         if (queryId) {
             setQueryResolved(false);
             analyticsQueryStore
@@ -58,19 +67,34 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
                     analyticsQuerySQLRequestStore.setRequest(value);
                     setQueryResolved(true);
                 })
-                .catch(() => setSearchParams({}));
+                .catch(() => updateSearchParams({ id: null, type: 'sql' }));
         } else {
             analyticsQueryStore.clear();
             analyticsQuerySQLRequestStore.clear();
             setQueryResolved(true);
         }
-    }, []);
+
+        updateSearchParams({ query: null });
+    }, [updateSearchParams]);
+
+    useEffect(() => {
+        const typedNetwork = queryNetwork as Network;
+        const isValidNetwork = Object.values(Network).includes(typedNetwork);
+        const validNetwork = isValidNetwork ? typedNetwork : Network.MAINNET;
+
+        analyticsQuerySQLRequestStore.setNetwork(validNetwork);
+        analyticsQueryGPTRequestStore.setNetwork(validNetwork);
+    }, [queryNetwork, analyticsQuerySQLRequestStore, analyticsQueryGPTRequestStore]);
 
     const projectId = projectsStore.selectedProject?.id;
     const prevProjectId = usePrevious(projectId);
-    const [tabIndex, setTabIndex] = useState(0);
+    const tabIndex = queryType === 'gpt' ? 1 : 0;
+    const setTabIndex = (index: number) =>
+        updateSearchParams({ type: index === 1 ? 'gpt' : 'sql' });
+
     const requestTemplateStore =
         tabIndex === 0 ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
+    const network = requestTemplateStore.network;
 
     useEffect(() => {
         if (prevProjectId !== undefined && projectId !== prevProjectId) {
@@ -90,22 +114,22 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
                         textStyle="label2"
                         color="text.secondary"
                     >
-                        <Span textTransform="capitalize">{requestTemplateStore.network}</Span>
+                        <Span textTransform="capitalize">{network}</Span>
                     </MenuButtonDefault>
                     <MenuList w="122px">
                         <MenuItem
                             gap="2"
-                            onClick={() => requestTemplateStore.setNetwork('mainnet')}
+                            onClick={() => updateSearchParams({ network: DTOChain.DTOMainnet })}
                         >
                             <Span textStyle="label2">Mainnet</Span>
-                            {requestTemplateStore.network === 'mainnet' && <TickIcon />}
+                            {network === Network.MAINNET && <TickIcon />}
                         </MenuItem>
                         <MenuItem
                             gap="2"
-                            onClick={() => requestTemplateStore.setNetwork('testnet')}
+                            onClick={() => updateSearchParams({ network: DTOChain.DTOTestnet })}
                         >
                             <Span textStyle="label2">Testnet</Span>
-                            {requestTemplateStore.network === 'testnet' && <TickIcon />}
+                            {network === Network.TESTNET && <TickIcon />}
                         </MenuItem>
                     </MenuList>
                 </Menu>
@@ -125,18 +149,32 @@ const QueryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
                     >
                         Console Docs
                     </ButtonLink>
-                    <Tabs flexDir="column" flex="1" display="flex" mb="6" onChange={setTabIndex}>
+                    <Tabs
+                        flexDir="column"
+                        flex="1"
+                        display="flex"
+                        mb="6"
+                        index={tabIndex}
+                        onChange={setTabIndex}
+                    >
                         <TabList w="auto" mx="-24px" px="6">
                             <Tab>SQL</Tab>
                             <Tab>ChatGPT</Tab>
                         </TabList>
                         <TabPanels>
                             <TabPanel flex="1">
-                                <AnalyticsQueryCode flex="1" type="sql" />
+                                <AnalyticsQueryCode
+                                    flex="1"
+                                    type="sql"
+                                    defaultRequest={initialQuerySQL}
+                                />
                             </TabPanel>
                             <TabPanel flex="1">
                                 <Box w="100%">
-                                    <AnalyticsQueryGTPGeneration mb="5" />
+                                    <AnalyticsQueryGTPGeneration
+                                        mb="5"
+                                        defaultRequest={initialQueryGPT}
+                                    />
                                     {!!analyticsGPTGenerationStore.generatedSQL$.value && (
                                         <AnalyticsQueryCode flex="1" type="gpt" />
                                     )}
