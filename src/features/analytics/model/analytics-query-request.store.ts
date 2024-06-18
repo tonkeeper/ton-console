@@ -10,11 +10,12 @@ import {
 } from 'src/shared';
 import { AnalyticsQueryTemplate } from './interfaces';
 import { projectsStore } from 'src/entities';
+import { DTOChainNetworkMap } from 'src/shared/lib/blockchain/network';
 
 class AnalyticsQueryRequestStore {
     request$ = new Loadable<AnalyticsQueryTemplate | null>(null);
 
-    private _network: Network = 'mainnet';
+    private _network = Network.MAINNET;
 
     get network(): Network {
         return this._network;
@@ -37,7 +38,7 @@ class AnalyticsQueryRequestStore {
         async (request: string, network?: Network) => {
             try {
                 const chain =
-                    (network || this.network) === 'testnet'
+                    (network || this.network) === Network.TESTNET
                         ? DTOChain.DTOTestnet
                         : DTOChain.DTOMainnet;
                 const result = await apiClient.api.estimateStatsQuery(
@@ -77,7 +78,6 @@ class AnalyticsQueryRequestStore {
     clear(): void {
         this.estimateRequest.cancelAllPendingCalls();
         this.request$.clear();
-        this._network = 'mainnet';
     }
 
     clearRequest(): void {
@@ -88,12 +88,12 @@ class AnalyticsQueryRequestStore {
 
 function mapDTOStatsEstimateSQLToAnalyticsQuery(
     request: string,
-    network: Network,
+    network: DTOChain,
     value: DTOStatsEstimateQuery
 ): AnalyticsQueryTemplate {
     return {
         request,
-        network,
+        network: DTOChainNetworkMap[network],
         estimatedTimeMS: value.approximate_time,
         estimatedCost: new TonCurrencyAmount(value.approximate_cost),
         explanation: value.explain!

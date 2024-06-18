@@ -5,7 +5,7 @@ import {
     createImmediateReaction,
     CurrencyAmount,
     DTODeposit,
-    DTODepositType,
+    DTODepositTypeEnum,
     Loadable,
     setIntervalWhenPageOnFocus,
     TonAddress,
@@ -124,7 +124,7 @@ function mapDTODepositToRefill(dtoDeposit: DTODeposit): Refill {
         amount: new TonCurrencyAmount(dtoDeposit.amount)
     };
 
-    if (dtoDeposit.type === DTODepositType.DTODeposit) {
+    if (dtoDeposit.type === DTODepositTypeEnum.DTODeposit) {
         return {
             ...commonFields,
             type: 'deposit',
