@@ -21,6 +21,7 @@ import {
     DTOChain,
     H4,
     MenuButtonDefault,
+    Network,
     Overlay,
     Span,
     TickIcon,
@@ -77,9 +78,9 @@ const QueryPage: FC<BoxProps> = () => {
     }, [updateSearchParams]);
 
     useEffect(() => {
-        const typedNetwork = queryNetwork as DTOChain;
-        const isValidNetwork = Object.values(DTOChain).includes(typedNetwork);
-        const validNetwork = isValidNetwork ? typedNetwork : DTOChain.DTOMainnet;
+        const typedNetwork = queryNetwork as Network;
+        const isValidNetwork = Object.values(Network).includes(typedNetwork);
+        const validNetwork = isValidNetwork ? typedNetwork : Network.MAINNET;
 
         analyticsQuerySQLRequestStore.setNetwork(validNetwork);
         analyticsQueryGPTRequestStore.setNetwork(validNetwork);
@@ -121,14 +122,14 @@ const QueryPage: FC<BoxProps> = () => {
                             onClick={() => updateSearchParams({ network: DTOChain.DTOMainnet })}
                         >
                             <Span textStyle="label2">Mainnet</Span>
-                            {network === DTOChain.DTOMainnet && <TickIcon />}
+                            {network === Network.MAINNET && <TickIcon />}
                         </MenuItem>
                         <MenuItem
                             gap="2"
                             onClick={() => updateSearchParams({ network: DTOChain.DTOTestnet })}
                         >
                             <Span textStyle="label2">Testnet</Span>
-                            {network === DTOChain.DTOTestnet && <TickIcon />}
+                            {network === Network.TESTNET && <TickIcon />}
                         </MenuItem>
                     </MenuList>
                 </Menu>
