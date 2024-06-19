@@ -1,7 +1,13 @@
 import { AxiosError } from 'axios';
 import { makeAutoObservable } from 'mobx';
 import { projectsStore } from 'src/entities';
-import { DTOCnftCollection, Loadable, TonCurrencyAmount, apiClient } from 'src/shared';
+import {
+    DTOCnftCollection,
+    Loadable,
+    TonCurrencyAmount,
+    apiClient,
+    createImmediateReaction
+} from 'src/shared';
 import { CnftCollection } from './interfaces/CnftCollection';
 import { Address } from 'ton-core';
 
@@ -16,8 +22,18 @@ class CNFTStore {
 
     constructor() {
         makeAutoObservable(this);
-        this.loadConfig();
-        this.loadHistory();
+
+        createImmediateReaction(
+            () => projectsStore.selectedProject,
+            project => {
+                this.clearState();
+
+                if (project) {
+                    this.loadConfig();
+                    this.loadHistory();
+                }
+            }
+        );
     }
 
     loadConfig = this.pricePerNFT$.createAsyncAction(async () => {

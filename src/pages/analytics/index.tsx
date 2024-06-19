@@ -1,21 +1,11 @@
 import { lazy } from '@loadable/component';
 import { Suspense } from 'react';
-import { Navigate, Route } from 'react-router-dom';
-import { observer } from 'mobx-react-lite';
-import { projectsStore } from 'src/entities';
+import { Route } from 'react-router-dom';
 
 const GraphPage = lazy(() => import('./graph'));
 const HistoryPage = lazy(() => import('./history'));
 const QueryPage = lazy(() => import('./query'));
 // const DashboardPage = lazy(() => import('./dashboard'));
-
-const QueryGuard = observer(() => {
-    if (!projectsStore.selectedProject?.capabilities.stats.query) {
-        return <Navigate to=".." replace />;
-    }
-
-    return <QueryPage />;
-});
 
 /*const DashboardGuard = observer(() => {
     if (!projectsStore.selectedProject?.capabilities.stats.query) {
@@ -47,7 +37,7 @@ const AnalyticsRouting = (
             path="query"
             element={
                 <Suspense>
-                    <QueryGuard />
+                    <QueryPage />
                 </Suspense>
             }
         />
@@ -60,8 +50,8 @@ const AnalyticsRouting = (
             }
         />*/}
 
-        <Route index element={<Navigate to="history" replace />} />
-        <Route path="*" element={<Navigate to="history" replace />} />
+        {/* <Route index element={<Navigate to="history" replace />} /> */}
+        {/* <Route path="*" element={<Navigate to="history" replace />} /> */}
     </>
 );
 
