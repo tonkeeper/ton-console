@@ -47,6 +47,8 @@ class PaymentsTableStore {
                         return mapChargeToFaucetPayment(charge, tonRate);
                     case DTOServiceName.DTOStats:
                         return mapChargeToAnalyticsPayment(charge);
+                    case DTOServiceName.DTOCnft:
+                        return mapChargeToCnftPayment(charge);
                     default:
                         return null;
                 }
@@ -194,6 +196,20 @@ function mapChargeToAnalyticsPayment(charge: DTOCharge): Payment {
     return {
         id: `analytics-${charge.id}`,
         name: `TON Analytics ${subservices[charge.stats_type_query!]}`,
+        date: new Date(charge.date_create),
+        amount: tonAmount,
+        amountUsdEquivalent: new UsdCurrencyAmount(
+            tonAmount.amount.multipliedBy(charge.exchange_rate)
+        )
+    };
+}
+
+function mapChargeToCnftPayment(charge: DTOCharge): Payment {
+    const tonAmount = new TonCurrencyAmount(charge.amount);
+
+    return {
+        id: `cnft-${charge.id}`,
+        name: `Indexing ${charge.cnft_count} item(s) of cNFT`,
         date: new Date(charge.date_create),
         amount: tonAmount,
         amountUsdEquivalent: new UsdCurrencyAmount(
