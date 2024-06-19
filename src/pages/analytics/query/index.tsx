@@ -41,6 +41,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { projectsStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
+import JoinQuery from 'src/features/analytics/ui/JoinQuery';
 
 const QueryPage: FC<BoxProps> = () => {
     const navigate = useNavigate();
@@ -101,6 +102,10 @@ const QueryPage: FC<BoxProps> = () => {
             navigate('../history');
         }
     }, [prevProjectId, projectId]);
+
+    if (!projectsStore.selectedProject?.capabilities.stats.query) {
+        return <JoinQuery />;
+    }
 
     return (
         <Overlay display="flex" flexDirection="column">

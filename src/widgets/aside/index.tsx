@@ -14,7 +14,7 @@ import {
 } from 'src/shared';
 import { FunctionComponent } from 'react';
 import { Flex, Text } from '@chakra-ui/react';
-import { balanceStore, projectsStore } from 'src/entities';
+import { balanceStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { invoicesAppStore } from 'src/features';
 import { NftIcon24 } from 'src/shared/ui/icons/NftIcon24';
@@ -55,9 +55,7 @@ const Aside: FunctionComponent = () => {
                     <DropDownMenuItem linkTo="dashboard">Dashboard</DropDownMenuItem>
                 )}*/}
                 <DropDownMenuItem linkTo="history">History</DropDownMenuItem>
-                {projectsStore.selectedProject?.capabilities.stats.query && (
-                    <DropDownMenuItem linkTo="query">Query</DropDownMenuItem>
-                )}
+                <DropDownMenuItem linkTo="query">Query</DropDownMenuItem>
                 <DropDownMenuItem linkTo="graph">Graph</DropDownMenuItem>
             </DropDownMenuItemExpandable>
             <DropDownMenuItemExpandable leftIcon={<NftIcon24 />} content="NFT" linkTo="nft">
