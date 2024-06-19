@@ -2,7 +2,6 @@ import { Address } from 'ton-core';
 
 export interface CnftCollection {
     account: Address;
-    /** @example "name" */
     name: string;
     description?: string;
     image?: string;

@@ -34,9 +34,7 @@ class CNFTStore {
                 data
             );
 
-            const res = await getPaidCNftCollections();
-
-            return res;
+            return getPaidCNftCollections();
         },
         {
             successToast: {
