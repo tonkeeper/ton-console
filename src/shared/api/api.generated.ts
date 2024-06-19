@@ -521,14 +521,6 @@ export enum DTOProServiceDashboardColumnType {
     DTONumericCrypto = 'numeric_crypto'
 }
 
-export interface DTOCnftConfig {
-    /**
-     * @format uint64
-     * @example 100000000
-     */
-    price_per_nft: number;
-}
-
 export interface DTOCnftCollection {
     /** @example "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
     account: string;
@@ -539,11 +531,11 @@ export interface DTOCnftCollection {
     /** @example "https://tonapi.io/collection.png" */
     image?: string;
     /** @format uint32 */
-    nft_counts: number;
+    nft_count: number;
     /** @format uint32 */
-    minted_counts: number;
+    minted_count: number;
     /** @format uint32 */
-    paid_indexing_counts: number;
+    paid_indexing_count: number;
 }
 
 export interface DTOProServiceInvoiceWebhook {
@@ -3955,13 +3947,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags cnft_service
-         * @name CnftConfig
-         * @summary Compress NFT config
+         * @name GetCNftConfig
+         * @summary Get cNFT config
          * @request GET:/api/v1/services/cnft/config
          */
-        cnftConfig: (params: RequestParams = {}) =>
+        getCNftConfig: (params: RequestParams = {}) =>
             this.request<
-                DTOCnftConfig,
+                {
+                    /**
+                     * @format uint64
+                     * @example 100000000
+                     */
+                    price_per_nft: number;
+                },
                 {
                     /** Error message */
                     error: string;
@@ -3978,11 +3976,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags cnft_service
-         * @name GetInfoCnftCollectionAccount
-         * @summary Get info about compress collection account
+         * @name GetInfoCNftCollectionAccount
+         * @summary Get info about cNFT collection account
          * @request GET:/api/v1/services/cnft/collection/{account}
          */
-        getInfoCnftCollectionAccount: (account: string, params: RequestParams = {}) =>
+        getInfoCNftCollectionAccount: (account: string, params: RequestParams = {}) =>
             this.request<
                 DTOCnftCollection,
                 {
@@ -4001,11 +3999,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags cnft_service
-         * @name IndexingCnftCollection
-         * @summary Indexing compress NFTs
+         * @name IndexingCNftCollection
+         * @summary Indexing cNFTs
          * @request POST:/api/v1/services/cnft/indexing
          */
-        indexingCnftCollection: (
+        indexingCNftCollection: (
             query: {
                 /**
                  * Project ID
@@ -4041,11 +4039,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags cnft_service
-         * @name CnftPaidCollections
-         * @summary Get paid compress NFT collections
-         * @request GET:/api/v1/services/cnft/paid/collections
+         * @name GetPaidCNftCollections
+         * @summary Get paid cNFT collections
+         * @request GET:/api/v1/services/cnft/paid
          */
-        cnftPaidCollections: (
+        getPaidCNftCollections: (
             query: {
                 /**
                  * Project ID
@@ -4066,7 +4064,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                     code: number;
                 }
             >({
-                path: `/api/v1/services/cnft/paid/collections`,
+                path: `/api/v1/services/cnft/paid`,
                 method: 'GET',
                 query: query,
                 ...params
