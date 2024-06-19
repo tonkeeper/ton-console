@@ -69,7 +69,7 @@ export const DropDownMenuItem: FunctionComponent<
             {...navLinkProps}
         >
             {props.leftIcon}
-            <Box wordBreak="break-all" noOfLines={1}>
+            <Box wordBreak="break-all" noOfLines={1} style={{ display: 'block' }}>
                 {props.children}
             </Box>
         </MenuItemButton>
