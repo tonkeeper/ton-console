@@ -90,7 +90,12 @@ const AnalyticsQueryControlPanel: FunctionComponent<
                             {request.estimatedTimeMS < 1000 ? (
                                 '< 1s'
                             ) : (
-                                <Span>≈ {toTimeLeft(request.estimatedTimeMS)}</Span>
+                                <>
+                                    <Span paddingRight="5px" fontSize={20} lineHeight="24px">
+                                        ≈
+                                    </Span>
+                                    <Span>{toTimeLeft(request.estimatedTimeMS)}</Span>
+                                </>
                             )}
                             &nbsp;·&nbsp;
                             {request.estimatedCost.toStringCurrencyAmount({ decimalPlaces: 'all' })}
