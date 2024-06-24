@@ -6,7 +6,8 @@ import {
     Loadable,
     TonCurrencyAmount,
     apiClient,
-    createImmediateReaction
+    createImmediateReaction,
+    isAddersValid
 } from 'src/shared';
 import { CnftCollection } from './interfaces/CnftCollection';
 import { Address } from 'ton-core';
@@ -19,6 +20,8 @@ class CNFTStore {
     pricePerNFT$ = new Loadable<TonCurrencyAmount | undefined>(undefined);
 
     history$ = new Loadable<CnftCollection[]>([]);
+
+    currentAddress$ = new Loadable<CnftCollection | null>(null);
 
     constructor() {
         makeAutoObservable(this);
@@ -68,9 +71,24 @@ class CNFTStore {
         }
     );
 
+    checkCNFT = this.currentAddress$.createAsyncAction(async (addressString: string) => {
+        const isValid = isAddersValid(addressString, {
+            acceptRaw: true,
+            acceptMasterchain: true,
+            acceptTestnet: true
+        });
+        if (!isValid) {
+            return null;
+        }
+        const res = await apiClient.api.getInfoCNftCollectionAccount(addressString);
+
+        return res.data ? mapDTOCnftCollectionToCnftCollection(res.data) : null;
+    });
+
     clearState(): void {
         this.pricePerNFT$.clear();
         this.history$.clear();
+        this.currentAddress$.clear();
     }
 }
 
