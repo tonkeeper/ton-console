@@ -11,8 +11,11 @@ interface AnalyticsQueryGPTGenerationProps extends BoxProps {
     defaultRequest?: string;
 }
 
-const AnalyticsQueryGPTGeneration: FC<AnalyticsQueryGPTGenerationProps> = props => {
-    const [message, setMessage] = useState(props.defaultRequest ?? '');
+const AnalyticsQueryGPTGeneration: FC<AnalyticsQueryGPTGenerationProps> = ({
+    defaultRequest,
+    ...restProps
+}) => {
+    const [message, setMessage] = useState(defaultRequest ?? '');
     const [context, setContext] = useState('');
     const [showContext, setShowContext] = useLocalStorage('analytics:showContext', false);
 
@@ -49,7 +52,7 @@ const AnalyticsQueryGPTGeneration: FC<AnalyticsQueryGPTGenerationProps> = props 
     }
 
     return (
-        <Box {...props}>
+        <Box {...restProps}>
             {showContext && (
                 <Textarea
                     mb="3"
