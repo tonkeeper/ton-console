@@ -107,7 +107,7 @@ const CNFTTable: FC<TableContainerProps> = props => {
                         <Tr>
                             <Th>Name</Th>
                             <Th>Address</Th>
-                            <Th>On chain</Th>
+                            <Th>Minted</Th>
                             <Th>Paid</Th>
                             <Th>Total count</Th>
                         </Tr>
