@@ -1,6 +1,6 @@
 import { lazy } from '@loadable/component';
 import { Suspense } from 'react';
-import { Route } from 'react-router-dom';
+import { Navigate, Route } from 'react-router-dom';
 
 const GraphPage = lazy(() => import('./graph'));
 const HistoryPage = lazy(() => import('./history'));
@@ -50,8 +50,8 @@ const AnalyticsRouting = (
             }
         />*/}
 
-        {/* <Route index element={<Navigate to="history" replace />} /> */}
-        {/* <Route path="*" element={<Navigate to="history" replace />} /> */}
+        <Route index element={<Navigate to="history" replace />} />
+        <Route path="*" element={<Navigate to="history" replace />} />
     </>
 );
 
