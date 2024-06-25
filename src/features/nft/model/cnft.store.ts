@@ -47,14 +47,10 @@ class CNFTStore {
     loadHistory = this.history$.createAsyncAction(getPaidCNftCollections);
 
     addCNFT = this.history$.createAsyncAction(
-        async (data: IndexingCnftCollectionDataT) => {
-            await apiClient.api.indexingCNftCollection(
-                { project_id: projectsStore.selectedProject!.id },
-                data
-            );
-
-            return getPaidCNftCollections();
-        },
+        async (data: IndexingCnftCollectionDataT) =>
+            apiClient.api
+                .indexingCNftCollection({ project_id: projectsStore.selectedProject!.id }, data)
+                .then(getPaidCNftCollections),
         {
             successToast: {
                 title: 'cNFT added successfully'
@@ -77,12 +73,12 @@ class CNFTStore {
             acceptMasterchain: true,
             acceptTestnet: true
         });
-        if (!isValid) {
-            return null;
-        }
-        const res = await apiClient.api.getInfoCNftCollectionAccount(addressString);
 
-        return res.data ? mapDTOCnftCollectionToCnftCollection(res.data) : null;
+        return isValid
+            ? apiClient.api
+                  .getInfoCNftCollectionAccount(addressString)
+                  .then(({ data }) => (data ? mapDTOCnftCollectionToCnftCollection(data) : null))
+            : null;
     });
 
     clearState(): void {
