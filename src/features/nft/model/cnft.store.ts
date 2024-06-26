@@ -78,6 +78,7 @@ class CNFTStore {
             ? apiClient.api
                   .getInfoCNftCollectionAccount(addressString)
                   .then(({ data }) => (data ? mapDTOCnftCollectionToCnftCollection(data) : null))
+                  .catch(() => null)
             : null;
     });
 
