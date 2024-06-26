@@ -14,6 +14,7 @@ import NftRouting from 'src/pages/nft';
 import { isDevelopmentMode } from 'src/shared';
 
 const LandingPage = lazy(() => import('./landing'));
+const LoginPage = lazy(() => import('./login'));
 const CreateFirstProjectPage = lazy(() => import('./create-first-project'));
 const BalancePage = lazy(() => import('./balance'));
 const DashboardPage = lazy(() => import('./dashboard'));
@@ -50,12 +51,19 @@ const Routing: FunctionComponent = () => {
                     <Route
                         index
                         element={
-                            <Suspense>
+                            <Suspense fallback={<div>Loading...</div>}>
                                 <LandingPage />
                             </Suspense>
                         }
                     ></Route>
-                    <Route path="*" element={<Navigate to="/" replace />} />
+                    <Route
+                        path="*"
+                        element={
+                            <Suspense fallback={<div>Loading...</div>}>
+                                <LoginPage />
+                            </Suspense>
+                        }
+                    ></Route>
                 </Route>
             </Routes>
         );
