@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FC, useCallback } from 'react';
-import { CNFTAddForm } from './CNFTAddForm';
+import CNFTAddForm from './CNFTAddForm';
 import { IndexingCnftCollectionDataT, cnftStore } from '../../model/cnft.store';
 
 const CNFTAddModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {

@@ -1,8 +1,9 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import {
     chakra,
     FormControl,
     FormErrorMessage,
+    FormHelperText,
     FormLabel,
     Input,
     InputGroup,
@@ -10,11 +11,19 @@ import {
     StyleProps
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { isAddersValid, isNumber, mergeRefs, Span, TonCurrencyAmount } from 'src/shared';
+import {
+    AsyncInput,
+    isAddersValid,
+    isNumber,
+    mergeRefs,
+    Span,
+    TonCurrencyAmount
+} from 'src/shared';
 import { useIMask } from 'react-imask';
 import { cnftStore, IndexingCnftCollectionDataT } from '../../model/cnft.store';
+import { observer } from 'mobx-react-lite';
 
-export const CNFTAddForm: FC<
+const CNFTAddForm: FC<
     StyleProps & {
         id?: string;
         onSubmit: SubmitHandler<IndexingCnftCollectionDataT>;
@@ -23,6 +32,12 @@ export const CNFTAddForm: FC<
     const submitHandler = (form: IndexingCnftCollectionDataT): void => {
         onSubmit(form);
     };
+
+    useEffect(() => {
+        return () => {
+            cnftStore.currentAddress$.clear();
+        };
+    }, []);
 
     const {
         handleSubmit,
@@ -57,11 +72,26 @@ export const CNFTAddForm: FC<
         max: 1000000000
     });
 
+    const { nft_count, paid_indexing_count } = cnftStore.currentAddress$.value ?? {};
+    const currentAddressDataExists = nft_count !== undefined && paid_indexing_count !== undefined;
+    const invalidHelpText =
+        cnftStore.currentAddress$.error && !errors.account
+            ? 'cNFT not exists for this address'
+            : 'Please enter cNFT address';
+    const availableNFTCount = currentAddressDataExists ? nft_count - paid_indexing_count : 0;
+    const addressHelpText = currentAddressDataExists
+        ? `Collection NFT count: ${nft_count}, Paid: ${paid_indexing_count}, Available: ${availableNFTCount}`
+        : invalidHelpText;
+
     const { ref: hookFormRef, ...registerAmountRest } = register('count', {
         required: 'This is required',
         validate: value => {
             if (!value) {
                 return 'Amount should be greater than 0';
+            }
+
+            if (currentAddressDataExists && value > availableNFTCount) {
+                return 'Not enough avalible cNFT';
             }
         },
         valueAsNumber: true
@@ -71,8 +101,9 @@ export const CNFTAddForm: FC<
         <chakra.form id={id} w="100%" onSubmit={handleSubmit(submitHandler)} noValidate {...rest}>
             <FormControl isInvalid={!!errors.account} isRequired>
                 <FormLabel htmlFor="address">Address</FormLabel>
-                <Input
+                <AsyncInput
                     autoComplete="off"
+                    autoFocus
                     id="address"
                     {...register('account', {
                         required: 'This is required',
@@ -80,9 +111,15 @@ export const CNFTAddForm: FC<
                             if (!isAddersValid(value, { acceptTestnet: true, acceptRaw: true })) {
                                 return 'Wrong address';
                             }
-                        }
+                            if (cnftStore.currentAddress$.error) {
+                                return 'cNFT not exists for this address';
+                            }
+                        },
+                        onChange: e => cnftStore.checkCNFT(e.target.value)
                     })}
                 />
+
+                <FormHelperText>{addressHelpText}</FormHelperText>
                 <FormErrorMessage pos="static">
                     {errors.account && errors.account.message}
                 </FormErrorMessage>
@@ -109,3 +146,5 @@ export const CNFTAddForm: FC<
         </chakra.form>
     );
 };
+
+export default observer(CNFTAddForm);

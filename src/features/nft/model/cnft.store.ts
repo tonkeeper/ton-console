@@ -6,7 +6,8 @@ import {
     Loadable,
     TonCurrencyAmount,
     apiClient,
-    createImmediateReaction
+    createImmediateReaction,
+    isAddersValid
 } from 'src/shared';
 import { CnftCollection } from './interfaces/CnftCollection';
 import { Address } from 'ton-core';
@@ -19,6 +20,8 @@ class CNFTStore {
     pricePerNFT$ = new Loadable<TonCurrencyAmount | undefined>(undefined);
 
     history$ = new Loadable<CnftCollection[]>([]);
+
+    currentAddress$ = new Loadable<CnftCollection | null>(null);
 
     constructor() {
         makeAutoObservable(this);
@@ -44,14 +47,10 @@ class CNFTStore {
     loadHistory = this.history$.createAsyncAction(getPaidCNftCollections);
 
     addCNFT = this.history$.createAsyncAction(
-        async (data: IndexingCnftCollectionDataT) => {
-            await apiClient.api.indexingCNftCollection(
-                { project_id: projectsStore.selectedProject!.id },
-                data
-            );
-
-            return getPaidCNftCollections();
-        },
+        async (data: IndexingCnftCollectionDataT) =>
+            apiClient.api
+                .indexingCNftCollection({ project_id: projectsStore.selectedProject!.id }, data)
+                .then(getPaidCNftCollections),
         {
             successToast: {
                 title: 'cNFT added successfully'
@@ -68,9 +67,24 @@ class CNFTStore {
         }
     );
 
+    checkCNFT = this.currentAddress$.createAsyncAction(async (addressString: string) => {
+        const isValid = isAddersValid(addressString, {
+            acceptRaw: true,
+            acceptMasterchain: true,
+            acceptTestnet: true
+        });
+
+        return isValid
+            ? apiClient.api
+                  .getInfoCNftCollectionAccount(addressString)
+                  .then(({ data }) => (data ? mapDTOCnftCollectionToCnftCollection(data) : null))
+            : null;
+    });
+
     clearState(): void {
         this.pricePerNFT$.clear();
         this.history$.clear();
+        this.currentAddress$.clear();
     }
 }
 
