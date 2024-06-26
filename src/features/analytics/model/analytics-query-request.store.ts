@@ -49,7 +49,14 @@ class AnalyticsQueryRequestStore {
                     { chain }
                 );
 
-                return mapDTOStatsEstimateSQLToAnalyticsQuery(request, chain, result.data);
+                const analyticsQuery = mapDTOStatsEstimateSQLToAnalyticsQuery(
+                    request,
+                    chain,
+                    result.data
+                );
+
+                this.request$.value = analyticsQuery;
+                return analyticsQuery;
             } catch (e) {
                 const errText =
                     (
