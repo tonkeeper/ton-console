@@ -144,7 +144,7 @@ const QueryPage: FC<BoxProps> = () => {
                         size="sm"
                         variant="secondary"
                         zIndex="3"
-                        href={ANALYTICS_LINKS.INTRO}
+                        href={ANALYTICS_LINKS.QUERY.INTRO}
                         isExternal
                     >
                         Console Docs
