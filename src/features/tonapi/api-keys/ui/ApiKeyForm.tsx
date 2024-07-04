@@ -11,7 +11,7 @@ import {
     RadioGroup,
     StyleProps
 } from '@chakra-ui/react';
-import { Controller, SubmitHandler, useForm, useFormContext } from 'react-hook-form';
+import { Controller, SubmitHandler, useFormContext } from 'react-hook-form';
 import { isNumber, mergeRefs, Span, toBinaryRadio } from 'src/shared';
 import { useIMask } from 'react-imask';
 import { FormState } from 'react-hook-form/dist/types/form';
@@ -35,16 +35,14 @@ export const ApiKeyForm: FunctionComponent<
         id?: string;
         maxLimit: number;
         onSubmit: SubmitHandler<CreateApiKeyForm>;
-        defaultValues?: CreateApiKeyForm;
         disableDefaultFocus?: boolean;
     }
-> = ({ id, onSubmit, defaultValues, disableDefaultFocus, maxLimit, ...rest }) => {
+> = ({ id, onSubmit, disableDefaultFocus, maxLimit, ...rest }) => {
     const submitHandler = (form: ApiKeyFormInternal): void => {
         onSubmit({ name: form.name, limitRps: form.useIPLimit ? Number(form.ipLimitValue) : null });
     };
 
-    const context = useFormContext<ApiKeyFormInternal>();
-    let {
+    const {
         handleSubmit,
         register,
         unregister,
@@ -54,23 +52,7 @@ export const ApiKeyForm: FunctionComponent<
         watch,
         getFieldState,
         formState: { errors }
-    } = useForm<ApiKeyFormInternal>({
-        defaultValues: toApiKeyFormDefaultValues(defaultValues)
-    });
-
-    if (context) {
-        ({
-            handleSubmit,
-            register,
-            unregister,
-            setFocus,
-            control,
-            resetField,
-            watch,
-            getFieldState,
-            formState: { errors }
-        } = context);
-    }
+    } = useFormContext<ApiKeyFormInternal>();
 
     useEffect(() => {
         if (!disableDefaultFocus) {
@@ -112,7 +94,7 @@ export const ApiKeyForm: FunctionComponent<
                 }
 
                 if (value < 0.1) {
-                    return 'Limit must be grater then 0.1';
+                    return 'Limit must be greater then 0.1';
                 }
             }
         });
