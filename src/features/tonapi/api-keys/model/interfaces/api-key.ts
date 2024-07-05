@@ -3,5 +3,6 @@ export interface ApiKey {
     name: string;
     value: string;
     limitRps: number | null;
+    origins?: string[];
     creationDate: Date;
 }

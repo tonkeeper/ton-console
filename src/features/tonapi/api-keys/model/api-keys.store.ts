@@ -30,10 +30,10 @@ class ApiKeysStore {
     });
 
     createApiKey = this.apiKeys$.createAsyncAction(
-        async ({ name, limitRps }: CreateApiKeyForm) => {
+        async ({ name, limitRps, origins }: CreateApiKeyForm) => {
             const response = await apiClient.api.generateProjectTonApiToken(
                 { project_id: projectsStore.selectedProject!.id },
-                { name, limit_rps: limitRps }
+                { name, limit_rps: limitRps, origins }
             );
 
             if (response.data.token) {
@@ -51,11 +51,11 @@ class ApiKeysStore {
     );
 
     editApiKey = this.apiKeys$.createAsyncAction(
-        async ({ id, name, limitRps }: EditApiKeyForm) => {
+        async ({ id, name, limitRps, origins }: EditApiKeyForm) => {
             await apiClient.api.updateProjectTonApiToken(
                 id,
                 { project_id: projectsStore.selectedProject!.id },
-                { name, limit_rps: limitRps }
+                { name, limit_rps: limitRps, origins }
             );
 
             const key = this.apiKeys$.value.find(item => item.id === id);
@@ -63,6 +63,7 @@ class ApiKeysStore {
             if (key) {
                 key.name = name;
                 key.limitRps = limitRps;
+                key.origins = origins;
             }
         },
         {
@@ -104,6 +105,7 @@ function mapApiTokenDTOToApiKey(apiTokenDTO: DTOProjectTonApiToken): ApiKey {
         value: apiTokenDTO.token,
         creationDate: new Date(apiTokenDTO.date_create),
         limitRps: apiTokenDTO.limit_rps || null,
+        origins: apiTokenDTO.origins || undefined,
         id: apiTokenDTO.id
     };
 }

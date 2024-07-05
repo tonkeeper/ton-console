@@ -9,7 +9,8 @@ import {
     Input,
     Radio,
     RadioGroup,
-    StyleProps
+    StyleProps,
+    Textarea
 } from '@chakra-ui/react';
 import { Controller, SubmitHandler, useFormContext } from 'react-hook-form';
 import { isNumber, mergeRefs, Span, toBinaryRadio } from 'src/shared';
@@ -21,6 +22,7 @@ type ApiKeyFormWithLimit = {
     name: string;
     useIPLimit: true;
     ipLimitValue: number;
+    originsValue: string;
 };
 
 type ApiKeyFormWithoutLimit = {
@@ -39,7 +41,13 @@ export const ApiKeyForm: FunctionComponent<
     }
 > = ({ id, onSubmit, disableDefaultFocus, maxLimit, ...rest }) => {
     const submitHandler = (form: ApiKeyFormInternal): void => {
-        onSubmit({ name: form.name, limitRps: form.useIPLimit ? Number(form.ipLimitValue) : null });
+        onSubmit({
+            name: form.name,
+            limitRps: form.useIPLimit ? Number(form.ipLimitValue) : null,
+            origins: form.useIPLimit
+                ? form.originsValue.split('\n').filter(x => x !== '')
+                : undefined
+        });
     };
 
     const {
@@ -84,9 +92,10 @@ export const ApiKeyForm: FunctionComponent<
     });
 
     let limitInput;
+    let originsInput;
 
     if (useIPLimit) {
-        const { ref: hookFromRef, ...ipLimitValueRest } = register('ipLimitValue', {
+        const { ref: hookIpLimitRef, ...ipLimitValueRest } = register('ipLimitValue', {
             required: 'This is required',
             validate(value) {
                 if (!isNumber(value.toString())) {
@@ -99,8 +108,20 @@ export const ApiKeyForm: FunctionComponent<
             }
         });
 
-        const ipLimitValueErrors = (errors as FormState<ApiKeyFormWithLimit>['errors'])
-            .ipLimitValue;
+        const { ref: hookOriginsRef, ...originsValueRest } = register('originsValue', {
+            validate(value) {
+                const numberRows = value.split('\n').length;
+                if (numberRows > 20) {
+                    return 'Maximum number of origins is 20';
+                }
+            }
+        });
+
+        const typedErrors = errors as FormState<ApiKeyFormWithLimit>['errors'];
+        const ipLimitValueErrors = typedErrors.ipLimitValue;
+        const originsValueErrors = typedErrors.originsValue;
+
+        const originsPlaceholder = 'http://example.com\nhttps://dev.example.net';
 
         limitInput = (
             <FormControl isInvalid={!!ipLimitValueErrors} isRequired>
@@ -112,7 +133,7 @@ export const ApiKeyForm: FunctionComponent<
                         min - 0.1, max - {maxLimit}
                     </Box>
                     <Input
-                        ref={mergeRefs(ref, hookFromRef)}
+                        ref={mergeRefs(ref, hookIpLimitRef)}
                         w="70px"
                         autoComplete="off"
                         id="ipLimitValue"
@@ -122,6 +143,35 @@ export const ApiKeyForm: FunctionComponent<
                 </Flex>
                 <FormErrorMessage>
                     {ipLimitValueErrors && ipLimitValueErrors.message}
+                </FormErrorMessage>
+            </FormControl>
+        );
+
+        originsInput = (
+            <FormControl isInvalid={!!originsValueErrors}>
+                <Flex align="center">
+                    <Box>
+                        <FormLabel sx={{ mb: '0 !important' }} mr="1.5" htmlFor="originsValue">
+                            <Span textStyle="label2">Origins</Span>
+                        </FormLabel>
+                        <Box textStyle="body2" mr="4" color="text.secondary">
+                            Enter up to 20 values,
+                            <br />
+                            each on a new line
+                        </Box>
+                    </Box>
+                    <Textarea
+                        ref={hookOriginsRef}
+                        w="250px"
+                        autoComplete="off"
+                        id="originsValue"
+                        placeholder={originsPlaceholder}
+                        rows={2}
+                        {...originsValueRest}
+                    />
+                </Flex>
+                <FormErrorMessage>
+                    {originsValueErrors && originsValueErrors.message}
                 </FormErrorMessage>
             </FormControl>
         );
@@ -186,6 +236,7 @@ export const ApiKeyForm: FunctionComponent<
                 />
             </FormControl>
             {limitInput}
+            {originsInput}
         </chakra.form>
     );
 };
@@ -196,7 +247,11 @@ export function toApiKeyFormDefaultValues(
     return {
         name: createApiKeyForm?.name,
         ...(createApiKeyForm?.limitRps != null
-            ? { useIPLimit: true, ipLimitValue: createApiKeyForm.limitRps }
+            ? {
+                  useIPLimit: true,
+                  ipLimitValue: createApiKeyForm.limitRps,
+                  originsValue: createApiKeyForm.origins ? createApiKeyForm.origins.join('\n') : ''
+              }
             : { useIPLimit: false })
     };
 }
