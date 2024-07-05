@@ -91,91 +91,31 @@ export const ApiKeyForm: FunctionComponent<
         max: maxLimit
     });
 
-    let limitInput;
-    let originsInput;
-
-    if (useIPLimit) {
-        const { ref: hookIpLimitRef, ...ipLimitValueRest } = register('ipLimitValue', {
-            required: 'This is required',
-            validate(value) {
-                if (!isNumber(value.toString())) {
-                    return 'Limit should be valid number';
-                }
-
-                if (value < 0.1) {
-                    return 'Limit must be greater then 0.1';
-                }
+    const { ref: hookIpLimitRef, ...ipLimitValueRest } = register('ipLimitValue', {
+        required: 'This is required',
+        validate(value) {
+            if (!isNumber(value.toString())) {
+                return 'Limit should be valid number';
             }
-        });
 
-        const { ref: hookOriginsRef, ...originsValueRest } = register('originsValue', {
-            validate(value) {
-                const numberRows = value.split('\n').length;
-                if (numberRows > 20) {
-                    return 'Maximum number of origins is 20';
-                }
+            if (value < 0.1) {
+                return 'Limit must be greater then 0.1';
             }
-        });
+        }
+    });
 
-        const typedErrors = errors as FormState<ApiKeyFormWithLimit>['errors'];
-        const ipLimitValueErrors = typedErrors.ipLimitValue;
-        const originsValueErrors = typedErrors.originsValue;
+    const { ref: hookOriginsRef, ...originsValueRest } = register('originsValue', {
+        validate(value) {
+            const numberRows = value.split('\n').length;
+            if (numberRows > 20) {
+                return 'Maximum number of origins is 20';
+            }
+        }
+    });
 
-        const originsPlaceholder = 'http://example.com\nhttps://dev.example.net';
-
-        limitInput = (
-            <FormControl isInvalid={!!ipLimitValueErrors} isRequired>
-                <Flex align="center">
-                    <FormLabel sx={{ mb: '0 !important' }} mr="1.5" htmlFor="ipLimitValue">
-                        <Span textStyle="label2">Request Per Second</Span>
-                    </FormLabel>
-                    <Box textStyle="body2" mr="4" color="text.secondary">
-                        min - 0.1, max - {maxLimit}
-                    </Box>
-                    <Input
-                        ref={mergeRefs(ref, hookIpLimitRef)}
-                        w="70px"
-                        autoComplete="off"
-                        id="ipLimitValue"
-                        placeholder="1"
-                        {...ipLimitValueRest}
-                    />
-                </Flex>
-                <FormErrorMessage>
-                    {ipLimitValueErrors && ipLimitValueErrors.message}
-                </FormErrorMessage>
-            </FormControl>
-        );
-
-        originsInput = (
-            <FormControl isInvalid={!!originsValueErrors}>
-                <Flex align="center">
-                    <Box>
-                        <FormLabel sx={{ mb: '0 !important' }} mr="1.5" htmlFor="originsValue">
-                            <Span textStyle="label2">Origins</Span>
-                        </FormLabel>
-                        <Box textStyle="body2" mr="4" color="text.secondary">
-                            Enter up to 20 values,
-                            <br />
-                            each on a new line
-                        </Box>
-                    </Box>
-                    <Textarea
-                        ref={hookOriginsRef}
-                        w="250px"
-                        autoComplete="off"
-                        id="originsValue"
-                        placeholder={originsPlaceholder}
-                        rows={2}
-                        {...originsValueRest}
-                    />
-                </Flex>
-                <FormErrorMessage>
-                    {originsValueErrors && originsValueErrors.message}
-                </FormErrorMessage>
-            </FormControl>
-        );
-    }
+    const typedErrors = errors as FormState<ApiKeyFormWithLimit>['errors'];
+    const ipLimitValueErrors = typedErrors.ipLimitValue;
+    const originsValueErrors = typedErrors.originsValue;
 
     return (
         <chakra.form id={id} w="100%" onSubmit={handleSubmit(submitHandler)} noValidate {...rest}>
@@ -235,8 +175,62 @@ export const ApiKeyForm: FunctionComponent<
                     )}
                 />
             </FormControl>
-            {limitInput}
-            {originsInput}
+            {useIPLimit && (
+                <>
+                    <FormControl isInvalid={!!ipLimitValueErrors} isRequired>
+                        <Flex align="center">
+                            <FormLabel sx={{ mb: '0 !important' }} mr="1.5" htmlFor="ipLimitValue">
+                                <Span textStyle="label2">Request Per Second</Span>
+                            </FormLabel>
+                            <Box textStyle="body2" mr="4" color="text.secondary">
+                                min - 0.1, max - {maxLimit}
+                            </Box>
+                            <Input
+                                ref={mergeRefs(ref, hookIpLimitRef)}
+                                w="70px"
+                                autoComplete="off"
+                                id="ipLimitValue"
+                                placeholder="1"
+                                {...ipLimitValueRest}
+                            />
+                        </Flex>
+                        <FormErrorMessage>
+                            {ipLimitValueErrors && ipLimitValueErrors.message}
+                        </FormErrorMessage>
+                    </FormControl>
+
+                    <FormControl isInvalid={!!originsValueErrors}>
+                        <Flex align="center">
+                            <Box minW="160px">
+                                <FormLabel
+                                    sx={{ mb: '0 !important' }}
+                                    mr="1.5"
+                                    htmlFor="originsValue"
+                                >
+                                    <Span textStyle="label2">Origins</Span>
+                                </FormLabel>
+                                <Box textStyle="body2" mr="4" color="text.secondary">
+                                    Enter up to 20 values,
+                                    <br />
+                                    each on a new line
+                                </Box>
+                            </Box>
+                            <Textarea
+                                ref={hookOriginsRef}
+                                minH={65}
+                                autoComplete="off"
+                                id="originsValue"
+                                placeholder={'http://example.com\nhttps://dev.example.net'}
+                                rows={2}
+                                {...originsValueRest}
+                            />
+                        </Flex>
+                        <FormErrorMessage>
+                            {originsValueErrors && originsValueErrors.message}
+                        </FormErrorMessage>
+                    </FormControl>
+                </>
+            )}
         </chakra.form>
     );
 };
