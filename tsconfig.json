@@ -19,7 +19,8 @@
     "rootDir": ".",
     "paths": {
       "src/*": ["./src/*"]
-    }
+    },
+    "incremental": true
   },
   "include": ["src"],
   "exclude": ["tests"],
