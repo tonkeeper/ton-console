@@ -106,7 +106,7 @@ export const ApiKeyForm: FunctionComponent<
 
     const { ref: hookOriginsRef, ...originsValueRest } = register('originsValue', {
         validate(value) {
-            const numberRows = value.split('\n').length;
+            const numberRows = value?.split('\n').length ?? 0;
             if (numberRows > 20) {
                 return 'Maximum number of origins is 20';
             }
