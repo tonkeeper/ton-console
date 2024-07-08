@@ -53,10 +53,8 @@ export const ApiKeyForm: FunctionComponent<
     const {
         handleSubmit,
         register,
-        unregister,
         setFocus,
         control,
-        resetField,
         watch,
         getFieldState,
         formState: { errors }
@@ -72,15 +70,12 @@ export const ApiKeyForm: FunctionComponent<
     const { isDirty: useIPLimitDirty } = getFieldState('useIPLimit');
 
     useEffect(() => {
-        if (!useIPLimit) {
-            unregister('ipLimitValue');
-            resetField('ipLimitValue');
-        } else if (useIPLimitDirty) {
+        if (useIPLimitDirty) {
             setFocus('ipLimitValue');
         }
     }, [useIPLimit, useIPLimitDirty]);
 
-    const { ref } = useIMask({
+    const { ref: imaskRef } = useIMask({
         mask: Number,
         scale: 1,
         signed: false,
@@ -89,28 +84,6 @@ export const ApiKeyForm: FunctionComponent<
         mapToRadix: [','],
         min: 0,
         max: maxLimit
-    });
-
-    const { ref: hookIpLimitRef, ...ipLimitValueRest } = register('ipLimitValue', {
-        required: 'This is required',
-        validate(value) {
-            if (!isNumber(value.toString())) {
-                return 'Limit should be valid number';
-            }
-
-            if (value < 0.1) {
-                return 'Limit must be greater then 0.1';
-            }
-        }
-    });
-
-    const { ref: hookOriginsRef, ...originsValueRest } = register('originsValue', {
-        validate(value) {
-            const numberRows = value.split('\n').length;
-            if (numberRows > 20) {
-                return 'Maximum number of origins is 20';
-            }
-        }
     });
 
     const typedErrors = errors as FormState<ApiKeyFormWithLimit>['errors'];
@@ -186,12 +159,28 @@ export const ApiKeyForm: FunctionComponent<
                                 min - 0.1, max - {maxLimit}
                             </Box>
                             <Input
-                                ref={mergeRefs(ref, hookIpLimitRef)}
                                 w="70px"
                                 autoComplete="off"
                                 id="ipLimitValue"
                                 placeholder="1"
-                                {...ipLimitValueRest}
+                                {...(() => {
+                                    const { ref, ...restLocal } = register('ipLimitValue', {
+                                        required: 'This is required',
+                                        validate(value) {
+                                            if (!isNumber(value.toString())) {
+                                                return 'Limit should be valid number';
+                                            }
+
+                                            if (value < 0.1) {
+                                                return 'Limit must be greater then 0.1';
+                                            }
+                                        }
+                                    });
+                                    return {
+                                        ref: mergeRefs(ref, imaskRef),
+                                        ...restLocal
+                                    };
+                                })()}
                             />
                         </Flex>
                         <FormErrorMessage>
@@ -216,13 +205,19 @@ export const ApiKeyForm: FunctionComponent<
                                 </Box>
                             </Box>
                             <Textarea
-                                ref={hookOriginsRef}
                                 minH={65}
                                 autoComplete="off"
                                 id="originsValue"
                                 placeholder={'http://example.com\nhttps://dev.example.net'}
                                 rows={2}
-                                {...originsValueRest}
+                                {...register('originsValue', {
+                                    validate(value) {
+                                        const numberRows = value.split('\n').length;
+                                        if (numberRows > 20) {
+                                            return 'Maximum number of origins is 20';
+                                        }
+                                    }
+                                })}
                             />
                         </Flex>
                         <FormErrorMessage>
