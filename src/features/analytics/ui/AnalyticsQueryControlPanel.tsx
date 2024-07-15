@@ -105,11 +105,12 @@ const AnalyticsQueryControlPanel: FunctionComponent<
 
             <Button
                 ml="4"
+                colorScheme="blue"
                 isDisabled={!store.request$.value || requestEqQuery}
                 isLoading={store.request$.isLoading || analyticsQueryStore.createQuery.isLoading}
                 onClick={onCreate}
                 size="sm"
-                variant="contrast"
+                variant="solid"
             >
                 Run
             </Button>
