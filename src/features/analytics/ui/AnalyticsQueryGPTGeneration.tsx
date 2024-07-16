@@ -86,10 +86,12 @@ const AnalyticsQueryGPTGeneration: FC<AnalyticsQueryGPTGenerationProps> = ({
                         </Span>
                     )}
                     <Button
+                        colorScheme="blue"
                         isDisabled={!message}
                         isLoading={analyticsGPTGenerationStore.generateSQL.isLoading}
                         onClick={onGenerate}
                         size="sm"
+                        variant="solid"
                     >
                         Generate
                     </Button>
