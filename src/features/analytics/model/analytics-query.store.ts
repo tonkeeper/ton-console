@@ -242,6 +242,11 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
     };
 }
 
+function isStrictDecimal(value: string): boolean {
+    const decimalPattern = /^[+-]?(\d+(\.\d*)?|\.\d+)$/;
+    return decimalPattern.test(value.trim());
+}
+
 async function downloadAndParseCSV(url: string): Promise<Record<string, number>[]> {
     const preFetched = await fetch(url);
     console.log(preFetched.headers.get('content-length')); // TODO check content-length
@@ -253,13 +258,11 @@ async function downloadAndParseCSV(url: string): Promise<Record<string, number>[
         columns: true,
         skip_empty_lines: true,
         cast(value, ctx) {
-            const parsedValue = parseFloat(value);
-            if (isFinite(parsedValue)) {
+            if (isStrictDecimal(value)) {
                 if (!numericFields.has(ctx.column)) {
                     numericFields.set(ctx.column, true);
                 }
-                numericFields.get(ctx.column);
-                return parsedValue;
+                return parseFloat(value);
             }
 
             numericFields.set(ctx.column, false);
