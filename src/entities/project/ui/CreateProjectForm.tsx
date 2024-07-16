@@ -10,6 +10,7 @@ import {
 import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
 import { ImageInput, imageUrlToFilesList } from 'src/shared';
 import { CreateProjectFormValues } from '../model/interfaces';
+import { EditMembers } from './EditMembers';
 
 type CreateProjectFormValuesInternal = Omit<CreateProjectFormValues, 'icon'> & {
     icon: FileList;
@@ -75,6 +76,12 @@ export const CreateProjectForm: FunctionComponent<
                     {formState.errors.name && formState.errors.name.message}
                 </FormErrorMessage>
             </FormControl>
+
+            <FormLabel fontSize={14} fontWeight={600}>
+                Access to the project
+            </FormLabel>
+
+            <EditMembers />
 
             <FormControl mb="0">
                 <FormLabel htmlFor="icon">Icon</FormLabel>
