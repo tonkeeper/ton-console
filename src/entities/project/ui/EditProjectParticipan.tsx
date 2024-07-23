@@ -15,7 +15,7 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 import { FC, useRef } from 'react';
-import { PlusIcon16, IconButton, DTOParticipant } from 'src/shared';
+import { PlusIcon16, IconButton, DTOParticipant, Span } from 'src/shared';
 import { TrashIcon16 } from 'src/shared/ui/icons/TrashIcon16';
 import { projectsStore } from '../model';
 import { observer } from 'mobx-react-lite';
@@ -72,7 +72,12 @@ const Participant: FC<FlexProps & { participant: DTOParticipant }> = ({ particip
             {...rest}
         >
             <Avatar ml={2} name={name} size="sm" src={participant.avatar} />
-            <Box fontWeight={600}>{name}</Box>
+            <Box fontWeight={600}>
+                {name}{' '}
+                <Span fontSize={14} color="text.secondary">
+                    #{participant.id}
+                </Span>
+            </Box>
 
             <IconButton
                 aria-label="Remove"
