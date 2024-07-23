@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
-import { loginViaTG, TGLoginData } from './telegram-oauth';
+import { loginViaTG } from './telegram-oauth';
 import { User } from './interfaces/user';
-import { apiClient, Loadable } from 'src/shared';
+import { apiClient, DTOUser, Loadable } from 'src/shared';
 import { projectsStore } from 'src/entities';
 import { AxiosError } from 'axios';
 
@@ -30,12 +30,14 @@ class UserStore {
 
         await apiClient.api.authViaTg(tgOAuthResponse);
 
+        const userRes = await apiClient.api.getUserInfo();
+
         await projectsStore.fetchProjects();
         if (projectsStore.projects$.value.length && !projectsStore.selectedProject) {
             projectsStore.selectProject(projectsStore.projects$.value[0].id);
         }
 
-        return mapTgUserDTOToUser(tgOAuthResponse);
+        return mapDTOUserToUser(userRes.data.user);
     });
 
     logoutIfSessionExpired = this.user$.createAsyncAction(async () => {
@@ -59,12 +61,12 @@ class UserStore {
     });
 }
 
-function mapTgUserDTOToUser(userTg: TGLoginData): User {
+function mapDTOUserToUser(user: DTOUser): User {
     return {
-        id: userTg.id,
-        firstName: userTg.first_name,
-        lastName: userTg.last_name,
-        imageUrl: userTg.photo_url
+        id: user.id,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        imageUrl: user.avatar
     };
 }
 
