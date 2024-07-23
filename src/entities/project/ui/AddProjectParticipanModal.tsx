@@ -55,12 +55,12 @@ const AddProjectParticipanModal: FC<{
     return (
         <Modal scrollBehavior="inside" {...rest}>
             <ModalOverlay />
-            <ModalContent maxW="350px">
+            <ModalContent maxW="380px">
                 <ModalHeader textAlign="center">
                     Add user
-                    <Box color="text.secondary" fontSize={14}>
-                        {/* TODO change on more strict message */}
-                        Users who will be able to edit, enter data and delete information
+                    <Box color="text.secondary" fontSize={14} fontWeight={400} lineHeight="20px">
+                        Users with the same permissions as you, including the ability to manage all
+                        project users
                     </Box>
                 </ModalHeader>
                 <ModalCloseButton />
