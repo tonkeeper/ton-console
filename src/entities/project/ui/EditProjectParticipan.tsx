@@ -1,14 +1,13 @@
 import { Avatar, Box, BoxProps, Button, Divider, Flex, FlexProps } from '@chakra-ui/react';
 import { FC } from 'react';
-import { PlusIcon16, IconButton } from 'src/shared';
+import { PlusIcon16, IconButton, DTOParticipant } from 'src/shared';
 import { TrashIcon16 } from 'src/shared/ui/icons/TrashIcon16';
+import { projectsStore } from '../model';
+import { observer } from 'mobx-react-lite';
 
-type ParticipanT = {
-    id: number;
-    name: string;
-};
+const Participan: FC<FlexProps & { participan: DTOParticipant }> = ({ participan, ...rest }) => {
+    const name = [participan.first_name, participan.last_name].join(' ');
 
-const Participan: FC<FlexProps & { participan: ParticipanT }> = ({ participan, ...rest }) => {
     const onRemove = () => {
         console.log('Remove'); // TODO: Implement
     };
@@ -18,19 +17,13 @@ const Participan: FC<FlexProps & { participan: ParticipanT }> = ({ participan, .
             align="center"
             gap={2}
             h={12}
-            // fontSize={14}
             fontWeight={600}
             borderRadius={8}
             _hover={{ bg: 'background.contentTint' }}
             {...rest}
         >
-            <Avatar
-                ml={2}
-                name={participan.name}
-                size="sm"
-                src={`https://avatar.iran.liara.run/public/boy?username=${participan.name}`}
-            />
-            <Box fontWeight={600}>{participan.name}</Box>
+            <Avatar ml={2} name={name} size="sm" src={participan.avatar} />
+            <Box fontWeight={600}>{name}</Box>
 
             <IconButton
                 aria-label="Remove"
@@ -43,26 +36,13 @@ const Participan: FC<FlexProps & { participan: ParticipanT }> = ({ participan, .
     );
 };
 
-const mockParticipans: ParticipanT[] = [
-    {
-        id: 1,
-        name: 'Varun Sharma'
-    },
-    {
-        id: 2,
-        name: 'Poetra Weka'
-    },
-    {
-        id: 3,
-        name: ''
-    }
-];
-
 export const EditProjectParticipan: FC<
     BoxProps & {
         onAddParticipan: () => void;
     }
-> = ({ onAddParticipan, ...rest }) => {
+> = observer(({ onAddParticipan, ...rest }) => {
+    const participans = projectsStore.projectParticipants$.value;
+
     return (
         <Box mb={4} {...rest}>
             <Button colorScheme="gray" onClick={onAddParticipan} variant="solid">
@@ -73,10 +53,10 @@ export const EditProjectParticipan: FC<
             <Divider my={4} />
 
             <Box>
-                {mockParticipans.map(participan => (
+                {participans.map(participan => (
                     <Participan key={participan.id} participan={participan} />
                 ))}
             </Box>
         </Box>
     );
-};
+});

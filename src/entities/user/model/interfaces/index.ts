@@ -1,1 +1,1 @@
-export type { User as TgUser } from './user';
+export type { User } from './user';

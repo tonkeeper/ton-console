@@ -9,14 +9,14 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { CreateProjectForm } from './CreateProjectForm';
-import { CreateProjectFormValues, projectsStore } from 'src/entities';
+import { ProjectForm } from './ProjectForm';
+import { ProjectFormValues, projectsStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 
 const CreateProjectModal_: FunctionComponent<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'create-project-form';
 
-    const onSubmit = (form: CreateProjectFormValues): void => {
+    const onSubmit = (form: ProjectFormValues): void => {
         projectsStore.createProject(form).then(props.onClose);
     };
 
@@ -27,7 +27,7 @@ const CreateProjectModal_: FunctionComponent<{ isOpen: boolean; onClose: () => v
                 <ModalHeader>New Project</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <CreateProjectForm id={formId} onSubmit={onSubmit} />
+                    <ProjectForm id={formId} onSubmit={onSubmit} />
                 </ModalBody>
 
                 <ModalFooter gap="3">

@@ -4,6 +4,7 @@ import {
     apiClient,
     createImmediateReaction,
     deserializeState,
+    DTOParticipant,
     DTOProject,
     DTOProjectCapabilitiesEnum,
     getWindow,
@@ -13,7 +14,7 @@ import {
     toColor
 } from 'src/shared';
 import {
-    CreateProjectFormValues,
+    ProjectFormValues,
     Project,
     UpdateProjectFormValues,
     AddProjectParticipantFormValues
@@ -22,6 +23,8 @@ import { userStore } from '../../user';
 
 class ProjectsStore {
     projects$ = new Loadable<Project[]>([]);
+
+    projectParticipants$ = new Loadable<DTOParticipant[]>([]);
 
     private selectedProjectId: number | null = null;
 
@@ -103,7 +106,7 @@ class ProjectsStore {
     };
 
     createProject = this.projects$.createAsyncAction(
-        async (form: CreateProjectFormValues) => {
+        async (form: ProjectFormValues) => {
             const request: Parameters<typeof apiClient.api.createProject>[0] = {
                 name: form.name
             };
@@ -180,9 +183,23 @@ class ProjectsStore {
         }
     );
 
-    addProjectParticipant = this.projects$.createAsyncAction(
+    fetchProjectParticipants = this.projectParticipants$.createAsyncAction(async () => {
+        if (!this.selectedProjectId) {
+            return [];
+        }
+
+        const currentUserId = userStore.user$.value?.id;
+        const response = await apiClient.api.getProjectParticipants(this.selectedProjectId);
+
+        return response.data.items.filter(item => item.id !== currentUserId);
+    });
+
+    addProjectParticipant = this.projectParticipants$.createAsyncAction(
         async (projectId: number, form: AddProjectParticipantFormValues) => {
-            await apiClient.api.addProjectParticipant(projectId, { user_id: form.userId });
+            const newParticipant = await apiClient.api.addProjectParticipant(projectId, {
+                user_id: form.userId
+            });
+            return this.projectParticipants$.value.concat(newParticipant.data.participant);
         },
         {
             successToast: {

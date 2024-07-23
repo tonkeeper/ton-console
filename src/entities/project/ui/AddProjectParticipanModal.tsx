@@ -23,7 +23,7 @@ const AddProjectParticipanModal: FC<{
     onClose: () => void;
     projectId: number;
 }> = ({ projectId, ...rest }) => {
-    const formId = 'add-project-participan-form';
+    const formId = 'add-project-participant-form';
 
     const { handleSubmit, register, formState } = useForm<AddProjectParticipantFormValues>();
 

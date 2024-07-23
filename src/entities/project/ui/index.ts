@@ -1,4 +1,4 @@
 export { SelectProject } from './SelectProject';
-export { CreateProjectForm } from './CreateProjectForm';
+export { ProjectForm } from './ProjectForm';
 export { CreateProjectModal } from './CreateProjectModal';
 export { DeleteProjectConfirmation } from './DeleteProjectConfirmation';

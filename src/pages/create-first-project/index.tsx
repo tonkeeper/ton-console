@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import { Button, Center, Flex, Text, useBoolean } from '@chakra-ui/react';
 import { CreateIcon96, H4, Overlay } from 'src/shared';
-import { CreateProjectForm, projectsStore } from 'src/entities';
+import { ProjectForm, projectsStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 
 const CreateFirstProjectPage: FunctionComponent = () => {
@@ -14,7 +14,7 @@ const CreateFirstProjectPage: FunctionComponent = () => {
                 <Flex align="center" direction="column" w="100%" maxW="512px">
                     {clicked ? (
                         <>
-                            <CreateProjectForm
+                            <ProjectForm
                                 id={formId}
                                 mb="2"
                                 onSubmit={form => projectsStore.createProject(form)}

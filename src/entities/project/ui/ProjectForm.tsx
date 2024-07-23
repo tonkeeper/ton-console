@@ -9,28 +9,28 @@ import {
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
 import { ImageInput, imageUrlToFilesList } from 'src/shared';
-import { CreateProjectFormValues } from '../model/interfaces';
+import { ProjectFormValues } from '../model/interfaces';
 import { EditProjectParticipan } from './EditProjectParticipan';
 import AddProjectParticipanModal from './AddProjectParticipanModal';
 
-type CreateProjectFormValuesInternal = Omit<CreateProjectFormValues, 'icon'> & {
+type ProjectFormValuesInternal = Omit<ProjectFormValues, 'icon'> & {
     icon: FileList;
 };
 
-export const CreateProjectForm: FC<
+export const ProjectForm: FC<
     StyleProps & {
         id?: string;
-        onSubmit: SubmitHandler<CreateProjectFormValues>;
-        defaultValues?: Partial<Omit<CreateProjectFormValues, 'icon'> & { imgUrl: string }>;
+        onSubmit: SubmitHandler<ProjectFormValues>;
+        defaultValues?: Partial<Omit<ProjectFormValues, 'icon'> & { imgUrl: string }>;
         disableDefaultFocus?: boolean;
         projectId?: number;
     }
 > = ({ onSubmit, defaultValues, disableDefaultFocus, projectId, ...rest }) => {
-    const context = useFormContext<CreateProjectFormValuesInternal>();
+    const context = useFormContext<ProjectFormValuesInternal>();
     const [isParticipanModalOpen, setIsParticipanModalOpen] = useState(false);
 
     let { handleSubmit, register, formState, reset, setFocus } =
-        useForm<CreateProjectFormValuesInternal>();
+        useForm<ProjectFormValuesInternal>();
     if (context) {
         ({ handleSubmit, register, formState, reset, setFocus } = context);
     }
@@ -57,7 +57,7 @@ export const CreateProjectForm: FC<
         getDefaultValues().then(reset);
     }, [defaultValues, reset, getDefaultValues]);
 
-    const submitMiddleware = (values: CreateProjectFormValuesInternal): void => {
+    const submitMiddleware = (values: ProjectFormValuesInternal): void => {
         onSubmit({ name: values.name, icon: values.icon?.length ? values.icon[0] : undefined });
     };
 

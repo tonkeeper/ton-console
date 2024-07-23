@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
-import { TgUser, userStore } from 'src/entities';
+import { User, userStore } from 'src/entities';
 import {
     Box,
     Button,
@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react';
 import { ArrowIcon, DisconnectIcon, MenuButtonDefault, Span, TgIcon } from 'src/shared';
 
-const ExistUserMenu: FC<{ user: TgUser }> = observer(({ user }) => {
+const ExistUserMenu: FC<{ user: User }> = observer(({ user }) => {
     const { hasCopied, onCopy } = useClipboard(user.id.toString());
 
     return (
@@ -53,7 +53,7 @@ export const TgUserButton: FC = observer(() => {
         md: 'Connect via Telegram'
     });
 
-    return userStore.user$.value ? (
+    return userStore.isAuthorized() ? (
         <ExistUserMenu user={userStore.user$.value} />
     ) : (
         <Button

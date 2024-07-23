@@ -59,6 +59,10 @@ class UserStore {
 
         this.user$.value = null;
     });
+
+    isAuthorized(): this is { user$: Loadable<User> } {
+        return !!this.user$.value;
+    }
 }
 
 function mapDTOUserToUser(user: DTOUser): User {
