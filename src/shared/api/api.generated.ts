@@ -1195,6 +1195,31 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
+         * No description
+         *
+         * @tags account
+         * @name GetUserInfo
+         * @summary Get user info
+         * @request GET:/api/v1/me
+         */
+        getUserInfo: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    user: DTOUser;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/me`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
          * @description After logout, the user's token is deleted
          *
          * @tags account

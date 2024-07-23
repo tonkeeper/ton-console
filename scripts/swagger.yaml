@@ -173,6 +173,24 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
   
+  /api/v1/me:
+    get:
+      summary: "Get user info"
+      operationId: getUserInfo
+      tags:
+        - account
+      responses:
+        '200':
+          $ref: '#/components/responses/UserInfo'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
   /api/v1/account/logout:
     post:
       summary: "Logout from the system"
@@ -4393,3 +4411,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InvoicesInvoice'
+    UserInfo:
+      description: "User info"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user
+            properties:
+              user:
+                $ref: '#/components/schemas/User'
