@@ -63,7 +63,7 @@ const AddProjectParticipanModal: FC<{
                                 id="name"
                                 placeholder="User ID"
                                 {...register('userId', {
-                                    required: 'This is required', // TODO add validation for existing user
+                                    required: 'This is required', // TODO add validation for existing user and number mask
                                     valueAsNumber: true
                                 })}
                             />
