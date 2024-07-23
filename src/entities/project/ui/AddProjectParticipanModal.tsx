@@ -23,24 +23,22 @@ import { mergeRefs } from 'src/shared';
 const AddProjectParticipanModal: FC<{
     isOpen: boolean;
     onClose: () => void;
-}> = ({ ...rest }) => {
+}> = ({ onClose, ...rest }) => {
     const formId = 'add-project-participant-form';
 
-    const { handleSubmit, register, formState } = useForm<AddProjectParticipantFormValues>();
+    const { handleSubmit, register, formState, reset } = useForm<AddProjectParticipantFormValues>();
 
-    const { onClose } = rest;
+    const handleClose = () => {
+        onClose();
+        reset();
+    };
 
     const submitMiddleware = (form: AddProjectParticipantFormValues): void => {
         projectsStore
             .addProjectParticipant(form)
-            .then(onClose)
+            .then(handleClose)
             .catch(() => console.error('Error'));
     };
-
-    // TODO reset form after close
-    // useEffect(() => {
-    //     return () => reset();
-    // });
 
     const { ref: maskRef } = useIMask({
         // FIXME: useIMask is not work
@@ -67,7 +65,7 @@ const AddProjectParticipanModal: FC<{
     });
 
     return (
-        <Modal scrollBehavior="inside" {...rest}>
+        <Modal onClose={handleClose} scrollBehavior="inside" {...rest}>
             <ModalOverlay />
             <ModalContent maxW="380px">
                 <ModalHeader textAlign="center">
@@ -103,7 +101,7 @@ const AddProjectParticipanModal: FC<{
                 </ModalBody>
 
                 <ModalFooter gap="3">
-                    <Button flex={1} onClick={onClose} variant="secondary">
+                    <Button flex={1} onClick={handleClose} variant="secondary">
                         Cancel
                     </Button>
                     <Button
