@@ -3,27 +3,14 @@ import { FC } from 'react';
 import { PlusIcon16, IconButton } from 'src/shared';
 import { TrashIcon16 } from 'src/shared/ui/icons/TrashIcon16';
 
-type MemberT = {
+type ParticipanT = {
     id: number;
     name: string;
-    role: Role;
 };
 
-enum Role {
-    OWNER = 'owner',
-    ADMIN = 'admin',
-    MEMBER = 'member'
-}
-
-const roles: Record<Role, string> = {
-    [Role.OWNER]: 'Owner',
-    [Role.ADMIN]: 'Admin',
-    [Role.MEMBER]: 'User'
-};
-
-const Member: FC<FlexProps & { member: MemberT }> = ({ member, ...rest }) => {
-    const onClose = () => {
-        console.log('Close');
+const Participan: FC<FlexProps & { participan: ParticipanT }> = ({ participan, ...rest }) => {
+    const onRemove = () => {
+        console.log('Remove'); // TODO: Implement
     };
 
     return (
@@ -39,17 +26,16 @@ const Member: FC<FlexProps & { member: MemberT }> = ({ member, ...rest }) => {
         >
             <Avatar
                 ml={2}
-                name={member.name}
+                name={participan.name}
                 size="sm"
-                src={`https://avatar.iran.liara.run/public/boy?username=${member.name}`}
+                src={`https://avatar.iran.liara.run/public/boy?username=${participan.name}`}
             />
-            <Box fontWeight={600}>{member.name}</Box>
-            <Box color="text.secondary">{roles[member.role]}</Box>
+            <Box fontWeight={600}>{participan.name}</Box>
 
             <IconButton
                 aria-label="Remove"
                 icon={<TrashIcon16 />}
-                onClick={onClose}
+                onClick={onRemove}
                 ml="auto"
                 p={3}
             />
@@ -57,28 +43,29 @@ const Member: FC<FlexProps & { member: MemberT }> = ({ member, ...rest }) => {
     );
 };
 
-const mockMembers: MemberT[] = [
+const mockParticipans: ParticipanT[] = [
     {
         id: 1,
-        name: 'Varun Sharma',
-        role: Role.OWNER
+        name: 'Varun Sharma'
     },
     {
         id: 2,
-        name: 'Poetra Weka',
-        role: Role.ADMIN
+        name: 'Poetra Weka'
     },
     {
         id: 3,
-        name: '',
-        role: Role.MEMBER
+        name: ''
     }
 ];
 
-export const EditMembers: FC<BoxProps> = props => {
+export const EditProjectParticipan: FC<
+    BoxProps & {
+        onAddParticipan: () => void;
+    }
+> = ({ onAddParticipan, ...rest }) => {
     return (
-        <Box mb={4} {...props}>
-            <Button colorScheme="gray" variant="solid">
+        <Box mb={4} {...rest}>
+            <Button colorScheme="gray" onClick={onAddParticipan} variant="solid">
                 <PlusIcon16 mr={2} color="constant.black" />
                 Add user
             </Button>
@@ -86,8 +73,8 @@ export const EditMembers: FC<BoxProps> = props => {
             <Divider my={4} />
 
             <Box>
-                {mockMembers.map(member => (
-                    <Member key={member.id} member={member} />
+                {mockParticipans.map(participan => (
+                    <Participan key={participan.id} participan={participan} />
                 ))}
             </Box>
         </Box>

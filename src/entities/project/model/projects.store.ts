@@ -12,7 +12,12 @@ import {
     serializeState,
     toColor
 } from 'src/shared';
-import { CreateProjectFormValues, Project, UpdateProjectFormValues } from './interfaces';
+import {
+    CreateProjectFormValues,
+    Project,
+    UpdateProjectFormValues,
+    AddProjectParticipantFormValues
+} from './interfaces';
 import { tGUserStore } from '../../tg-user';
 
 class ProjectsStore {
@@ -171,6 +176,20 @@ class ProjectsStore {
             },
             errorToast: {
                 title: "Project wasn't deleted"
+            }
+        }
+    );
+
+    addProjectParticipant = this.projects$.createAsyncAction(
+        async (projectId: number, form: AddProjectParticipantFormValues) => {
+            await apiClient.api.addProjectParticipant(projectId, { user_id: form.userId });
+        },
+        {
+            successToast: {
+                title: 'User added successfully'
+            },
+            errorToast: {
+                title: "User wasn't added"
             }
         }
     );

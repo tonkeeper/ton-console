@@ -17,8 +17,16 @@ const EditProjectPage: FunctionComponent = () => {
         [projectsStore.selectedProject]
     );
 
+    if (projectsStore.selectedProject === null) {
+        throw new Error('Selected project is not defined');
+    }
+
     const onSubmit = useCallback(
         (values: CreateProjectFormValues) => {
+            if (!projectsStore.selectedProject) {
+                return;
+            }
+
             const modifiedFields = Object.fromEntries(
                 Object.keys(formState.dirtyFields).map(key => [
                     key,
@@ -27,7 +35,7 @@ const EditProjectPage: FunctionComponent = () => {
             );
 
             projectsStore.updateProject({
-                projectId: projectsStore.selectedProject!.id,
+                projectId: projectsStore.selectedProject.id,
                 ...modifiedFields
             });
         },
@@ -49,7 +57,7 @@ const EditProjectPage: FunctionComponent = () => {
                         size="sm"
                         pr="1"
                         textStyles={{ textStyle: 'label1' }}
-                        text={projectsStore.selectedProject?.id.toString() || ''}
+                        text={projectsStore.selectedProject.id.toString() || ''}
                     />
 
                     <FormProvider {...methods}>
@@ -59,6 +67,7 @@ const EditProjectPage: FunctionComponent = () => {
                             mb="4"
                             onSubmit={onSubmit}
                             disableDefaultFocus
+                            projectId={projectsStore.selectedProject.id}
                         />
                     </FormProvider>
                     <Button
