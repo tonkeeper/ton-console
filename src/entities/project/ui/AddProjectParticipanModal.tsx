@@ -37,7 +37,13 @@ const AddProjectParticipanModal: FC<{
             .catch(() => console.error('Error'));
     };
 
+    // TODO reset form after close
+    // useEffect(() => {
+    //     return () => reset();
+    // });
+
     const { ref: maskRef } = useIMask({
+        // FIXME: useIMask is not work
         mask: Number,
         scale: 0,
         signed: false,
@@ -46,11 +52,19 @@ const AddProjectParticipanModal: FC<{
     });
 
     const { ref: hookFormRef, ...amountRest } = register('userId', {
-        required: 'This is required', // TODO add validation for existing user
+        required: 'This is required',
+        validate: value => {
+            if (
+                projectsStore.projectParticipants$.value.find(
+                    participant => participant.id === value
+                )
+            ) {
+                return 'User already exists';
+            }
+            return true;
+        },
         valueAsNumber: true
     });
-
-    // TODO reset form after close
 
     return (
         <Modal scrollBehavior="inside" {...rest}>
