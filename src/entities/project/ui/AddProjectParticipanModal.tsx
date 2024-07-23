@@ -17,6 +17,8 @@ import {
 import { AddProjectParticipantFormValues, projectsStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
+import { useIMask } from 'react-imask';
+import { mergeRefs } from 'src/shared';
 
 const AddProjectParticipanModal: FC<{
     isOpen: boolean;
@@ -34,6 +36,19 @@ const AddProjectParticipanModal: FC<{
             .then(onClose)
             .catch(() => console.error('Error'));
     };
+
+    const { ref: maskRef } = useIMask({
+        mask: Number,
+        scale: 0,
+        signed: false,
+        min: 0,
+        max: Number.MAX_SAFE_INTEGER
+    });
+
+    const { ref: hookFormRef, ...amountRest } = register('userId', {
+        required: 'This is required', // TODO add validation for existing user
+        valueAsNumber: true
+    });
 
     // TODO reset form after close
 
@@ -58,14 +73,13 @@ const AddProjectParticipanModal: FC<{
                     >
                         <FormControl isInvalid={!!formState.errors.userId} isRequired>
                             <Input
+                                ref={mergeRefs(maskRef, hookFormRef)}
                                 autoComplete="off"
                                 autoFocus
                                 id="name"
+                                min={0}
                                 placeholder="User ID"
-                                {...register('userId', {
-                                    required: 'This is required', // TODO add validation for existing user and number mask
-                                    valueAsNumber: true
-                                })}
+                                {...amountRest}
                             />
                             <FormErrorMessage>
                                 {formState.errors.userId && formState.errors.userId.message}
