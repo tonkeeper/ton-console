@@ -1,4 +1,4 @@
-export interface TgUser {
+export interface User {
     id: number;
 
     firstName?: string;

@@ -2,7 +2,7 @@ import { ComponentProps, FunctionComponent } from 'react';
 import { Box, Button, SimpleGrid } from '@chakra-ui/react';
 import { FeatureCard } from './FeatureCard';
 import { ButtonLink, EXTERNAL_LINKS } from 'src/shared';
-import { tGUserStore } from 'src/entities';
+import { userStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,11 +12,11 @@ const FeaturesList: FunctionComponent<
     const navigate = useNavigate();
 
     const loginAndNavigateTo = async (path: string): Promise<void> => {
-        if (tGUserStore.user$.value) {
+        if (userStore.user$.value) {
             return navigate(path);
         }
 
-        const result = await tGUserStore.login();
+        const result = await userStore.login();
 
         if (result) {
             navigate(path);
@@ -117,11 +117,11 @@ const FeaturesList: FunctionComponent<
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button
-                    isLoading={tGUserStore.user$.isLoading}
+                    isLoading={userStore.user$.isLoading}
                     onClick={() => loginAndNavigateTo('/tonkeeper-messages')}
                     variant={buttonVariant}
                 >
-                    {tGUserStore.user$.value ? 'Open' : 'Connect and Try'}
+                    {userStore.user$.value ? 'Open' : 'Connect and Try'}
                 </Button>
             </FeatureCard>
 
@@ -141,11 +141,11 @@ const FeaturesList: FunctionComponent<
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button
-                    isLoading={tGUserStore.user$.isLoading}
+                    isLoading={userStore.user$.isLoading}
                     onClick={() => loginAndNavigateTo('/invoices')}
                     variant={buttonVariant}
                 >
-                    {tGUserStore.user$.value ? 'Open' : 'Connect and Try'}
+                    {userStore.user$.value ? 'Open' : 'Connect and Try'}
                 </Button>
             </FeatureCard>
 
@@ -165,13 +165,13 @@ const FeaturesList: FunctionComponent<
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button
-                    isLoading={tGUserStore.user$.isLoading}
+                    isLoading={userStore.user$.isLoading}
                     onClick={() => loginAndNavigateTo('/tonapi')}
                     variant={buttonVariant}
                 >
-                    {tGUserStore.user$.value ? 'Open' : 'Connect and Try'}
+                    {userStore.user$.value ? 'Open' : 'Connect and Try'}
                 </Button>
-                {!tGUserStore.user$.value && (
+                {!userStore.user$.value && (
                     <Button onClick={onTonapiClick} variant={buttonVariant}>
                         See Prices
                     </Button>

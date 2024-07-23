@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { Box, Center, Fade, useConst } from '@chakra-ui/react';
 import { TonConsoleIcon } from 'src/shared';
-import { tGUserStore } from 'src/entities';
+import { userStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 
 const FadeAnimation: FunctionComponent<ComponentProps<typeof Fade>> = props => (
@@ -25,11 +25,11 @@ const AppInitialization: FunctionComponent<PropsWithChildren> = props => {
     const startResolvingTimeout = useConst(Date.now());
     const ref = useRef<SVGElement | null>(null);
     useEffect(() => {
-        if (tGUserStore.user$.isResolved) {
+        if (userStore.user$.isResolved) {
             const timeout = 500 - (Date.now() - startResolvingTimeout);
             setTimeout(() => setUserResolved(true), timeout < 0 ? 0 : timeout);
         }
-    }, [tGUserStore.user$.isResolved]);
+    }, [userStore.user$.isResolved]);
 
     useEffect(() => {
         if (userResolved && ref.current) {

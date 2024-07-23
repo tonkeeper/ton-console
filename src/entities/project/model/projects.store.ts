@@ -18,7 +18,7 @@ import {
     UpdateProjectFormValues,
     AddProjectParticipantFormValues
 } from './interfaces';
-import { tGUserStore } from '../../tg-user';
+import { userStore } from '../../user';
 
 class ProjectsStore {
     projects$ = new Loadable<Project[]>([]);
@@ -52,7 +52,7 @@ class ProjectsStore {
             storage: getWindow()!.localStorage
         }).then(() => {
             createImmediateReaction(
-                () => tGUserStore.user$.value,
+                () => userStore.user$.value,
                 async user => {
                     if (user) {
                         await this.fetchProjects();

@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
-import { TgUser, tGUserStore } from 'src/entities';
+import { TgUser, userStore } from 'src/entities';
 import {
     Box,
     Button,
@@ -38,7 +38,7 @@ const ExistUserMenu: FC<{ user: TgUser }> = observer(({ user }) => {
                         </Span>
                     </Tooltip>
                 </Box>
-                <MenuItem onClick={() => tGUserStore.logout()}>
+                <MenuItem onClick={() => userStore.logout()}>
                     <DisconnectIcon mr="2" />
                     <Text textStyle="label2">Disconnect</Text>
                 </MenuItem>
@@ -53,13 +53,13 @@ export const TgUserButton: FC = observer(() => {
         md: 'Connect via Telegram'
     });
 
-    return tGUserStore.user$.value ? (
-        <ExistUserMenu user={tGUserStore.user$.value} />
+    return userStore.user$.value ? (
+        <ExistUserMenu user={userStore.user$.value} />
     ) : (
         <Button
-            isLoading={tGUserStore.user$.isLoading}
+            isLoading={userStore.user$.isLoading}
             leftIcon={<TgIcon />}
-            onClick={() => tGUserStore.login()}
+            onClick={() => userStore.login()}
             variant="secondary"
         >
             {buttonText}
