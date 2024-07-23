@@ -347,6 +347,65 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/project/{id}/participants:
+    get:
+      summary: "Get project participants"
+      operationId: getProjectParticipants
+      tags:
+        - project
+      parameters:
+        - $ref: '#/components/parameters/projectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Participants'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: "Add a participant to the project"
+      operationId: addProjectParticipant
+      tags:
+        - project
+      parameters:
+        - $ref: '#/components/parameters/projectID'
+      requestBody:
+        $ref: "#/components/requestBodies/NewParticipant"
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedParticipant'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/project/{id}/participant/{user_id}:
+    delete:
+      summary: "Delete a participant from the project"
+      operationId: deleteProjectParticipant
+      tags:
+        - project
+      parameters:
+        - $ref: '#/components/parameters/projectID'
+        - $ref: '#/components/parameters/userID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
   /api/v1/services/tonapi/tokens:
     get:
@@ -1759,6 +1818,14 @@ components:
       schema:
         type: integer
         format: uint32
+    userID:
+      description: User ID
+      in: path
+      name: user_id
+      required: true
+      schema:
+        type: integer
+        format: uint32
     promoCode:
       description: Promo code
       in: path
@@ -2071,6 +2138,18 @@ components:
               remove_image:
                 type: boolean
                 default: false
+    NewParticipant:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user_id
+            properties:
+              user_id:
+                type: integer
+                format: uint32
     NewTier:
       description: "Data that is expected"
       content:
@@ -2802,6 +2881,32 @@ components:
           type: integer
           format: int64
           example: 1000000000
+    Participant:
+      type: object
+      required:
+        - id
+        - permissions
+        - date_create
+      properties:
+        id:
+          type: integer
+          format: uint32
+        first_name:
+          type: string
+          example: "Test"
+        last_name:
+          type: string
+          example: "Testov"
+        permissions:
+          type: array
+          items:
+            type: string
+            enum:
+              - admin
+              - user
+        avatar:
+          type: string
+          example: "https://test.io/my_face.png"
     Project:
       type: object
       required:
@@ -3732,6 +3837,30 @@ components:
             properties:
               project:
                 $ref: '#/components/schemas/Project'
+    Participants:
+      description: "List of project participants"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - items
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Participant'
+    CreatedParticipant:
+      description: "Participant"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - participant
+            properties:
+              participant:
+                $ref: '#/components/schemas/Participant'
     GeneratedPayload:
       description: "Payload for TON Connect"
       content:
