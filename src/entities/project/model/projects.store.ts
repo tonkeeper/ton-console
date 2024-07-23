@@ -195,10 +195,17 @@ class ProjectsStore {
     });
 
     addProjectParticipant = this.projectParticipants$.createAsyncAction(
-        async (projectId: number, form: AddProjectParticipantFormValues) => {
-            const newParticipant = await apiClient.api.addProjectParticipant(projectId, {
-                user_id: form.userId
-            });
+        async (form: AddProjectParticipantFormValues) => {
+            if (!this.selectedProjectId) {
+                return;
+            }
+
+            const newParticipant = await apiClient.api.addProjectParticipant(
+                this.selectedProjectId,
+                {
+                    user_id: form.userId
+                }
+            );
             return this.projectParticipants$.value.concat(newParticipant.data.participant);
         },
         {
@@ -207,6 +214,25 @@ class ProjectsStore {
             },
             errorToast: {
                 title: "User wasn't added"
+            }
+        }
+    );
+
+    deleteProjectParticipant = this.projectParticipants$.createAsyncAction(
+        async (participantId: number) => {
+            if (!this.selectedProjectId) {
+                return;
+            }
+
+            await apiClient.api.deleteProjectParticipant(this.selectedProjectId, participantId);
+            return this.projectParticipants$.value.filter(item => item.id !== participantId);
+        },
+        {
+            successToast: {
+                title: 'User deleted successfully'
+            },
+            errorToast: {
+                title: "User wasn't deleted"
             }
         }
     );

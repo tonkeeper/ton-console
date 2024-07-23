@@ -23,9 +23,9 @@ const EditProjectPage: FunctionComponent = () => {
 
     useEffect(() => {
         projectsStore.fetchProjectParticipants();
-        // return () => {
-        //     projectsStore.projectParticipants$.clear();
-        // };
+        return () => {
+            projectsStore.projectParticipants$.clear();
+        };
     });
 
     const onSubmit = useCallback(
@@ -74,7 +74,6 @@ const EditProjectPage: FunctionComponent = () => {
                             mb="4"
                             onSubmit={onSubmit}
                             disableDefaultFocus
-                            projectId={projectsStore.selectedProject.id}
                         />
                     </FormProvider>
                     <Button

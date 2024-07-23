@@ -5,11 +5,11 @@ import { TrashIcon16 } from 'src/shared/ui/icons/TrashIcon16';
 import { projectsStore } from '../model';
 import { observer } from 'mobx-react-lite';
 
-const Participan: FC<FlexProps & { participan: DTOParticipant }> = ({ participan, ...rest }) => {
-    const name = [participan.first_name, participan.last_name].join(' ');
+const Participant: FC<FlexProps & { participant: DTOParticipant }> = ({ participant, ...rest }) => {
+    const name = [participant.first_name, participant.last_name].join(' ');
 
     const onRemove = () => {
-        console.log('Remove'); // TODO: Implement
+        projectsStore.deleteProjectParticipant(participant.id); // TODO: add confirmation modal
     };
 
     return (
@@ -22,7 +22,7 @@ const Participan: FC<FlexProps & { participan: DTOParticipant }> = ({ participan
             _hover={{ bg: 'background.contentTint' }}
             {...rest}
         >
-            <Avatar ml={2} name={name} size="sm" src={participan.avatar} />
+            <Avatar ml={2} name={name} size="sm" src={participant.avatar} />
             <Box fontWeight={600}>{name}</Box>
 
             <IconButton
@@ -42,6 +42,7 @@ export const EditProjectParticipan: FC<
     }
 > = observer(({ onAddParticipan, ...rest }) => {
     const participans = projectsStore.projectParticipants$.value;
+    const isParticipantsEmpty = participans.length === 0;
 
     return (
         <Box mb={4} {...rest}>
@@ -50,11 +51,11 @@ export const EditProjectParticipan: FC<
                 Add user
             </Button>
 
-            <Divider my={4} />
+            {!isParticipantsEmpty && <Divider my={4} />}
 
             <Box>
-                {participans.map(participan => (
-                    <Participan key={participan.id} participan={participan} />
+                {participans.map(participant => (
+                    <Participant key={participant.id} participant={participant} />
                 ))}
             </Box>
         </Box>

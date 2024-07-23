@@ -23,9 +23,8 @@ export const ProjectForm: FC<
         onSubmit: SubmitHandler<ProjectFormValues>;
         defaultValues?: Partial<Omit<ProjectFormValues, 'icon'> & { imgUrl: string }>;
         disableDefaultFocus?: boolean;
-        projectId?: number;
     }
-> = ({ onSubmit, defaultValues, disableDefaultFocus, projectId, ...rest }) => {
+> = ({ onSubmit, defaultValues, disableDefaultFocus, ...rest }) => {
     const context = useFormContext<ProjectFormValuesInternal>();
     const [isParticipanModalOpen, setIsParticipanModalOpen] = useState(false);
 
@@ -97,13 +96,10 @@ export const ProjectForm: FC<
                     <ImageInput {...register('icon')} />
                 </FormControl>
             </chakra.form>
-            {projectId && (
-                <AddProjectParticipanModal
-                    isOpen={isParticipanModalOpen}
-                    onClose={() => setIsParticipanModalOpen(false)}
-                    projectId={projectId}
-                />
-            )}
+            <AddProjectParticipanModal
+                isOpen={isParticipanModalOpen}
+                onClose={() => setIsParticipanModalOpen(false)}
+            />
         </>
     );
 };

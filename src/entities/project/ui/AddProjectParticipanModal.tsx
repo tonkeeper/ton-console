@@ -21,8 +21,7 @@ import { useForm } from 'react-hook-form';
 const AddProjectParticipanModal: FC<{
     isOpen: boolean;
     onClose: () => void;
-    projectId: number;
-}> = ({ projectId, ...rest }) => {
+}> = ({ ...rest }) => {
     const formId = 'add-project-participant-form';
 
     const { handleSubmit, register, formState } = useForm<AddProjectParticipantFormValues>();
@@ -31,7 +30,7 @@ const AddProjectParticipanModal: FC<{
 
     const submitMiddleware = (form: AddProjectParticipantFormValues): void => {
         projectsStore
-            .addProjectParticipant(projectId, form)
+            .addProjectParticipant(form)
             .then(onClose)
             .catch(() => console.error('Error'));
     };
@@ -64,7 +63,7 @@ const AddProjectParticipanModal: FC<{
                                 id="name"
                                 placeholder="User ID"
                                 {...register('userId', {
-                                    required: 'This is required',
+                                    required: 'This is required', // TODO add validation for existing user
                                     valueAsNumber: true
                                 })}
                             />
