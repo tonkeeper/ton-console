@@ -15,13 +15,13 @@ const mockSites: Site[] = [
         id: 1,
         domain: 'mois.ton',
         adnl_address: generateRandomHash(),
-        endpoints: ['https://mois.pro']
+        endpoints: ['https://mois.pro', 'http://145:234:78:12/']
     },
     {
         id: 2,
         domain: 'google.ton',
         adnl_address: generateRandomHash(),
-        endpoints: ['https://google.com']
+        endpoints: ['https://google.com', 'lol.google']
     }
 ];
 
