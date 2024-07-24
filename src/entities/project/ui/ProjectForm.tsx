@@ -11,7 +11,7 @@ import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
 import { ImageInput, imageUrlToFilesList } from 'src/shared';
 import { ProjectFormValues } from '../model/interfaces';
 import { EditProjectParticipan } from './EditProjectParticipan';
-import AddProjectParticipanModal from './AddProjectParticipanModal';
+import AddProjectParticipantModal from './AddProjectParticipantModal';
 
 type ProjectFormValuesInternal = Omit<ProjectFormValues, 'icon'> & {
     icon: FileList;
@@ -96,7 +96,7 @@ export const ProjectForm: FC<
                     <ImageInput {...register('icon')} />
                 </FormControl>
             </chakra.form>
-            <AddProjectParticipanModal
+            <AddProjectParticipantModal
                 isOpen={isParticipanModalOpen}
                 onClose={() => setIsParticipanModalOpen(false)}
             />

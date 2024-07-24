@@ -20,7 +20,7 @@ import { useForm } from 'react-hook-form';
 import { useIMask } from 'react-imask';
 import { mergeRefs } from 'src/shared';
 
-const AddProjectParticipanModal: FC<{
+const AddProjectParticipantModal: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ onClose, ...rest }) => {
@@ -34,16 +34,14 @@ const AddProjectParticipanModal: FC<{
     };
 
     const submitMiddleware = (form: AddProjectParticipantFormValues): void => {
-        projectsStore
-            .addProjectParticipant(form)
-            .then(handleClose)
-            .catch(() => console.error('Error'));
+        projectsStore.addProjectParticipant(form).then(handleClose);
     };
 
     const { ref: maskRef } = useIMask({
-        // FIXME: useIMask is not work
+        // FIXME: useIMask is not work sometimes
         mask: Number,
         scale: 0,
+        normalizeZeros: true,
         signed: false,
         min: 0,
         max: Number.MAX_SAFE_INTEGER
@@ -88,7 +86,7 @@ const AddProjectParticipanModal: FC<{
                                 ref={mergeRefs(maskRef, hookFormRef)}
                                 autoComplete="off"
                                 autoFocus
-                                id="name"
+                                id="userId"
                                 min={0}
                                 placeholder="User ID"
                                 {...amountRest}
@@ -119,4 +117,4 @@ const AddProjectParticipanModal: FC<{
     );
 };
 
-export default observer(AddProjectParticipanModal);
+export default observer(AddProjectParticipantModal);
