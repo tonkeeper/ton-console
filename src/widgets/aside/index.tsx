@@ -18,6 +18,7 @@ import { balanceStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { invoicesAppStore } from 'src/features';
 import { NftIcon24 } from 'src/shared/ui/icons/NftIcon24';
+import { GloubeIcon24 } from 'src/shared/ui/icons/GloubeIcon24';
 
 const Aside: FunctionComponent = () => {
     return (
@@ -46,6 +47,9 @@ const Aside: FunctionComponent = () => {
                     Payment Tracker
                 </DropDownMenuItem>
             )}
+            <DropDownMenuItem linkTo="sites" leftIcon={<GloubeIcon24 />}>
+                TON Sites
+            </DropDownMenuItem>
             <DropDownMenuItemExpandable
                 leftIcon={<StatsIcon24 />}
                 content="TON Analytics"
