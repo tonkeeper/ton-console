@@ -1,8 +1,7 @@
 import { Button, Flex, useDisclosure, BoxProps } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
-import CNFTAddModal from 'src/features/nft/ui/cnft/CNFTAddModal';
-import CNFTTable from 'src/features/nft/ui/cnft/CNFTTable';
+import { CNFTAddModal, CNFTTable } from 'src/features';
 import { H4, Overlay } from 'src/shared';
 
 const CnftPage: FC<BoxProps> = () => {
