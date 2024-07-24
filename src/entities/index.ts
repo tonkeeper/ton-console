@@ -4,3 +4,4 @@ export * from './balance';
 export * from './service';
 export * from './rates';
 export * from './dapp';
+export * from './empty-page';
