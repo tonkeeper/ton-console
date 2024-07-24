@@ -53,6 +53,27 @@ class SitesStore {
         }
     );
 
+    deleteSite = this.sites$.createAsyncAction(
+        async (id: number) => {
+            await mockLoaders.deleteSite(id);
+            return this.sites$.value.filter(site => site.id !== id);
+        },
+        {
+            successToast: {
+                title: 'Site deleted successfully'
+            },
+            errorToast: e => {
+                const error = e as AxiosError;
+                const response = error.response?.data as { error: string };
+
+                return {
+                    title: 'Site deleting error',
+                    description: response?.error
+                };
+            }
+        }
+    );
+
     clearState(): void {
         this.sites$.clear();
     }
