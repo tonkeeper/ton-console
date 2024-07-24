@@ -35,8 +35,6 @@ export const mockLoaders = {
             setTimeout(() => {
                 if (mockSites.some(site => site.domain === domain)) {
                     reject(new Error('Domain already exists'));
-                } else if (mockSites.length > 2) {
-                    reject(new Error('Max sites limit reached'));
                 } else {
                     const maxId = Math.max(...mockSites.map(site => site.id));
                     const newSite = {
@@ -46,7 +44,7 @@ export const mockLoaders = {
                         endpoints: []
                     };
                     mockSites.push(newSite);
-                    resolve(mockSites);
+                    resolve(newSite);
                 }
             }, 500);
         });

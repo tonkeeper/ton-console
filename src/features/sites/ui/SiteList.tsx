@@ -51,7 +51,7 @@ const SiteListItem: FC<{ item: Site }> = ({ item }) => {
                     </Menu>
                 </Flex>
             </CardHeader>
-            <CardBody bgColor="background.contentTint">
+            <CardBody borderBottomRadius={8} bgColor="background.contentTint">
                 <Stack direction="row">
                     {item.endpoints.map(endpoint => (
                         <Box
