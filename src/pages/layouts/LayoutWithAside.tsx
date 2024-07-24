@@ -3,6 +3,8 @@ import { Aside, Footer, Header } from 'src/widgets';
 import { Overlay } from 'src/shared';
 import { Outlet } from 'react-router-dom';
 import { FunctionComponent } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorPage from './ui/ErrorPage';
 
 export const LayoutWithAside: FunctionComponent = () => {
     return (
@@ -17,7 +19,9 @@ export const LayoutWithAside: FunctionComponent = () => {
                 </Box>
 
                 <Box flex={1}>
-                    <Outlet />
+                    <ErrorBoundary fallback={<ErrorPage />}>
+                        <Outlet />
+                    </ErrorBoundary>
                 </Box>
             </Flex>
         </Flex>
