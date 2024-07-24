@@ -1,4 +1,4 @@
-import { Button, Flex, useDisclosure, BoxProps } from '@chakra-ui/react';
+import { Button, Flex, useDisclosure, BoxProps, Spinner } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
 import { EmptyPage } from 'src/entities';
@@ -12,16 +12,21 @@ const SitesPage: FC<BoxProps> = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const isSitesEmpty = sitesStore.sites$.value.length === 0;
 
-    // TODO add loader for sites
+    if (isSitesEmpty && sitesStore.sites$.isLoading) {
+        return (
+            <Overlay display="flex" justifyContent="center" alignItems="center">
+                <Spinner />
+            </Overlay>
+        );
+    }
 
-    if (isSitesEmpty) {
+    if (sitesStore.sites$.value.length === 0) {
         return (
             <>
                 <EmptyPage
                     title="TON Sites"
                     description="Your Domains and endpoints will be shown here. We help you connect to any resource using the TON DNS."
                     Icon={GloubeIcon40}
-                    // guideButtonLink="https://ton.dev"
                     mainButtonAction={onOpen}
                     mainButtonText="Add domain"
                 />

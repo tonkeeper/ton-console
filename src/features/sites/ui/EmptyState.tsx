@@ -8,7 +8,6 @@ import { GloubeIcon24 } from 'src/shared/ui/icons/GloubeIcon24';
 const EmptyState: FunctionComponent = () => {
     return (
         <Overlay pt="60px" display="flex" flexDirection="column" alignItems="center">
-            {/* <InvoiceIcon40 mb="5" /> */}
             <GloubeIcon24 mb="5" boxSize={40} />
             <H3 mb="4">TON Sites</H3>
             <Text textStyle="body2" maxW="392px" mb="9" color="text.secondary" textAlign="center">
