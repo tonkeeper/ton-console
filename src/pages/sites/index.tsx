@@ -2,6 +2,7 @@ import { Button, Flex, useDisclosure, BoxProps } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
 import { EmptyPage } from 'src/entities';
+import { SiteList } from 'src/features';
 import { sitesStore } from 'src/features/sites/model';
 import SiteAddModal from 'src/features/sites/ui/SiteAddModal';
 import { H4, Overlay, PlusIcon16 } from 'src/shared';
@@ -39,6 +40,7 @@ const SitesPage: FC<BoxProps> = () => {
                 </Button>
             </Flex>
             <SiteAddModal isOpen={isOpen} onClose={onClose} />
+            <SiteList />
         </Overlay>
     );
 };
