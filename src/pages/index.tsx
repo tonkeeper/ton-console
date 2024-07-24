@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import TonapiRouting from 'src/pages/tonapi';
 import { lazy } from '@loadable/component';
 import { Layout } from './layouts';
-import { projectsStore, tGUserStore } from 'src/entities';
+import { projectsStore, userStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import SettingsRouting from 'src/pages/settings';
 import InvoicesRouting from './invoices';
@@ -38,18 +38,18 @@ const Routing: FunctionComponent = () => {
             return;
         }
 
-        if (!tGUserStore.user$.value) {
+        if (!userStore.user$.value) {
             metatag.content = 'width=device-width, initial-scale=1.0';
         } else {
             metatag.content = 'width=1350px';
         }
-    }, [tGUserStore.user$.value]);
+    }, [userStore.user$.value]);
 
-    if (!tGUserStore.user$.isResolved) {
+    if (!userStore.user$.isResolved) {
         return null;
     }
 
-    if (!tGUserStore.user$.value) {
+    if (!userStore.user$.value) {
         return (
             <Routes>
                 <Route path="/" element={<LayoutSolid />}>

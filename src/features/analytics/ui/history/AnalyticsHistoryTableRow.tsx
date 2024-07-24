@@ -52,7 +52,6 @@ const ItemRow: FunctionComponent<{
     const navigate = useNavigate();
     const renderTime = useConst(Date.now());
 
-    //  const { onCopy: onCopyRequest, hasCopied: hasCopiedRequest } = useClipboard(query.request);
     const { rowHeight } = useContext(AnalyticsHistoryTableContext);
 
     const isAggregated = isAnalyticsRepeatingQueryAggregated(q);

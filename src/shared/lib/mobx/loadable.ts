@@ -192,7 +192,6 @@ export class Loadable<T> {
                 }
                 return result;
             } catch (e) {
-                console.error(e);
                 changeError(e);
                 if (this.isResolved) {
                     changeState('refetchErrored');

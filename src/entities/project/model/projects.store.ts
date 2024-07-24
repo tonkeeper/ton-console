@@ -4,6 +4,7 @@ import {
     apiClient,
     createImmediateReaction,
     deserializeState,
+    DTOParticipant,
     DTOProject,
     DTOProjectCapabilitiesEnum,
     getWindow,
@@ -12,11 +13,18 @@ import {
     serializeState,
     toColor
 } from 'src/shared';
-import { CreateProjectFormValues, Project, UpdateProjectFormValues } from './interfaces';
-import { tGUserStore } from '../../tg-user';
+import {
+    ProjectFormValues,
+    Project,
+    UpdateProjectFormValues,
+    AddProjectParticipantFormValues
+} from './interfaces';
+import { userStore } from '../../user';
 
 class ProjectsStore {
     projects$ = new Loadable<Project[]>([]);
+
+    projectParticipants$ = new Loadable<DTOParticipant[]>([]);
 
     private selectedProjectId: number | null = null;
 
@@ -47,7 +55,7 @@ class ProjectsStore {
             storage: getWindow()!.localStorage
         }).then(() => {
             createImmediateReaction(
-                () => tGUserStore.user$.value,
+                () => userStore.user$.value,
                 async user => {
                     if (user) {
                         await this.fetchProjects();
@@ -98,7 +106,7 @@ class ProjectsStore {
     };
 
     createProject = this.projects$.createAsyncAction(
-        async (form: CreateProjectFormValues) => {
+        async (form: ProjectFormValues) => {
             const request: Parameters<typeof apiClient.api.createProject>[0] = {
                 name: form.name
             };
@@ -171,6 +179,60 @@ class ProjectsStore {
             },
             errorToast: {
                 title: "Project wasn't deleted"
+            }
+        }
+    );
+
+    fetchProjectParticipants = this.projectParticipants$.createAsyncAction(async () => {
+        if (!this.selectedProjectId) {
+            return [];
+        }
+
+        const currentUserId = userStore.user$.value?.id;
+        const response = await apiClient.api.getProjectParticipants(this.selectedProjectId);
+
+        return response.data.items.filter(item => item.id !== currentUserId);
+    });
+
+    addProjectParticipant = this.projectParticipants$.createAsyncAction(
+        async (form: AddProjectParticipantFormValues) => {
+            if (!this.selectedProjectId) {
+                return;
+            }
+
+            const newParticipant = await apiClient.api.addProjectParticipant(
+                this.selectedProjectId,
+                {
+                    user_id: form.userId
+                }
+            );
+            return this.projectParticipants$.value.concat(newParticipant.data.participant);
+        },
+        {
+            successToast: {
+                title: 'User added successfully'
+            },
+            errorToast: {
+                title: "User wasn't added"
+            }
+        }
+    );
+
+    deleteProjectParticipant = this.projectParticipants$.createAsyncAction(
+        async (participantId: number) => {
+            if (!this.selectedProjectId) {
+                return;
+            }
+
+            await apiClient.api.deleteProjectParticipant(this.selectedProjectId, participantId);
+            return this.projectParticipants$.value.filter(item => item.id !== participantId);
+        },
+        {
+            successToast: {
+                title: 'User deleted successfully'
+            },
+            errorToast: {
+                title: "User wasn't deleted"
             }
         }
     );

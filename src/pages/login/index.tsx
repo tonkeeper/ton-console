@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import { H1, H2, H3, Overlay, TgIcon } from 'src/shared';
 import { Button, Flex, Text, useBreakpointValue } from '@chakra-ui/react';
-import { tGUserStore } from 'src/entities';
+import { userStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { Footer } from 'src/widgets';
 
@@ -36,9 +36,9 @@ const LoginPage: FunctionComponent = () => {
                         w={{ base: '100%', md: 'auto' }}
                     >
                         <Button
-                            isLoading={tGUserStore.user$.isLoading}
+                            isLoading={userStore.user$.isLoading}
                             leftIcon={<TgIcon color="constant.white" />}
-                            onClick={() => tGUserStore.login()}
+                            onClick={() => userStore.login()}
                             size="lg"
                             variant="primary"
                         >

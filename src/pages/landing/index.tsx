@@ -1,7 +1,7 @@
 import { FunctionComponent, useRef } from 'react';
 import { ButtonLink, DocsIcon16, EXTERNAL_LINKS, H1, H2, H3, Overlay, TgIcon } from 'src/shared';
 import { Button, Flex, Text, useBreakpointValue } from '@chakra-ui/react';
-import { tGUserStore } from 'src/entities';
+import { userStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import TonApiPricing from './TonApiPricing';
 import { Footer } from 'src/widgets';
@@ -45,9 +45,9 @@ const LandingPage: FunctionComponent = () => {
                         w={{ base: '100%', md: 'auto' }}
                     >
                         <Button
-                            isLoading={tGUserStore.user$.isLoading}
+                            isLoading={userStore.user$.isLoading}
                             leftIcon={<TgIcon color="constant.white" />}
-                            onClick={() => tGUserStore.login()}
+                            onClick={() => userStore.login()}
                             variant="primary"
                         >
                             Connect and Try

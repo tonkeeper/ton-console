@@ -1,4 +1,4 @@
-export * from './tg-user';
+export * from './user';
 export * from './project';
 export * from './balance';
 export * from './service';

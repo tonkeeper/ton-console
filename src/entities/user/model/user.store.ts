@@ -1,13 +1,13 @@
 import { makeAutoObservable } from 'mobx';
-import { loginViaTG, TGLoginData } from './telegram-oauth';
-import { TgUser } from './interfaces/tg-user';
-import { apiClient, Loadable } from 'src/shared';
+import { loginViaTG } from './telegram-oauth';
+import { User } from './interfaces/user';
+import { apiClient, DTOUser, Loadable } from 'src/shared';
 import { projectsStore } from 'src/entities';
 import { AxiosError } from 'axios';
 
-class TGUserStore {
-    user$ = new Loadable<TgUser | null>(null, {
-        makePersistable: { storeKey: 'TGUser', notModifyStatusAfter: true }
+class UserStore {
+    user$ = new Loadable<User | null>(null, {
+        makePersistable: { storeKey: 'User', notModifyStatusAfter: true }
     });
 
     constructor() {
@@ -30,12 +30,14 @@ class TGUserStore {
 
         await apiClient.api.authViaTg(tgOAuthResponse);
 
-        await projectsStore.fetchProjects(); // TODO вынести в стор-фасад для авторизации
+        const userRes = await apiClient.api.getUserInfo();
+
+        await projectsStore.fetchProjects();
         if (projectsStore.projects$.value.length && !projectsStore.selectedProject) {
             projectsStore.selectProject(projectsStore.projects$.value[0].id);
         }
 
-        return mapTgUserDTOToTgUser(tgOAuthResponse);
+        return mapDTOUserToUser(userRes.data.user);
     });
 
     logoutIfSessionExpired = this.user$.createAsyncAction(async () => {
@@ -57,15 +59,19 @@ class TGUserStore {
 
         this.user$.value = null;
     });
+
+    isAuthorized(): this is { user$: Loadable<User> } {
+        return !!this.user$.value;
+    }
 }
 
-function mapTgUserDTOToTgUser(userDTO: TGLoginData): TgUser {
+function mapDTOUserToUser(user: DTOUser): User {
     return {
-        id: userDTO.id,
-        firstName: userDTO.first_name,
-        lastName: userDTO.last_name,
-        imageUrl: userDTO.photo_url
+        id: user.id,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        imageUrl: user.avatar
     };
 }
 
-export const tGUserStore = new TGUserStore();
+export const userStore = new UserStore();

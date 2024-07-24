@@ -1,4 +1,4 @@
-export interface CreateProjectFormValues {
+export interface ProjectFormValues {
     name: string;
     icon?: File;
 }

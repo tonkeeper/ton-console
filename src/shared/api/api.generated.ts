@@ -275,6 +275,18 @@ export interface DTOBalance {
     balance: number;
 }
 
+export interface DTOParticipant {
+    /** @format uint32 */
+    id: number;
+    /** @example "Test" */
+    first_name?: string;
+    /** @example "Testov" */
+    last_name?: string;
+    permissions: DTOParticipantPermissionsEnum[];
+    /** @example "https://test.io/my_face.png" */
+    avatar?: string;
+}
+
 export interface DTOProject {
     /**
      * @format uint32
@@ -717,6 +729,11 @@ export enum DTODepositTypeEnum {
     DTODeposit = 'deposit'
 }
 
+export enum DTOParticipantPermissionsEnum {
+    DTOAdmin = 'admin',
+    DTOUser = 'user'
+}
+
 export enum DTOProjectCapabilitiesEnum {
     DTOInvoices = 'invoices',
     DTOStats = 'stats'
@@ -842,6 +859,9 @@ export class HttpClient<SecurityDataType = unknown> {
     }
 
     protected createFormData(input: Record<string, unknown>): FormData {
+        if (input instanceof FormData) {
+            return input;
+        }
         return Object.keys(input || {}).reduce((formData, key) => {
             const property = input[key];
             const propertyContent: any[] = property instanceof Array ? property : [property];
@@ -1175,6 +1195,31 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
+         * No description
+         *
+         * @tags account
+         * @name GetUserInfo
+         * @summary Get user info
+         * @request GET:/api/v1/me
+         */
+        getUserInfo: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    user: DTOUser;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/me`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
          * @description After logout, the user's token is deleted
          *
          * @tags account
@@ -1434,6 +1479,87 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/v1/project/${id}/payments/history`,
                 method: 'GET',
                 query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags project
+         * @name GetProjectParticipants
+         * @summary Get project participants
+         * @request GET:/api/v1/project/{id}/participants
+         */
+        getProjectParticipants: (id: number, params: RequestParams = {}) =>
+            this.request<
+                {
+                    items: DTOParticipant[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/project/${id}/participants`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags project
+         * @name AddProjectParticipant
+         * @summary Add a participant to the project
+         * @request POST:/api/v1/project/{id}/participants
+         */
+        addProjectParticipant: (
+            id: number,
+            data: {
+                /** @format uint32 */
+                user_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    participant: DTOParticipant;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/project/${id}/participants`,
+                method: 'POST',
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags project
+         * @name DeleteProjectParticipant
+         * @summary Delete a participant from the project
+         * @request DELETE:/api/v1/project/{id}/participant/{user_id}
+         */
+        deleteProjectParticipant: (id: number, userId: number, params: RequestParams = {}) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/project/${id}/participant/${userId}`,
+                method: 'DELETE',
                 ...params
             }),
 

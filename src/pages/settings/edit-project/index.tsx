@@ -1,6 +1,6 @@
-import { FunctionComponent, useCallback, useMemo } from 'react';
+import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
 import { Button, Center, Flex, Text } from '@chakra-ui/react';
-import { CreateProjectForm, CreateProjectFormValues, projectsStore } from 'src/entities';
+import { ProjectForm, ProjectFormValues, projectsStore } from 'src/entities';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toJS } from 'mobx';
 import { CopyPad, H4, Overlay } from 'src/shared';
@@ -17,17 +17,32 @@ const EditProjectPage: FunctionComponent = () => {
         [projectsStore.selectedProject]
     );
 
+    if (projectsStore.selectedProject === null) {
+        throw new Error('Selected project is not defined');
+    }
+
+    useEffect(() => {
+        projectsStore.fetchProjectParticipants();
+        return () => {
+            projectsStore.projectParticipants$.clear();
+        };
+    });
+
     const onSubmit = useCallback(
-        (values: CreateProjectFormValues) => {
+        (values: ProjectFormValues) => {
+            if (!projectsStore.selectedProject) {
+                return;
+            }
+
             const modifiedFields = Object.fromEntries(
                 Object.keys(formState.dirtyFields).map(key => [
                     key,
-                    values[key as keyof CreateProjectFormValues]
+                    values[key as keyof ProjectFormValues]
                 ])
             );
 
             projectsStore.updateProject({
-                projectId: projectsStore.selectedProject!.id,
+                projectId: projectsStore.selectedProject.id,
                 ...modifiedFields
             });
         },
@@ -49,11 +64,11 @@ const EditProjectPage: FunctionComponent = () => {
                         size="sm"
                         pr="1"
                         textStyles={{ textStyle: 'label1' }}
-                        text={projectsStore.selectedProject?.id.toString() || ''}
+                        text={projectsStore.selectedProject.id.toString() || ''}
                     />
 
                     <FormProvider {...methods}>
-                        <CreateProjectForm
+                        <ProjectForm
                             defaultValues={defaultValues}
                             id={formId}
                             mb="4"
