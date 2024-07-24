@@ -48,5 +48,18 @@ export const mockLoaders = {
                 }
             }, 500);
         });
+    },
+    deleteSite: (id: number): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                const siteIndex = mockSites.findIndex(site => site.id === id);
+                if (siteIndex === -1) {
+                    reject(new Error('Site not found'));
+                } else {
+                    mockSites.splice(siteIndex, 1);
+                    resolve();
+                }
+            }, 500);
+        });
     }
 };

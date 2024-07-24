@@ -20,6 +20,10 @@ import { Site } from '../model/sites.store';
 import { DeleteIcon24, EditIcon24, Span, VerticalDotsIcon16 } from 'src/shared';
 
 const SiteListItem: FC<{ item: Site }> = ({ item }) => {
+    const onDelete = () => {
+        sitesStore.deleteSite(item.id);
+    };
+
     return (
         <Card w="100%">
             <CardHeader gap={3} paddingY={4}>
@@ -46,7 +50,9 @@ const SiteListItem: FC<{ item: Site }> = ({ item }) => {
                         />
                         <MenuList>
                             <MenuItem icon={<EditIcon24 />}>Edit</MenuItem>
-                            <MenuItem icon={<DeleteIcon24 />}>Delete</MenuItem>
+                            <MenuItem icon={<DeleteIcon24 />} onClick={onDelete}>
+                                Delete
+                            </MenuItem>
                         </MenuList>
                     </Menu>
                 </Flex>
