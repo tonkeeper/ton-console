@@ -5,3 +5,4 @@ export * from './invoices';
 export * from './faucet';
 export * from './marketing';
 export * from './analytics';
+export * from './nft';
