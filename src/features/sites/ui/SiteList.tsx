@@ -58,6 +58,7 @@ const SiteListItem: FC<{ item: Site }> = ({ item }) => {
                                 Edit
                             </MenuItem>
                             <MenuItem icon={<DeleteIcon24 />} onClick={onDelete}>
+                                {/* TODO confirmation dialog */}
                                 Delete
                             </MenuItem>
                         </MenuList>

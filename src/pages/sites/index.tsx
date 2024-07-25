@@ -3,10 +3,10 @@ import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
 import { EmptyPage } from 'src/entities';
 import { SiteList } from 'src/features';
-import { sitesStore } from 'src/features/sites/model';
-import SiteAddModal from 'src/features/sites/ui/SiteAddModal';
+import { sitesStore } from 'src/features';
+import { SiteAddModal } from 'src/features';
 import { H4, Overlay, PlusIcon16 } from 'src/shared';
-import { GloubeIcon40 } from 'src/shared/ui/icons/GloubeIcon40';
+import { GloubeIcon40 } from 'src/shared';
 
 const SitesPage: FC<BoxProps> = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();

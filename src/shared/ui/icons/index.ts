@@ -51,3 +51,7 @@ export { ChartBarIcon24 } from './ChartBarIcon24';
 export { TonConsoleWhiteIcon20 } from './TonConsoleWhiteIcon20';
 export { DatabaseIcon40 } from './DatabaseIcon40';
 export { ChevronRightIcon16 } from './ChevronRightIcon16';
+export { GloubeIcon24 } from './GloubeIcon24';
+export { GloubeIcon40 } from './GloubeIcon40';
+export { TrashIcon16 } from './TrashIcon16';
+export { NftIcon24 } from './NftIcon24';
