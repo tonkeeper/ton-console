@@ -1,12 +1,10 @@
-import { Button, Flex, useDisclosure, BoxProps, Spinner } from '@chakra-ui/react';
+import { Button, Flex, useDisclosure, BoxProps, Spinner, Badge } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
-import { EmptyPage } from 'src/entities';
-import { SiteList } from 'src/features';
+import { SiteList, SitesEmptyState } from 'src/features';
 import { sitesStore } from 'src/features';
 import { SiteAddModal } from 'src/features';
 import { H4, Overlay, PlusIcon16 } from 'src/shared';
-import { GloubeIcon40 } from 'src/shared';
 
 const SitesPage: FC<BoxProps> = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
@@ -23,13 +21,7 @@ const SitesPage: FC<BoxProps> = () => {
     if (sitesStore.sites$.value.length === 0) {
         return (
             <>
-                <EmptyPage
-                    title="TON Sites"
-                    description="Your Domains and endpoints will be shown here. We help you connect to any resource using the TON DNS."
-                    Icon={GloubeIcon40}
-                    mainButtonAction={onOpen}
-                    mainButtonText="Add domain"
-                />
+                <SitesEmptyState onAddDomain={onOpen} />
                 <SiteAddModal isOpen={isOpen} onClose={onClose} />
             </>
         );
@@ -37,9 +29,19 @@ const SitesPage: FC<BoxProps> = () => {
 
     return (
         <Overlay display="flex" flexDirection="column">
-            <Flex align="flex-start" justify="space-between" mb="5">
+            <Flex align="center" mb="5">
                 <H4>Domains</H4>
-                <Button gap="10px" onClick={onOpen} variant="secondary">
+
+                <Badge
+                    textStyle="label3"
+                    ml="2"
+                    color="accent.orange"
+                    fontFamily="body"
+                    bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
+                >
+                    BETA
+                </Badge>
+                <Button gap="10px" ml="auto" onClick={onOpen} variant="secondary">
                     <PlusIcon16 />
                     Add domain
                 </Button>
