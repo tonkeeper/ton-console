@@ -83,14 +83,14 @@ class SitesStore {
         },
         {
             successToast: {
-                title: 'Endpoints saved successfully'
+                title: 'Endpoint saved successfully'
             },
             errorToast: e => {
                 const error = e as AxiosError;
                 const response = error.response?.data as { error: string };
 
                 return {
-                    title: 'Endpoints saving error',
+                    title: 'Endpoint saving error',
                     description: response?.error
                 };
             }
