@@ -74,6 +74,29 @@ class SitesStore {
         }
     );
 
+    updateEndpoints = this.sites$.createAsyncAction(
+        async (siteId: number, endpoints: string[]) => {
+            await mockLoaders.updateEndpoints(siteId, endpoints);
+            return this.sites$.value.map(site =>
+                site.id === siteId ? { ...site, endpoints } : site
+            );
+        },
+        {
+            successToast: {
+                title: 'Endpoints saved successfully'
+            },
+            errorToast: e => {
+                const error = e as AxiosError;
+                const response = error.response?.data as { error: string };
+
+                return {
+                    title: 'Endpoints saving error',
+                    description: response?.error
+                };
+            }
+        }
+    );
+
     getSiteByDomain(domain: string): Site | undefined {
         return this.sites$.value.find(site => site.domain === domain);
     }
