@@ -74,6 +74,10 @@ class SitesStore {
         }
     );
 
+    getSiteByDomain(domain: string): Site | undefined {
+        return this.sites$.value.find(site => site.domain === domain);
+    }
+
     clearState(): void {
         this.sites$.clear();
     }
