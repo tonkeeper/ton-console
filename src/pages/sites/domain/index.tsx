@@ -8,7 +8,7 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { EmptyPage } from 'src/entities';
 import { SiteADNLAddress, SiteEndpoints } from 'src/features';
 import { sitesStore } from 'src/features';
@@ -35,6 +35,7 @@ const Breadcrumbs: FC<{ domain: string }> = ({ domain }) => (
 );
 
 const SitesPage: FC<BoxProps> = () => {
+    const navigate = useNavigate();
     const { domain } = useParams<{ domain: string }>();
 
     if (!domain) {
@@ -65,7 +66,7 @@ const SitesPage: FC<BoxProps> = () => {
                 <Divider />
                 <SiteADNLAddress adnl={site.adnl_address} />
                 <Divider />
-                <SiteEndpoints />
+                <SiteEndpoints site={site} onClose={() => navigate('/sites')} />
             </Overlay>
         </>
     );
