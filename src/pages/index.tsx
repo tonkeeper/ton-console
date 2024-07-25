@@ -1,5 +1,5 @@
 import { FunctionComponent, Suspense, useEffect } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import TonapiRouting from 'src/pages/tonapi';
 import { lazy } from '@loadable/component';
 import { Layout } from './layouts';
@@ -12,7 +12,6 @@ import { LayoutWithAside } from 'src/pages/layouts/LayoutWithAside';
 import AnalyticsRouting from 'src/pages/analytics';
 import NftRouting from 'src/pages/nft';
 import { isDevelopmentMode } from 'src/shared';
-import { useLocation } from 'react-router-dom';
 
 const LandingPage = lazy(() => import('./landing'));
 const LoginPage = lazy(() => import('./login'));
@@ -22,6 +21,7 @@ const DashboardPage = lazy(() => import('./dashboard'));
 const AppMessagesPage = lazy(() => import('./app-messages'));
 const FaucetPage = lazy(() => import('./faucet'));
 const SitesPage = lazy(() => import('./sites'));
+const SitesDomainPage = lazy(() => import('./sites/domain'));
 
 const Routing: FunctionComponent = () => {
     const location = useLocation();
@@ -143,6 +143,14 @@ const Routing: FunctionComponent = () => {
                     element={
                         <Suspense>
                             <SitesPage />
+                        </Suspense>
+                    }
+                />
+                <Route
+                    path="/sites/:domain"
+                    element={
+                        <Suspense>
+                            <SitesDomainPage />
                         </Suspense>
                     }
                 />

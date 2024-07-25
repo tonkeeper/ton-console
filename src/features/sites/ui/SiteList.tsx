@@ -24,6 +24,8 @@ const SiteListItem: FC<{ item: Site }> = ({ item }) => {
         sitesStore.deleteSite(item.id);
     };
 
+    // FIXME: long domain names are not displayed correctly
+
     return (
         <Card w="100%">
             <CardHeader gap={3} paddingY={4}>
