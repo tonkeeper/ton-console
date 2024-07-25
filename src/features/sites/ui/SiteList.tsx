@@ -11,7 +11,8 @@ import {
     Menu,
     MenuButton,
     MenuList,
-    MenuItem
+    MenuItem,
+    useDisclosure
 } from '@chakra-ui/react';
 import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
@@ -19,8 +20,10 @@ import { sitesStore } from '../model';
 import { Site } from '../model/sites.store';
 import { DeleteIcon24, EditIcon24, Span, VerticalDotsIcon16 } from 'src/shared';
 import { useNavigate } from 'react-router-dom';
+import { ConfirmationDialog } from 'src/entities';
 
 const SiteListItem: FC<{ item: Site }> = ({ item }) => {
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const navigate = useNavigate();
 
     const onDelete = () => {
@@ -30,60 +33,71 @@ const SiteListItem: FC<{ item: Site }> = ({ item }) => {
     // FIXME: long domain names are not displayed correctly
 
     return (
-        <Card w="100%">
-            <CardHeader gap={3} paddingY={4}>
-                <Flex gap="4">
-                    <Flex align="end" flex="1" gap="2">
-                        <Span fontWeight={600}>{item.domain}</Span>
-                        <Span
-                            fontWeight={400}
-                            fontSize={14}
-                            lineHeight="22px"
-                            color="text.secondary"
-                        >
-                            {item.adnl_address}
-                        </Span>
+        <>
+            <Card w="100%">
+                <CardHeader gap={3} paddingY={4}>
+                    <Flex gap="4">
+                        <Flex align="end" flex="1" gap="2">
+                            <Span fontWeight={600}>{item.domain}</Span>
+                            <Span
+                                fontWeight={400}
+                                fontSize={14}
+                                lineHeight="22px"
+                                color="text.secondary"
+                            >
+                                {item.adnl_address}
+                            </Span>
+                        </Flex>
+                        <Menu>
+                            <MenuButton
+                                as={IconButton}
+                                w={6}
+                                aria-label="See menu"
+                                icon={<VerticalDotsIcon16 />}
+                                size="xsm"
+                                variant="ghost"
+                            />
+                            <MenuList>
+                                <MenuItem
+                                    icon={<EditIcon24 />}
+                                    onClick={() => navigate(item.domain)}
+                                >
+                                    Edit
+                                </MenuItem>
+                                <MenuItem icon={<DeleteIcon24 />} onClick={onOpen}>
+                                    Delete
+                                </MenuItem>
+                            </MenuList>
+                        </Menu>
                     </Flex>
-                    <Menu>
-                        <MenuButton
-                            as={IconButton}
-                            w={6}
-                            aria-label="See menu"
-                            icon={<VerticalDotsIcon16 />}
-                            size="xsm"
-                            variant="ghost"
-                        />
-                        <MenuList>
-                            <MenuItem icon={<EditIcon24 />} onClick={() => navigate(item.domain)}>
-                                Edit
-                            </MenuItem>
-                            <MenuItem icon={<DeleteIcon24 />} onClick={onDelete}>
-                                {/* TODO confirmation dialog */}
-                                Delete
-                            </MenuItem>
-                        </MenuList>
-                    </Menu>
-                </Flex>
-            </CardHeader>
-            <CardBody borderBottomRadius={8} bgColor="background.contentTint">
-                <Stack direction="row">
-                    {item.endpoints.map(endpoint => (
-                        <Box
-                            key={endpoint}
-                            alignContent="center"
-                            h={8}
-                            fontSize={14}
-                            fontWeight={600}
-                            borderRadius={8}
-                            bgColor="background.content"
-                            paddingX={6}
-                        >
-                            {endpoint}
-                        </Box>
-                    ))}
-                </Stack>
-            </CardBody>
-        </Card>
+                </CardHeader>
+                <CardBody borderBottomRadius={8} bgColor="background.contentTint">
+                    <Stack direction="row">
+                        {item.endpoints.map(endpoint => (
+                            <Box
+                                key={endpoint}
+                                alignContent="center"
+                                h={8}
+                                fontSize={14}
+                                fontWeight={600}
+                                borderRadius={8}
+                                bgColor="background.content"
+                                paddingX={6}
+                            >
+                                {endpoint}
+                            </Box>
+                        ))}
+                    </Stack>
+                </CardBody>
+            </Card>
+            <ConfirmationDialog
+                isOpen={isOpen}
+                onClose={onClose}
+                onConfirm={onDelete}
+                title="Delete domain"
+                description="Are you sure you want to delete this domain?"
+            />
+        </>
     );
 };
 
