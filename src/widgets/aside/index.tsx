@@ -17,8 +17,8 @@ import { Flex, Text } from '@chakra-ui/react';
 import { balanceStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { invoicesAppStore } from 'src/features';
-import { NftIcon24 } from 'src/shared/ui/icons/NftIcon24';
-import { GloubeIcon24 } from 'src/shared/ui/icons/GloubeIcon24';
+import { NftIcon24 } from 'src/shared';
+import { GloubeIcon24 } from 'src/shared';
 
 const Aside: FunctionComponent = () => {
     return (
