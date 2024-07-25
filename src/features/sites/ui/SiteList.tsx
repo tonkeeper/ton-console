@@ -18,8 +18,11 @@ import { observer } from 'mobx-react-lite';
 import { sitesStore } from '../model';
 import { Site } from '../model/sites.store';
 import { DeleteIcon24, EditIcon24, Span, VerticalDotsIcon16 } from 'src/shared';
+import { useNavigate } from 'react-router-dom';
 
 const SiteListItem: FC<{ item: Site }> = ({ item }) => {
+    const navigate = useNavigate();
+
     const onDelete = () => {
         sitesStore.deleteSite(item.id);
     };
@@ -51,7 +54,9 @@ const SiteListItem: FC<{ item: Site }> = ({ item }) => {
                             variant="ghost"
                         />
                         <MenuList>
-                            <MenuItem icon={<EditIcon24 />}>Edit</MenuItem>
+                            <MenuItem icon={<EditIcon24 />} onClick={() => navigate(item.domain)}>
+                                Edit
+                            </MenuItem>
                             <MenuItem icon={<DeleteIcon24 />} onClick={onDelete}>
                                 Delete
                             </MenuItem>
