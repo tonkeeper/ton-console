@@ -50,3 +50,4 @@ export { ChartPieIcon24 } from './ChartPieIcon24';
 export { ChartBarIcon24 } from './ChartBarIcon24';
 export { TonConsoleWhiteIcon20 } from './TonConsoleWhiteIcon20';
 export { DatabaseIcon40 } from './DatabaseIcon40';
+export { ChevronRightIcon16 } from './ChevronRightIcon16';
