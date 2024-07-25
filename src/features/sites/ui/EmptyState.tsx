@@ -3,7 +3,7 @@ import { ButtonLink, H3, Overlay } from 'src/shared';
 import { Flex, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { INVOICES_LINKS } from 'src/features';
-import { GloubeIcon24 } from 'src/shared/ui/icons/GloubeIcon24';
+import { GloubeIcon24 } from 'src/shared';
 
 const EmptyState: FunctionComponent = () => {
     return (

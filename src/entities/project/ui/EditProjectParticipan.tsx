@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react';
 import { FC, useRef } from 'react';
 import { PlusIcon16, IconButton, DTOParticipant, Span } from 'src/shared';
-import { TrashIcon16 } from 'src/shared/ui/icons/TrashIcon16';
+import { TrashIcon16 } from 'src/shared';
 import { projectsStore } from '../model';
 import { observer } from 'mobx-react-lite';
 
