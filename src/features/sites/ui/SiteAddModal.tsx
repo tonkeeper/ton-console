@@ -12,16 +12,15 @@ import { observer } from 'mobx-react-lite';
 import { FC, useCallback } from 'react';
 import SiteAddForm from './SiteAddForm';
 import { Site, sitesStore } from '../model/sites.store';
+import { useNavigate } from 'react-router-dom';
 
 const SiteAddModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'site-add-form';
+    const navigate = useNavigate();
 
-    const onSubmit = useCallback(
-        (form: Site): void => {
-            sitesStore.addSite(form).then(() => props.onClose());
-        },
-        [props.onClose]
-    );
+    const onSubmit = useCallback((form: Site): void => {
+        sitesStore.addSite(form).then(() => navigate(form.domain));
+    }, []);
 
     return (
         <Modal scrollBehavior="inside" {...props}>
