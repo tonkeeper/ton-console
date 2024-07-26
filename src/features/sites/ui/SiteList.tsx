@@ -17,12 +17,11 @@ import {
 import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 import { sitesStore } from '../model';
-import { Site } from '../model/sites.store';
-import { DeleteIcon24, EditIcon24, Span, VerticalDotsIcon16 } from 'src/shared';
+import { DTOTonSite, DeleteIcon24, EditIcon24, Span, VerticalDotsIcon16 } from 'src/shared';
 import { useNavigate } from 'react-router-dom';
 import { ConfirmationDialog } from 'src/entities';
 
-const SiteListItem: FC<{ item: Site }> = ({ item }) => {
+const SiteListItem: FC<{ item: DTOTonSite }> = ({ item }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const navigate = useNavigate();
 
@@ -73,9 +72,9 @@ const SiteListItem: FC<{ item: Site }> = ({ item }) => {
                 </CardHeader>
                 <CardBody borderBottomRadius={8} bgColor="background.contentTint">
                     <Stack direction="row">
-                        {item.endpoints.map(endpoint => (
+                        {item.endpoints.map(({ id, domain }) => (
                             <Box
-                                key={endpoint}
+                                key={id}
                                 alignContent="center"
                                 h={8}
                                 fontSize={14}
@@ -84,7 +83,7 @@ const SiteListItem: FC<{ item: Site }> = ({ item }) => {
                                 bgColor="background.content"
                                 paddingX={6}
                             >
-                                {endpoint}
+                                {domain}
                             </Box>
                         ))}
                     </Stack>

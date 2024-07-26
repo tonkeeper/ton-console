@@ -550,6 +550,24 @@ export interface DTOCnftCollection {
     paid_indexing_count: number;
 }
 
+export interface DTOTonSite {
+    /** @example "60ffb075" */
+    id: string;
+    /** @example "lucky.ton" */
+    domain: string;
+    endpoints: {
+        id: string;
+        /** @example "lucky.io" */
+        domain: string;
+    }[];
+    adnl_address: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
+}
+
 export interface DTOProServiceInvoiceWebhook {
     /** @example "60ffb075" */
     id: string;
@@ -4193,6 +4211,150 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/v1/services/cnft/paid`,
                 method: 'GET',
                 query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ton_sites_service
+         * @name CreateTonSite
+         * @summary Create a Ton Site
+         * @request POST:/api/v1/services/sites
+         */
+        createTonSite: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: {
+                domain: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    site: DTOTonSite;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/sites`,
+                method: 'POST',
+                query: query,
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ton_sites_service
+         * @name GetTonSites
+         * @summary Get Ton Sites
+         * @request GET:/api/v1/services/sites
+         */
+        getTonSites: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: DTOTonSite[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/sites`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ton_sites_service
+         * @name DeleteTonSite
+         * @summary Delete the Ton Site
+         * @request DELETE:/api/v1/services/sites/{id}
+         */
+        deleteTonSite: (
+            id: string,
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/sites/${id}`,
+                method: 'DELETE',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ton_sites_service
+         * @name UpdateTonSitesEndpoints
+         * @summary Add endpoints to the Ton Site
+         * @request POST:/api/v1/services/sites/{id}/endpoints
+         */
+        updateTonSitesEndpoints: (
+            id: string,
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: string[],
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/sites/${id}/endpoints`,
+                method: 'POST',
+                query: query,
+                body: data,
                 ...params
             })
     };

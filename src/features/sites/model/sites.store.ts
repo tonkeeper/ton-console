@@ -1,18 +1,10 @@
 import { AxiosError } from 'axios';
 import { makeAutoObservable } from 'mobx';
 import { projectsStore } from 'src/entities';
-import { Loadable, createImmediateReaction } from 'src/shared';
-import { mockLoaders } from './__mocks__/loaders';
-
-export interface Site {
-    id: number;
-    domain: string;
-    adnl_address: string;
-    endpoints: string[];
-}
+import { DTOTonSite, Loadable, apiClient, createImmediateReaction } from 'src/shared';
 
 class SitesStore {
-    sites$ = new Loadable<Site[]>([]);
+    sites$ = new Loadable<DTOTonSite[]>([]);
 
     constructor() {
         makeAutoObservable(this);
@@ -30,13 +22,31 @@ class SitesStore {
     }
 
     loadSites = this.sites$.createAsyncAction(async () => {
-        const response = await mockLoaders.getSites();
-        return response;
+        if (!projectsStore.selectedProject) {
+            throw new Error('No project selected');
+        }
+
+        const response = await apiClient.api.getTonSites({
+            project_id: projectsStore.selectedProject.id
+        });
+        return response.data.items;
     });
 
     addSite = this.sites$.createAsyncAction(
-        async (data: { domain: string }) =>
-            mockLoaders.addSite(data).then(site => [...this.sites$.value, site]),
+        async (data: { domain: string }) => {
+            if (!projectsStore.selectedProject) {
+                throw new Error('No project selected');
+            }
+
+            return apiClient.api
+                .createTonSite(
+                    {
+                        project_id: projectsStore.selectedProject.id
+                    },
+                    data
+                )
+                .then(response => [...this.sites$.value, response.data.site]);
+        },
         {
             successToast: {
                 title: 'Site added successfully'
@@ -54,9 +64,16 @@ class SitesStore {
     );
 
     deleteSite = this.sites$.createAsyncAction(
-        async (id: number) => {
-            await mockLoaders.deleteSite(id);
-            return this.sites$.value.filter(site => site.id !== id);
+        async (siteId: string) => {
+            if (!projectsStore.selectedProject) {
+                throw new Error('No project selected');
+            }
+
+            await apiClient.api.deleteTonSite(siteId, {
+                project_id: projectsStore.selectedProject.id
+            });
+
+            return this.sites$.value.filter(site => site.id !== siteId);
         },
         {
             successToast: {
@@ -75,10 +92,28 @@ class SitesStore {
     );
 
     updateEndpoints = this.sites$.createAsyncAction(
-        async (siteId: number, endpoints: string[]) => {
-            await mockLoaders.updateEndpoints(siteId, endpoints);
+        async (siteId: string, endpoints: string[]) => {
+            if (!projectsStore.selectedProject) {
+                throw new Error('No project selected');
+            }
+
+            await apiClient.api.updateTonSitesEndpoints(
+                siteId,
+                {
+                    project_id: projectsStore.selectedProject.id
+                },
+                endpoints
+            );
+
             return this.sites$.value.map(site =>
-                site.id === siteId ? { ...site, endpoints } : site
+                site.id === siteId
+                    ? {
+                          ...site,
+                          endpoints: endpoints.map(endpoint => {
+                              return { id: endpoint, domain: endpoint };
+                          })
+                      }
+                    : site
             );
         },
         {
@@ -97,7 +132,7 @@ class SitesStore {
         }
     );
 
-    getSiteByDomain(domain: string): Site | undefined {
+    getSiteByDomain(domain: string): DTOTonSite | undefined {
         return this.sites$.value.find(site => site.domain === domain);
     }
 
