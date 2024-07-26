@@ -3449,16 +3449,8 @@ components:
         endpoints:
           type: array
           items:
-            type: object
-            required:
-              - id
-              - domain
-            properties:
-              id:
-                type: string
-              domain:
-                type: string
-                example: "lucky.io"
+              type: string
+              example: "https://lucky.io"
         adnl_address:
           type: string
         date_create:

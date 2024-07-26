@@ -72,9 +72,9 @@ const SiteListItem: FC<{ item: DTOTonSite }> = ({ item }) => {
                 </CardHeader>
                 <CardBody borderBottomRadius={8} bgColor="background.contentTint">
                     <Stack direction="row">
-                        {item.endpoints.map(({ id, domain }) => (
+                        {item.endpoints.map(domain => (
                             <Box
-                                key={id}
+                                key={domain}
                                 alignContent="center"
                                 h={8}
                                 fontSize={14}
