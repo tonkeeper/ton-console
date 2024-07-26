@@ -9,6 +9,32 @@ info:
 servers:
   - url: "http://localhost:8888"
 
+tags:
+  - name: admin
+    description: 'Private endpoints.'
+  - name: auth
+    description: 'Endpoints for authentication and authorization.'
+  - name: account
+    description: 'Endpoints for account management and operations.'
+  - name: project
+    description: 'Endpoints for project management and operations.'
+  - name: tonapi_service
+    description: 'Endpoints for TonAPI service management and operations.'
+  - name: messages_service
+    description: 'Endpoints for Messages service management and operations.'
+  - name: testnet_service
+    description: 'Endpoints for Testnet service management and operations.'
+  - name: stats_service
+    description: 'Endpoints for Stats service management and operations.'
+  - name: invoices_service
+    description: 'Endpoints for Invoices service management and operations.'
+  - name: pro_service
+    description: 'Endpoints for Pro service management and operations.'
+  - name: cnft_service
+    description: 'Endpoints for cNFT service management and operations.'
+  - name: ton_sites_service
+    description: 'Endpoints for Ton Sites service management and operations.'
+
 paths:
   /ready:
     get:
@@ -1497,7 +1523,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
   /api/v1/services/pro/user/info:
     get:
       summary: "Get user info"
@@ -1515,7 +1540,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
   /api/v1/services/pro/tiers:
     get:
       summary: "Get active tiers"
@@ -1534,7 +1558,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
   /api/v1/services/pro/invoice:
     post:
       summary: "Creating an invoice for Pro tier payment"
@@ -1596,7 +1619,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
   /api/v1/services/pro/verify:
     get:
       summary: "Verify Pro tier subscription"
@@ -1614,7 +1636,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
   /api/v1/services/pro/trial:
     post:
       summary: "Activate pro trial period"
@@ -1634,7 +1655,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
   /api/v1/services/pro/dashboard/columns:
     get:
       summary: "Get dashboard columns"
@@ -1676,7 +1696,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
   /api/v1/services/pro/state:
     get:
       summary: "Get the state"
@@ -1805,6 +1824,88 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  
+  /api/v1/services/sites:
+    post:
+      summary: "Create a Ton Site"
+      operationId: createTonSite
+      tags:
+        - ton_sites_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/NewTonSiteDomain"
+      responses:
+        '201':
+          $ref: '#/components/responses/TonSiteCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    get:
+      summary: "Get Ton Sites"
+      operationId: getTonSites
+      tags:
+        - ton_sites_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/TonSites'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/sites/{id}:
+    delete:
+      summary: "Delete the Ton Site"
+      operationId: deleteTonSite
+      tags:
+        - ton_sites_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+        - $ref: '#/components/parameters/siteID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/sites/{id}/endpoints:
+    post:
+      summary: "Add endpoints to the Ton Site"
+      operationId: updateTonSitesEndpoints
+      tags:
+        - ton_sites_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+        - $ref: '#/components/parameters/siteID'
+      requestBody:
+        $ref: "#/components/requestBodies/TonSiteEndpoints"
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
 components:
   securitySchemes:
@@ -1891,6 +1992,14 @@ components:
       schema:
         type: string
         example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+    siteID:
+      description: Site ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        example: "03cfc582"
     account:
       description: Account
       in: path
@@ -2099,6 +2208,25 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ProServiceState'
+    NewTonSiteDomain:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - domain
+            properties:
+              domain:
+                type: string
+    TonSiteEndpoints:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: string
     ProjectTonApiTokenReq:
       description: "Data that is expected"
       content:
@@ -3303,6 +3431,40 @@ components:
         paid_indexing_count:
           type: integer
           format: uint32
+    TonSite:
+      type: object
+      required:
+        - id
+        - domain
+        - endpoints
+        - adnl_address
+        - date_create
+      properties:
+        id:
+          type: string
+          example: "60ffb075"
+        domain:
+          type: string
+          example: "lucky.ton"
+        endpoints:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - domain
+            properties:
+              id:
+                type: string
+              domain:
+                type: string
+                example: "lucky.io"
+        adnl_address:
+          type: string
+        date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
     ProServiceInvoiceWebhook:
       type: object
       required:
@@ -4396,6 +4558,30 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/CnftCollection'
+    TonSites:
+      description: "Ton Sites"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - items
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TonSite'
+    TonSiteCreated:
+      description: "Created Ton Site"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - site
+            properties:
+              site:
+                $ref: '#/components/schemas/TonSite'
     ProServiceInvoice:
       description: "Invoice"
       headers:

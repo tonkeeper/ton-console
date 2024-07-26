@@ -1,16 +1,17 @@
 import { FC } from 'react';
 import { chakra, FormControl, FormErrorMessage, StyleProps, Input } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { Site, sitesStore } from '../model/sites.store';
+import { sitesStore } from '../model/sites.store';
 import { observer } from 'mobx-react-lite';
+import { DTOTonSite } from 'src/shared';
 
 const SiteAddForm: FC<
     StyleProps & {
         id?: string;
-        onSubmit: SubmitHandler<Site>;
+        onSubmit: SubmitHandler<DTOTonSite>;
     }
 > = ({ id, onSubmit, ...rest }) => {
-    const submitHandler = (form: Site): void => {
+    const submitHandler = (form: DTOTonSite): void => {
         onSubmit(form);
     };
 
@@ -18,7 +19,7 @@ const SiteAddForm: FC<
         handleSubmit,
         register,
         formState: { errors }
-    } = useForm<Site>({});
+    } = useForm<DTOTonSite>({});
 
     return (
         <chakra.form id={id} w="100%" onSubmit={handleSubmit(submitHandler)} noValidate {...rest}>

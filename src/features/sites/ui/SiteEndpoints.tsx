@@ -9,15 +9,15 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FC, useCallback } from 'react';
-import { H4 } from 'src/shared';
-import { Site, sitesStore } from '../model/sites.store';
+import { DTOTonSite, H4 } from 'src/shared';
+import { sitesStore } from '../model/sites.store';
 import { useForm } from 'react-hook-form';
 
 interface SiteEndpointFormValues {
     endpoint: string;
 }
 
-const SiteEndpoints: FC<{ site: Site; onClose: () => void }> = ({ site, onClose }) => {
+const SiteEndpoints: FC<{ site: DTOTonSite; onClose: () => void }> = ({ site, onClose }) => {
     const formId = 'site-endpoints-form';
     const {
         register,
@@ -50,7 +50,7 @@ const SiteEndpoints: FC<{ site: Site; onClose: () => void }> = ({ site, onClose 
                     <Input
                         autoComplete="off"
                         autoFocus
-                        defaultValue={site.endpoints[0]}
+                        defaultValue={site.endpoints[0]?.domain}
                         id="endpoint"
                         placeholder="http://15.29.87.01:433 or https://example.com"
                         {...register('endpoint', {

@@ -11,14 +11,15 @@ import {
 import { observer } from 'mobx-react-lite';
 import { FC, useCallback } from 'react';
 import SiteAddForm from './SiteAddForm';
-import { Site, sitesStore } from '../model/sites.store';
+import { sitesStore } from '../model/sites.store';
 import { useNavigate } from 'react-router-dom';
+import { DTOTonSite } from 'src/shared';
 
 const SiteAddModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'site-add-form';
     const navigate = useNavigate();
 
-    const onSubmit = useCallback((form: Site): void => {
+    const onSubmit = useCallback((form: DTOTonSite): void => {
         sitesStore.addSite(form).then(() => navigate(form.domain));
     }, []);
 
