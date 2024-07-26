@@ -45,7 +45,7 @@ class SitesStore {
                     },
                     data
                 )
-                .then(response => [...this.sites$.value, response.data.site]);
+                .then(response => [response.data.site, ...this.sites$.value]);
         },
         {
             successToast: {
@@ -106,14 +106,7 @@ class SitesStore {
             );
 
             return this.sites$.value.map(site =>
-                site.id === siteId
-                    ? {
-                          ...site,
-                          endpoints: endpoints.map(endpoint => {
-                              return { id: endpoint, domain: endpoint };
-                          })
-                      }
-                    : site
+                site.id === siteId ? { ...site, endpoints } : site
             );
         },
         {

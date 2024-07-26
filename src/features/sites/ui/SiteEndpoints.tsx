@@ -50,7 +50,7 @@ const SiteEndpoints: FC<{ site: DTOTonSite; onClose: () => void }> = ({ site, on
                     <Input
                         autoComplete="off"
                         autoFocus
-                        defaultValue={site.endpoints[0]?.domain}
+                        defaultValue={site.endpoints[0]}
                         id="endpoint"
                         placeholder="http://15.29.87.01:433 or https://example.com"
                         {...register('endpoint', {

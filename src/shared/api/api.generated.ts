@@ -555,11 +555,7 @@ export interface DTOTonSite {
     id: string;
     /** @example "lucky.ton" */
     domain: string;
-    endpoints: {
-        id: string;
-        /** @example "lucky.io" */
-        domain: string;
-    }[];
+    endpoints: string[];
     adnl_address: string;
     /**
      * @format int64
