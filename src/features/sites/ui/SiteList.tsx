@@ -24,19 +24,18 @@ import { ConfirmationDialog } from 'src/entities';
 const SiteListItem: FC<{ item: DTOTonSite }> = ({ item }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const navigate = useNavigate();
+    const domainEncoded = encodeURIComponent(item.domain);
 
     const onDelete = () => {
         sitesStore.deleteSite(item.id);
     };
-
-    // FIXME: long domain names are not displayed correctly
 
     return (
         <>
             <Card w="100%">
                 <CardHeader gap={3} paddingY={4}>
                     <Flex gap="4">
-                        <Flex align="end" flex="1" gap="2">
+                        <Flex align="end" wrap="wrap" flex="1" columnGap="2">
                             <Span fontWeight={600}>{item.domain}</Span>
                             <Span
                                 fontWeight={400}
@@ -59,7 +58,7 @@ const SiteListItem: FC<{ item: DTOTonSite }> = ({ item }) => {
                             <MenuList>
                                 <MenuItem
                                     icon={<EditIcon24 />}
-                                    onClick={() => navigate(item.domain)}
+                                    onClick={() => navigate(domainEncoded)}
                                 >
                                     Edit
                                 </MenuItem>
