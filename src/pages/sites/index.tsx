@@ -41,7 +41,6 @@ const SitesPage: FC<BoxProps> = () => {
                 >
                     BETA
                 </Badge>
-
                 <Text
                     textStyle="body2"
                     alignItems="center"

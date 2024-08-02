@@ -30,6 +30,8 @@ const SiteListItem: FC<{ item: DTOTonSite }> = ({ item }) => {
         sitesStore.deleteSite(item.id);
     };
 
+    // FIXME: long domain names are not displayed correctly
+
     return (
         <>
             <Card w="100%">
