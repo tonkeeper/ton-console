@@ -1,10 +1,10 @@
-import { Button, Flex, useDisclosure, BoxProps, Spinner, Badge } from '@chakra-ui/react';
+import { Button, Flex, useDisclosure, BoxProps, Spinner, Badge, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
 import { SiteList, SitesEmptyState } from 'src/features';
 import { sitesStore } from 'src/features';
 import { SiteAddModal } from 'src/features';
-import { H4, Overlay, PlusIcon16 } from 'src/shared';
+import { H4, InfoIcon16, Overlay, PlusIcon16 } from 'src/shared';
 
 const SitesPage: FC<BoxProps> = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
@@ -41,7 +41,19 @@ const SitesPage: FC<BoxProps> = () => {
                 >
                     BETA
                 </Badge>
-                <Button gap="10px" ml="auto" onClick={onOpen} variant="secondary">
+
+                <Text
+                    textStyle="body2"
+                    alignItems="center"
+                    gap="1"
+                    display="flex"
+                    ml="auto"
+                    color="text.secondary"
+                >
+                    <InfoIcon16 />
+                    We provide 10GB of traffic for free
+                </Text>
+                <Button gap="10px" ml="4" onClick={onOpen} variant="secondary">
                     <PlusIcon16 />
                     Add domain
                 </Button>
