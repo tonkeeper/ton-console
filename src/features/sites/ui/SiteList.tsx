@@ -18,7 +18,7 @@ import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 import { sitesStore } from '../model';
 import { DTOTonSite, DeleteIcon24, EditIcon24, Span, VerticalDotsIcon16 } from 'src/shared';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ConfirmationDialog } from 'src/entities';
 
 const SiteListItem: FC<{ item: DTOTonSite }> = ({ item }) => {
@@ -36,7 +36,9 @@ const SiteListItem: FC<{ item: DTOTonSite }> = ({ item }) => {
                 <CardHeader gap={3} paddingY={4}>
                     <Flex gap="4">
                         <Flex align="end" wrap="wrap" flex="1" columnGap="2">
-                            <Span fontWeight={600}>{item.domain}</Span>
+                            <Span fontWeight={600}>
+                                <Link to={`/sites/${domainEncoded}`}>{item.domain}</Link>
+                            </Span>
                             <Span
                                 fontWeight={400}
                                 fontSize={14}
