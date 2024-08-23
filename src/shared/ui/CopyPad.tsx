@@ -13,9 +13,20 @@ export const CopyPad: FunctionComponent<
         isLoading?: boolean;
         size?: 'sm' | 'md';
         variant?: 'primary' | 'flat';
+        hideCopyIcon?: boolean;
     }
     // eslint-disable-next-line complexity
-> = ({ text, iconAlign, iconPosition, isLoading, size, variant, textStyles, ...rest }) => {
+> = ({
+    text,
+    iconAlign,
+    iconPosition,
+    isLoading,
+    size,
+    variant,
+    textStyles,
+    hideCopyIcon = false,
+    ...rest
+}) => {
     const { hasCopied, onCopy } = useClipboard(text);
     const bg = useToken('colors', 'background.page');
     const inner = useRef<HTMLDivElement | null>(null);
@@ -81,25 +92,26 @@ export const CopyPad: FunctionComponent<
                 {...(variant === 'flat' && { bgColor: 'transparent' })}
                 {...rest}
             >
-                {size === 'sm' ? (
-                    <CopyIcon16
-                        zIndex="2"
-                        bgColor={variant === 'flat' ? 'unset' : hexToRGBA(bg, 0.8)}
-                        borderRadius="sm"
-                        pos="absolute"
-                        top={iconAlign === 'start' ? pt : 'calc(50% - 8px)'}
-                        right={pr}
-                    />
-                ) : (
-                    <CopyIcon24
-                        zIndex="2"
-                        bgColor={variant === 'flat' ? 'unset' : hexToRGBA(bg, 0.8)}
-                        borderRadius="sm"
-                        pos="absolute"
-                        top={iconAlign === 'start' ? pt : 'calc(50% - 12px)'}
-                        right={pr}
-                    />
-                )}
+                {!hideCopyIcon &&
+                    (size === 'sm' ? (
+                        <CopyIcon16
+                            zIndex="2"
+                            bgColor={variant === 'flat' ? 'unset' : hexToRGBA(bg, 0.8)}
+                            borderRadius="sm"
+                            pos="absolute"
+                            top={iconAlign === 'start' ? pt : 'calc(50% - 8px)'}
+                            right={pr}
+                        />
+                    ) : (
+                        <CopyIcon24
+                            zIndex="2"
+                            bgColor={variant === 'flat' ? 'unset' : hexToRGBA(bg, 0.8)}
+                            borderRadius="sm"
+                            pos="absolute"
+                            top={iconAlign === 'start' ? pt : 'calc(50% - 12px)'}
+                            right={pr}
+                        />
+                    ))}
                 <Box
                     ref={inner}
                     pos={iconPosition === 'sticky' ? 'absolute' : 'static'}
@@ -110,7 +122,7 @@ export const CopyPad: FunctionComponent<
                     h="fit-content"
                     maxH={maxHeight}
                     pt={iconPosition === 'sticky' ? pt : 0}
-                    pr={prWithIcon}
+                    pr={hideCopyIcon ? 0 : prWithIcon}
                     pb={iconPosition === 'sticky' ? pb : 0}
                     pl={iconPosition === 'sticky' ? pl : 0}
                     whiteSpace="inherit"

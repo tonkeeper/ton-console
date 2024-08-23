@@ -50,3 +50,5 @@ export { ChartPieIcon24 } from './ChartPieIcon24';
 export { ChartBarIcon24 } from './ChartBarIcon24';
 export { TonConsoleWhiteIcon20 } from './TonConsoleWhiteIcon20';
 export { DatabaseIcon40 } from './DatabaseIcon40';
+export { TrashIcon16 } from './TrashIcon16';
+export { NftIcon24 } from './NftIcon24';
