@@ -1,9 +1,10 @@
-import { FC } from 'react';
+import { FC, useRef } from 'react';
 import {
     Box,
     Button,
     FormControl,
     FormErrorMessage,
+    FormHelperText,
     Input,
     Modal,
     ModalBody,
@@ -12,13 +13,18 @@ import {
     ModalFooter,
     ModalHeader,
     ModalOverlay,
+    Popover,
+    PopoverBody,
+    PopoverContent,
+    PopoverTrigger,
+    Portal,
     chakra
 } from '@chakra-ui/react';
 import { AddProjectParticipantFormValues, projectsStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
 import { useIMask } from 'react-imask';
-import { mergeRefs } from 'src/shared';
+import { InfoIcon16, mergeRefs } from 'src/shared';
 
 const AddProjectParticipantModal: FC<{
     isOpen: boolean;
@@ -27,6 +33,7 @@ const AddProjectParticipantModal: FC<{
     const formId = 'add-project-participant-form';
 
     const { handleSubmit, register, formState, reset } = useForm<AddProjectParticipantFormValues>();
+    const ref = useRef(null);
 
     const handleClose = () => {
         onClose();
@@ -65,7 +72,7 @@ const AddProjectParticipantModal: FC<{
     return (
         <Modal onClose={handleClose} scrollBehavior="inside" {...rest}>
             <ModalOverlay />
-            <ModalContent maxW="380px">
+            <ModalContent ref={ref} maxW="380px">
                 <ModalHeader textAlign="center">
                     Add user
                     <Box color="text.secondary" fontSize={14} fontWeight={400} lineHeight="20px">
@@ -81,7 +88,7 @@ const AddProjectParticipantModal: FC<{
                         noValidate
                         id={formId}
                     >
-                        <FormControl isInvalid={!!formState.errors.userId} isRequired>
+                        <FormControl mb={0} isInvalid={!!formState.errors.userId} isRequired>
                             <Input
                                 ref={mergeRefs(maskRef, hookFormRef)}
                                 autoComplete="off"
@@ -94,6 +101,31 @@ const AddProjectParticipantModal: FC<{
                             <FormErrorMessage>
                                 {formState.errors.userId && formState.errors.userId.message}
                             </FormErrorMessage>
+                            <FormHelperText
+                                textStyle="body2"
+                                alignItems="center"
+                                gap="1"
+                                display="flex"
+                                ml="auto"
+                                color="text.secondary"
+                            >
+                                Where to find User ID?
+                                <Popover isLazy>
+                                    <PopoverTrigger>
+                                        <InfoIcon16 cursor="pointer" />
+                                    </PopoverTrigger>
+                                    <Portal containerRef={ref}>
+                                        <PopoverContent>
+                                            <PopoverBody>
+                                                <video
+                                                    autoPlay={true}
+                                                    src="/assets/videos/where-user-id.webm"
+                                                />
+                                            </PopoverBody>
+                                        </PopoverContent>
+                                    </Portal>
+                                </Popover>{' '}
+                            </FormHelperText>
                         </FormControl>
                     </chakra.form>
                 </ModalBody>
