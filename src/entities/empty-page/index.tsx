@@ -1,11 +1,11 @@
 import { FC } from 'react';
 import { ButtonLink, H3, Overlay } from 'src/shared';
-import { Button, Flex, IconProps, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, IconProps } from '@chakra-ui/react';
 
 export const EmptyPage: FC<{
     Icon?: FC<IconProps>;
     title: string;
-    description: string;
+    children: React.ReactNode;
     guideButtonLink?: string;
     guideButtonText?: string;
     mainButtonAction?: () => void;
@@ -13,7 +13,7 @@ export const EmptyPage: FC<{
 }> = ({
     Icon,
     title,
-    description,
+    children,
     guideButtonLink,
     guideButtonText = 'Read Guide',
     mainButtonAction,
@@ -23,9 +23,9 @@ export const EmptyPage: FC<{
         <Overlay pt="60px" display="flex" flexDirection="column" alignItems="center">
             {Icon && <Icon boxSize="40px" mb="5" />}
             <H3 mb="4">{title}</H3>
-            <Text textStyle="body2" maxW="392px" mb="9" color="text.secondary" textAlign="center">
-                {description}
-            </Text>
+            <Box textStyle="body2" maxW="392px" mb="9" color="text.secondary">
+                {children}
+            </Box>
 
             <Flex gap="5">
                 {guideButtonLink && (

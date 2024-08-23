@@ -1,4 +1,4 @@
-import { Button, Flex, useDisclosure, BoxProps, Spinner } from '@chakra-ui/react';
+import { Button, Flex, useDisclosure, BoxProps, Spinner, Text } from '@chakra-ui/react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { FC } from 'react';
 import { EmptyPage } from 'src/entities';
@@ -23,13 +23,19 @@ const CnftPage: FC<BoxProps> = () => {
             <>
                 <EmptyPage
                     title="Compresed NFTs"
-                    description={`The cNFT Indexing Service allows you to add and index your cNFTs via the Tonconsole interface.
-                        
-                        Making them available through TonAPI without requiring immediate on-chain minting.`}
                     mainButtonAction={onOpen}
                     mainButtonText="Add cNFT"
-                    guideButtonLink="https://docs.tonconsole.com/tonconsole/nft#cnft-indexing-service"
-                />
+                    guideButtonLink="https://docs.tonconsole.com/tonconsole/nft/cnft#cnft-indexing-service"
+                >
+                    <Text textStyle="body2">
+                        The cNFT Indexing Service allows you to add and index your cNFTs via the
+                        Tonconsole interface.
+                    </Text>
+                    <Text textStyle="body2" mt={4}>
+                        Making them available through TonAPI without requiring immediate on-chain
+                        minting.
+                    </Text>
+                </EmptyPage>
                 <CNFTAddModal cnftStore={cnftStore} isOpen={isOpen} onClose={onClose} />
             </>
         );
