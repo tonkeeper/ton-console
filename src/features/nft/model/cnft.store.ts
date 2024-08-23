@@ -16,7 +16,7 @@ export type IndexingCnftCollectionDataT = Parameters<
     typeof apiClient.api.indexingCNftCollection
 >[1];
 
-class CNFTStore {
+export class CNFTStore {
     pricePerNFT$ = new Loadable<TonCurrencyAmount | undefined>(undefined);
 
     history$ = new Loadable<CnftCollection[]>([]);
@@ -103,5 +103,3 @@ function mapDTOCnftCollectionToCnftCollection(dto: DTOCnftCollection): CnftColle
         account: Address.parse(dto.account)
     };
 }
-
-export const cnftStore = new CNFTStore();

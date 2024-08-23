@@ -20,15 +20,16 @@ import {
     TonCurrencyAmount
 } from 'src/shared';
 import { useIMask } from 'react-imask';
-import { cnftStore, IndexingCnftCollectionDataT } from '../../model/cnft.store';
+import { CNFTStore, IndexingCnftCollectionDataT } from '../../model/cnft.store';
 import { observer } from 'mobx-react-lite';
 
 const CNFTAddForm: FC<
     StyleProps & {
+        cnftStore: CNFTStore;
         id?: string;
         onSubmit: SubmitHandler<IndexingCnftCollectionDataT>;
     }
-> = ({ id, onSubmit, ...rest }) => {
+> = ({ id, onSubmit, cnftStore, ...rest }) => {
     const submitHandler = (form: IndexingCnftCollectionDataT): void => {
         onSubmit(form);
     };

@@ -16,7 +16,6 @@ import {
 } from '@chakra-ui/react';
 import { FC, PropsWithChildren, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { cnftStore } from '../../model';
 import {
     CopyIcon16,
     EmptyFolderIcon48,
@@ -26,6 +25,7 @@ import {
     IconButton
 } from 'src/shared';
 import { CnftCollection } from '../../model/interfaces/CnftCollection';
+import { CNFTStore } from 'src/features';
 
 const EmptyTable: FC<PropsWithChildren<BoxProps>> = ({ children, ...props }) => {
     return (
@@ -89,7 +89,11 @@ const CNFTTableRow: FC<{ row: CnftCollection }> = ({ row }) => {
     );
 };
 
-const CNFTTable: FC<TableContainerProps> = props => {
+interface CNFTTableProps {
+    cnftStore: CNFTStore;
+}
+
+const CNFTTable: FC<TableContainerProps & CNFTTableProps> = ({ cnftStore, ...props }) => {
     const noDataKey = cnftStore.history$.isResolved ? 'empty' : 'loading';
     const bodyKey = cnftStore.history$.value.length > 0 ? 'data' : noDataKey;
 
