@@ -1,10 +1,6 @@
-import { Icon, forwardRef } from '@chakra-ui/react';
-import { ComponentProps } from 'react';
+import { Icon, forwardRef, IconProps } from '@chakra-ui/react';
 
-export const RefreshIcon16 = forwardRef<
-    ComponentProps<typeof Icon> & { accentColor?: string },
-    typeof Icon
->(({ accentColor, ...rest }, ref) => {
+export const RefreshIcon16 = forwardRef<IconProps, typeof Icon>((props, ref) => {
     return (
         <Icon
             ref={ref}
@@ -14,7 +10,7 @@ export const RefreshIcon16 = forwardRef<
             fill="none"
             viewBox="0 0 16 16"
             xmlns="http://www.w3.org/2000/svg"
-            {...rest}
+            {...props}
         >
             <path
                 fillRule="evenodd"

@@ -20,7 +20,7 @@ export const LineChartCard: FunctionComponent<
         dataSource: Record<string, number>[];
         options?: Omit<LineChartOptions, 'type'>;
     }
-> = ({ onClose, dataSource, options, ...rest }) => {
+> = ({ onClose, dataSource, options: _, ...rest }) => {
     const [lines, colors, xKey] = useMemo(() => {
         const allLines = Object.keys(dataSource[0]);
         const _xKey = allLines[0];
