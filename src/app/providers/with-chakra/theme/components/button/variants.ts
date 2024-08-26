@@ -6,7 +6,7 @@ import semanticTokens from '../../foundations/semanticTokens';
 const button = semanticTokens.colors.button;
 
 function variant(backgroundColor: string, color: string): SystemStyleInterpolation {
-    const { minHeight, ...fontStyles } = textStyles.label2;
+    const { minHeight: _, ...fontStyles } = textStyles.label2;
     return defineStyle({
         ...fontStyles,
         backgroundColor,
