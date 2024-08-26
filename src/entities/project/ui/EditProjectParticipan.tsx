@@ -1,10 +1,4 @@
 import {
-    AlertDialog,
-    AlertDialogBody,
-    AlertDialogContent,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogOverlay,
     Avatar,
     Box,
     BoxProps,
@@ -14,45 +8,31 @@ import {
     FlexProps,
     useDisclosure
 } from '@chakra-ui/react';
-import { FC, useRef } from 'react';
+import { FC } from 'react';
 import { PlusIcon16, IconButton, DTOParticipant, Span } from 'src/shared';
-import { TrashIcon16 } from 'src/shared/ui/icons/TrashIcon16';
+import { TrashIcon16 } from 'src/shared';
 import { projectsStore } from '../model';
 import { observer } from 'mobx-react-lite';
+import { ConfirmationDialog } from 'src/entities';
 
 const DeleteConfirmationModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     participantId: number;
 }> = ({ isOpen, onClose, participantId }) => {
-    const cancelRef = useRef(null);
-
     const handleDelete = () => {
         projectsStore.deleteProjectParticipant(participantId);
         onClose();
     };
 
     return (
-        <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
-            <AlertDialogOverlay>
-                <AlertDialogContent>
-                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                        Delete user?
-                    </AlertDialogHeader>
-
-                    <AlertDialogBody paddingY={0}>Are you sure?</AlertDialogBody>
-
-                    <AlertDialogFooter>
-                        <Button ref={cancelRef} onClick={onClose} variant="outline">
-                            Cancel
-                        </Button>
-                        <Button ml={3} onClick={handleDelete}>
-                            Delete
-                        </Button>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialogOverlay>
-        </AlertDialog>
+        <ConfirmationDialog
+            isOpen={isOpen}
+            onClose={onClose}
+            onConfirm={handleDelete}
+            title="Delete user"
+            description="Are you sure?"
+        />
     );
 };
 

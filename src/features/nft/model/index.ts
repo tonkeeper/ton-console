@@ -1,1 +1,1 @@
-export { cnftStore } from './cnft.store';
+export * from './cnft.store';

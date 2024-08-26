@@ -3,6 +3,7 @@ import { ButtonLink, FolderIcon40, H4, Overlay } from 'src/shared';
 import { Button, Divider, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import { CreateInvoicesProjectModal, INVOICES_LINKS, invoicesAppStore } from 'src/features';
 import { observer } from 'mobx-react-lite';
+
 const RegisterProject: FunctionComponent = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 

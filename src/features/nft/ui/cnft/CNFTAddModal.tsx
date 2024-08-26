@@ -11,16 +11,17 @@ import {
 import { observer } from 'mobx-react-lite';
 import { FC, useCallback } from 'react';
 import CNFTAddForm from './CNFTAddForm';
-import { IndexingCnftCollectionDataT, cnftStore } from '../../model/cnft.store';
+import { CNFTStore, IndexingCnftCollectionDataT } from '../../model/cnft.store';
 
-const CNFTAddModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
+const CNFTAddModal: FC<{ isOpen: boolean; onClose: () => void; cnftStore: CNFTStore }> = props => {
     const formId = 'cnft-add-form';
+    const { cnftStore, onClose } = props;
 
     const onSubmit = useCallback(
         (form: IndexingCnftCollectionDataT): void => {
-            cnftStore.addCNFT(form).then(() => props.onClose());
+            cnftStore.addCNFT(form).then(() => onClose());
         },
-        [props.onClose]
+        [onClose]
     );
 
     return (
@@ -30,11 +31,11 @@ const CNFTAddModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
                 <ModalHeader>Add cNFT</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody py="0">
-                    <CNFTAddForm id={formId} onSubmit={onSubmit} />
+                    <CNFTAddForm cnftStore={cnftStore} id={formId} onSubmit={onSubmit} />
                 </ModalBody>
 
                 <ModalFooter gap="3">
-                    <Button flex={1} onClick={props.onClose} variant="secondary">
+                    <Button flex={1} onClick={onClose} variant="secondary">
                         Cancel
                     </Button>
                     <Button
