@@ -55,5 +55,3 @@ export { NftIcon24 } from './NftIcon24';
 export { ChevronRightIcon16 } from './ChevronRightIcon16';
 export { GloubeIcon24 } from './GloubeIcon24';
 export { GloubeIcon40 } from './GloubeIcon40';
-export { TrashIcon16 } from './TrashIcon16';
-export { NftIcon24 } from './NftIcon24';

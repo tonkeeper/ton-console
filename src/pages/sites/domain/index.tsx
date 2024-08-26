@@ -48,10 +48,9 @@ const SitesPage: FC<BoxProps> = () => {
         return (
             <>
                 <Breadcrumbs domain={domain} />
-                <EmptyPage
-                    title={'Domain not found'}
-                    description={`The domain “${domain}” has not been added yet.`}
-                />
+                <EmptyPage title={'Domain not found'}>
+                    {`The domain “${domain}” has not been added yet.`}
+                </EmptyPage>
             </>
         );
     }
