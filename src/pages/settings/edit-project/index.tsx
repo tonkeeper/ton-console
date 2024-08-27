@@ -11,6 +11,8 @@ import { toJS } from 'mobx';
 import { CopyPad, H4, Overlay } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 
+const availableDeleteProject = import.meta.env.VITE_AVAILABLE_DELETE_PROJECT === 'true';
+
 const EditProjectPage: FunctionComponent = () => {
     const formId = 'edit-project-form';
     const selectedProject = projectsStore.selectedProject;
@@ -90,24 +92,29 @@ const EditProjectPage: FunctionComponent = () => {
                     >
                         Save
                     </Button>
-                    <Button
-                        w="100%"
-                        colorScheme="red"
-                        isLoading={projectsStore.deleteProject.isLoading}
-                        onClick={() => setDeleteConfirmationIsOpen(true)}
-                    >
-                        Delete project
-                    </Button>
-                    <DeleteProjectConfirmation
-                        isOpen={deleteConfirmationIsOpen}
-                        onClose={() => setDeleteConfirmationIsOpen(false)}
-                        projectName={selectedProject.name}
-                        onConfirm={() =>
-                            projectsStore
-                                .deleteProject(selectedProject.id)
-                                .then(() => setDeleteConfirmationIsOpen(false))
-                        }
-                    />
+
+                    {availableDeleteProject && (
+                        <>
+                            <Button
+                                w="100%"
+                                colorScheme="red"
+                                isLoading={projectsStore.deleteProject.isLoading}
+                                onClick={() => setDeleteConfirmationIsOpen(true)}
+                            >
+                                Delete project
+                            </Button>
+                            <DeleteProjectConfirmation
+                                isOpen={deleteConfirmationIsOpen}
+                                onClose={() => setDeleteConfirmationIsOpen(false)}
+                                projectName={selectedProject.name}
+                                onConfirm={() =>
+                                    projectsStore
+                                        .deleteProject(selectedProject.id)
+                                        .then(() => setDeleteConfirmationIsOpen(false))
+                                }
+                            />
+                        </>
+                    )}
                 </Flex>
             </Center>
         </Overlay>
