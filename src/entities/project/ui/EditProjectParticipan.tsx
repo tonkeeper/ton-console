@@ -6,7 +6,8 @@ import {
     Divider,
     Flex,
     FlexProps,
-    useDisclosure
+    useDisclosure,
+    Text
 } from '@chakra-ui/react';
 import { FC } from 'react';
 import { PlusIcon16, IconButton, DTOParticipant, Span } from 'src/shared';
@@ -15,13 +16,17 @@ import { projectsStore } from '../model';
 import { observer } from 'mobx-react-lite';
 import { ConfirmationDialog } from 'src/entities';
 
+const getParticipantName = (participant: DTOParticipant) => {
+    return [participant.first_name, participant.last_name].join(' ');
+};
+
 const DeleteConfirmationModal: FC<{
     isOpen: boolean;
     onClose: () => void;
-    participantId: number;
-}> = ({ isOpen, onClose, participantId }) => {
+    participant: DTOParticipant;
+}> = ({ isOpen, onClose, participant }) => {
     const handleDelete = () => {
-        projectsStore.deleteProjectParticipant(participantId);
+        projectsStore.deleteProjectParticipant(participant.id);
         onClose();
     };
 
@@ -30,8 +35,14 @@ const DeleteConfirmationModal: FC<{
             isOpen={isOpen}
             onClose={onClose}
             onConfirm={handleDelete}
-            title="Delete user"
-            description="Are you sure?"
+            title="Confirm you want to remove this user?"
+            description={
+                <Text>
+                    Once removed, <b>{getParticipantName(participant)}</b> will no longer have
+                    direct access to this project.
+                </Text>
+            }
+            confirmButtonText="Remove"
         />
     );
 };
@@ -67,11 +78,7 @@ const Participant: FC<FlexProps & { participant: DTOParticipant }> = ({ particip
                 p={3}
             />
 
-            <DeleteConfirmationModal
-                isOpen={isOpen}
-                onClose={onClose}
-                participantId={participant.id}
-            />
+            <DeleteConfirmationModal isOpen={isOpen} onClose={onClose} participant={participant} />
         </Flex>
     );
 };

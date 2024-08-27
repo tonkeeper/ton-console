@@ -249,7 +249,7 @@ function isStrictDecimal(value: string): boolean {
 
 async function downloadAndParseCSV(url: string): Promise<Record<string, number>[]> {
     const preFetched = await fetch(url);
-    console.log(preFetched.headers.get('content-length')); // TODO check content-length
+    // console.log(preFetched.headers.get('content-length')); // TODO check content-length
 
     const result = await preFetched.text();
 

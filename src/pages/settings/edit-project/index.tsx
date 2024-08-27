@@ -1,23 +1,29 @@
-import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
+import { FunctionComponent, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Center, Flex, Text } from '@chakra-ui/react';
-import { ProjectForm, ProjectFormValues, projectsStore } from 'src/entities';
+import {
+    DeleteProjectConfirmation,
+    ProjectForm,
+    ProjectFormValues,
+    projectsStore
+} from 'src/entities';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toJS } from 'mobx';
 import { CopyPad, H4, Overlay } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 
+const availableDeleteProject = import.meta.env.VITE_AVAILABLE_DELETE_PROJECT === 'true';
+
 const EditProjectPage: FunctionComponent = () => {
     const formId = 'edit-project-form';
+    const selectedProject = projectsStore.selectedProject;
 
     const methods = useForm();
+    const [deleteConfirmationIsOpen, setDeleteConfirmationIsOpen] = useState(false);
     const { formState } = methods;
 
-    const defaultValues = useMemo(
-        () => toJS(projectsStore.selectedProject) || undefined,
-        [projectsStore.selectedProject]
-    );
+    const defaultValues = useMemo(() => toJS(selectedProject) || undefined, [selectedProject]);
 
-    if (projectsStore.selectedProject === null) {
+    if (selectedProject === null) {
         throw new Error('Selected project is not defined');
     }
 
@@ -30,7 +36,7 @@ const EditProjectPage: FunctionComponent = () => {
 
     const onSubmit = useCallback(
         (values: ProjectFormValues) => {
-            if (!projectsStore.selectedProject) {
+            if (!selectedProject) {
                 return;
             }
 
@@ -42,7 +48,7 @@ const EditProjectPage: FunctionComponent = () => {
             );
 
             projectsStore.updateProject({
-                projectId: projectsStore.selectedProject.id,
+                projectId: selectedProject.id,
                 ...modifiedFields
             });
         },
@@ -64,7 +70,7 @@ const EditProjectPage: FunctionComponent = () => {
                         size="sm"
                         pr="1"
                         textStyles={{ textStyle: 'label1' }}
-                        text={projectsStore.selectedProject.id.toString() || ''}
+                        text={selectedProject.id.toString() || ''}
                     />
 
                     <FormProvider {...methods}>
@@ -86,6 +92,29 @@ const EditProjectPage: FunctionComponent = () => {
                     >
                         Save
                     </Button>
+
+                    {availableDeleteProject && (
+                        <>
+                            <Button
+                                w="100%"
+                                colorScheme="red"
+                                isLoading={projectsStore.deleteProject.isLoading}
+                                onClick={() => setDeleteConfirmationIsOpen(true)}
+                            >
+                                Delete project
+                            </Button>
+                            <DeleteProjectConfirmation
+                                isOpen={deleteConfirmationIsOpen}
+                                onClose={() => setDeleteConfirmationIsOpen(false)}
+                                projectName={selectedProject.name}
+                                onConfirm={() =>
+                                    projectsStore
+                                        .deleteProject(selectedProject.id)
+                                        .then(() => setDeleteConfirmationIsOpen(false))
+                                }
+                            />
+                        </>
+                    )}
                 </Flex>
             </Center>
         </Overlay>

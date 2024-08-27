@@ -146,16 +146,20 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                     </Tbody>
                 </Table>
             </TableContainer>
-            <EditApiKeyModal
-                isOpen={modal?.action === 'edit'}
-                apiKey={modal?.key}
-                onClose={closeModal}
-            />
-            <DeleteApiKeyModal
-                isOpen={modal?.action === 'delete'}
-                apiKey={modal?.key}
-                onClose={closeModal}
-            />
+            {modal && (
+                <EditApiKeyModal
+                    isOpen={modal?.action === 'edit'}
+                    apiKey={modal?.key}
+                    onClose={closeModal}
+                />
+            )}
+            {modal && (
+                <DeleteApiKeyModal
+                    isOpen={modal?.action === 'delete'}
+                    apiKey={modal?.key}
+                    onClose={closeModal}
+                />
+            )}
         </>
     );
 };
