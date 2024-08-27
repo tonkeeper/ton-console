@@ -96,7 +96,7 @@ class ProjectsStore {
         });
     });
 
-    selectProject = (id: number): void => {
+    selectProject = (id: number | null): void => {
         this.selectedProjectId = id;
     };
 
@@ -170,6 +170,9 @@ class ProjectsStore {
     deleteProject = this.projects$.createAsyncAction(
         async (projectId: number) => {
             await apiClient.api.deleteProject(projectId);
+
+            const newSelectedProjectId = this.projects$.value[0]?.id ?? null;
+            this.selectProject(newSelectedProjectId);
 
             return this.projects$.value.filter(item => item.id !== projectId);
         },

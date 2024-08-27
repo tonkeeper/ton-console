@@ -1,62 +1,28 @@
-import { FunctionComponent, useEffect, useState } from 'react';
-import {
-    Button,
-    Input,
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    ModalOverlay,
-    Text
-} from '@chakra-ui/react';
+import { FunctionComponent } from 'react';
+import { Text } from '@chakra-ui/react';
+import { ConfirmationDialog } from 'src/entities/confirmation-dialog';
 
 export const DeleteProjectConfirmation: FunctionComponent<
-    { projectName: string } & { isOpen: boolean; onClose: (confirm?: boolean) => void }
+    { projectName: string } & { isOpen: boolean; onClose: () => void; onConfirm: () => void }
 > = props => {
-    const { projectName, ...rest } = props;
-    const [inputValue, setInputValue] = useState('');
-
-    useEffect(() => {
-        if (!rest.isOpen) {
-            setInputValue('');
-        }
-    }, [rest.isOpen]);
+    const { projectName, isOpen, onClose, onConfirm } = props;
 
     return (
-        <Modal scrollBehavior="inside" size="md" {...rest}>
-            <ModalOverlay />
-            <ModalContent>
-                <ModalHeader textAlign="center">Delete {projectName}?</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody pb="0">
-                    <Text textStyle="text.body2" mb="6" color="text.secondary" textAlign="center">
-                        This action cannot be canceled. To confirm, please enter the name of the
-                        project.
+        <ConfirmationDialog
+            isOpen={isOpen}
+            onClose={onClose}
+            onConfirm={onConfirm}
+            title={v => `Delete ${v}`}
+            description={v => (
+                <>
+                    <Text textStyle="text.body2" mb="6" color="text.secondary">
+                        This action cannot be canceled. To confirm, type <b>{v}</b> in the box
+                        below.
                     </Text>
-                    <Input
-                        onChange={e => setInputValue(e.target.value)}
-                        placeholder="Name"
-                        value={inputValue}
-                    />
-                </ModalBody>
-
-                <ModalFooter gap="3">
-                    <Button flex={1} onClick={() => props.onClose()} variant="secondary">
-                        Cancel
-                    </Button>
-                    <Button
-                        flex={1}
-                        isDisabled={inputValue !== projectName}
-                        onClick={() => props.onClose(true)}
-                        type="submit"
-                        variant="primary"
-                    >
-                        Delete
-                    </Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                </>
+            )}
+            confirmValue={projectName}
+            confirmButtonText="Delete"
+        />
     );
 };
