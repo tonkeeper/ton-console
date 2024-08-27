@@ -43,7 +43,9 @@ export const ConfirmationDialog: FC<{
 
     const titleString = typeof title === 'function' ? confirmValue && title(confirmValue) : title;
     const descriptionString =
-        typeof description === 'function' ? confirmValue && description(confirmValue) : description;
+        typeof description === 'function'
+            ? confirmValue && description(`"${confirmValue}"`)
+            : description;
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside" size="md">
