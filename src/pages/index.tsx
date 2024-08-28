@@ -11,6 +11,7 @@ import { LayoutSolid } from 'src/pages/layouts/LayoutSolid';
 import { LayoutWithAside } from 'src/pages/layouts/LayoutWithAside';
 import AnalyticsRouting from 'src/pages/analytics';
 import NftRouting from 'src/pages/nft';
+import JettonRouting from 'src/pages/jetton';
 import { isDevelopmentMode } from 'src/shared';
 import { useLocation } from 'react-router-dom';
 
@@ -139,6 +140,7 @@ const Routing: FunctionComponent = () => {
                 />
                 <Route path="analytics">{AnalyticsRouting}</Route>
                 <Route path="nft">{NftRouting}</Route>
+                <Route path="jetton">{JettonRouting}</Route>
                 <Route path="settings">{SettingsRouting}</Route>
                 <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="*" element={<Navigate to="dashboard" replace />} />

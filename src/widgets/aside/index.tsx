@@ -61,6 +61,9 @@ const Aside: FunctionComponent = () => {
             <DropDownMenuItemExpandable leftIcon={<NftIcon24 />} content="NFT" linkTo="nft">
                 <DropDownMenuItem linkTo="cnft">cNFT</DropDownMenuItem>
             </DropDownMenuItemExpandable>
+            <DropDownMenuItemExpandable leftIcon={<NftIcon24 />} content="Jetton" linkTo="jetton">
+                <DropDownMenuItem linkTo="minter">Minter</DropDownMenuItem>
+            </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>
                 Testnet Assets
             </DropDownMenuItem>
