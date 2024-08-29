@@ -7,7 +7,7 @@ import {
     TonCurrencyAmount,
     apiClient,
     createImmediateReaction,
-    isAddersValid
+    isAddressValid
 } from 'src/shared';
 import { CnftCollection } from './interfaces/CnftCollection';
 import { Address } from 'ton-core';
@@ -68,7 +68,7 @@ export class CNFTStore {
     );
 
     checkCNFT = this.currentAddress$.createAsyncAction(async (addressString: string) => {
-        const isValid = isAddersValid(addressString, {
+        const isValid = isAddressValid(addressString, {
             acceptRaw: true,
             acceptMasterchain: true,
             acceptTestnet: true

@@ -1,6 +1,6 @@
 import { Address } from 'ton-core';
 
-export function isAddersValid(
+export function isAddressValid(
     address: string,
     options?: { acceptTestnet?: boolean; acceptRaw?: boolean; acceptMasterchain?: boolean }
 ): boolean {
