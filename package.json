@@ -24,6 +24,7 @@
     "@lezer/highlight": "^1.1.6",
     "@loadable/component": "^5.15.3",
     "@react-hook/resize-observer": "^1.2.6",
+    "@ton-api/client": "^0.1.1",
     "@ton/core": "^0.57.0",
     "@ton/ton": "^15.0.0",
     "@tonconnect/ui-react": "^2.0.9",
