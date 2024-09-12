@@ -1,4 +1,5 @@
 import { Flex, BoxProps, Button } from '@chakra-ui/react';
+import { TonConnectButton } from '@tonconnect/ui-react';
 import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
 // import { CNFTStore } from 'src/features';
@@ -22,6 +23,7 @@ const JettonPage: FC<BoxProps> = () => {
         <Overlay display="flex" flexDirection="column">
             <Flex align="flex-start" justify="space-between" mb="5">
                 <H4>Mint your token</H4>
+                <TonConnectButton />
             </Flex>
             <JettonForm onSubmit={() => alert('Mint Jettons')} id={formId} />
             <Button flex={1} form={formId} type="submit" variant="primary">
