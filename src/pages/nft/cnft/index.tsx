@@ -22,7 +22,7 @@ const CnftPage: FC<BoxProps> = () => {
         return (
             <>
                 <EmptyPage
-                    title="Compresed NFTs"
+                    title="Compressed NFTs"
                     mainButtonAction={onOpen}
                     mainButtonText="Add cNFT"
                     guideButtonLink="https://docs.tonconsole.com/tonconsole/nft/cnft#cnft-indexing-service"

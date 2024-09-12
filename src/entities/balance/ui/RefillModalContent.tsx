@@ -25,8 +25,8 @@ const RefillModalContent: FunctionComponent<{
             <ModalHeader>
                 <H4 mb="1">Balance Refill</H4>
                 <Text textStyle="body2" color="text.secondary">
-                    Scan QR code for refill or send Toncoin by address bellow. Send only Toncoin on
-                    this address. Sending other coins may result in permanent loss.
+                    Scan the QR code to refill or send Toncoin to the address below. Send only
+                    Toncoin to this address. Sending other coins may result in permanent loss.
                 </Text>
             </ModalHeader>
             <ModalCloseButton />
