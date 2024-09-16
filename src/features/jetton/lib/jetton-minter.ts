@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import { Cell, beginCell, Address, toNano, Dictionary } from '@ton/core';
 
 import walletHex from './contracts/jetton-wallet.compiled.json';

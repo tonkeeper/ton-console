@@ -149,7 +149,7 @@ const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => 
                 </FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!!errors.image} isRequired>
+            <FormControl isInvalid={!!errors.image}>
                 <FormLabel htmlFor="image">Jetton Logo</FormLabel>
                 <Input autoComplete="off" autoFocus id="image" {...register('image')} />
 
@@ -178,7 +178,7 @@ const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => 
                 </FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!!errors.description} isRequired>
+            <FormControl isInvalid={!!errors.description}>
                 <FormLabel htmlFor="description">Jetton description</FormLabel>
                 <Textarea
                     autoComplete="off"

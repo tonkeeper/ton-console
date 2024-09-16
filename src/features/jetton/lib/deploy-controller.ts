@@ -1,7 +1,7 @@
 // import { Address, beginCell, toNano } from '@ton/ton';
-// import { ContractDeployer } from './contract-deployer';
+import { ContractDeployer } from './contract-deployer';
 
-// import { createDeployParams, waitForContractDeploy, waitForSeqno } from './utils';
+import { createDeployParams, waitForContractDeploy } from './utils';
 // import { zeroAddress } from './utils';
 // import {
 //     buildJettonOnchainMetadata,
@@ -17,7 +17,8 @@
 // import { SendTransactionRequest, TonConnectUI } from '@tonconnect/ui-react';
 
 import { JettonBalance, JettonInfo } from '@ton-api/client';
-import { Address, toNano } from '@ton/ton';
+import { Address, toNano } from '@ton/core';
+import { TonConnectUI } from '@tonconnect/ui-react';
 
 import { tonApiClient } from 'src/shared';
 
@@ -58,35 +59,43 @@ export interface JettonData {
 }
 
 export class JettonDeployController {
-    // async createJetton(params: JettonDeployParams, tonConnection: TonConnectUI): Promise<Address> {
-    //     const contractDeployer = new ContractDeployer();
-    //     const tc = await getClient();
-    //     const balance = await tc.getBalance(params.owner);
+    async createJetton(params: JettonDeployParams, tonConnection: TonConnectUI): Promise<Address> {
+        const contractDeployer = new ContractDeployer();
+        // const balance = await tc.getBalance(params.owner);
+        const balance = await tonApiClient.accounts.getAccount(params.owner).then(v => v.balance);
 
-    //     if (balance < JETTON_DEPLOY_GAS) throw new Error('Not enough balance in deployer wallet');
+        if (balance < JETTON_DEPLOY_GAS) throw new Error('Not enough balance in deployer wallet');
 
-    //     const deployParams = await createDeployParams(params, params.offchainUri);
-    //     const contractAddr = contractDeployer.addressForContract(deployParams);
+        const deployParams = await createDeployParams(params, params.offchainUri);
+        const contractAddr = contractDeployer.addressForContract(deployParams);
 
-    //     const isDeployed = await tc.isContractDeployed(contractAddr);
-    //     if (!isDeployed) {
-    //         await contractDeployer.deployContract(deployParams, tonConnection);
-    //         await waitForContractDeploy(contractAddr, tc);
-    //     }
+        // const isDeployed = await tc.isContractDeployed(contractAddr);
+        const isDeployed = await tonApiClient.accounts
+            .getAccount(contractAddr)
+            .then(v => v.status === 'active');
 
-    //     const cellForOwner = beginCell().storeAddress(params.owner).endCell();
+        if (!isDeployed) {
+            await contractDeployer.deployContract(deployParams, tonConnection);
+            await waitForContractDeploy(contractAddr, tonApiClient);
+        }
 
-    //     const ownerJWalletAddr = await makeGetCall(
-    //         contractAddr,
-    //         'get_wallet_address',
-    //         cellForOwner,
-    //         tc
-    //     ).then(v => v.readAddress());
+        // const cellForOwner = beginCell().storeAddress(params.owner).endCell();
 
-    //     await waitForContractDeploy(ownerJWalletAddr, tc);
+        // const ownerJWalletAddr = await makeGetCall(
+        //     contractAddr,
+        //     'get_wallet_address',
+        //     cellForOwner,
+        //     tc
+        // ).then(v => v.readAddress());
 
-    //     return contractAddr;
-    // }
+        const ownerJWalletAddr = await tonApiClient.accounts
+            .getAccountJettonBalance(contractAddr, params.owner)
+            .then(v => v.walletAddress.address);
+
+        await waitForContractDeploy(ownerJWalletAddr, tonApiClient);
+
+        return contractAddr;
+    }
 
     // async burnAdmin(contractAddress: Address, tonConnection: TonConnectUI, walletAddress: string) {
     //     const waiter = await waitForSeqno(walletAddress);
@@ -262,3 +271,6 @@ export class JettonDeployController {
     //     await waiter();
     // }
 }
+
+const jettonDeployController = new JettonDeployController();
+export { jettonDeployController };

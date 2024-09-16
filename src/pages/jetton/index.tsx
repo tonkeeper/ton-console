@@ -3,6 +3,8 @@ import { Suspense } from 'react';
 import { Navigate, Route } from 'react-router-dom';
 
 const MinterPage = lazy(() => import('./minter'));
+const JettonNewPage = lazy(() => import('./minter/new'));
+const JettonViewPage = lazy(() => import('./minter/view'));
 
 const JettonRouting = (
     <>
@@ -11,6 +13,24 @@ const JettonRouting = (
             element={
                 <Suspense>
                     <MinterPage />
+                </Suspense>
+            }
+        />
+
+        <Route
+            path="minter/new"
+            element={
+                <Suspense>
+                    <JettonNewPage />
+                </Suspense>
+            }
+        />
+
+        <Route
+            path="minter/view"
+            element={
+                <Suspense>
+                    <JettonViewPage />
                 </Suspense>
             }
         />
