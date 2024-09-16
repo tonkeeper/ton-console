@@ -16,6 +16,7 @@
 // import { makeGetCall } from './make-get-call';
 // import { SendTransactionRequest, TonConnectUI } from '@tonconnect/ui-react';
 
+import { JettonBalance, JettonInfo } from '@ton-api/client';
 import { Address, toNano } from '@ton/ton';
 
 import { tonApiClient } from 'src/shared';
@@ -47,7 +48,16 @@ export interface JettonDeployParams {
     amountToMint: bigint;
 }
 
-class JettonDeployController {
+export interface JettonData {
+    minter: JettonInfo;
+    jettonWallet: {
+        balance: bigint;
+        jWalletAddress: Address;
+        jettonMasterAddress: Address;
+    } | null;
+}
+
+export class JettonDeployController {
     // async createJetton(params: JettonDeployParams, tonConnection: TonConnectUI): Promise<Address> {
     //     const contractDeployer = new ContractDeployer();
     //     const tc = await getClient();
@@ -176,7 +186,10 @@ class JettonDeployController {
     //     await waiter();
     // }
 
-    async getJettonDetails(contractAddr: Address, owner: Address) {
+    static async getJettonDetails(
+        contractAddr: Address,
+        userAddress: Address
+    ): Promise<JettonData> {
         // const minter = await makeGetCall(contractAddr, 'get_jetton_data', null, tc).then(
         //     async reader => {
         //         const totalSupply = reader.readBigNumber();
@@ -201,14 +214,16 @@ class JettonDeployController {
 
         // TODO make it easier
         const minter = await tonApiClient.jettons.getJettonInfo(contractAddr);
-        const jWallet = await tonApiClient.accounts.getAccount(owner);
-        const jWalletAddress = jWallet.address;
-        const isDeployed = jWallet.status === 'active';
+        const userJettonWallet: JettonBalance = await tonApiClient.accounts.getAccountJettonBalance(
+            userAddress,
+            contractAddr
+        );
+        const isDeployed = userJettonWallet.balance !== '';
 
         const jettonWallet = isDeployed
             ? {
-                  balance: jWallet.balance,
-                  jWalletAddress,
+                  balance: BigInt(userJettonWallet.balance),
+                  jWalletAddress: userJettonWallet.walletAddress.address,
                   jettonMasterAddress: contractAddr
               }
             : null;
@@ -247,6 +262,3 @@ class JettonDeployController {
     //     await waiter();
     // }
 }
-
-const jettonDeployController = new JettonDeployController();
-export { jettonDeployController };

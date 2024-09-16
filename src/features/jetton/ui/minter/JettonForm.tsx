@@ -13,19 +13,21 @@ import {
     Box,
     Textarea
 } from '@chakra-ui/react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { observer } from 'mobx-react-lite';
+import { SubmitHandler, useFormContext } from 'react-hook-form';
 import { mergeRefs } from 'src/shared';
 import { useIMask } from 'react-imask';
-import { JettonMetadata } from '../../model/interfaces/JettonMetadata';
+import { JettonData } from '../../lib/deploy-controller';
+import { JettonMetadata } from '@ton-api/client';
 
-type RawJettonMetadata = Omit<JettonMetadata, 'address'> & { mint: string };
+export type RawJettonMetadata = Omit<JettonMetadata, 'address'> & { mint: string };
 
 type JettonFormProps = StyleProps & {
     id?: string;
     onSubmit: SubmitHandler<RawJettonMetadata>;
 };
 
-const JettonForm: FC<JettonFormProps> = ({ id, onSubmit, ...rest }) => {
+const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => {
     const submitHandler = (form: RawJettonMetadata): void => {
         onSubmit(form);
     };
@@ -33,9 +35,19 @@ const JettonForm: FC<JettonFormProps> = ({ id, onSubmit, ...rest }) => {
     const {
         handleSubmit,
         register,
+        // setFocus,
+        // control,
         watch,
+        // getFieldState,
         formState: { errors }
-    } = useForm<RawJettonMetadata>({});
+    } = useFormContext<RawJettonMetadata>();
+
+    // const {
+    //     handleSubmit,
+    //     register,
+    //     watch,
+    //     formState: { errors }
+    // } = useForm<RawJettonMetadata>({});
 
     const { ref: maskDecimalsRef } = useIMask({
         mask: Number,
@@ -68,9 +80,16 @@ const JettonForm: FC<JettonFormProps> = ({ id, onSubmit, ...rest }) => {
     });
 
     return (
-        <chakra.form id={id} w="100%" onSubmit={handleSubmit(submitHandler)} noValidate {...rest}>
+        <chakra.form
+            id={id}
+            w="100%"
+            maxW={600}
+            onSubmit={handleSubmit(submitHandler)}
+            noValidate
+            {...rest}
+        >
             <Flex gap={4} mb="4">
-                <Avatar name="Mint" size="lg" src={watch('image')} />
+                <Avatar name="Mint" size="lg" src={watch('image') || ''} />
                 <Box minW={220}>
                     <Text textStyle="label" color="text.secondary">
                         {watch('name') || 'Jetton Name'}
@@ -195,6 +214,17 @@ const JettonForm: FC<JettonFormProps> = ({ id, onSubmit, ...rest }) => {
             </FormControl>
         </chakra.form>
     );
-};
+});
 
 export default JettonForm;
+
+export function toRawJettonMetadataDefaultValues(metadata: JettonData | null): RawJettonMetadata {
+    return {
+        name: metadata?.minter.metadata.name || '',
+        symbol: metadata?.minter.metadata.symbol || '',
+        image: metadata?.minter.metadata.image || '',
+        decimals: metadata?.minter.metadata.decimals || '9',
+        description: metadata?.minter.metadata.description || '',
+        mint: '0'
+    };
+}
