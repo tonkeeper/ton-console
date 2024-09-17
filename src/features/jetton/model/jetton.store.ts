@@ -4,7 +4,7 @@ import { Loadable } from 'src/shared';
 import { Address } from '@ton/core';
 
 export class JettonStore {
-    jettonMasterAddress = Address.parse('EQAQBGCWuLOTVyGdFGnF5UN19jOKdsM7F-s_Jb-94jI7Oaco');
+    jettonMasterAddress: Address | null = null;
 
     jettonData$ = new Loadable<JettonData | null>(null);
 
@@ -14,6 +14,10 @@ export class JettonStore {
 
     fetchJettonDetails = this.jettonData$.createAsyncAction(
         async (userAddress: Address) => {
+            if (!this.jettonMasterAddress) {
+                throw new Error('Jetton master address is not set');
+            }
+
             const response = await JettonDeployController.getJettonDetails(
                 this.jettonMasterAddress,
                 userAddress

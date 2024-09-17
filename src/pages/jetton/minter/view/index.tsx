@@ -9,18 +9,23 @@ import JettonForm, {
     RawJettonMetadata,
     toRawJettonMetadataDefaultValues
 } from 'src/features/jetton/ui/minter/JettonForm';
-import { H4, Overlay } from 'src/shared';
+import { H4, Overlay, useSearchParams } from 'src/shared';
 
 const JettonViewPage: FC<BoxProps> = () => {
+    const { searchParams } = useSearchParams();
+    const jettonAddressStr = searchParams.get('jettonAddress');
+
     const jettonStore = useLocalObservable(() => new JettonStore());
-    const userAddress = useTonAddress();
+    const userAddressStr = useTonAddress();
 
     useEffect(() => {
-        if (userAddress) {
-            const address = Address.parse(userAddress);
-            jettonStore.fetchJettonDetails(address);
+        if (userAddressStr) {
+            const userAddress = Address.parse(userAddressStr);
+            const jettonAddress = Address.parse(jettonAddressStr ?? '');
+
+            jettonStore.setJettonMasterAddress(jettonAddress, userAddress);
         }
-    }, [userAddress, jettonStore]);
+    }, [userAddressStr, jettonAddressStr, jettonStore]);
 
     const formId = 'jetton-form-id';
 
