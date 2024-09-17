@@ -28,9 +28,10 @@ const JettonNewPage: FC<BoxProps> = () => {
                 name: form.name,
                 symbol: form.symbol,
                 description: form.description,
-                decimals: form.decimals
+                decimals: form.decimals,
+                image: form.image
             },
-            offchainUri: form.image,
+            offchainUri: undefined,
             owner: Address.parse(userAddress),
             amountToMint: toDecimals(form.mint, form.decimals ?? DEFAULT_DECIMALS)
         };

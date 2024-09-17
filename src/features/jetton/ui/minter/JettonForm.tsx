@@ -61,8 +61,7 @@ const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => 
     });
 
     const { ref: hookDecimalsRef, ...registerDecimalsRest } = register('decimals', {
-        required: 'This is required',
-        valueAsNumber: true
+        required: 'This is required'
     });
 
     const { ref: maskMintRef } = useIMask({
@@ -165,7 +164,7 @@ const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => 
                 <Input
                     ref={mergeRefs(maskDecimalsRef, hookDecimalsRef)}
                     autoComplete="off"
-                    defaultValue={9}
+                    defaultValue="9"
                     id="decimals"
                     {...registerDecimalsRest}
                 />

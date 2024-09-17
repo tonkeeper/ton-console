@@ -16,10 +16,10 @@ export const JETTON_MINTER_CODE = Cell.fromBoc(Buffer.from(minterHex.hex, 'hex')
 enum OPS {
     CHANGE_ADMIN = 3,
     REPLACE_METADATA = 4,
-    MINT = 5,
-    INTERNAL_TRANSFER = 6,
-    TRANSFER = 7,
-    BURN = 8
+    MINT = 21,
+    INTERNAL_TRANSFER = 0x178d4519,
+    TRANSFER = 0xf8a7ea5,
+    BURN = 0x595f07bc
 }
 
 export type JettonMetaDataKeys =
@@ -116,20 +116,22 @@ export async function buildJettonOnchainMetadata(data: {
 }): Promise<Cell> {
     const dict = Dictionary.empty(Dictionary.Keys.BigUint(256), Dictionary.Values.Cell());
 
-    Object.entries(data).forEach(async ([k, v]: [string, string | undefined]) => {
-        const key = k as JettonMetaDataKeys;
+    await Promise.all(
+        Object.entries(data).map(async ([k, v]: [string, string | undefined]) => {
+            const key = k as JettonMetaDataKeys;
 
-        if (!jettonOnChainMetadataSpec.get(key)) {
-            throw new Error(`Unsupported onchain key: ${k}`);
-        }
+            if (!jettonOnChainMetadataSpec.get(key)) {
+                throw new Error(`Unsupported onchain key: ${k}`);
+            }
 
-        if (v === undefined || v === '') return;
+            if (v === undefined || v === '') return;
 
-        const bufferToStore = Buffer.from(v, jettonOnChainMetadataSpec.get(key));
+            const bufferToStore = Buffer.from(v, jettonOnChainMetadataSpec.get(key));
 
-        const dictKey = await toDictKey(k);
-        dict.set(dictKey, makeSnakeCell(bufferToStore));
-    });
+            const dictKey = await toDictKey(k);
+            dict.set(dictKey, makeSnakeCell(bufferToStore));
+        })
+    );
 
     return beginCell().storeUint(ONCHAIN_CONTENT_PREFIX, 8).storeDict(dict).endCell();
 }

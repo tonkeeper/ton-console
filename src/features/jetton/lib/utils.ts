@@ -54,15 +54,17 @@ export async function waitForContractDeploy(address: Address, tonApiClient: Api<
 }
 
 export const createDeployParams = async (params: JettonDeployParams, offchainUri?: string) => {
+    const deployer = params.owner;
     const queryId = parseInt(import.meta.env.VITE_DEPLOY_JETTON_QUERY_ID || '0');
-    const data = await initData(params.owner, params.onchainMetaData, offchainUri);
+    const data = await initData(deployer, params.onchainMetaData, offchainUri);
+    const message = mintBody(deployer, params.amountToMint, toNano(0.2), queryId);
 
     return {
-        code: JETTON_MINTER_CODE,
         data,
-        deployer: params.owner,
-        value: JETTON_DEPLOY_GAS,
-        message: mintBody(params.owner, params.amountToMint, toNano(0.2), queryId)
+        message,
+        deployer,
+        code: JETTON_MINTER_CODE,
+        value: JETTON_DEPLOY_GAS
     };
 };
 
