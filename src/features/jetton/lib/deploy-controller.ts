@@ -1,4 +1,3 @@
-// import { Address, beginCell, toNano } from '@ton/ton';
 import { ContractDeployer } from './contract-deployer';
 
 import { createDeployParams, waitForContractDeploy } from './utils';
@@ -12,12 +11,9 @@ import { createDeployParams, waitForContractDeploy } from './utils';
 //     updateMetadataBody
 // } from './jetton-minter';
 // import { changeAdminBody, JettonMetaDataKeys } from './jetton-minter';
-// import { getClient } from './get-ton-client';
-// import { makeGetCall } from './make-get-call';
-// import { SendTransactionRequest, TonConnectUI } from '@tonconnect/ui-react';
 
 import { JettonBalance, JettonInfo } from '@ton-api/client';
-import { Address, toNano } from '@ton/core';
+import { Address, beginCell, toNano } from '@ton/core';
 import { TonConnectUI } from '@tonconnect/ui-react';
 
 import { tonApiClient } from 'src/shared';
@@ -61,7 +57,6 @@ export interface JettonData {
 export class JettonDeployController {
     async createJetton(params: JettonDeployParams, tonConnection: TonConnectUI): Promise<Address> {
         const contractDeployer = new ContractDeployer();
-        // const balance = await tc.getBalance(params.owner);
         const balance = await tonApiClient.accounts.getAccount(params.owner).then(v => v.balance);
 
         if (balance < JETTON_DEPLOY_GAS) throw new Error('Not enough balance in deployer wallet');
@@ -78,9 +73,17 @@ export class JettonDeployController {
             await waitForContractDeploy(contractAddr, tonApiClient);
         }
 
-        const ownerJWalletAddr = await tonApiClient.accounts
-            .getAccountJettonBalance(contractAddr, params.owner)
-            .then(v => v.walletAddress.address);
+        const ownerAddress = beginCell()
+            .storeAddress(params.owner)
+            .endCell()
+            .toBoc()
+            .toString('hex');
+
+        const ownerJWalletAddr = await tonApiClient.blockchain
+            .execGetMethodForBlockchainAccount(contractAddr, 'get_wallet_address', {
+                args: [ownerAddress]
+            })
+            .then(v => Address.parse(v.decoded.jettonWalletAddress));
 
         await waitForContractDeploy(ownerJWalletAddr, tonApiClient);
 

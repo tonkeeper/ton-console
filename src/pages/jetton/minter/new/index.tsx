@@ -4,6 +4,7 @@ import { TonConnectButton, useTonAddress, useTonConnectUI } from '@tonconnect/ui
 import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { ContractDeployer } from 'src/features/jetton/lib/contract-deployer';
 import {
     JettonDeployParams,
@@ -16,6 +17,7 @@ import { H4, Overlay, tonApiClient } from 'src/shared';
 const DEFAULT_DECIMALS = 9;
 
 const JettonNewPage: FC<BoxProps> = () => {
+    const navigate = useNavigate();
     const userAddress = useTonAddress();
     const [tonconnect] = useTonConnectUI();
 
@@ -49,7 +51,9 @@ const JettonNewPage: FC<BoxProps> = () => {
             return;
         }
 
-        jettonDeployController.createJetton(dataForMint, tonconnect);
+        const deployedContract = await jettonDeployController.createJetton(dataForMint, tonconnect);
+
+        navigate(`/jetton/minter/view?address=${deployedContract.toString()}`);
     };
 
     return (
