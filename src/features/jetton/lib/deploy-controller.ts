@@ -69,7 +69,6 @@ export class JettonDeployController {
         const deployParams = await createDeployParams(params, params.offchainUri);
         const contractAddr = contractDeployer.addressForContract(deployParams);
 
-        // const isDeployed = await tc.isContractDeployed(contractAddr);
         const isDeployed = await tonApiClient.accounts
             .getAccount(contractAddr)
             .then(v => v.status === 'active');
@@ -78,15 +77,6 @@ export class JettonDeployController {
             await contractDeployer.deployContract(deployParams, tonConnection);
             await waitForContractDeploy(contractAddr, tonApiClient);
         }
-
-        // const cellForOwner = beginCell().storeAddress(params.owner).endCell();
-
-        // const ownerJWalletAddr = await makeGetCall(
-        //     contractAddr,
-        //     'get_wallet_address',
-        //     cellForOwner,
-        //     tc
-        // ).then(v => v.readAddress());
 
         const ownerJWalletAddr = await tonApiClient.accounts
             .getAccountJettonBalance(contractAddr, params.owner)

@@ -4,13 +4,14 @@ import { TonConnectButton, useTonAddress, useTonConnectUI } from '@tonconnect/ui
 import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { ContractDeployer } from 'src/features/jetton/lib/contract-deployer';
 import {
     JettonDeployParams,
     jettonDeployController
 } from 'src/features/jetton/lib/deploy-controller';
-import { toDecimals } from 'src/features/jetton/lib/utils';
+import { createDeployParams, toDecimals } from 'src/features/jetton/lib/utils';
 import JettonForm, { RawJettonMetadata } from 'src/features/jetton/ui/minter/JettonForm';
-import { H4, Overlay } from 'src/shared';
+import { H4, Overlay, tonApiClient } from 'src/shared';
 
 const DEFAULT_DECIMALS = 9;
 
@@ -22,7 +23,7 @@ const JettonNewPage: FC<BoxProps> = () => {
 
     const methods = useForm<RawJettonMetadata>({});
 
-    const handleSubmit = (form: RawJettonMetadata) => {
+    const handleSubmit = async (form: RawJettonMetadata) => {
         const dataForMint: JettonDeployParams = {
             onchainMetaData: {
                 name: form.name,
@@ -35,6 +36,18 @@ const JettonNewPage: FC<BoxProps> = () => {
             owner: Address.parse(userAddress),
             amountToMint: toDecimals(form.mint, form.decimals ?? DEFAULT_DECIMALS)
         };
+
+        const deployParams = await createDeployParams(dataForMint, dataForMint.offchainUri);
+        const contractAddress = new ContractDeployer().addressForContract(deployParams);
+
+        const isDeployed = await tonApiClient.accounts
+            .getAccount(contractAddress)
+            .then(v => v.status === 'active');
+
+        if (isDeployed) {
+            console.log('Contract already deployed'); // TODO: show error
+            return;
+        }
 
         jettonDeployController.createJetton(dataForMint, tonconnect);
     };
