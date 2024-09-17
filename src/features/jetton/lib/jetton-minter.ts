@@ -22,16 +22,17 @@ enum OPS {
     BURN = 0x595f07bc
 }
 
-export type JettonMetaDataKeys =
-    | 'name'
-    | 'description'
-    | 'image'
-    | 'symbol'
-    | 'image_data'
-    | 'decimals'
-    | 'uri';
+export type JettonMetadata = {
+    name?: string;
+    description?: string;
+    image?: string;
+    symbol?: string;
+    image_data?: string;
+    decimals?: string;
+    uri?: string;
+};
 
-const jettonOnChainMetadataSpec: Map<JettonMetaDataKeys, 'utf8' | 'ascii' | undefined> = new Map([
+const jettonOnChainMetadataSpec: Map<keyof JettonMetadata, 'utf8' | 'ascii' | undefined> = new Map([
     ['name', 'utf8'],
     ['description', 'utf8'],
     ['image', 'ascii'],
@@ -111,14 +112,12 @@ async function toDictKey(key: string): Promise<bigint> {
     return BigInt(`0x${shaKey.toString('hex')}`);
 }
 
-export async function buildJettonOnchainMetadata(data: {
-    [s in JettonMetaDataKeys]?: string | undefined;
-}): Promise<Cell> {
+export async function buildJettonOnchainMetadata(data: JettonMetadata): Promise<Cell> {
     const dict = Dictionary.empty(Dictionary.Keys.BigUint(256), Dictionary.Values.Cell());
 
     await Promise.all(
         Object.entries(data).map(async ([k, v]: [string, string | undefined]) => {
-            const key = k as JettonMetaDataKeys;
+            const key = k as keyof JettonMetadata;
 
             if (!jettonOnChainMetadataSpec.get(key)) {
                 throw new Error(`Unsupported onchain key: ${k}`);
@@ -240,11 +239,7 @@ export type PersistenceType = 'onchain' | 'offchain_private_domain' | 'offchain_
 //     };
 // }
 
-export async function initData(
-    owner: Address,
-    data?: { [s in JettonMetaDataKeys]?: string | undefined },
-    offchainUri?: string
-) {
+export async function initData(owner: Address, data?: JettonMetadata, offchainUri?: string) {
     if (!data && !offchainUri) {
         throw new Error('Must either specify onchain data or offchain uri');
     }
