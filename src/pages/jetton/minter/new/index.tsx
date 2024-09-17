@@ -1,8 +1,8 @@
-import { Flex, BoxProps, Button } from '@chakra-ui/react';
+import { Flex, BoxProps, Button, Spinner, Text, useToast, Link } from '@chakra-ui/react';
 import { Address } from '@ton/core';
 import { TonConnectButton, useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
 import { observer } from 'mobx-react-lite';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { ContractDeployer } from 'src/features/jetton/lib/contract-deployer';
@@ -17,15 +17,19 @@ import { H4, Overlay, tonApiClient } from 'src/shared';
 const DEFAULT_DECIMALS = 9;
 
 const JettonNewPage: FC<BoxProps> = () => {
+    const toast = useToast();
     const navigate = useNavigate();
     const userAddress = useTonAddress();
     const [tonconnect] = useTonConnectUI();
+    const [isDeploying, setIsDeploying] = useState(false);
 
     const formId = 'jetton-form-id';
 
     const methods = useForm<RawJettonMetadata>({});
 
     const handleSubmit = async (form: RawJettonMetadata) => {
+        setIsDeploying(true);
+
         const dataForMint: JettonDeployParams = {
             onchainMetaData: {
                 name: form.name,
@@ -46,15 +50,45 @@ const JettonNewPage: FC<BoxProps> = () => {
             .getAccount(contractAddress)
             .then(v => v.status === 'active');
 
+        const jettonViewUrl = `/jetton/minter/view?address=${contractAddress.toString()}`;
+
         if (isDeployed) {
-            console.log('Contract already deployed'); // TODO: show error
+            setIsDeploying(false);
+            toast({
+                title: 'Contract already deployed',
+                description: (
+                    <Text>
+                        This contract already exists. You can view it{' '}
+                        <Link
+                            textStyle="body1"
+                            color="constant.white"
+                            textDecoration="underline"
+                            href={jettonViewUrl}
+                        >
+                            here
+                        </Link>
+                    </Text>
+                ),
+                status: 'error',
+                duration: 1000000,
+                isClosable: true
+            });
             return;
         }
 
-        const deployedContract = await jettonDeployController.createJetton(dataForMint, tonconnect);
-
-        navigate(`/jetton/minter/view?address=${deployedContract.toString()}`);
+        await jettonDeployController.createJetton(dataForMint, tonconnect);
+        navigate(jettonViewUrl);
+        setIsDeploying(false);
     };
+
+    if (isDeploying) {
+        return (
+            <Overlay display="flex" justifyContent="center" alignItems="center">
+                <Spinner />
+                <Text ml={2}>Deploying jetton contract...</Text>
+            </Overlay>
+        );
+    }
 
     return (
         <Overlay display="flex" flexDirection="column">
@@ -65,7 +99,15 @@ const JettonNewPage: FC<BoxProps> = () => {
             <FormProvider {...methods}>
                 <JettonForm onSubmit={handleSubmit} id={formId} />
             </FormProvider>
-            <Button flex={1} maxW={600} mt={4} form={formId} type="submit" variant="primary">
+            <Button
+                flex={1}
+                maxW={600}
+                mt={4}
+                form={formId}
+                isLoading={isDeploying}
+                type="submit"
+                variant="primary"
+            >
                 Mint
             </Button>
         </Overlay>
