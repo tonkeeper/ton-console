@@ -33,6 +33,8 @@ export const SearchInput = () => {
         }
     };
 
+    const buttonElementsWidth = searchValue ? '100px' : '0px';
+
     return (
         <InputGroup
             w={isSearchFocused ? '533px' : '320px'}
@@ -44,14 +46,14 @@ export const SearchInput = () => {
                 <SearchIcon24 color="text.secondary" />
             </InputLeftElement>
             <Input
-                pr="100px"
+                pr={buttonElementsWidth}
                 onBlur={() => setTimeout(() => setIsSearchFocused(false), 100)}
                 onChange={e => setSearchValue(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
                 placeholder="Search..."
                 value={searchValue}
             />
-            <InputRightElement gap={1} display="flex" w="100px" ml="auto">
+            <InputRightElement gap={1} display="flex" w={buttonElementsWidth} ml="auto">
                 {searchValue && (
                     <IconButton
                         aria-label="clear search"

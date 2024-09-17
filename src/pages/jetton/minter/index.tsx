@@ -1,5 +1,4 @@
 import { Flex, BoxProps } from '@chakra-ui/react';
-import { TonConnectButton } from '@tonconnect/ui-react';
 import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
 import { ButtonLink, H4, Overlay } from 'src/shared';
@@ -12,7 +11,6 @@ const MinterPage: FC<BoxProps> = () => {
                 <H4>Jetton Minter</H4>
                 <SearchInput />
                 <ButtonLink href="/jetton/minter/new">New Jetton</ButtonLink>
-                <TonConnectButton />
             </Flex>
         </Overlay>
     );
