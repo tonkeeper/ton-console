@@ -6,11 +6,7 @@ import {
     FormHelperText,
     FormLabel,
     Input,
-    Text,
     StyleProps,
-    Avatar,
-    Flex,
-    Box,
     Textarea
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
@@ -35,19 +31,8 @@ const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => 
     const {
         handleSubmit,
         register,
-        // setFocus,
-        // control,
-        watch,
-        // getFieldState,
         formState: { errors }
     } = useFormContext<RawJettonMetadata>();
-
-    // const {
-    //     handleSubmit,
-    //     register,
-    //     watch,
-    //     formState: { errors }
-    // } = useForm<RawJettonMetadata>({});
 
     const { ref: maskDecimalsRef } = useIMask({
         mask: Number,
@@ -85,62 +70,41 @@ const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => 
             maxW={600}
             onSubmit={handleSubmit(submitHandler)}
             noValidate
+            gap={4}
+            display="flex"
+            flexDirection="column"
             {...rest}
         >
-            <Flex gap={4} mb="4">
-                <Avatar name="Mint" size="lg" src={watch('image') || ''} />
-                <Box minW={220}>
-                    <Text textStyle="label" color="text.secondary">
-                        {watch('name') || 'Jetton Name'}
-                    </Text>
-                    <Text textStyle="label2" color="text.secondary">
-                        {watch('symbol') || 'Jetton Symbol'}
-                    </Text>
-                    <Text textStyle="label2" color="text.secondary">
-                        {watch('mint') || '0'}
-                    </Text>
-                </Box>
-                <Text
-                    textStyle="label2"
-                    overflow="hidden"
-                    color="text.secondary"
-                    textOverflow="ellipsis"
-                    noOfLines={3}
-                    title={watch('description')}
-                >
-                    {watch('description') || 'Jetton Description'}
-                </Text>
-            </Flex>
-            <FormControl isInvalid={!!errors.name} isRequired>
-                <FormLabel htmlFor="name">Jetton Name</FormLabel>
+            <FormControl mb={0} isInvalid={!!errors.name} isRequired>
+                <FormLabel htmlFor="name">Name</FormLabel>
                 <Input
                     autoComplete="off"
                     autoFocus
                     id="name"
+                    placeholder="Jetton Name"
                     {...register('name', {
                         required: 'This is required'
                     })}
                 />
-
-                <FormHelperText>
-                    Your project unabbreviated name with spaces (usually 1-3 words).
+                <FormHelperText color="text.secondary">
+                    Name with spaces (usually 1-3 words)
                 </FormHelperText>
                 <FormErrorMessage pos="static">
                     {errors.name && errors.name.message}
                 </FormErrorMessage>
             </FormControl>
-            <FormControl isInvalid={!!errors.symbol} isRequired>
-                <FormLabel htmlFor="symbol">Jetton Symbol</FormLabel>
+            <FormControl mb={0} isInvalid={!!errors.symbol} isRequired>
+                <FormLabel htmlFor="symbol">Symbol</FormLabel>
                 <Input
                     autoComplete="off"
-                    autoFocus
                     id="symbol"
+                    placeholder="SMBL"
                     {...register('symbol', {
                         required: 'This is required'
                     })}
                 />
 
-                <FormHelperText>
+                <FormHelperText color="text.secondary">
                     Currency symbol appearing in balance (usually 3-5 uppercase chars).
                 </FormHelperText>
                 <FormErrorMessage pos="static">
@@ -148,28 +112,18 @@ const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => 
                 </FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!!errors.image}>
-                <FormLabel htmlFor="image">Jetton Logo</FormLabel>
-                <Input autoComplete="off" autoFocus id="image" {...register('image')} />
-
-                <FormHelperText>
-                    URL of 256x256 pixel PNG image of token logo with transparent background.
-                </FormHelperText>
-                <FormErrorMessage pos="static">
-                    {errors.image && errors.image.message}
-                </FormErrorMessage>
-            </FormControl>
-            <FormControl mb="0" isInvalid={!!errors.decimals} isRequired>
-                <FormLabel htmlFor="decimals">Decimals</FormLabel>
+            <FormControl mb={0} isInvalid={!!errors.decimals} isRequired>
+                <FormLabel htmlFor="decimals">Decimal precision</FormLabel>
                 <Input
                     ref={mergeRefs(maskDecimalsRef, hookDecimalsRef)}
                     autoComplete="off"
                     defaultValue="9"
                     id="decimals"
+                    placeholder="9"
                     {...registerDecimalsRest}
                 />
 
-                <FormHelperText>
+                <FormHelperText color="text.secondary">
                     The decimal precision of your token (9 is TON default).
                 </FormHelperText>
                 <FormErrorMessage pos="static">
@@ -177,38 +131,44 @@ const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => 
                 </FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!!errors.description}>
-                <FormLabel htmlFor="description">Jetton description</FormLabel>
+            <FormControl mb={0} isInvalid={!!errors.mint} isRequired>
+                <FormLabel htmlFor="mint">Tokens to Mint</FormLabel>
+                <Input
+                    ref={mergeRefs(maskMintRef, hookMintRef)}
+                    autoComplete="off"
+                    id="mint"
+                    placeholder="238"
+                    {...registerMintRest}
+                />
+
+                <FormErrorMessage pos="static">
+                    {errors.mint && errors.mint.message}
+                </FormErrorMessage>
+            </FormControl>
+
+            <FormControl mb={0} isInvalid={!!errors.description}>
+                <FormLabel htmlFor="description">Description</FormLabel>
                 <Textarea
                     autoComplete="off"
-                    autoFocus
                     id="description"
+                    placeholder="Rodent with absolutely no intentions"
                     {...register('description')}
                 />
 
-                <FormHelperText>
-                    Currency description appearing in balance (usually 3-5 uppercase chars).
-                </FormHelperText>
                 <FormErrorMessage pos="static">
                     {errors.description && errors.description.message}
                 </FormErrorMessage>
             </FormControl>
 
-            <FormControl mb="0" isInvalid={!!errors.mint} isRequired>
-                <FormLabel htmlFor="mint">Tokens to mint</FormLabel>
-                <Input
-                    ref={mergeRefs(maskMintRef, hookMintRef)}
-                    autoComplete="off"
-                    id="mint"
-                    placeholder="mint"
-                    {...registerMintRest}
-                />
+            <FormControl mb={0} isInvalid={!!errors.image}>
+                <FormLabel htmlFor="image">Jetton Logo</FormLabel>
+                <Input autoComplete="off" id="image" {...register('image')} />
 
                 <FormHelperText>
-                    Number of initial tokens to mint and send to your wallet address (float).
+                    URL of 256x256 pixel PNG image of token logo with transparent background.
                 </FormHelperText>
                 <FormErrorMessage pos="static">
-                    {errors.mint && errors.mint.message}
+                    {errors.image && errors.image.message}
                 </FormErrorMessage>
             </FormControl>
         </chakra.form>
