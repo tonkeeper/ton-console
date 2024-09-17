@@ -1,6 +1,11 @@
 import { Flex, BoxProps, Button, Spinner, Text, useToast, Link } from '@chakra-ui/react';
 import { Address } from '@ton/core';
-import { TonConnectButton, useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
+import {
+    TonConnectButton,
+    useTonAddress,
+    useTonConnectUI,
+    useTonConnectModal
+} from '@tonconnect/ui-react';
 import { observer } from 'mobx-react-lite';
 import { FC, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -20,6 +25,7 @@ const JettonNewPage: FC<BoxProps> = () => {
     const toast = useToast();
     const navigate = useNavigate();
     const userAddress = useTonAddress();
+    const { open: openConnect } = useTonConnectModal();
     const [tonconnect] = useTonConnectUI();
     const [isDeploying, setIsDeploying] = useState(false);
 
@@ -93,23 +99,29 @@ const JettonNewPage: FC<BoxProps> = () => {
     return (
         <Overlay display="flex" flexDirection="column">
             <Flex align="flex-start" justify="space-between" mb="5">
-                <H4>Mint your token</H4>
+                <H4>New Jetton</H4>
                 <TonConnectButton />
             </Flex>
             <FormProvider {...methods}>
                 <JettonForm onSubmit={handleSubmit} id={formId} />
             </FormProvider>
-            <Button
-                flex={1}
-                maxW={600}
-                mt={4}
-                form={formId}
-                isLoading={isDeploying}
-                type="submit"
-                variant="primary"
-            >
-                Mint
-            </Button>
+            {userAddress ? (
+                <Button
+                    flex={1}
+                    maxW={600}
+                    mt={4}
+                    form={formId}
+                    isLoading={isDeploying}
+                    type="submit"
+                    variant="primary"
+                >
+                    Mint
+                </Button>
+            ) : (
+                <Button flex={1} maxW={600} mt={4} onClick={openConnect} variant="primary">
+                    Connect Wallet
+                </Button>
+            )}
         </Overlay>
     );
 };
