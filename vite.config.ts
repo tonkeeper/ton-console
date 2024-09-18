@@ -67,7 +67,27 @@ export default ({ mode }) => {
                     }
                 }
             }
+        },
+        build: {
+            rollupOptions: {
+                onwarn(warning, warn) {
+                    // TODO: check and fix this warnings
+                    const warningExportDefault =
+                        warning.code === 'CYCLIC_CROSS_CHUNK_REEXPORT' &&
+                        warning.message.includes(`Export "default"`);
+                    const warningUseClient =
+                        warning.code === 'MODULE_LEVEL_DIRECTIVE' &&
+                        warning.message.includes(`"use client"`);
+
+                    if (warningExportDefault || warningUseClient) {
+                        return;
+                    }
+
+                    warn(warning);
+                }
+            }
         }
+
         // test: {
         //     globals: true,
         //     environment: 'jsdom',
