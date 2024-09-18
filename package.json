@@ -54,13 +54,10 @@
     "react-window": "^1.8.9",
     "react-window-infinite-loader": "^1.0.9",
     "recharts": "^2.5.0",
-    "ton-core": "^0.49.1",
-    "vite-plugin-html": "^3.2.0"
+    "ton-core": "^0.49.1"
   },
   "devDependencies": {
     "@chakra-ui/styled-system": "^2.7.0",
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
-    "@rollup/plugin-inject": "^5.0.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@types/compose-function": "^0.0.30",
@@ -94,7 +91,9 @@
     "tsx": "^4.16.2",
     "typescript": "^5.6.2",
     "vite": "^4.2.1",
+    "vite-plugin-html": "^3.2.0",
     "vite-plugin-mkcert": "^1.13.3",
+    "vite-plugin-node-polyfills": "^0.22.0",
     "vite-tsconfig-paths": "^4.0.5",
     "vitest": "^0.28.4"
   }
