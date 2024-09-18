@@ -53,7 +53,6 @@ export default ({ mode }) => {
         server: {
             host: '127.0.0.1',
             port: 5173,
-            https: true,
             watch: {
                 usePolling: true
             },
@@ -68,15 +67,15 @@ export default ({ mode }) => {
                     }
                 }
             }
-        },
-        test: {
-            globals: true,
-            environment: 'jsdom',
-            setupFiles: './tests/setup.ts',
-            typecheck: {
-                tsconfig: './tsconfig.test.json'
-            }
         }
+        // test: {
+        //     globals: true,
+        //     environment: 'jsdom',
+        //     setupFiles: './tests/setup.ts',
+        //     typecheck: {
+        //         tsconfig: './tsconfig.test.json'
+        //     }
+        // }
     });
 };
 

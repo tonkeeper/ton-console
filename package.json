@@ -2,6 +2,7 @@
   "name": "ton-console",
   "private": true,
   "version": "0.0.1",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "dev-host": "vite --host",
@@ -90,7 +91,7 @@
     "swagger-typescript-api": "^13.0.5",
     "tsx": "^4.16.2",
     "typescript": "^5.6.2",
-    "vite": "^4.2.1",
+    "vite": "^5.4.6",
     "vite-plugin-html": "^3.2.0",
     "vite-plugin-mkcert": "^1.13.3",
     "vite-plugin-node-polyfills": "^0.22.0",
