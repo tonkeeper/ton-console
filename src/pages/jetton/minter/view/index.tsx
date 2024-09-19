@@ -1,9 +1,10 @@
-import { Flex, BoxProps, Spinner, Divider } from '@chakra-ui/react';
+import { Flex, BoxProps, Spinner, Divider, Text } from '@chakra-ui/react';
 import { Address } from '@ton/core';
 import { TonConnectButton, useTonAddress } from '@tonconnect/ui-react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { FC, useEffect } from 'react';
 import { JettonCard, JettonStore } from 'src/features';
+import JettonWallet from 'src/features/jetton/ui/minter/JettonWallet';
 
 import { H4, Overlay, useSearchParams } from 'src/shared';
 
@@ -45,6 +46,10 @@ const JettonViewPage: FC<BoxProps> = () => {
                 <>
                     <JettonCard data={jettonStore.jettonData$.value.minter} />
                     <Divider mt={6} />
+                    <Text textStyle="label1" py={5}>
+                        Connected Jetton wallet
+                    </Text>
+                    <JettonWallet jettonStore={jettonStore} />
                 </>
             )}
         </Overlay>
