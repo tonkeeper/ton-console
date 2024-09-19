@@ -1,27 +1,23 @@
-import { Address } from 'ton-core';
+import { Address } from '@ton/core';
 
 export function isAddressValid(
     address: string,
-    options?: { acceptTestnet?: boolean; acceptRaw?: boolean; acceptMasterchain?: boolean }
+    { acceptTestnet = false, acceptRaw = false } = {}
 ): boolean {
-    try {
-        if (address.includes(':') && !options?.acceptRaw) {
-            return false;
-        }
-
-        let a: Address;
-        if (!options?.acceptTestnet) {
-            const { address: parsed, isTestOnly } = Address.parseFriendly(address);
-            a = parsed;
-            if (isTestOnly) {
-                return false;
-            }
-        } else {
-            a = Address.parse(address);
-        }
-
-        return (options?.acceptMasterchain ? [0, -1] : [0]).includes(a.workChain);
-    } catch (e) {
+    if (!Address.isRaw(address) && !Address.isFriendly(address)) {
         return false;
     }
+
+    if (Address.isRaw(address) && !acceptRaw) {
+        return false;
+    }
+
+    if (Address.isFriendly(address) && !acceptTestnet) {
+        const { isTestOnly } = Address.parseFriendly(address);
+        if (isTestOnly) {
+            return false;
+        }
+    }
+
+    return true;
 }

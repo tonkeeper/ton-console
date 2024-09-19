@@ -109,7 +109,7 @@ const CNFTAddForm: FC<
                     {...register('account', {
                         required: 'This is required',
                         validate: value => {
-                            if (!isAddressValid(value, { acceptTestnet: true, acceptRaw: true })) {
+                            if (!isAddressValid(value, { acceptRaw: true })) {
                                 return 'Wrong address';
                             }
                             if (cnftStore.currentAddress$.error) {

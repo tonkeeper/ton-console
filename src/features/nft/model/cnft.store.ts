@@ -68,11 +68,7 @@ export class CNFTStore {
     );
 
     checkCNFT = this.currentAddress$.createAsyncAction(async (addressString: string) => {
-        const isValid = isAddressValid(addressString, {
-            acceptRaw: true,
-            acceptMasterchain: true,
-            acceptTestnet: true
-        });
+        const isValid = isAddressValid(addressString, { acceptRaw: true });
 
         return isValid
             ? apiClient.api

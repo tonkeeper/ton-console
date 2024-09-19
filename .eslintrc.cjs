@@ -164,7 +164,7 @@ module.exports = {
             }
         },
         {
-            files: ['tests/**/*.ts', 'tests/**/*.tsx'],
+            files: ['tests/**/*.ts', 'tests/**/*.tsx', '**/*.test.ts', '**/*.test.tsx'],
             rules: {
                 '@typescript-eslint/explicit-function-return-type': 'off',
                 'import/no-extraneous-dependencies': ['error', { devDependencies: true }]

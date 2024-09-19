@@ -70,11 +70,9 @@ export const EditInvoicesProjectForm: FunctionComponent<
                     {...register('receiverAddress', {
                         required: 'This is required',
                         validate(value) {
-                            if (isAddressValid(value)) {
-                                return;
+                            if (!isAddressValid(value)) {
+                                return 'Invalid address';
                             }
-
-                            return 'Invalid address';
                         }
                     })}
                 />
