@@ -4,14 +4,15 @@ import {
     InputGroup,
     InputLeftElement,
     InputRightElement,
+    StyleProps,
     useToast
 } from '@chakra-ui/react';
 import { Address } from '@ton/core';
-import { useState } from 'react';
+import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CloseIcon24, IconButton, SearchIcon24 } from 'src/shared';
 
-export const SearchInput = () => {
+export const SearchInput: FC<StyleProps> = props => {
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [searchValue, setSearchValue] = useState('');
     const navigate = useNavigate();
@@ -38,9 +39,9 @@ export const SearchInput = () => {
     return (
         <InputGroup
             w={isSearchFocused ? '533px' : '320px'}
-            ml="auto"
             transition="width 0.2s"
             size="md"
+            {...props}
         >
             <InputLeftElement pointerEvents="none">
                 <SearchIcon24 color="text.secondary" />
