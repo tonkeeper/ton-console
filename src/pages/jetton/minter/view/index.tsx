@@ -1,9 +1,10 @@
-import { Flex, BoxProps, Spinner, Divider, Text } from '@chakra-ui/react';
+import { Flex, BoxProps, Spinner, Divider } from '@chakra-ui/react';
 import { Address } from '@ton/core';
 import { TonConnectButton, useTonAddress } from '@tonconnect/ui-react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { FC, useEffect } from 'react';
 import { JettonCard, JettonStore } from 'src/features';
+import { isValidAddress } from 'src/features/jetton/lib/utils';
 import JettonWallet from 'src/features/jetton/ui/minter/JettonWallet';
 
 import { H4, Overlay, useSearchParams } from 'src/shared';
@@ -16,12 +17,10 @@ const JettonViewPage: FC<BoxProps> = () => {
     const userAddressStr = useTonAddress();
 
     useEffect(() => {
-        if (userAddressStr) {
-            const userAddress = Address.parse(userAddressStr);
-            const jettonAddress = Address.parse(jettonAddressStr ?? '');
+        const userAddress = isValidAddress(userAddressStr) ? Address.parse(userAddressStr) : null;
+        const jettonAddress = Address.parse(jettonAddressStr ?? '');
 
-            jettonStore.setJettonMasterAddress(jettonAddress, userAddress);
-        }
+        jettonStore.setJettonMasterAddress(jettonAddress, userAddress);
     }, [userAddressStr, jettonAddressStr, jettonStore]);
 
     if (jettonStore.jettonData$.value === null && jettonStore.jettonData$.isLoading) {
@@ -32,24 +31,28 @@ const JettonViewPage: FC<BoxProps> = () => {
         );
     }
 
+    const wallet = jettonStore.wallet;
+    const jettonData = jettonStore.jettonData$;
+
     return (
         <Overlay display="flex" flexDirection="column">
             <Flex align="flex-start" justify="space-between" mb="5">
                 <H4>Jetton</H4>
                 <TonConnectButton />
             </Flex>
-            {jettonStore.jettonData$.value === null ? (
+            {jettonData.value === null ? (
                 <Overlay display="flex" justifyContent="center" alignItems="center">
                     <H4>Jetton not found</H4>
                 </Overlay>
             ) : (
                 <>
-                    <JettonCard data={jettonStore.jettonData$.value.minter} />
+                    <JettonCard data={jettonData.value.jettonInfo} />
                     <Divider mt={6} />
-                    <Text textStyle="label1" py={5}>
-                        Connected Jetton wallet
-                    </Text>
-                    <JettonWallet jettonStore={jettonStore} />
+                    <JettonWallet
+                        onChangeWallet={jettonStore.fetchJettonDetails}
+                        jettonWallet={wallet}
+                        jettonMetadata={jettonData.value.jettonInfo.metadata}
+                    />
                 </>
             )}
         </Overlay>

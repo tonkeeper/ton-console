@@ -45,13 +45,15 @@ export interface JettonDeployParams {
     amountToMint: bigint;
 }
 
+export interface JettonWallet {
+    balance: bigint;
+    jWalletAddress: Address;
+    jettonMasterAddress: Address;
+}
+
 export interface JettonData {
-    minter: JettonInfo;
-    jettonWallet: {
-        balance: bigint;
-        jWalletAddress: Address;
-        jettonMasterAddress: Address;
-    } | null;
+    jettonInfo: JettonInfo;
+    jettonWallet: JettonWallet | null;
 }
 
 export class JettonDeployController {
@@ -190,37 +192,16 @@ export class JettonDeployController {
 
     static async getJettonDetails(
         contractAddr: Address,
-        userAddress: Address
+        userAddress: Address | null
     ): Promise<JettonData> {
-        // const minter = await makeGetCall(contractAddr, 'get_jetton_data', null, tc).then(
-        //     async reader => {
-        //         const totalSupply = reader.readBigNumber();
-        //         reader.readBigNumber();
-        //         const admin = reader.readAddress();
-        //         const contentCell = await readJettonMetadata(reader.readCell());
-
-        //         return {
-        //             ...contentCell,
-        //             totalSupply,
-        //             admin
-        //         };
-        //     }
-        // );
-
-        // const jWalletAddress = await makeGetCall(
-        //     contractAddr,
-        //     'get_wallet_address',
-        //     beginCell().storeAddress(owner).endCell(),
-        //     tc
-        // ).then(reader => reader.readAddress());
-
         // TODO make it easier
-        const minter = await tonApiClient.jettons.getJettonInfo(contractAddr);
-        const userJettonWallet: JettonBalance = await tonApiClient.accounts.getAccountJettonBalance(
-            userAddress,
-            contractAddr
-        );
-        const isDeployed = userJettonWallet.balance !== '';
+        const jettonInfo = await tonApiClient.jettons.getJettonInfo(contractAddr);
+
+        const userJettonWallet: JettonBalance | null = userAddress
+            ? await tonApiClient.accounts.getAccountJettonBalance(userAddress, contractAddr)
+            : null;
+
+        const isDeployed = userJettonWallet !== null && userJettonWallet.balance !== ''; // TODO: check backend fix
 
         const jettonWallet = isDeployed
             ? {
@@ -231,7 +212,7 @@ export class JettonDeployController {
             : null;
 
         return {
-            minter,
+            jettonInfo,
             jettonWallet
         };
     }

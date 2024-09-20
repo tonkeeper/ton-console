@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx';
+import { computed, makeAutoObservable, observable } from 'mobx';
 import { JettonData, JettonDeployController } from '../lib/deploy-controller';
 import { Loadable } from 'src/shared';
 import { Address } from '@ton/core';
@@ -9,11 +9,18 @@ export class JettonStore {
     jettonData$ = new Loadable<JettonData | null>(null);
 
     constructor() {
-        makeAutoObservable(this);
+        makeAutoObservable(this, {
+            jettonData$: observable,
+            wallet: computed
+        });
+    }
+
+    get wallet() {
+        return this.jettonData$.value?.jettonWallet ?? null;
     }
 
     fetchJettonDetails = this.jettonData$.createAsyncAction(
-        async (userAddress: Address) => {
+        async (userAddress: Address | null) => {
             if (!this.jettonMasterAddress) {
                 throw new Error('Jetton master address is not set');
             }
@@ -29,7 +36,7 @@ export class JettonStore {
         }
     );
 
-    setJettonMasterAddress(jettonAddress: Address, userAddress: Address) {
+    setJettonMasterAddress(jettonAddress: Address, userAddress: Address | null) {
         this.jettonMasterAddress = jettonAddress;
         this.fetchJettonDetails(userAddress);
     }

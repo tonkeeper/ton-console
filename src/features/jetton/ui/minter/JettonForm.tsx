@@ -13,7 +13,6 @@ import { observer } from 'mobx-react-lite';
 import { SubmitHandler, useFormContext } from 'react-hook-form';
 import { mergeRefs } from 'src/shared';
 import { useIMask } from 'react-imask';
-import { JettonData } from '../../lib/deploy-controller';
 import { JettonMetadata } from '@ton-api/client';
 
 export type RawJettonMetadata = Omit<JettonMetadata, 'address'> & { mint: string };
@@ -176,14 +175,3 @@ const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => 
 });
 
 export default JettonForm;
-
-export function toRawJettonMetadataDefaultValues(metadata: JettonData | null): RawJettonMetadata {
-    return {
-        name: metadata?.minter.metadata.name || '',
-        symbol: metadata?.minter.metadata.symbol || '',
-        image: metadata?.minter.metadata.image || '',
-        decimals: metadata?.minter.metadata.decimals || '9',
-        description: metadata?.minter.metadata.description || '',
-        mint: '0'
-    };
-}
