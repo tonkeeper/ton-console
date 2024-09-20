@@ -51,7 +51,8 @@ export const SearchInput: FC<StyleProps> = props => {
                 onBlur={() => setTimeout(() => setIsSearchFocused(false), 100)}
                 onChange={e => setSearchValue(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
-                placeholder="Search..."
+                onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                placeholder="Jetton Address"
                 value={searchValue}
             />
             <InputRightElement gap={1} display="flex" w={buttonElementsWidth} ml="auto">
@@ -63,12 +64,7 @@ export const SearchInput: FC<StyleProps> = props => {
                     />
                 )}
                 {searchValue && (
-                    <Button
-                        h="1.75rem"
-                        colorScheme="constant.white"
-                        onClick={handleSearch}
-                        size="sm"
-                    >
+                    <Button h="1.75rem" onClick={handleSearch} size="sm" variant="overlay">
                         Find
                     </Button>
                 )}
