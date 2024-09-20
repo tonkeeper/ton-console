@@ -23,7 +23,7 @@ import { observer } from 'mobx-react-lite';
 import { Address } from '@ton/core';
 import { useTonAddress } from '@tonconnect/ui-react';
 import { CopyPad, Span, isAddressValid } from 'src/shared';
-import { fromDecimals } from '../../lib/utils';
+import { fromDecimals, toDecimals } from '../../lib/utils';
 import { JettonMetadata } from '@ton-api/client';
 import { type JettonWallet as JettonWalletType } from '../../lib/deploy-controller';
 
@@ -88,9 +88,17 @@ const ModalBurn: FC<{
     onClose: (reset?: boolean) => void;
     onBurn: (count: bigint) => void;
     jettonSymbol: string;
-}> = ({ isOpen, onClose, onBurn, jettonSymbol }) => {
+    jettomDecimals: string;
+}> = ({ isOpen, onClose, onBurn, jettonSymbol, jettomDecimals }) => {
+    const [value, setValue] = useState(NaN);
+
+    const handleClose = () => {
+        setValue(NaN);
+        onClose();
+    };
+
     return (
-        <Modal isOpen={isOpen} onClose={() => onClose()} size="md">
+        <Modal isOpen={isOpen} onClose={handleClose} size="md">
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader textAlign="center">Burn {jettonSymbol}</ModalHeader>
@@ -101,8 +109,10 @@ const ModalBurn: FC<{
                             autoComplete="off"
                             autoFocus
                             min={0}
+                            onChange={e => setValue(Number(e.target.value))}
                             placeholder={`Enter ${jettonSymbol} amount`}
                             type="number"
+                            value={value}
                         />
                         <FormHelperText color="text.secondary">
                             Number of tokens to burn from connected wallet
@@ -111,12 +121,13 @@ const ModalBurn: FC<{
                 </ModalBody>
 
                 <ModalFooter gap="3">
-                    <Button flex={1} onClick={() => onClose()} variant="secondary">
+                    <Button flex={1} onClick={handleClose} variant="secondary">
                         Cancel
                     </Button>
                     <Button
                         flex={1}
-                        onClick={() => onBurn(BigInt(0))}
+                        disabled={!value}
+                        onClick={() => onBurn(toDecimals(value, jettomDecimals))}
                         type="submit"
                         variant="primary"
                     >
@@ -143,6 +154,7 @@ const JettonWallet: FC<JettonWalletProps> = observer(
             : null;
 
         const [walletAddress, setWalletAddress] = useState<Address | null>(tonconnectAddress);
+
         const [isModalChnageWalletOpen, setIsModalChnageWalletOpen] = useState(false);
         const [isModalBurnOpen, setIsModalBurnOpen] = useState(false);
 
@@ -226,6 +238,7 @@ const JettonWallet: FC<JettonWalletProps> = observer(
                         // jettonStore.burnJetton(count);
                     }}
                     jettonSymbol={jettonMetadata.symbol}
+                    jettomDecimals={jettonMetadata.decimals}
                 />
             </>
         );
