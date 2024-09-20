@@ -259,7 +259,7 @@ export function mintBody(
     owner: Address,
     jettonValue: bigint,
     transferToJWallet: bigint,
-    queryId: number
+    queryId: bigint
 ): Cell {
     return beginCell()
         .storeUint(OPS.MINT, 32)
