@@ -57,8 +57,8 @@ const ModalChnageWallet: FC<{
                 <ModalHeader textAlign="center">Check balance for another address</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody pb="0">
-                    <FormControl mb={0}>
-                        <FormLabel htmlFor="name">Wallet Address</FormLabel>
+                    <FormControl mb={0} isInvalid={error}>
+                        <FormLabel htmlFor="name">Enter address to check balance:</FormLabel>
                         <Input
                             autoComplete="off"
                             autoFocus
@@ -66,10 +66,6 @@ const ModalChnageWallet: FC<{
                             placeholder="Wallet Address"
                             value={value}
                         />
-                        <FormHelperText color="text.secondary">
-                            Connected wallet public address, can be shared to receive jetton
-                            transfers
-                        </FormHelperText>
                         <FormErrorMessage>{error && 'Invalid address'}</FormErrorMessage>
                     </FormControl>
                 </ModalBody>
@@ -79,7 +75,7 @@ const ModalChnageWallet: FC<{
                         Cancel
                     </Button>
                     <Button flex={1} onClick={handleSelect} type="submit" variant="primary">
-                        Change
+                        Check balance
                     </Button>
                 </ModalFooter>
             </ModalContent>
@@ -91,21 +87,21 @@ const ModalBurn: FC<{
     isOpen: boolean;
     onClose: (reset?: boolean) => void;
     onBurn: (count: bigint) => void;
-}> = ({ isOpen, onClose, onBurn }) => {
+    jettonSymbol: string;
+}> = ({ isOpen, onClose, onBurn, jettonSymbol }) => {
     return (
         <Modal isOpen={isOpen} onClose={() => onClose()} size="md">
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader textAlign="center">Burn Jetton</ModalHeader>
+                <ModalHeader textAlign="center">Burn {jettonSymbol}</ModalHeader>
                 <ModalCloseButton />
-                <ModalBody pb="0">
-                    <FormControl mb={0}>
-                        <FormLabel htmlFor="name">Burn Jetton</FormLabel>
+                <ModalBody py="0">
+                    <FormControl my={0}>
                         <Input
                             autoComplete="off"
                             autoFocus
                             min={0}
-                            placeholder="Count"
+                            placeholder={`Enter ${jettonSymbol} amount`}
                             type="number"
                         />
                         <FormHelperText color="text.secondary">
@@ -218,6 +214,7 @@ const JettonWallet: FC<JettonWalletProps> = observer(({ jettonStore, ...rest }) 
                     alert('Burn ' + count);
                     // jettonStore.burnJetton(count);
                 }}
+                jettonSymbol={jettonData.minter.metadata.symbol}
             />
         </>
     );
