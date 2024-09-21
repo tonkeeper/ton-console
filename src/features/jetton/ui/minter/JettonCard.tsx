@@ -23,6 +23,7 @@ import { JettonInfo } from '@ton-api/client';
 import { EditIcon24, IconButton, sliceAddress } from 'src/shared';
 import { fromDecimals, toDecimals } from '../../lib/utils';
 import { ConfirmationDialog } from 'src/entities';
+import { jettonStore } from '../../model';
 
 const Field: FC<{ label: string; value: string; children?: ReactNode }> = ({
     label,
@@ -158,6 +159,7 @@ type JettonCardProps = StyleProps & {
 const JettonCard: FC<JettonCardProps> = observer(
     ({
         data: {
+            mintable,
             metadata: { name, symbol, image, decimals, description, address },
             totalSupply,
             admin
@@ -167,6 +169,9 @@ const JettonCard: FC<JettonCardProps> = observer(
         const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
         const [isMintModalOpen, setIsMintModalOpen] = useState(false);
         const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+        const connectedWalletAddress = jettonStore.connectedWalletAddress;
+        const isOwner = connectedWalletAddress && admin?.address.equals(connectedWalletAddress);
 
         return (
             <Box w={440} bgColor="background.contentTint" {...rest} borderRadius={8}>
@@ -190,12 +195,14 @@ const JettonCard: FC<JettonCardProps> = observer(
                             {description}
                         </Text>
                     </Flex>
-                    <IconButton
-                        aria-label="Remove"
-                        icon={<EditIcon24 />}
-                        onClick={() => setIsEditModalOpen(true)}
-                        ml="auto"
-                    />
+                    {isOwner && (
+                        <IconButton
+                            aria-label="Remove"
+                            icon={<EditIcon24 />}
+                            onClick={() => setIsEditModalOpen(true)}
+                            ml="auto"
+                        />
+                    )}
                 </Flex>
                 <Divider />
                 <Box textStyle="body2" p={4}>
@@ -204,16 +211,18 @@ const JettonCard: FC<JettonCardProps> = observer(
                         label="Owner"
                         value={admin ? sliceAddress(admin.address) : 'Owner missing'}
                     >
-                        <Button
-                            textStyle="body2"
-                            color="text.accent"
-                            fontWeight={400}
-                            onClick={() => setIsRevokeModalOpen(true)}
-                            size="sm"
-                            variant="link"
-                        >
-                            Revoke Ownership
-                        </Button>
+                        {isOwner && (
+                            <Button
+                                textStyle="body2"
+                                color="text.accent"
+                                fontWeight={400}
+                                onClick={() => setIsRevokeModalOpen(true)}
+                                size="sm"
+                                variant="link"
+                            >
+                                Revoke Ownership
+                            </Button>
+                        )}
                     </Field>
                     <Field label="Symbol" value={symbol} />
                     <Field label="Decimals" value={decimals} />
@@ -221,16 +230,18 @@ const JettonCard: FC<JettonCardProps> = observer(
                         label="Total Supply"
                         value={`${fromDecimals(totalSupply, decimals)} ${symbol}`}
                     >
-                        <Button
-                            textStyle="body2"
-                            color="text.accent"
-                            fontWeight={400}
-                            onClick={() => setIsMintModalOpen(true)}
-                            size="sm"
-                            variant="link"
-                        >
-                            Mint
-                        </Button>
+                        {isOwner && mintable && (
+                            <Button
+                                textStyle="body2"
+                                color="text.accent"
+                                fontWeight={400}
+                                onClick={() => setIsMintModalOpen(true)}
+                                size="sm"
+                                variant="link"
+                            >
+                                Mint
+                            </Button>
+                        )}
                     </Field>
                 </Box>
                 <ModalRevokeOwnership
