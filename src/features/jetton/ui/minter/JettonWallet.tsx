@@ -156,7 +156,7 @@ const ModalBurn: FC<{
 
 const JettonWallet: FC<
     StyleProps & {
-        connectedWalletAddress: Address;
+        connectedWalletAddress: Address | null;
         jettonInfo: JettonInfo;
     }
 > = observer(({ connectedWalletAddress, jettonInfo, ...rest }) => {
@@ -171,9 +171,13 @@ const JettonWallet: FC<
         ? fromDecimals(jettonWallet.balance, jettonMetadata.decimals)
         : '-';
 
-    const isConnectedWallet = walletUserAddress?.equals(connectedWalletAddress);
+    const isConnectedWallet = connectedWalletAddress
+        ? walletUserAddress?.equals(connectedWalletAddress) ?? false
+        : true;
+
     const isConnectedWalletOwner =
-        jettonInfo.admin?.address.equals(connectedWalletAddress) ?? false;
+        (connectedWalletAddress && jettonInfo.admin?.address.equals(connectedWalletAddress)) ??
+        false;
 
     const handleWalletChange = () => {
         if (isConnectedWallet) {

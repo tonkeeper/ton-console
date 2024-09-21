@@ -65,12 +65,10 @@ const JettonViewPage: FC<BoxProps> = () => {
                     <JettonCard data={jettonInfo} />
                     <Divider mt={6} />
 
-                    {connectedWalletAddress && (
-                        <JettonWallet
-                            connectedWalletAddress={connectedWalletAddress}
-                            jettonInfo={jettonInfo}
-                        />
-                    )}
+                    <JettonWallet
+                        connectedWalletAddress={connectedWalletAddress}
+                        jettonInfo={jettonInfo}
+                    />
                 </>
             )}
         </Overlay>
