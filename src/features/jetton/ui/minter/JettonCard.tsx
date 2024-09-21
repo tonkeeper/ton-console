@@ -75,10 +75,10 @@ const ModalMint: FC<{
     jettonSymbol: string;
     jettomDecimals: string;
 }> = ({ isOpen, onClose, onMint, jettonSymbol, jettomDecimals }) => {
-    const [value, setValue] = useState(NaN);
+    const [value, setValue] = useState('');
 
     const handleClose = () => {
-        setValue(NaN);
+        setValue('');
         onClose();
     };
 
@@ -94,7 +94,7 @@ const ModalMint: FC<{
                             autoComplete="off"
                             autoFocus
                             min={0}
-                            onChange={e => setValue(Number(e.target.value))}
+                            onChange={e => setValue(e.target.value)}
                             placeholder={`Enter ${jettonSymbol} amount`}
                             type="number"
                             value={value}

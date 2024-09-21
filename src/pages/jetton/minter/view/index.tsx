@@ -32,6 +32,13 @@ const JettonViewPage: FC<BoxProps> = () => {
         jettonStore.setConnectedWalletAddress(connectedWalletAddress);
     }, [connectedWalletAddress, jettonStore]);
 
+    useEffect(() => {
+        return () => {
+            jettonStore.setJettonAddress(null);
+            jettonStore.setConnectedWalletAddress(null);
+        };
+    }, []);
+
     const jettonInfo = jettonStore.jettonInfo$.value;
     const jettonInfoLoading = jettonStore.jettonInfo$.isLoading;
 

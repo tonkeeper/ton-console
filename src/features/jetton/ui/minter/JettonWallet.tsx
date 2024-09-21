@@ -100,10 +100,10 @@ const ModalBurn: FC<{
     jettonSymbol: string;
     jettomDecimals: string;
 }> = ({ isOpen, onClose, onBurn, jettonSymbol, jettomDecimals }) => {
-    const [value, setValue] = useState(NaN);
+    const [value, setValue] = useState('');
 
     const handleClose = () => {
-        setValue(NaN);
+        setValue('');
         onClose();
     };
 
@@ -124,7 +124,7 @@ const ModalBurn: FC<{
                             autoComplete="off"
                             autoFocus
                             min={0}
-                            onChange={e => setValue(Number(e.target.value))}
+                            onChange={e => setValue(e.target.value)}
                             placeholder={`Enter ${jettonSymbol} amount`}
                             type="number"
                             value={value}

@@ -60,7 +60,7 @@ export class JettonStore {
             }
 
             return tonApiClient.jettons.getJettonInfo(this.jettonAddress).catch(e => {
-                if (e.response?.status === 404) {
+                if (e.status === 404) {
                     return null;
                 }
                 throw e;
@@ -87,7 +87,7 @@ export class JettonStore {
                     return res;
                 })
                 .catch(e => {
-                    if (e.response?.status === 404) {
+                    if (e.status === 404) {
                         return null;
                     }
                     return null; // TODO: remove that after API fix, not error on parse empty address
