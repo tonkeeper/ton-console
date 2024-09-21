@@ -17,7 +17,8 @@ import {
     FormErrorMessage,
     InputGroup,
     InputRightElement,
-    Text
+    Text,
+    useToast
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { Address } from '@ton/core';
@@ -178,9 +179,11 @@ const JettonWallet: FC<
         jettonInfo: JettonInfo;
     }
 > = observer(({ connectedWalletAddress, jettonInfo, ...rest }) => {
+    const toast = useToast();
     const [tonconnect] = useTonConnectUI();
     const [isModalChnageWalletOpen, setIsModalChnageWalletOpen] = useState(false);
     const [isModalBurnOpen, setIsModalBurnOpen] = useState(false);
+    const [isBurnProgress, setIsBurnProgress] = useState(false);
 
     const walletUserAddress = jettonStore.showWalletAddress;
     const jettonWallet = jettonStore.jettonWallet$.value;
@@ -204,6 +207,45 @@ const JettonWallet: FC<
         } else {
             jettonStore.setShowWalletAddress(connectedWalletAddress);
         }
+    };
+
+    const handlerBurn = (count: bigint) => {
+        setIsBurnProgress(true);
+
+        const toastId = toast({
+            title: 'Burning jetton',
+            description: 'Please wait...',
+            position: 'bottom-left',
+            duration: null,
+            status: 'loading',
+            isClosable: false
+        });
+
+        jettonStore
+            .burnJetton(count, tonconnect)
+            .then(() => {
+                toast.update(toastId, {
+                    title: 'Success',
+                    description: 'Jetton burned successfully',
+                    status: 'success',
+                    duration: 5000,
+                    isClosable: true
+                });
+            })
+            .catch(() => {
+                const errorMessage = 'Unknown traking error happened';
+                toast.update(toastId, {
+                    title: 'Traking lost',
+                    description: errorMessage,
+                    status: 'warning',
+                    duration: 5000,
+                    isClosable: true
+                });
+            })
+            .finally(() => {
+                jettonStore.updateJettonInfo();
+                setIsBurnProgress(false);
+            });
     };
 
     return (
@@ -243,8 +285,9 @@ const JettonWallet: FC<
                             {isConnectedWalletOwner && (
                                 <Button
                                     textStyle="label2"
-                                    color="text.accent"
+                                    color={isBurnProgress ? undefined : 'text.accent'}
                                     fontSize={14}
+                                    isLoading={isBurnProgress}
                                     onClick={() => setIsModalBurnOpen(true)}
                                     variant="link"
                                 >
@@ -267,7 +310,7 @@ const JettonWallet: FC<
                 <ModalBurn
                     isOpen={isModalBurnOpen}
                     onClose={() => setIsModalBurnOpen(false)}
-                    onBurn={count => jettonStore.burnJetton(count, tonconnect)}
+                    onBurn={handlerBurn}
                     jettonBalance={BigInt(jettonWallet.balance)}
                     jettonSymbol={jettonMetadata.symbol}
                     jettomDecimals={jettonMetadata.decimals}
