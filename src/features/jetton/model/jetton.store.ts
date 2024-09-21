@@ -1,7 +1,9 @@
 import { makeAutoObservable, reaction } from 'mobx';
 import { Loadable, tonApiClient } from 'src/shared';
-import { Address } from '@ton/core';
+import { Address, toNano } from '@ton/core';
 import { JettonBalance, JettonInfo } from '@ton-api/client';
+import { SendTransactionRequest, TonConnectUI } from '@tonconnect/ui-react';
+import { burn } from '../lib/jetton-minter';
 
 export class JettonStore {
     jettonAddress: Address | null = null;
@@ -93,6 +95,35 @@ export class JettonStore {
                     return null; // TODO: remove that after API fix, not error on parse empty address
                     // throw e;
                 });
+        },
+        {
+            onError: e => this.jettonWallet$.setErroredState(e)
+        }
+    );
+
+    burnJetton = this.jettonWallet$.createAsyncAction(
+        async (amount: bigint, tonConnection: TonConnectUI) => {
+            const jettonWalletAddress = this.jettonWallet$.value?.walletAddress.address;
+
+            if (!jettonWalletAddress || !this.connectedWalletAddress) {
+                throw new Error('Jetton address or connected wallet address is not set');
+            }
+
+            const tx: SendTransactionRequest = {
+                validUntil: Date.now() + 5 * 60 * 1000,
+                messages: [
+                    {
+                        address: jettonWalletAddress.toString(),
+                        amount: toNano(0.031).toString(),
+                        stateInit: undefined,
+                        payload: burn(amount, this.connectedWalletAddress)
+                            .toBoc()
+                            .toString('base64')
+                    }
+                ]
+            };
+
+            await tonConnection.sendTransaction(tx);
         },
         {
             onError: e => this.jettonWallet$.setErroredState(e)

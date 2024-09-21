@@ -25,6 +25,7 @@ import { CopyPad, Span, isAddressValid } from 'src/shared';
 import { fromDecimals, toDecimals } from '../../lib/utils';
 import { jettonStore } from 'src/features';
 import { JettonInfo } from '@ton-api/client';
+import { useTonConnectUI } from '@tonconnect/ui-react';
 
 const ModalChnageWallet: FC<{
     isOpen: boolean;
@@ -99,17 +100,32 @@ const ModalBurn: FC<{
     onBurn: (count: bigint) => void;
     jettonSymbol: string;
     jettomDecimals: string;
-}> = ({ isOpen, onClose, onBurn, jettonSymbol, jettomDecimals }) => {
+    jettonBalance: bigint;
+}> = ({ isOpen, onClose, onBurn, jettonSymbol, jettomDecimals, jettonBalance }) => {
     const [value, setValue] = useState('');
+    const [error, setError] = useState<string | null>(null);
 
     const handleClose = () => {
         setValue('');
+        setError(null);
         onClose();
     };
 
     const handleBurn = () => {
-        onBurn(toDecimals(value, jettomDecimals));
-        onClose();
+        const v = toDecimals(value, jettomDecimals);
+        if (v <= 0n) {
+            setError('Amount should be greater than 0');
+        } else if (v > jettonBalance) {
+            setError('Insufficient balance');
+        } else {
+            onBurn(v);
+            handleClose();
+        }
+    };
+
+    const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(e.target.value);
+        setError(null);
     };
 
     return (
@@ -119,12 +135,13 @@ const ModalBurn: FC<{
                 <ModalHeader textAlign="center">Burn {jettonSymbol}</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody py="0">
-                    <FormControl my={0}>
+                    <FormControl my={0} isInvalid={error !== null}>
                         <Input
                             autoComplete="off"
                             autoFocus
                             min={0}
-                            onChange={e => setValue(e.target.value)}
+                            onChange={handleValueChange}
+                            onKeyDown={e => e.key === 'Enter' && handleBurn()}
                             placeholder={`Enter ${jettonSymbol} amount`}
                             type="number"
                             value={value}
@@ -132,6 +149,7 @@ const ModalBurn: FC<{
                         <FormHelperText color="text.secondary">
                             Number of tokens to burn from connected wallet
                         </FormHelperText>
+                        <FormErrorMessage>{error}</FormErrorMessage>
                     </FormControl>
                 </ModalBody>
 
@@ -160,6 +178,7 @@ const JettonWallet: FC<
         jettonInfo: JettonInfo;
     }
 > = observer(({ connectedWalletAddress, jettonInfo, ...rest }) => {
+    const [tonconnect] = useTonConnectUI();
     const [isModalChnageWalletOpen, setIsModalChnageWalletOpen] = useState(false);
     const [isModalBurnOpen, setIsModalBurnOpen] = useState(false);
 
@@ -244,16 +263,16 @@ const JettonWallet: FC<
                 onClose={() => setIsModalChnageWalletOpen(false)}
                 onCheck={walletAddress => jettonStore.setShowWalletAddress(walletAddress)}
             />
-            <ModalBurn
-                isOpen={isModalBurnOpen}
-                onClose={() => setIsModalBurnOpen(false)}
-                onBurn={count => {
-                    alert('Burn ' + count);
-                    // jettonStore.burnJetton(count);
-                }}
-                jettonSymbol={jettonMetadata.symbol}
-                jettomDecimals={jettonMetadata.decimals}
-            />
+            {jettonWallet && (
+                <ModalBurn
+                    isOpen={isModalBurnOpen}
+                    onClose={() => setIsModalBurnOpen(false)}
+                    onBurn={count => jettonStore.burnJetton(count, tonconnect)}
+                    jettonBalance={BigInt(jettonWallet.balance)}
+                    jettonSymbol={jettonMetadata.symbol}
+                    jettomDecimals={jettonMetadata.decimals}
+                />
+            )}
         </>
     );
 });

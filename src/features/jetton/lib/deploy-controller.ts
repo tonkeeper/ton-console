@@ -8,11 +8,12 @@ import { createDeployParams, waitForContractDeploy } from './utils';
 //     mintBody,
 //     readJettonMetadata,
 //     transfer,
-//     updateMetadataBody
+//     updateMetadataBody,
+//     changeAdminBody,
+//     JettonMetaDataKeys
 // } from './jetton-minter';
-// import { changeAdminBody, JettonMetaDataKeys } from './jetton-minter';
 
-import { JettonBalance, JettonInfo } from '@ton-api/client';
+import { JettonInfo } from '@ton-api/client';
 import { Address, beginCell, toNano } from '@ton/core';
 import { TonConnectUI } from '@tonconnect/ui-react';
 
@@ -164,58 +165,6 @@ export class JettonDeployController {
 
     //     await waiter();
     // }
-
-    // async burnJettons(
-    //     tonConnection: TonConnectUI,
-    //     amount: bigint,
-    //     jettonAddress: string,
-    //     walletAddress: string
-    // ) {
-    //     const waiter = await waitForSeqno(walletAddress);
-
-    //     const tx: SendTransactionRequest = {
-    //         validUntil: Date.now() + 5 * 60 * 1000,
-    //         messages: [
-    //             {
-    //                 address: jettonAddress,
-    //                 amount: toNano(0.031).toString(),
-    //                 stateInit: undefined,
-    //                 payload: burn(amount, Address.parse(walletAddress)).toBoc().toString('base64')
-    //             }
-    //         ]
-    //     };
-
-    //     await tonConnection.sendTransaction(tx);
-
-    //     await waiter();
-    // }
-
-    static async getJettonDetails(
-        contractAddr: Address,
-        userAddress: Address | null
-    ): Promise<JettonData> {
-        // TODO make it easier
-        const jettonInfo = await tonApiClient.jettons.getJettonInfo(contractAddr);
-
-        const userJettonWallet: JettonBalance | null = userAddress
-            ? await tonApiClient.accounts.getAccountJettonBalance(userAddress, contractAddr)
-            : null;
-
-        const isDeployed = userJettonWallet !== null && userJettonWallet.balance !== ''; // TODO: check backend fix
-
-        const jettonWallet = isDeployed
-            ? {
-                  balance: BigInt(userJettonWallet.balance),
-                  jWalletAddress: userJettonWallet.walletAddress.address,
-                  jettonMasterAddress: contractAddr
-              }
-            : null;
-
-        return {
-            jettonInfo,
-            jettonWallet
-        };
-    }
 
     // async updateMetadata(
     //     contractAddress: Address,
