@@ -1,9 +1,9 @@
 import { Flex, BoxProps, Spinner, Divider } from '@chakra-ui/react';
 import { Address } from '@ton/core';
 import { TonConnectButton, useTonAddress } from '@tonconnect/ui-react';
-import { observer, useLocalObservable } from 'mobx-react-lite';
-import { FC, useEffect } from 'react';
-import { JettonCard, JettonStore } from 'src/features';
+import { observer } from 'mobx-react-lite';
+import { FC, useEffect, useMemo } from 'react';
+import { JettonCard, jettonStore } from 'src/features';
 import { isValidAddress } from 'src/features/jetton/lib/utils';
 import JettonWallet from 'src/features/jetton/ui/minter/JettonWallet';
 
@@ -13,17 +13,29 @@ const JettonViewPage: FC<BoxProps> = () => {
     const { searchParams } = useSearchParams();
     const jettonAddressStr = searchParams.get('address');
 
-    const jettonStore = useLocalObservable(() => new JettonStore());
-    const userAddressStr = useTonAddress();
+    const connectedWalletAddressStr = useTonAddress();
+    const connectedWalletAddress = useMemo(
+        () => (connectedWalletAddressStr ? Address.parse(connectedWalletAddressStr) : null),
+        [connectedWalletAddressStr]
+    );
 
     useEffect(() => {
-        const userAddress = isValidAddress(userAddressStr) ? Address.parse(userAddressStr) : null;
-        const jettonAddress = Address.parse(jettonAddressStr ?? '');
+        const jettonAddress =
+            jettonAddressStr && isValidAddress(jettonAddressStr)
+                ? Address.parse(jettonAddressStr)
+                : null;
 
-        jettonStore.setJettonMasterAddress(jettonAddress, userAddress);
-    }, [userAddressStr, jettonAddressStr, jettonStore]);
+        jettonStore.setJettonAddress(jettonAddress);
+    }, [jettonAddressStr, jettonStore]);
 
-    if (jettonStore.jettonData$.value === null && jettonStore.jettonData$.isLoading) {
+    useEffect(() => {
+        jettonStore.setConnectedWalletAddress(connectedWalletAddress);
+    }, [connectedWalletAddress, jettonStore]);
+
+    const jettonInfo = jettonStore.jettonInfo$.value;
+    const jettonInfoLoading = jettonStore.jettonInfo$.isLoading;
+
+    if (jettonInfo === null && jettonInfoLoading) {
         return (
             <Overlay display="flex" justifyContent="center" alignItems="center">
                 <Spinner />
@@ -31,28 +43,27 @@ const JettonViewPage: FC<BoxProps> = () => {
         );
     }
 
-    const wallet = jettonStore.wallet;
-    const jettonData = jettonStore.jettonData$;
-
     return (
         <Overlay display="flex" flexDirection="column">
             <Flex align="flex-start" justify="space-between" mb="5">
                 <H4>Jetton</H4>
                 <TonConnectButton />
             </Flex>
-            {jettonData.value === null ? (
+            {jettonInfo === null ? (
                 <Overlay display="flex" justifyContent="center" alignItems="center">
                     <H4>Jetton not found</H4>
                 </Overlay>
             ) : (
                 <>
-                    <JettonCard data={jettonData.value.jettonInfo} />
+                    <JettonCard data={jettonInfo} />
                     <Divider mt={6} />
-                    <JettonWallet
-                        onChangeWallet={jettonStore.fetchJettonDetails}
-                        jettonWallet={wallet}
-                        jettonMetadata={jettonData.value.jettonInfo.metadata}
-                    />
+
+                    {connectedWalletAddress && (
+                        <JettonWallet
+                            connectedWalletAddress={connectedWalletAddress}
+                            jettonInfo={jettonInfo}
+                        />
+                    )}
                 </>
             )}
         </Overlay>

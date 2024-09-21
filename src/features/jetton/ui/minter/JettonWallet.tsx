@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import {
     StyleProps,
     List,
@@ -21,11 +21,10 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { Address } from '@ton/core';
-import { useTonAddress } from '@tonconnect/ui-react';
 import { CopyPad, Span, isAddressValid } from 'src/shared';
 import { fromDecimals, toDecimals } from '../../lib/utils';
-import { JettonMetadata } from '@ton-api/client';
-import { type JettonWallet as JettonWalletType } from '../../lib/deploy-controller';
+import { jettonStore } from 'src/features';
+import { JettonInfo } from '@ton-api/client';
 
 const ModalChnageWallet: FC<{
     isOpen: boolean;
@@ -33,45 +32,56 @@ const ModalChnageWallet: FC<{
     onCheck: (address: Address) => void;
 }> = ({ isOpen, onClose, onCheck }) => {
     const [value, setValue] = useState('');
-    const [error, setError] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setValue(e.target.value);
-        setError(false);
+        setError(null);
+    };
+
+    const handleClose = () => {
+        setValue('');
+        setError(null);
+        onClose();
     };
 
     const handleSelect = () => {
         if (isAddressValid(value)) {
-            onCheck(Address.parse(value));
-            onClose();
+            const address = Address.parse(value);
+            if (jettonStore.connectedWalletAddress?.equals(address)) {
+                setError('This address is same as connected wallet');
+            } else {
+                onCheck(Address.parse(value));
+                handleClose();
+            }
         } else {
-            setError(true);
+            setError('Invalid address');
         }
-        setValue('');
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={() => onClose()} size="md">
+        <Modal isOpen={isOpen} onClose={handleClose} size="md">
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader textAlign="center">Check balance for another address</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody pb="0">
-                    <FormControl mb={0} isInvalid={error}>
+                    <FormControl mb={0} isInvalid={error !== null}>
                         <FormLabel htmlFor="name">Enter address to check balance:</FormLabel>
                         <Input
                             autoComplete="off"
                             autoFocus
                             onChange={handleChange}
+                            onKeyDown={e => e.key === 'Enter' && handleSelect()}
                             placeholder="Wallet Address"
                             value={value}
                         />
-                        <FormErrorMessage>{error && 'Invalid address'}</FormErrorMessage>
+                        <FormErrorMessage>{error}</FormErrorMessage>
                     </FormControl>
                 </ModalBody>
 
                 <ModalFooter gap="3">
-                    <Button flex={1} onClick={() => onClose()} variant="secondary">
+                    <Button flex={1} onClick={handleClose} variant="secondary">
                         Cancel
                     </Button>
                     <Button flex={1} onClick={handleSelect} type="submit" variant="primary">
@@ -94,6 +104,11 @@ const ModalBurn: FC<{
 
     const handleClose = () => {
         setValue(NaN);
+        onClose();
+    };
+
+    const handleBurn = () => {
+        onBurn(toDecimals(value, jettomDecimals));
         onClose();
     };
 
@@ -127,7 +142,7 @@ const ModalBurn: FC<{
                     <Button
                         flex={1}
                         disabled={!value}
-                        onClick={() => onBurn(toDecimals(value, jettomDecimals))}
+                        onClick={handleBurn}
                         type="submit"
                         variant="primary"
                     >
@@ -139,75 +154,70 @@ const ModalBurn: FC<{
     );
 };
 
-type JettonWalletProps = StyleProps & {
-    onChangeWallet: (address: Address) => void;
-    onBurn?: (count: bigint) => void;
-    jettonMetadata: JettonMetadata;
-    jettonWallet: JettonWalletType | null;
-};
+const JettonWallet: FC<
+    StyleProps & {
+        connectedWalletAddress: Address;
+        jettonInfo: JettonInfo;
+    }
+> = observer(({ connectedWalletAddress, jettonInfo, ...rest }) => {
+    const [isModalChnageWalletOpen, setIsModalChnageWalletOpen] = useState(false);
+    const [isModalBurnOpen, setIsModalBurnOpen] = useState(false);
 
-const JettonWallet: FC<JettonWalletProps> = observer(
-    ({ onChangeWallet, onBurn, jettonWallet, jettonMetadata, ...rest }) => {
-        const tonconnectAddressStr = useTonAddress();
-        const tonconnectAddress = isAddressValid(tonconnectAddressStr)
-            ? Address.parse(tonconnectAddressStr)
-            : null;
+    const walletUserAddress = jettonStore.showWalletAddress;
+    const jettonWallet = jettonStore.jettonWallet$.value;
+    const jettonMetadata = jettonInfo.metadata;
 
-        const [walletAddress, setWalletAddress] = useState<Address | null>(tonconnectAddress);
+    const balance = jettonWallet
+        ? fromDecimals(jettonWallet.balance, jettonMetadata.decimals)
+        : '-';
 
-        const [isModalChnageWalletOpen, setIsModalChnageWalletOpen] = useState(false);
-        const [isModalBurnOpen, setIsModalBurnOpen] = useState(false);
+    const isConnectedWallet = walletUserAddress?.equals(connectedWalletAddress);
+    const isConnectedWalletOwner =
+        jettonInfo.admin?.address.equals(connectedWalletAddress) ?? false;
 
-        useEffect(() => {
-            if (walletAddress) {
-                onChangeWallet(walletAddress);
-            }
-        }, [walletAddress, onChangeWallet]);
-
-        if (!jettonWallet) {
-            return null;
+    const handleWalletChange = () => {
+        if (isConnectedWallet) {
+            setIsModalChnageWalletOpen(true);
+        } else {
+            jettonStore.setShowWalletAddress(connectedWalletAddress);
         }
+    };
 
-        const balance = jettonWallet
-            ? fromDecimals(jettonWallet.balance, jettonMetadata.decimals)
-            : '-';
-
-        return (
-            <>
-                <Text textStyle="label1" py={5}>
-                    Connected Jetton wallet
-                </Text>
-                <List maxW={516} {...rest}>
-                    <FormControl>
-                        <FormLabel justifyContent="space-between" display="flex" htmlFor="name">
-                            <Span>Wallet Address</Span>
-                            {/* <Button
-                                textStyle="body2"
-                                color="text.accent"
-                                fontSize={14}
-                                fontWeight={400}
-                                onClick={() => setIsModalChnageWalletOpen(true)}
-                                variant="link"
-                            >
-                                Check balance for another address
-                            </Button> */}
-                            {/* TODO - Fix this button  */}
-                        </FormLabel>
-                        <CopyPad
-                            flex="1"
-                            wordBreak="break-all"
-                            text={walletAddress ? walletAddress.toString() : '-'}
-                        />
-                        <FormHelperText color="text.secondary">
-                            Connected wallet public address, can be shared to receive jetton
-                            transfers
-                        </FormHelperText>
-                    </FormControl>
-                    <FormControl>
-                        <FormLabel htmlFor="name">Wallet Balance</FormLabel>
-                        <InputGroup>
-                            <Input pr={63} defaultValue={balance} readOnly />
-                            <InputRightElement w={63}>
+    return (
+        <>
+            <Text textStyle="label1" py={5}>
+                Connected Jetton wallet
+            </Text>
+            <List maxW={516} {...rest}>
+                <FormControl>
+                    <FormLabel justifyContent="space-between" display="flex" htmlFor="name">
+                        <Span>Wallet Address</Span>
+                        <Button
+                            textStyle="body2"
+                            color="text.accent"
+                            fontSize={14}
+                            fontWeight={400}
+                            onClick={handleWalletChange}
+                            variant="link"
+                        >
+                            {isConnectedWallet ? 'Check balance for another wallet' : 'Cancel'}
+                        </Button>
+                    </FormLabel>
+                    <CopyPad
+                        flex="1"
+                        wordBreak="break-all"
+                        text={walletUserAddress?.toString({ bounceable: false }) ?? '-'}
+                    />
+                    <FormHelperText color="text.secondary">
+                        Connected wallet public address, can be shared to receive jetton transfers
+                    </FormHelperText>
+                </FormControl>
+                <FormControl>
+                    <FormLabel htmlFor="name">Wallet Balance</FormLabel>
+                    <InputGroup>
+                        <Input pr={63} readOnly value={balance} />
+                        <InputRightElement w={63}>
+                            {isConnectedWalletOwner && (
                                 <Button
                                     textStyle="label2"
                                     color="text.accent"
@@ -217,32 +227,31 @@ const JettonWallet: FC<JettonWalletProps> = observer(
                                 >
                                     Burn
                                 </Button>
-                            </InputRightElement>
-                        </InputGroup>
-                        <FormHelperText color="text.secondary">
-                            Number of tokens in connected wallet that can be transferred to others
-                        </FormHelperText>
-                    </FormControl>
-                </List>
-                <ModalChnageWallet
-                    isOpen={isModalChnageWalletOpen}
-                    onClose={() => setIsModalChnageWalletOpen(false)}
-                    onCheck={setWalletAddress}
-                />
-                <ModalBurn
-                    isOpen={isModalBurnOpen}
-                    onClose={() => setIsModalBurnOpen(false)}
-                    onBurn={count => {
-                        setIsModalBurnOpen(false);
-                        alert('Burn ' + count);
-                        // jettonStore.burnJetton(count);
-                    }}
-                    jettonSymbol={jettonMetadata.symbol}
-                    jettomDecimals={jettonMetadata.decimals}
-                />
-            </>
-        );
-    }
-);
+                            )}
+                        </InputRightElement>
+                    </InputGroup>
+                    <FormHelperText color="text.secondary">
+                        Number of tokens in connected wallet that can be transferred to others
+                    </FormHelperText>
+                </FormControl>
+            </List>
+            <ModalChnageWallet
+                isOpen={isModalChnageWalletOpen}
+                onClose={() => setIsModalChnageWalletOpen(false)}
+                onCheck={walletAddress => jettonStore.setShowWalletAddress(walletAddress)}
+            />
+            <ModalBurn
+                isOpen={isModalBurnOpen}
+                onClose={() => setIsModalBurnOpen(false)}
+                onBurn={count => {
+                    alert('Burn ' + count);
+                    // jettonStore.burnJetton(count);
+                }}
+                jettonSymbol={jettonMetadata.symbol}
+                jettomDecimals={jettonMetadata.decimals}
+            />
+        </>
+    );
+});
 
 export default JettonWallet;
