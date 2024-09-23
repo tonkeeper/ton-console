@@ -3,8 +3,8 @@ import { Loadable, tonApiClient } from 'src/shared';
 import { Address, toNano } from '@ton/core';
 import { JettonBalance, JettonInfo } from '@ton-api/client';
 import { SendTransactionRequest, TonConnectUI } from '@tonconnect/ui-react';
-import { burnBody, mintBody } from '../lib/jetton-minter';
-import { sleep } from '../lib/utils';
+import { burnBody, changeAdminBody, mintBody } from '../lib/jetton-minter';
+import { sleep, zeroAddress } from '../lib/utils';
 
 export class JettonStore {
     jettonAddress: Address | null = null;
@@ -195,6 +195,32 @@ export class JettonStore {
         await tonConnection.sendTransaction(tx);
 
         await this.waiter(supplyFetcher, v => v === beforeTotalSupply + amount);
+    }
+
+    async burnAdmin(tonConnection: TonConnectUI) {
+        const jettonWallet = this.jettonWallet$.value;
+
+        if (!jettonWallet || !this.connectedWalletAddress || !this.jettonAddress) {
+            throw new Error('Jetton address or connected wallet address is not set');
+        }
+
+        const supplyFetcher = async () =>
+            this.fetchJettonInfo(jettonWallet.jetton.address).then(v => v?.admin?.address ?? null);
+
+        const tx: SendTransactionRequest = {
+            validUntil: Date.now() + 5 * 60 * 1000,
+            messages: [
+                {
+                    address: this.jettonAddress.toString(),
+                    amount: toNano(0.01).toString(),
+                    stateInit: undefined,
+                    payload: changeAdminBody(zeroAddress()).toBoc().toString('base64')
+                }
+            ]
+        };
+
+        await tonConnection.sendTransaction(tx);
+        await this.waiter(supplyFetcher, v => v?.equals(zeroAddress()) ?? false);
     }
 
     setJettonAddress(address: Address | null) {

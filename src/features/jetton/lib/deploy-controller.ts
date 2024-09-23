@@ -93,51 +93,6 @@ export class JettonDeployController {
         return contractAddr;
     }
 
-    // async burnAdmin(contractAddress: Address, tonConnection: TonConnectUI, walletAddress: string) {
-    //     const waiter = await waitForSeqno(walletAddress);
-
-    //     const tx: SendTransactionRequest = {
-    //         validUntil: Date.now() + 5 * 60 * 1000,
-    //         messages: [
-    //             {
-    //                 address: contractAddress.toString(),
-    //                 amount: toNano(0.01).toString(),
-    //                 stateInit: undefined,
-    //                 payload: changeAdminBody(zeroAddress()).toBoc().toString('base64')
-    //             }
-    //         ]
-    //     };
-
-    //     await tonConnection.sendTransaction(tx);
-    //     await waiter();
-    // }
-
-    // async mint(
-    //     tonConnection: TonConnectUI,
-    //     jettonMaster: Address,
-    //     amount: bigint,
-    //     walletAddress: string
-    // ) {
-    //     const waiter = await waitForSeqno(walletAddress);
-
-    //     const tx: SendTransactionRequest = {
-    //         validUntil: Date.now() + 5 * 60 * 1000,
-    //         messages: [
-    //             {
-    //                 address: jettonMaster.toString(),
-    //                 amount: toNano(0.04).toString(),
-    //                 stateInit: undefined,
-    //                 payload: mintBody(Address.parse(walletAddress), amount, toNano(0.02), 0)
-    //                     .toBoc()
-    //                     .toString('base64')
-    //             }
-    //         ]
-    //     };
-
-    //     await tonConnection.sendTransaction(tx);
-    //     await waiter();
-    // }
-
     // async transfer(
     //     tonConnection: TonConnectUI,
     //     amount: bigint,

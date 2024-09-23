@@ -44,10 +44,11 @@ const Field: FC<{ label: string; value: string; children?: ReactNode }> = ({
 const ModalRevokeOwnership: FC<{
     isOpen: boolean;
     onClose: () => void;
+    onConfirm: () => void;
     jettonName: string;
-}> = ({ isOpen, onClose, jettonName }) => {
+}> = ({ isOpen, onClose, onConfirm, jettonName }) => {
     const handleConfirm = () => {
-        // TODO: Implement revoke ownership logic
+        onConfirm();
         onClose();
     };
 
@@ -194,6 +195,7 @@ const JettonCard: FC<JettonCardProps> = observer(
         const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
         const [isMineProgress, setIsMintProgress] = useState(false);
+        const [isRevokeProgress, setIsRevokeProgress] = useState(false);
 
         const handleMint = (count: bigint) => {
             setIsMintProgress(true);
@@ -231,6 +233,45 @@ const JettonCard: FC<JettonCardProps> = observer(
                 .finally(() => {
                     jettonStore.updateJettonInfo();
                     setIsMintProgress(false);
+                });
+        };
+
+        const handleRevokeOwnership = () => {
+            setIsRevokeProgress(true);
+
+            const toastId = toast({
+                title: 'Revoking ownership',
+                description: 'Please wait...',
+                position: 'bottom-left',
+                duration: null,
+                status: 'loading',
+                isClosable: false
+            });
+
+            jettonStore
+                .burnAdmin(tonconnect)
+                .then(() => {
+                    toast.update(toastId, {
+                        title: 'Success',
+                        description: 'Ownership revoked successfully',
+                        status: 'success',
+                        duration: 5000,
+                        isClosable: true
+                    });
+                })
+                .catch(() => {
+                    const errorMessage = 'Unknown traking error happened';
+                    toast.update(toastId, {
+                        title: 'Traking lost',
+                        description: errorMessage,
+                        status: 'warning',
+                        duration: 5000,
+                        isClosable: true
+                    });
+                })
+                .finally(() => {
+                    jettonStore.updateJettonInfo();
+                    setIsRevokeProgress(false);
                 });
         };
 
@@ -278,8 +319,9 @@ const JettonCard: FC<JettonCardProps> = observer(
                         {isOwner && (
                             <Button
                                 textStyle="body2"
-                                color="text.accent"
+                                color={isRevokeProgress ? undefined : 'text.accent'}
                                 fontWeight={400}
+                                isLoading={isRevokeProgress}
                                 onClick={() => setIsRevokeModalOpen(true)}
                                 size="sm"
                                 variant="link"
@@ -312,6 +354,7 @@ const JettonCard: FC<JettonCardProps> = observer(
                 <ModalRevokeOwnership
                     isOpen={isRevokeModalOpen}
                     onClose={() => setIsRevokeModalOpen(false)}
+                    onConfirm={handleRevokeOwnership}
                     jettonName={name}
                 />
                 <ModalMint
