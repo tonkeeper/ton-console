@@ -3,7 +3,7 @@ import { Loadable, tonApiClient } from 'src/shared';
 import { Address, toNano } from '@ton/core';
 import { JettonBalance, JettonInfo } from '@ton-api/client';
 import { SendTransactionRequest, TonConnectUI } from '@tonconnect/ui-react';
-import { burn } from '../lib/jetton-minter';
+import { burnBody, mintBody } from '../lib/jetton-minter';
 import { sleep } from '../lib/utils';
 
 export class JettonStore {
@@ -148,7 +148,9 @@ export class JettonStore {
                     address: jettonWalletAddress.toString(),
                     amount: toNano(0.031).toString(),
                     stateInit: undefined,
-                    payload: burn(amount, this.connectedWalletAddress).toBoc().toString('base64')
+                    payload: burnBody(amount, this.connectedWalletAddress)
+                        .toBoc()
+                        .toString('base64')
                 }
             ]
         };
@@ -156,6 +158,43 @@ export class JettonStore {
         await tonConnection.sendTransaction(tx);
 
         await this.waiter(supplyFetcher, v => v === beforeTotalSupply - amount);
+    }
+
+    async mintJetton(amount: bigint, tonConnection: TonConnectUI) {
+        const jettonWallet = this.jettonWallet$.value;
+
+        if (!jettonWallet || !this.connectedWalletAddress || !this.jettonAddress) {
+            throw new Error('Jetton address or connected wallet address is not set');
+        }
+
+        const supplyFetcher = async () =>
+            this.fetchJettonInfo(jettonWallet.jetton.address).then(v =>
+                v ? BigInt(v.totalSupply) : null
+            );
+
+        const beforeTotalSupply = await supplyFetcher();
+
+        if (!beforeTotalSupply) {
+            throw new Error('Jetton cannot be existed');
+        }
+
+        const tx: SendTransactionRequest = {
+            validUntil: Date.now() + 5 * 60 * 1000,
+            messages: [
+                {
+                    address: this.jettonAddress.toString(),
+                    amount: toNano(0.031).toString(),
+                    stateInit: undefined,
+                    payload: mintBody(this.connectedWalletAddress, amount, toNano(0.02), 0n)
+                        .toBoc()
+                        .toString('base64')
+                }
+            ]
+        };
+
+        await tonConnection.sendTransaction(tx);
+
+        await this.waiter(supplyFetcher, v => v === beforeTotalSupply + amount);
     }
 
     setJettonAddress(address: Address | null) {

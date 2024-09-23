@@ -258,14 +258,14 @@ export async function initData(owner: Address, data?: JettonMetadata, offchainUr
 export function mintBody(
     owner: Address,
     jettonValue: bigint,
-    transferToJWallet: bigint,
+    coinsForFee: bigint,
     queryId: bigint
 ): Cell {
     return beginCell()
         .storeUint(OPS.MINT, 32)
         .storeUint(queryId, 64) // queryid
         .storeAddress(owner)
-        .storeCoins(transferToJWallet)
+        .storeCoins(coinsForFee)
         .storeRef(
             // internal transfer message
             beginCell()
@@ -281,7 +281,7 @@ export function mintBody(
         .endCell();
 }
 
-export function burn(amount: bigint, responseAddress: Address) {
+export function burnBody(amount: bigint, responseAddress: Address) {
     return beginCell()
         .storeUint(OPS.BURN, 32) // action
         .storeUint(1, 64) // query-id

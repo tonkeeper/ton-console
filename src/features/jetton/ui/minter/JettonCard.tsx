@@ -16,7 +16,8 @@ import {
     ModalOverlay,
     FormControl,
     Input,
-    FormHelperText
+    FormHelperText,
+    useToast
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { JettonInfo } from '@ton-api/client';
@@ -24,6 +25,7 @@ import { EditIcon24, IconButton, sliceAddress } from 'src/shared';
 import { fromDecimals, toDecimals } from '../../lib/utils';
 import { ConfirmationDialog } from 'src/entities';
 import { jettonStore } from '../../model';
+import { useTonConnectUI } from '@tonconnect/ui-react';
 
 const Field: FC<{ label: string; value: string; children?: ReactNode }> = ({
     label,
@@ -76,10 +78,27 @@ const ModalMint: FC<{
     jettomDecimals: string;
 }> = ({ isOpen, onClose, onMint, jettonSymbol, jettomDecimals }) => {
     const [value, setValue] = useState('');
+    const [error, setError] = useState<string | null>(null);
 
     const handleClose = () => {
         setValue('');
+        setError(null);
         onClose();
+    };
+
+    const handleMint = () => {
+        const v = toDecimals(value, jettomDecimals);
+        if (v <= 0n) {
+            setError('Amount should be greater than 0');
+        } else {
+            onMint(v);
+            handleClose();
+        }
+    };
+
+    const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(e.target.value);
+        setError(null);
     };
 
     return (
@@ -89,12 +108,13 @@ const ModalMint: FC<{
                 <ModalHeader textAlign="center">Mint {jettonSymbol}</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody py="0">
-                    <FormControl my={0}>
+                    <FormControl my={0} isInvalid={error !== null}>
                         <Input
                             autoComplete="off"
                             autoFocus
                             min={0}
-                            onChange={e => setValue(e.target.value)}
+                            onChange={handleValueChange}
+                            onKeyDown={e => e.key === 'Enter' && handleMint()}
                             placeholder={`Enter ${jettonSymbol} amount`}
                             type="number"
                             value={value}
@@ -112,7 +132,7 @@ const ModalMint: FC<{
                     <Button
                         flex={1}
                         disabled={!value}
-                        onClick={() => onMint(toDecimals(value, jettomDecimals))}
+                        onClick={handleMint}
                         type="submit"
                         variant="primary"
                     >
@@ -166,9 +186,53 @@ const JettonCard: FC<JettonCardProps> = observer(
         },
         ...rest
     }) => {
+        const toast = useToast();
+        const [tonconnect] = useTonConnectUI();
+
         const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
         const [isMintModalOpen, setIsMintModalOpen] = useState(false);
         const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+        const [isMineProgress, setIsMintProgress] = useState(false);
+
+        const handleMint = (count: bigint) => {
+            setIsMintProgress(true);
+
+            const toastId = toast({
+                title: 'Minting jetton',
+                description: 'Please wait...',
+                position: 'bottom-left',
+                duration: null,
+                status: 'loading',
+                isClosable: false
+            });
+
+            jettonStore
+                .mintJetton(count, tonconnect)
+                .then(() => {
+                    toast.update(toastId, {
+                        title: 'Success',
+                        description: 'Jetton minted successfully',
+                        status: 'success',
+                        duration: 5000,
+                        isClosable: true
+                    });
+                })
+                .catch(() => {
+                    const errorMessage = 'Unknown traking error happened';
+                    toast.update(toastId, {
+                        title: 'Traking lost',
+                        description: errorMessage,
+                        status: 'warning',
+                        duration: 5000,
+                        isClosable: true
+                    });
+                })
+                .finally(() => {
+                    jettonStore.updateJettonInfo();
+                    setIsMintProgress(false);
+                });
+        };
 
         const connectedWalletAddress = jettonStore.connectedWalletAddress;
         const isOwner = connectedWalletAddress && admin?.address.equals(connectedWalletAddress);
@@ -233,8 +297,9 @@ const JettonCard: FC<JettonCardProps> = observer(
                         {isOwner && mintable && (
                             <Button
                                 textStyle="body2"
-                                color="text.accent"
+                                color={isMineProgress ? undefined : 'text.accent'}
                                 fontWeight={400}
+                                isLoading={isMineProgress}
                                 onClick={() => setIsMintModalOpen(true)}
                                 size="sm"
                                 variant="link"
@@ -252,7 +317,7 @@ const JettonCard: FC<JettonCardProps> = observer(
                 <ModalMint
                     isOpen={isMintModalOpen}
                     onClose={() => setIsMintModalOpen(false)}
-                    onMint={count => alert(`Minting ${count}`)}
+                    onMint={handleMint}
                     jettonSymbol={symbol}
                     jettomDecimals={decimals}
                 />

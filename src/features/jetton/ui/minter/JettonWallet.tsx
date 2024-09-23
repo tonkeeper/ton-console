@@ -209,7 +209,7 @@ const JettonWallet: FC<
         }
     };
 
-    const handlerBurn = (count: bigint) => {
+    const handleBurn = (count: bigint) => {
         setIsBurnProgress(true);
 
         const toastId = toast({
@@ -310,7 +310,7 @@ const JettonWallet: FC<
                 <ModalBurn
                     isOpen={isModalBurnOpen}
                     onClose={() => setIsModalBurnOpen(false)}
-                    onBurn={handlerBurn}
+                    onBurn={handleBurn}
                     jettonBalance={BigInt(jettonWallet.balance)}
                     jettonSymbol={jettonMetadata.symbol}
                     jettomDecimals={jettonMetadata.decimals}
