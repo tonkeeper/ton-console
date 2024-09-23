@@ -197,9 +197,7 @@ const JettonWallet: FC<
         ? walletUserAddress?.equals(connectedWalletAddress) ?? false
         : true;
 
-    const isConnectedWalletOwner =
-        (connectedWalletAddress && jettonInfo.admin?.address.equals(connectedWalletAddress)) ??
-        false;
+    const showBurnButton = isConnectedWallet && jettonWallet?.balance !== '0';
 
     const handleWalletChange = () => {
         if (isConnectedWallet) {
@@ -282,7 +280,7 @@ const JettonWallet: FC<
                     <InputGroup>
                         <Input pr={63} readOnly value={balance} />
                         <InputRightElement w={63}>
-                            {isConnectedWalletOwner && (
+                            {showBurnButton && (
                                 <Button
                                     textStyle="label2"
                                     color={isBurnProgress ? undefined : 'text.accent'}
