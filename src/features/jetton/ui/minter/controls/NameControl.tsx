@@ -1,36 +1,39 @@
-import { FC } from 'react';
 import { FormControl, FormLabel, Input, FormHelperText, FormErrorMessage } from '@chakra-ui/react';
-import { UseFormReturn } from 'react-hook-form';
-import { RawJettonMetadata } from '../JettonForm';
+import { FieldError, Path, UseFormReturn } from 'react-hook-form';
 
-interface NameControlProps {
-    context: UseFormReturn<RawJettonMetadata>;
+const controlId = 'name';
+
+interface ControlProps<T extends { [controlId]: string }> {
+    context: UseFormReturn<T>;
 }
 
-const NameControl: FC<NameControlProps> = ({
+const Control = <T extends { [controlId]: string }>({
     context: {
         register,
         formState: { errors }
     }
-}) => {
+}: ControlProps<T>) => {
+    const fieldName = controlId as Path<T>;
+    const fieldErrors = errors[controlId] as FieldError | undefined;
+
     return (
-        <FormControl mb={0} isInvalid={!!errors.name} isRequired>
-            <FormLabel htmlFor="name">Name</FormLabel>
+        <FormControl mb={0} isInvalid={!!fieldErrors} isRequired>
+            <FormLabel htmlFor={fieldName}>Name</FormLabel>
             <Input
                 autoComplete="off"
                 autoFocus
-                id="name"
+                id={fieldName}
                 placeholder="Jetton Name"
-                {...register('name', {
+                {...register(fieldName, {
                     required: 'This is required'
                 })}
             />
             <FormHelperText color="text.secondary">
                 Name with spaces (usually 1-3 words)
             </FormHelperText>
-            <FormErrorMessage pos="static">{errors.name && errors.name.message}</FormErrorMessage>
+            <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
         </FormControl>
     );
 };
 
-export default NameControl;
+export default Control;

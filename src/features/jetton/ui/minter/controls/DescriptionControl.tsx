@@ -1,33 +1,37 @@
-import { FC } from 'react';
 import { FormControl, FormLabel, FormErrorMessage, Textarea } from '@chakra-ui/react';
-import { UseFormReturn } from 'react-hook-form';
-import { RawJettonMetadata } from '../JettonForm';
+import { FieldError, Path, UseFormReturn } from 'react-hook-form';
 
-interface DescriptionControlProps {
-    context: UseFormReturn<RawJettonMetadata>;
+const controlId = 'description';
+interface ControlType {
+    [controlId]?: string;
 }
 
-const DescriptionControl: FC<DescriptionControlProps> = ({
+interface ControlProps<T extends ControlType> {
+    context: UseFormReturn<T>;
+}
+
+const Control = <T extends ControlType>({
     context: {
         register,
         formState: { errors }
     }
-}) => {
+}: ControlProps<T>) => {
+    const fieldName = controlId as Path<T>;
+    const fieldErrors = errors[controlId] as FieldError | undefined;
+
     return (
-        <FormControl mb={0} isInvalid={!!errors.description}>
-            <FormLabel htmlFor="description">Description</FormLabel>
+        <FormControl mb={0} isInvalid={!!fieldErrors}>
+            <FormLabel htmlFor={fieldName}>Description</FormLabel>
             <Textarea
                 autoComplete="off"
-                id="description"
+                id={fieldName}
                 placeholder="Rodent with absolutely no intentions"
-                {...register('description')}
+                {...register(fieldName)}
             />
 
-            <FormErrorMessage pos="static">
-                {errors.description && errors.description.message}
-            </FormErrorMessage>
+            <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
         </FormControl>
     );
 };
 
-export default DescriptionControl;
+export default Control;

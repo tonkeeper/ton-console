@@ -1,26 +1,29 @@
-import { FC } from 'react';
 import { FormControl, FormLabel, Input, FormHelperText, FormErrorMessage } from '@chakra-ui/react';
-import { UseFormReturn } from 'react-hook-form';
-import { RawJettonMetadata } from '../JettonForm';
+import { FieldError, Path, UseFormReturn } from 'react-hook-form';
 
-interface SymbolControlProps {
-    context: UseFormReturn<RawJettonMetadata>;
+const controlId = 'name';
+
+interface ControlProps<T extends { [controlId]: string }> {
+    context: UseFormReturn<T>;
 }
 
-const SymbolControl: FC<SymbolControlProps> = ({
+const Control = <T extends { [controlId]: string }>({
     context: {
         register,
         formState: { errors }
     }
-}) => {
+}: ControlProps<T>) => {
+    const fieldName = controlId as Path<T>;
+    const fieldErrors = errors[controlId] as FieldError | undefined;
+
     return (
-        <FormControl mb={0} isInvalid={!!errors.symbol} isRequired>
-            <FormLabel htmlFor="symbol">Symbol</FormLabel>
+        <FormControl mb={0} isInvalid={!!fieldErrors} isRequired>
+            <FormLabel htmlFor={fieldName}>Symbol</FormLabel>
             <Input
                 autoComplete="off"
-                id="symbol"
+                id={fieldName}
                 placeholder="SMBL"
-                {...register('symbol', {
+                {...register(fieldName, {
                     required: 'This is required'
                 })}
             />
@@ -28,11 +31,9 @@ const SymbolControl: FC<SymbolControlProps> = ({
             <FormHelperText color="text.secondary">
                 Currency symbol appearing in balance (usually 3-5 uppercase chars).
             </FormHelperText>
-            <FormErrorMessage pos="static">
-                {errors.symbol && errors.symbol.message}
-            </FormErrorMessage>
+            <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
         </FormControl>
     );
 };
 
-export default SymbolControl;
+export default Control;

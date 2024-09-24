@@ -1,29 +1,35 @@
-import { FC } from 'react';
 import { FormControl, FormLabel, Input, FormErrorMessage, FormHelperText } from '@chakra-ui/react';
-import { UseFormReturn } from 'react-hook-form';
-import { RawJettonMetadata } from '../JettonForm';
+import { FieldError, Path, UseFormReturn } from 'react-hook-form';
 
-interface LogoControlProps {
-    context: UseFormReturn<RawJettonMetadata>;
+const controlId = 'image';
+
+interface ControlType {
+    [controlId]?: string;
 }
 
-const LogoControl: FC<LogoControlProps> = ({
+interface ControlProps<T extends ControlType> {
+    context: UseFormReturn<T>;
+}
+
+const Control = <T extends ControlType>({
     context: {
         register,
         formState: { errors }
     }
-}) => {
+}: ControlProps<T>) => {
+    const fieldName = controlId as Path<T>;
+    const fieldErrors = errors[controlId] as FieldError | undefined;
     return (
-        <FormControl mb={0} isInvalid={!!errors.image}>
-            <FormLabel htmlFor="image">Jetton Logo</FormLabel>
-            <Input autoComplete="off" id="image" {...register('image')} />
+        <FormControl mb={0} isInvalid={!!fieldErrors}>
+            <FormLabel htmlFor={fieldName}>Jetton Logo</FormLabel>
+            <Input autoComplete="off" id={fieldName} {...register(fieldName)} />
 
             <FormHelperText>
                 URL of 256x256 pixel PNG image of token logo with transparent background.
             </FormHelperText>
-            <FormErrorMessage pos="static">{errors.image && errors.image.message}</FormErrorMessage>
+            <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
         </FormControl>
     );
 };
 
-export default LogoControl;
+export default Control;

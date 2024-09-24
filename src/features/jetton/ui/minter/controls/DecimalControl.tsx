@@ -1,20 +1,23 @@
-import { FC } from 'react';
 import { FormControl, FormLabel, Input, FormHelperText, FormErrorMessage } from '@chakra-ui/react';
-import { UseFormReturn } from 'react-hook-form';
-import { RawJettonMetadata } from '../JettonForm';
+import { FieldError, Path, UseFormReturn } from 'react-hook-form';
 import { useIMask } from 'react-imask';
 import { mergeRefs } from 'src/shared';
 
-interface DecimalControlProps {
-    context: UseFormReturn<RawJettonMetadata>;
+const controlId = 'decimals';
+
+interface ControlProps<T extends { [controlId]: string }> {
+    context: UseFormReturn<T>;
 }
 
-const DecimalControl: FC<DecimalControlProps> = ({
+const Control = <T extends { [controlId]: string }>({
     context: {
         register,
         formState: { errors }
     }
-}) => {
+}: ControlProps<T>) => {
+    const fieldName = controlId as Path<T>;
+    const fieldErrors = errors[controlId] as FieldError | undefined;
+
     const { ref: maskDecimalsRef } = useIMask({
         mask: Number,
         scale: 0,
@@ -22,18 +25,18 @@ const DecimalControl: FC<DecimalControlProps> = ({
         max: 255
     });
 
-    const { ref: hookDecimalsRef, ...registerDecimalsRest } = register('decimals', {
+    const { ref: hookDecimalsRef, ...registerDecimalsRest } = register(fieldName, {
         required: 'This is required'
     });
 
     return (
-        <FormControl mb={0} isInvalid={!!errors.decimals} isRequired>
-            <FormLabel htmlFor="decimals">Decimal precision</FormLabel>
+        <FormControl mb={0} isInvalid={!!fieldErrors} isRequired>
+            <FormLabel htmlFor={fieldName}>Decimal precision</FormLabel>
             <Input
                 ref={mergeRefs(maskDecimalsRef, hookDecimalsRef)}
                 autoComplete="off"
                 defaultValue="9"
-                id="decimals"
+                id={fieldName}
                 placeholder="9"
                 {...registerDecimalsRest}
             />
@@ -41,11 +44,9 @@ const DecimalControl: FC<DecimalControlProps> = ({
             <FormHelperText color="text.secondary">
                 The decimal precision of your token (9 is TON default).
             </FormHelperText>
-            <FormErrorMessage pos="static">
-                {errors.decimals && errors.decimals.message}
-            </FormErrorMessage>
+            <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
         </FormControl>
     );
 };
 
-export default DecimalControl;
+export default Control;
