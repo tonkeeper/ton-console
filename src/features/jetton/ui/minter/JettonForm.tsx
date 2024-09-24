@@ -36,10 +36,6 @@ const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => 
     const { ref: maskDecimalsRef } = useIMask({
         mask: Number,
         scale: 0,
-        signed: false,
-        normalizeZeros: true,
-        radix: '.',
-        mapToRadix: [','],
         min: 0,
         max: 255
     });
@@ -49,17 +45,12 @@ const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => 
     });
 
     const { ref: maskMintRef } = useIMask({
-        mask: Number,
-        scale: 0,
-        signed: false,
-        normalizeZeros: true,
-        radix: '.',
-        mapToRadix: [','],
-        min: 0
+        mask: /^(0|[1-9]\d*)$/
     });
 
     const { ref: hookMintRef, ...registerMintRest } = register('mint', {
-        required: 'This is required'
+        required: 'This is required',
+        validate: value => Number(value) > 0 || 'Should be greater than 0'
     });
 
     return (
