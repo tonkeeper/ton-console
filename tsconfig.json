@@ -24,9 +24,5 @@
   },
   "include": ["src"],
   "exclude": ["tests"],
-  "references": [{ "path": "./tsconfig.vite.json" }],
-  /* Чтобы завелись тесты, должно быть
-  "references": [{ "path": "./tsconfig.vite.json" }, { "path": "./tsconfig.test.json" }]
-  Но это ломает билд
-   */
+  "references": [{ "path": "./tsconfig.vite.json" }]
 }

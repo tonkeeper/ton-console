@@ -20,25 +20,6 @@ export function zeroAddress(): Address {
         .loadAddress();
 }
 
-// async function getSeqno(address: Address, tc: TonClient) {
-//     return makeGetCall(address, 'seqno', null, tc).then(reader => reader.readBigNumber());
-// }
-
-// export async function waitForSeqno(address: string) {
-//     const tc = await getClient();
-//     const ownerAddress = Address.parse(address);
-//     const seqnoBefore = await getSeqno(ownerAddress, tc);
-
-//     return async () => {
-//         for (let attempt = 0; attempt < 25; attempt++) {
-//             await sleep(3000);
-//             const seqnoAfter = await getSeqno(ownerAddress, tc);
-//             if (seqnoAfter > seqnoBefore) return;
-//         }
-//         throw new Error('Timeout');
-//     };
-// }
-
 export async function waitForContractDeploy(address: Address, tonApiClient: Api<unknown>) {
     let isDeployed = false;
     let maxTries = 25;

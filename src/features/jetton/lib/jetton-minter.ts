@@ -1,7 +1,8 @@
-import { Cell, beginCell, Address, toNano, Dictionary } from '@ton/core';
+import { Cell, beginCell, Address, toNano, Dictionary, Slice, Builder } from '@ton/core';
 
 import walletHex from './contracts/jetton-wallet.compiled.json';
 import minterHex from './contracts/jetton-minter.compiled.json';
+import axios from 'axios';
 
 const ONCHAIN_CONTENT_PREFIX = 0x00;
 const OFFCHAIN_CONTENT_PREFIX = 0x01;
@@ -83,28 +84,28 @@ export function makeSnakeCell(data: Buffer): Cell {
     return rootBuilder.endCell();
 }
 
-// export function flattenSnakeCell(cell: Cell): Buffer {
-//     const sliceToBuffer = (c: Cell, v: Buffer, isFirst: boolean): Buffer => {
-//         const s = c.beginParse();
+export function flattenSnakeCell(cell: Cell): Buffer {
+    const sliceToBuffer = (c: Cell, v: Buffer, isFirst: boolean): Buffer => {
+        const s = c.beginParse();
 
-//         if (isFirst && s.loadUint(8) !== SNAKE_PREFIX)
-//             throw new Error('Only snake format is supported');
+        if (isFirst && s.loadUint(8) !== SNAKE_PREFIX)
+            throw new Error('Only snake format is supported');
 
-//         if (s.remainingBits === 0) return v;
+        if (s.remainingBits === 0) return v;
 
-//         const data = s.loadBuffer(s.remainingBits / 8);
-//         v = Buffer.concat([v, data]);
+        const data = s.loadBuffer(s.remainingBits / 8);
+        v = Buffer.concat([v, data]);
 
-//         const newCell = s.remainingRefs > 0 ? s.loadRef() : null;
-//         s.endParse();
+        const newCell = s.remainingRefs > 0 ? s.loadRef() : null;
+        s.endParse();
 
-//         return newCell ? sliceToBuffer(newCell, v, false) : v;
-//     };
+        return newCell ? sliceToBuffer(newCell, v, false) : v;
+    };
 
-//     const buffer = sliceToBuffer(cell, Buffer.from(''), true);
+    const buffer = sliceToBuffer(cell, Buffer.from(''), true);
 
-//     return buffer;
-// }
+    return buffer;
+}
 
 async function toDictKey(key: string): Promise<bigint> {
     const shaKey = await sha256(key);
@@ -143,100 +144,98 @@ export function buildJettonOffChainMetadata(contentUri: string): Cell {
 
 export type PersistenceType = 'onchain' | 'offchain_private_domain' | 'offchain_ipfs';
 
-// export async function readJettonMetadata(contentCell: Cell): Promise<{
-//     persistenceType: PersistenceType;
-//     metadata: { [s in JettonMetaDataKeys]?: string };
-//     isJettonDeployerFaultyOnChainData?: boolean;
-// }> {
-//     const contentSlice = contentCell.beginParse();
-//     const prefix = contentSlice.loadInt(8);
+export async function readJettonMetadata(contentCell: Cell): Promise<{
+    persistenceType: PersistenceType;
+    metadata: JettonMetadata;
+    isJettonDeployerFaultyOnChainData?: boolean;
+}> {
+    const contentSlice = contentCell.beginParse();
+    const prefix = contentSlice.loadInt(8);
 
-//     switch (prefix) {
-//         case ONCHAIN_CONTENT_PREFIX: {
-//             const res = await parseJettonOnchainMetadata(contentSlice);
+    switch (prefix) {
+        case ONCHAIN_CONTENT_PREFIX: {
+            const res = await parseJettonOnchainMetadata(contentSlice);
 
-//             let persistenceType: PersistenceType = 'onchain';
+            let persistenceType: PersistenceType = 'onchain';
 
-//             if (res.metadata.uri) {
-//                 const offchainMetadata = await getJettonMetadataFromExternalUri(res.metadata.uri);
-//                 persistenceType = offchainMetadata.isIpfs
-//                     ? 'offchain_ipfs'
-//                     : 'offchain_private_domain';
-//                 res.metadata = {
-//                     ...res.metadata,
-//                     ...offchainMetadata.metadata
-//                 };
-//             }
+            if (res.metadata.uri) {
+                const offchainMetadata = await getJettonMetadataFromExternalUri(res.metadata.uri);
+                persistenceType = offchainMetadata.isIpfs
+                    ? 'offchain_ipfs'
+                    : 'offchain_private_domain';
+                res.metadata = {
+                    ...res.metadata,
+                    ...offchainMetadata.metadata
+                };
+            }
 
-//             return {
-//                 persistenceType: persistenceType,
-//                 ...res
-//             };
-//         }
-//         case OFFCHAIN_CONTENT_PREFIX: {
-//             const { metadata, isIpfs } = await parseJettonOffchainMetadata(contentSlice);
-//             return {
-//                 persistenceType: isIpfs ? 'offchain_ipfs' : 'offchain_private_domain',
-//                 metadata
-//             };
-//         }
-//         default:
-//             throw new Error('Unexpected jetton metadata content prefix');
-//     }
-// }
+            return {
+                persistenceType: persistenceType,
+                ...res
+            };
+        }
+        case OFFCHAIN_CONTENT_PREFIX: {
+            const { metadata, isIpfs } = await parseJettonOffchainMetadata(contentSlice);
+            return {
+                persistenceType: isIpfs ? 'offchain_ipfs' : 'offchain_private_domain',
+                metadata
+            };
+        }
+        default:
+            throw new Error('Unexpected jetton metadata content prefix');
+    }
+}
 
-// async function parseJettonOffchainMetadata(contentSlice: Slice): Promise<{
-//     metadata: { [s in JettonMetaDataKeys]?: string };
-//     isIpfs: boolean;
-// }> {
-//     return getJettonMetadataFromExternalUri(contentSlice.loadStringTail());
-// }
+async function parseJettonOffchainMetadata(contentSlice: Slice): Promise<{
+    metadata: JettonMetadata;
+    isIpfs: boolean;
+}> {
+    return getJettonMetadataFromExternalUri(contentSlice.loadStringTail());
+}
 
-// async function getJettonMetadataFromExternalUri(uri: string) {
-//     const jsonURI = uri.replace('ipfs://', 'https://ipfs.io/ipfs/');
+async function getJettonMetadataFromExternalUri(uri: string) {
+    const jsonURI = uri.replace('ipfs://', 'https://ipfs.io/ipfs/');
 
-//     return {
-//         metadata: (await axios.get(jsonURI)).data,
-//         isIpfs: /(^|\/)ipfs[.:]/.test(jsonURI)
-//     };
-// }
+    return {
+        metadata: (await axios.get(jsonURI)).data,
+        isIpfs: /(^|\/)ipfs[.:]/.test(jsonURI)
+    };
+}
 
-// async function parseJettonOnchainMetadata(contentSlice: Slice): Promise<{
-//     metadata: {
-//         [s in JettonMetaDataKeys]?: string;
-//     };
-//     isJettonDeployerFaultyOnChainData: boolean;
-// }> {
-//     let isJettonDeployerFaultyOnChainData = false; // TODO: check if this is used
+async function parseJettonOnchainMetadata(contentSlice: Slice): Promise<{
+    metadata: JettonMetadata;
+    isJettonDeployerFaultyOnChainData: boolean;
+}> {
+    let isJettonDeployerFaultyOnChainData = false; // TODO: check if this is used
 
-//     const dict = contentSlice.loadDict(Dictionary.Keys.BigUint(256), {
-//         serialize(_src: Buffer, _builder: Builder) {
-//             return;
-//         },
-//         parse: (src: Slice): Buffer => {
-//             if (src.remainingRefs === 0) {
-//                 isJettonDeployerFaultyOnChainData = true;
-//                 return flattenSnakeCell(src.asCell());
-//             }
-//             return flattenSnakeCell(src.loadRef());
-//         }
-//     });
+    const dict = contentSlice.loadDict(Dictionary.Keys.BigUint(256), {
+        serialize(_src: Buffer, _builder: Builder) {
+            return;
+        },
+        parse: (src: Slice): Buffer => {
+            if (src.remainingRefs === 0) {
+                isJettonDeployerFaultyOnChainData = true;
+                return flattenSnakeCell(src.asCell());
+            }
+            return flattenSnakeCell(src.loadRef());
+        }
+    });
 
-//     const res = Object.fromEntries(
-//         await Promise.all(
-//             Array.from(jettonOnChainMetadataSpec).map(async ([k, v]) => {
-//                 const dictKey = await toDictKey(k);
-//                 const val = dict.get(dictKey)?.toString(v);
-//                 return [k, val];
-//             })
-//         )
-//     );
+    const res = Object.fromEntries(
+        await Promise.all(
+            Array.from(jettonOnChainMetadataSpec).map(async ([k, v]) => {
+                const dictKey = await toDictKey(k);
+                const val = dict.get(dictKey)?.toString(v);
+                return [k, val];
+            })
+        )
+    );
 
-//     return {
-//         metadata: res,
-//         isJettonDeployerFaultyOnChainData
-//     };
-// }
+    return {
+        metadata: res,
+        isJettonDeployerFaultyOnChainData
+    };
+}
 
 export async function initData(owner: Address, data?: JettonMetadata, offchainUri?: string) {
     if (!data && !offchainUri) {

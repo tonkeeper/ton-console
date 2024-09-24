@@ -1,6 +1,6 @@
 import { makeAutoObservable, reaction } from 'mobx';
 import { Loadable, tonApiClient } from 'src/shared';
-import { Address, toNano } from '@ton/core';
+import { Address, toNano, Cell } from '@ton/core';
 import { JettonBalance, JettonInfo } from '@ton-api/client';
 import { SendTransactionRequest, TonConnectUI } from '@tonconnect/ui-react';
 import {
@@ -9,6 +9,7 @@ import {
     burnBody,
     changeAdminBody,
     mintBody,
+    readJettonMetadata,
     updateMetadataBody
 } from '../lib/jetton-minter';
 import { sleep, zeroAddress } from '../lib/utils';
@@ -64,12 +65,35 @@ export class JettonStore {
     }
 
     private async fetchJettonInfo(jettonAddress: Address) {
-        return tonApiClient.jettons.getJettonInfo(jettonAddress).catch(e => {
+        const jettonInfo = await tonApiClient.jettons.getJettonInfo(jettonAddress).catch(e => {
             if (e.status === 404) {
                 return null;
             }
             throw e;
         });
+
+        // FIXME: remove that after API fix
+        if (!jettonInfo) {
+            return null;
+        }
+
+        const jettonImageFromBlockchainContent = await tonApiClient.blockchain
+            .execGetMethodForBlockchainAccount(jettonAddress, 'get_jetton_data')
+            .then(v => v.decoded.jettonContent)
+            .then(v => Cell.fromBoc(Buffer.from(v, 'hex')))
+            .then(async v => {
+                const pop = v.pop();
+                return pop && (await readJettonMetadata(pop));
+            })
+            .then(v => v?.metadata.image);
+
+        return {
+            ...jettonInfo,
+            metadata: {
+                ...jettonInfo.metadata,
+                image: jettonImageFromBlockchainContent
+            }
+        };
     }
 
     updateJettonInfo = this.jettonInfo$.createAsyncAction(
@@ -92,7 +116,7 @@ export class JettonStore {
             .getAccountJettonBalance(showWalletAddress, jettonAddress)
             .then(res => {
                 if (res.balance === '') {
-                    // TODO: remove that after API fix
+                    // FIXME: remove that after API fix
                     return null;
                 }
                 return res;
@@ -101,7 +125,7 @@ export class JettonStore {
                 if (e.status === 404) {
                     return null;
                 }
-                return null; // TODO: remove that after API fix, not error on parse empty address
+                return null; // FIXME: remove that after API fix, not error on parse empty address
                 // throw e;
             });
     }
