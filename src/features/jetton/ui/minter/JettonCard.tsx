@@ -26,6 +26,9 @@ import { fromDecimals, toDecimals } from '../../lib/utils';
 import { ConfirmationDialog } from 'src/entities';
 import { jettonStore } from '../../model';
 import { useTonConnectUI } from '@tonconnect/ui-react';
+import JettonEditForm, { EditJettonMetadata } from './JettonEditForm';
+import { FormProvider, useForm } from 'react-hook-form';
+import { JettonMetadata } from '../../lib/jetton-minter';
 
 const Field: FC<{ label: string; value: string; children?: ReactNode }> = ({
     label,
@@ -145,27 +148,57 @@ const ModalMint: FC<{
     );
 };
 
-const ModalEdit: FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
-    const handleConfirm = () => {};
+const ModalEdit: FC<{
+    isOpen: boolean;
+    onClose: () => void;
+    onSubmit: (value: JettonMetadata) => void;
+}> = ({ isOpen, onClose, onSubmit }) => {
+    const formId = 'jetton-edit-form';
+
+    const metadata = jettonStore.jettonInfo$.value?.metadata;
+
+    if (!metadata) {
+        throw new Error('Jetton metadata is missing');
+    }
+
+    const methods = useForm<EditJettonMetadata>({
+        defaultValues: {
+            name: metadata.name,
+            symbol: metadata.symbol,
+            description: metadata.description,
+            image: metadata.image
+        }
+    });
+
+    const handleConfirm = (values: EditJettonMetadata) => {
+        onSubmit({
+            name: values.name,
+            symbol: values.symbol,
+            description: values.description,
+            image: values.image,
+            decimals: metadata.decimals
+        });
+        onClose();
+    };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} size="md">
+        <Modal isOpen={isOpen} onClose={onClose} size="lg">
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Edit</ModalHeader>
+                <ModalHeader>Edit token</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <Text textStyle="text.body2" color="text.secondary">
-                        TODO Implement edit form
-                    </Text>
+                    <FormProvider {...methods}>
+                        <JettonEditForm onSubmit={handleConfirm} id={formId} />
+                    </FormProvider>
                 </ModalBody>
 
                 <ModalFooter>
                     <Button flex={1} onClick={onClose} variant="outline">
                         Cancel
                     </Button>
-                    <Button flex={1} ml={3} onClick={handleConfirm}>
-                        Edit
+                    <Button flex={1} ml={3} onClick={methods.handleSubmit(handleConfirm)}>
+                        Save
                     </Button>
                 </ModalFooter>
             </ModalContent>
@@ -196,6 +229,7 @@ const JettonCard: FC<JettonCardProps> = observer(
 
         const [isMineProgress, setIsMintProgress] = useState(false);
         const [isRevokeProgress, setIsRevokeProgress] = useState(false);
+        const [isEditProgress, setIsEditProgress] = useState(false);
 
         const handleMint = (count: bigint) => {
             setIsMintProgress(true);
@@ -275,6 +309,45 @@ const JettonCard: FC<JettonCardProps> = observer(
                 });
         };
 
+        const handleUpdateMetadata = (values: JettonMetadata) => {
+            setIsEditProgress(true);
+
+            const toastId = toast({
+                title: 'Editing jetton',
+                description: 'Please wait...',
+                position: 'bottom-left',
+                duration: null,
+                status: 'loading',
+                isClosable: false
+            });
+
+            jettonStore
+                .updateMetadata(values, tonconnect)
+                .then(() => {
+                    toast.update(toastId, {
+                        title: 'Success',
+                        description: 'Jetton edited successfully',
+                        status: 'success',
+                        duration: 5000,
+                        isClosable: true
+                    });
+                })
+                .catch(() => {
+                    const errorMessage = 'Unknown traking error happened';
+                    toast.update(toastId, {
+                        title: 'Traking lost',
+                        description: errorMessage,
+                        status: 'warning',
+                        duration: 5000,
+                        isClosable: true
+                    });
+                })
+                .finally(() => {
+                    jettonStore.updateJettonInfo();
+                    setIsEditProgress(false);
+                });
+        };
+
         const connectedWalletAddress = jettonStore.connectedWalletAddress;
         const isOwner = connectedWalletAddress && admin?.address.equals(connectedWalletAddress);
 
@@ -304,6 +377,7 @@ const JettonCard: FC<JettonCardProps> = observer(
                         <IconButton
                             aria-label="Remove"
                             icon={<EditIcon24 />}
+                            isLoading={isEditProgress}
                             onClick={() => setIsEditModalOpen(true)}
                             ml="auto"
                         />
@@ -364,7 +438,11 @@ const JettonCard: FC<JettonCardProps> = observer(
                     jettonSymbol={symbol}
                     jettomDecimals={decimals}
                 />
-                <ModalEdit isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
+                <ModalEdit
+                    isOpen={isEditModalOpen}
+                    onClose={() => setIsEditModalOpen(false)}
+                    onSubmit={handleUpdateMetadata}
+                />
             </Box>
         );
     }

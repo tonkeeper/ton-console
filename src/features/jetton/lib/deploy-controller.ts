@@ -120,34 +120,6 @@ export class JettonDeployController {
 
     //     await waiter();
     // }
-
-    // async updateMetadata(
-    //     contractAddress: Address,
-    //     data: {
-    //         [s in JettonMetaDataKeys]?: string | undefined;
-    //     },
-    //     connection: TonConnectUI,
-    //     walletAddress: string
-    // ) {
-    //     const waiter = await waitForSeqno(walletAddress);
-    //     const metadata = await buildJettonOnchainMetadata(data);
-
-    //     const tx: SendTransactionRequest = {
-    //         validUntil: Date.now() + 5 * 60 * 1000,
-    //         messages: [
-    //             {
-    //                 address: contractAddress.toString(),
-    //                 amount: toNano(0.01).toString(),
-    //                 stateInit: undefined,
-    //                 payload: updateMetadataBody(metadata).toBoc().toString('base64')
-    //             }
-    //         ]
-    //     };
-
-    //     await connection.sendTransaction(tx);
-
-    //     await waiter();
-    // }
 }
 
 const jettonDeployController = new JettonDeployController();
