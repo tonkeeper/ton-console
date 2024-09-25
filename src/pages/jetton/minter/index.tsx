@@ -75,6 +75,7 @@ const JettonNewPage: FC<BoxProps> = () => {
                         </Link>
                     </Text>
                 ),
+                position: 'bottom-left',
                 status: 'error',
                 duration: 1000000,
                 isClosable: true
@@ -82,9 +83,22 @@ const JettonNewPage: FC<BoxProps> = () => {
             return;
         }
 
-        await jettonDeployController.createJetton(dataForMint, tonconnect);
-        navigate(jettonViewUrl);
-        setIsDeploying(false);
+        await jettonDeployController
+            .createJetton(dataForMint, tonconnect)
+            .then(() => navigate(jettonViewUrl))
+            .catch(e =>
+                toast({
+                    title: 'Error',
+                    description: e.message,
+                    status: 'error',
+                    position: 'bottom-left',
+                    duration: 1000000,
+                    isClosable: true
+                })
+            )
+            .finally(() => {
+                setIsDeploying(false);
+            });
     };
 
     if (isDeploying) {
