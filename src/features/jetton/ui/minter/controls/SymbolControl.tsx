@@ -1,7 +1,7 @@
 import { FormControl, FormLabel, Input, FormHelperText, FormErrorMessage } from '@chakra-ui/react';
 import { FieldError, Path, UseFormReturn } from 'react-hook-form';
 
-const controlId = 'name';
+const controlId = 'symbol';
 
 interface ControlProps<T extends { [controlId]: string }> {
     context: UseFormReturn<T>;
