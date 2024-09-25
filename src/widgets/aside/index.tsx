@@ -67,7 +67,7 @@ const Aside: FunctionComponent = () => {
                 content="Jetton"
                 linkTo="jetton"
             >
-                <DropDownMenuItem linkTo="minter">Minter</DropDownMenuItem>
+                <DropDownMenuItem linkTo="../jetton">Minter</DropDownMenuItem>
             </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>
                 Testnet Assets
