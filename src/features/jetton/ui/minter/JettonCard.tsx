@@ -388,7 +388,11 @@ const JettonCard: FC<JettonCardProps> = observer(
                     <Field label="Address" value={sliceAddress(address)} />
                     <Field
                         label="Owner"
-                        value={admin ? sliceAddress(admin.address) : 'Owner missing'}
+                        value={
+                            admin
+                                ? sliceAddress(admin.address, { bounceable: false })
+                                : 'Owner missing'
+                        }
                     >
                         {isOwner && (
                             <Button
