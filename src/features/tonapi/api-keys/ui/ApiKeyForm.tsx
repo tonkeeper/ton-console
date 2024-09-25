@@ -79,7 +79,6 @@ export const ApiKeyForm: FunctionComponent<
         mask: Number,
         scale: 1,
         signed: false,
-        normalizeZeros: true,
         radix: '.',
         mapToRadix: [','],
         min: 0,

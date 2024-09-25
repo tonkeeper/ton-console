@@ -27,6 +27,7 @@ import { fromDecimals, toDecimals } from '../../lib/utils';
 import { jettonStore } from 'src/features';
 import { JettonInfo } from '@ton-api/client';
 import { useTonConnectUI } from '@tonconnect/ui-react';
+import { useIMask } from 'react-imask';
 
 const ModalChnageWallet: FC<{
     isOpen: boolean;
@@ -129,6 +130,14 @@ const ModalBurn: FC<{
         setError(null);
     };
 
+    const { ref: maskRef } = useIMask({
+        mask: Number,
+        scale: Number(jettomDecimals),
+        signed: false,
+        radix: '.',
+        mapToRadix: [',']
+    });
+
     return (
         <Modal isOpen={isOpen} onClose={handleClose} size="md">
             <ModalOverlay />
@@ -138,9 +147,9 @@ const ModalBurn: FC<{
                 <ModalBody py="0">
                     <FormControl my={0} isInvalid={error !== null}>
                         <Input
+                            ref={maskRef}
                             autoComplete="off"
                             autoFocus
-                            min={0}
                             onChange={handleValueChange}
                             onKeyDown={e => e.key === 'Enter' && handleBurn()}
                             placeholder={`Enter ${jettonSymbol} amount`}
