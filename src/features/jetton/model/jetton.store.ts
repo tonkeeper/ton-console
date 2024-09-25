@@ -1,7 +1,7 @@
 import { makeAutoObservable, reaction } from 'mobx';
 import { Loadable, tonApiClient } from 'src/shared';
 import { Address, toNano, Cell } from '@ton/core';
-import { JettonBalance, JettonInfo } from '@ton-api/client';
+import { JettonBalance, JettonInfo, JettonMetadata as ApiJettonMetadata } from '@ton-api/client';
 import { SendTransactionRequest, TonConnectUI } from '@tonconnect/ui-react';
 import {
     JettonMetadata,
@@ -77,7 +77,7 @@ export class JettonStore {
             return null;
         }
 
-        const jettonImageFromBlockchainContent = await tonApiClient.blockchain
+        const jettonMetadataFromBlockchainContent = await tonApiClient.blockchain
             .execGetMethodForBlockchainAccount(jettonAddress, 'get_jetton_data')
             .then(v => v.decoded.jettonContent)
             .then(v => Cell.fromBoc(Buffer.from(v, 'hex')))
@@ -85,13 +85,21 @@ export class JettonStore {
                 const pop = v.pop();
                 return pop && (await readJettonMetadata(pop));
             })
-            .then(v => v?.metadata.image);
+            .then(v => v?.metadata);
+
+        const preparedMetadataFromBlockchainContent: Partial<ApiJettonMetadata> = {
+            name: jettonMetadataFromBlockchainContent?.name,
+            symbol: jettonMetadataFromBlockchainContent?.symbol,
+            decimals: jettonMetadataFromBlockchainContent?.decimals,
+            image: jettonMetadataFromBlockchainContent?.image,
+            description: jettonMetadataFromBlockchainContent?.description
+        };
 
         return {
             ...jettonInfo,
             metadata: {
                 ...jettonInfo.metadata,
-                image: jettonImageFromBlockchainContent
+                ...preparedMetadataFromBlockchainContent
             }
         };
     }
