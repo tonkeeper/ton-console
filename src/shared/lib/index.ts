@@ -15,3 +15,4 @@ export * from './form';
 export * from './env';
 export * from './address';
 export * from './number';
+export * from './decimals';

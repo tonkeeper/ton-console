@@ -22,8 +22,7 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { Address } from '@ton/core';
-import { CopyPad, Span, isAddressValid } from 'src/shared';
-import { fromDecimals, toDecimals } from '../../lib/utils';
+import { CopyPad, Span, isAddressValid, toDecimals, fromDecimals } from 'src/shared';
 import { jettonStore } from 'src/features';
 import { JettonInfo } from '@ton-api/client';
 import { useTonConnectUI } from '@tonconnect/ui-react';
@@ -114,7 +113,7 @@ const ModalBurn: FC<{
     };
 
     const handleBurn = () => {
-        const v = toDecimals(value, jettomDecimals);
+        const v = fromDecimals(value, jettomDecimals);
         if (v <= 0n) {
             setError('Amount should be greater than 0');
         } else if (v > jettonBalance) {
@@ -198,9 +197,7 @@ const JettonWallet: FC<
     const jettonWallet = jettonStore.jettonWallet$.value;
     const jettonMetadata = jettonInfo.metadata;
 
-    const balance = jettonWallet
-        ? fromDecimals(jettonWallet.balance, jettonMetadata.decimals)
-        : '-';
+    const balance = jettonWallet ? toDecimals(jettonWallet.balance, jettonMetadata.decimals) : '-';
 
     const isConnectedWallet = connectedWalletAddress
         ? walletUserAddress?.equals(connectedWalletAddress) ?? false

@@ -21,8 +21,14 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { JettonInfo } from '@ton-api/client';
-import { CopyPad, EditIcon24, IconButton, sliceAddress } from 'src/shared';
-import { fromDecimals, toDecimals } from '../../lib/utils';
+import {
+    CopyPad,
+    EditIcon24,
+    IconButton,
+    sliceAddress,
+    toDecimals,
+    fromDecimals
+} from 'src/shared';
 import { ConfirmationDialog } from 'src/entities';
 import { jettonStore } from '../../model';
 import { useTonConnectUI } from '@tonconnect/ui-react';
@@ -91,7 +97,7 @@ const ModalMint: FC<{
     };
 
     const handleMint = () => {
-        const v = toDecimals(value, jettomDecimals);
+        const v = fromDecimals(value, jettomDecimals);
         if (v <= 0n) {
             setError('Amount should be greater than 0');
         } else {
@@ -433,7 +439,7 @@ const JettonCard: FC<JettonCardProps> = observer(
                     <Field label="Decimals" value={decimals} />
                     <Field
                         label="Total Supply"
-                        value={`${fromDecimals(totalSupply, decimals)} ${symbol}`}
+                        value={`${toDecimals(totalSupply, decimals)} ${symbol}`}
                     >
                         {isOwner && mintable && (
                             <Button

@@ -15,9 +15,9 @@ import {
     JettonDeployParams,
     jettonDeployController
 } from 'src/features/jetton/lib/deploy-controller';
-import { createDeployParams, toDecimals } from 'src/features/jetton/lib/utils';
+import { createDeployParams } from 'src/features/jetton/lib/utils';
 import JettonForm, { RawJettonMetadata } from 'src/features/jetton/ui/minter/JettonForm';
-import { H4, Overlay, tonApiClient } from 'src/shared';
+import { H4, Overlay, fromDecimals, tonApiClient } from 'src/shared';
 
 const DEFAULT_DECIMALS = 9;
 
@@ -46,7 +46,7 @@ const JettonNewPage: FC<BoxProps> = () => {
             },
             offchainUri: undefined,
             owner: Address.parse(userAddress),
-            amountToMint: toDecimals(form.mint, form.decimals ?? DEFAULT_DECIMALS)
+            amountToMint: fromDecimals(form.mint, form.decimals ?? DEFAULT_DECIMALS)
         };
 
         const deployParams = await createDeployParams(dataForMint, dataForMint.offchainUri);
