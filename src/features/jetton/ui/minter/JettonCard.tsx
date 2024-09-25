@@ -21,7 +21,7 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { JettonInfo } from '@ton-api/client';
-import { EditIcon24, IconButton, sliceAddress } from 'src/shared';
+import { CopyPad, EditIcon24, IconButton, sliceAddress } from 'src/shared';
 import { fromDecimals, toDecimals } from '../../lib/utils';
 import { ConfirmationDialog } from 'src/entities';
 import { jettonStore } from '../../model';
@@ -30,7 +30,7 @@ import JettonEditForm, { EditJettonMetadata } from './JettonEditForm';
 import { FormProvider, useForm } from 'react-hook-form';
 import { JettonMetadata } from '../../lib/jetton-minter';
 
-const Field: FC<{ label: string; value: string; children?: ReactNode }> = ({
+const Field: FC<{ label: string; value: ReactNode; children?: ReactNode }> = ({
     label,
     children,
     value
@@ -39,7 +39,7 @@ const Field: FC<{ label: string; value: string; children?: ReactNode }> = ({
         <Text w="88px" color="text.secondary">
             {label}
         </Text>
-        <Text>{value}</Text>
+        {typeof value === 'string' ? <Text>{value}</Text> : value}
         {children}
     </Flex>
 );
@@ -385,13 +385,34 @@ const JettonCard: FC<JettonCardProps> = observer(
                 </Flex>
                 <Divider />
                 <Box textStyle="body2" p={4}>
-                    <Field label="Address" value={sliceAddress(address)} />
+                    <Field
+                        label="Address"
+                        value={
+                            <CopyPad
+                                variant="flat"
+                                size="sm"
+                                textView={sliceAddress(address)}
+                                text={address.toString()}
+                                iconAlign="start"
+                                hideCopyIcon
+                            />
+                        }
+                    />
                     <Field
                         label="Owner"
                         value={
-                            admin
-                                ? sliceAddress(admin.address, { bounceable: false })
-                                : 'Owner missing'
+                            admin ? (
+                                <CopyPad
+                                    variant="flat"
+                                    size="sm"
+                                    textView={sliceAddress(admin.address, { bounceable: false })}
+                                    text={admin.address.toString({ bounceable: false })}
+                                    iconAlign="start"
+                                    hideCopyIcon
+                                />
+                            ) : (
+                                'Owner missing'
+                            )
                         }
                     >
                         {isOwner && (
