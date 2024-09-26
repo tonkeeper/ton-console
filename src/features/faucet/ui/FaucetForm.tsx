@@ -12,7 +12,7 @@ import {
     StyleProps
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
-import { isNumber, isAddersValid, TonCurrencyAmount, mergeRefs, tonMask, Span } from 'src/shared';
+import { isNumber, isAddressValid, TonCurrencyAmount, mergeRefs, tonMask, Span } from 'src/shared';
 import { useIMask } from 'react-imask';
 import { RequestFaucetForm } from '../model';
 import { Address } from 'ton-core';
@@ -132,7 +132,7 @@ export const FaucetForm: FunctionComponent<
                             required: 'This is required',
                             validate: value => {
                                 if (
-                                    !isAddersValid(value, { acceptTestnet: true, acceptRaw: true })
+                                    !isAddressValid(value, { acceptTestnet: true, acceptRaw: true })
                                 ) {
                                     return 'Wrong address';
                                 }

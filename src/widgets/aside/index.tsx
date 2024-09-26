@@ -18,6 +18,7 @@ import { balanceStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { invoicesAppStore } from 'src/features';
 import { NftIcon24 } from 'src/shared';
+import { JettonIcon24 } from 'src/shared/ui/icons/JettonIcon24';
 
 const Aside: FunctionComponent = () => {
     return (
@@ -60,6 +61,13 @@ const Aside: FunctionComponent = () => {
             </DropDownMenuItemExpandable>
             <DropDownMenuItemExpandable leftIcon={<NftIcon24 />} content="NFT" linkTo="nft">
                 <DropDownMenuItem linkTo="cnft">cNFT</DropDownMenuItem>
+            </DropDownMenuItemExpandable>
+            <DropDownMenuItemExpandable
+                leftIcon={<JettonIcon24 />}
+                content="Jetton"
+                linkTo="jetton"
+            >
+                <DropDownMenuItem linkTo="../jetton">Minter</DropDownMenuItem>
             </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>
                 Testnet Assets

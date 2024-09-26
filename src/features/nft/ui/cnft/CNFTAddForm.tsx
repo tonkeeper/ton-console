@@ -13,7 +13,7 @@ import {
 import { SubmitHandler, useForm } from 'react-hook-form';
 import {
     AsyncInput,
-    isAddersValid,
+    isAddressValid,
     isNumber,
     mergeRefs,
     Span,
@@ -109,7 +109,7 @@ const CNFTAddForm: FC<
                     {...register('account', {
                         required: 'This is required',
                         validate: value => {
-                            if (!isAddersValid(value, { acceptTestnet: true, acceptRaw: true })) {
+                            if (!isAddressValid(value, { acceptRaw: true })) {
                                 return 'Wrong address';
                             }
                             if (cnftStore.currentAddress$.error) {

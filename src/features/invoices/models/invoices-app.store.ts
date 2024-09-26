@@ -60,7 +60,6 @@ class InvoicesAppStore {
 
             return mapInvoicesAppDTOToInvoicesApp(response.data.app);
         } catch (e) {
-            console.debug(e);
             return null;
         }
     });

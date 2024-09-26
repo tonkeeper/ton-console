@@ -1,6 +1,7 @@
 import { Api } from './api.generated';
 
 export * from './api.generated';
+export * from './tonapi';
 
 export const apiClientBaseURL = import.meta.env.VITE_BASE_URL;
 

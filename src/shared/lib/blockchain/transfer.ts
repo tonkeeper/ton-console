@@ -1,14 +1,16 @@
 import BigNumber from 'bignumber.js';
 import { TokenCurrencyAmount } from 'src/shared';
 
-export function createTransferLink(options?: {
-    address?: string;
-    amount?: string | number | BigNumber | TokenCurrencyAmount;
-    text?: string;
-    exp?: Date | number | string;
-}): string {
+export function createTransferLink(
+    address: string,
+    options?: {
+        amount?: string | number | BigNumber | TokenCurrencyAmount;
+        text?: string;
+        exp?: Date | number | string;
+    }
+): string {
     const baseUrl = 'https://app.tonkeeper.com/transfer';
-    const link = new URL(options?.address ? `${baseUrl}/${options.address}` : baseUrl);
+    const link = new URL(address ? `${baseUrl}/${address}` : baseUrl);
 
     if (options?.amount) {
         let value: string;

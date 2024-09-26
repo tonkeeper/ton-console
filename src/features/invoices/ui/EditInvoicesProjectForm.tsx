@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
 import { InvoicesProjectForm } from '../models';
-import { isAddersValid } from 'src/shared';
+import { isAddressValid } from 'src/shared';
 
 export const EditInvoicesProjectForm: FunctionComponent<
     StyleProps & {
@@ -70,11 +70,9 @@ export const EditInvoicesProjectForm: FunctionComponent<
                     {...register('receiverAddress', {
                         required: 'This is required',
                         validate(value) {
-                            if (isAddersValid(value)) {
-                                return;
+                            if (!isAddressValid(value)) {
+                                return 'Invalid address';
                             }
-
-                            return 'Invalid address';
                         }
                     })}
                 />

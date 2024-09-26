@@ -1,4 +1,5 @@
 import {
+    Box,
     Button,
     Input,
     Modal,
@@ -7,8 +8,7 @@ import {
     ModalContent,
     ModalFooter,
     ModalHeader,
-    ModalOverlay,
-    Text
+    ModalOverlay
 } from '@chakra-ui/react';
 import { FC, ReactNode, useEffect, useState } from 'react';
 
@@ -54,15 +54,15 @@ export const ConfirmationDialog: FC<{
                 <ModalHeader textAlign="center">{titleString}</ModalHeader>
                 <ModalCloseButton />
                 {descriptionString && (
-                    <ModalBody pb="0">
-                        <Text
+                    <ModalBody py="0">
+                        <Box
                             textStyle="text.body2"
                             mb="6"
                             color="text.secondary"
                             textAlign="center"
                         >
                             {descriptionString}
-                        </Text>
+                        </Box>
                         {confirmValue && (
                             <Input
                                 onChange={e => setInputValue(e.target.value)}

@@ -12,7 +12,7 @@ import { createStandaloneToast } from '@chakra-ui/react';
 import { projectsStore } from 'src/entities';
 import type { AxiosError } from 'axios';
 import { RequestFaucetForm } from './interfaces';
-import { TonapiTestnet } from 'src/shared/api/tonapi';
+import { tonApiClient } from 'src/shared';
 
 class FaucetStore {
     tonRate$ = new Loadable<number>(0);
@@ -92,19 +92,21 @@ class FaucetStore {
 }
 
 async function fetchTxHash(msgHash: string, attempt = 0): Promise<string> {
-    try {
-        return await TonapiTestnet.getTransactionHashByMessage(msgHash);
-    } catch (e) {
-        if (hasProperty(e, 'message') && e.message === 'transaction not found') {
-            if (attempt > 20) {
-                throw new Error('Tx not found');
+    return tonApiClient.blockchain
+        .getBlockchainTransactionByMessageHash(msgHash)
+        .then(data => data.hash)
+        .catch(e => {
+            if (hasProperty(e, 'message') && e.message === 'transaction not found') {
+                if (attempt > 20) {
+                    throw new Error('Tx not found');
+                }
+                return new Promise(r => setTimeout(r, 1500)).then(() =>
+                    fetchTxHash(msgHash, attempt + 1)
+                );
             }
-            await new Promise(r => setTimeout(r, 1500));
-            return fetchTxHash(msgHash);
-        }
 
-        throw e;
-    }
+            throw e;
+        });
 }
 
 export const faucetStore = new FaucetStore();

@@ -1,12 +1,11 @@
-/*
-
 import { ReactNode } from 'react';
 import { TonConnectUIProvider, THEME } from '@tonconnect/ui-react';
+import { EXTERNAL_LINKS } from 'src/shared';
 
-export const withTonConnectUI = (component: () => ReactNode) => () =>
-    (
+export const withTonConnectUI = (component: () => ReactNode) => {
+    const WithTonConnectUI = () => (
         <TonConnectUIProvider
-            manifestUrl="https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json"
+            manifestUrl={EXTERNAL_LINKS.TONCONNECT_MANIFEST}
             uiPreferences={{
                 theme: THEME.LIGHT,
                 borderRadius: 's'
@@ -15,6 +14,6 @@ export const withTonConnectUI = (component: () => ReactNode) => () =>
             {component()}
         </TonConnectUIProvider>
     );
-*/
 
-export {};
+    return WithTonConnectUI;
+};

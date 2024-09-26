@@ -7,6 +7,7 @@ import { hexToRGBA } from 'src/shared';
 export const CopyPad: FunctionComponent<
     ComponentProps<typeof Pad> & {
         text: string;
+        textView?: string;
         textStyles?: ComponentProps<typeof Text>;
         iconAlign?: 'start' | 'center';
         iconPosition?: 'sticky' | 'static';
@@ -18,6 +19,7 @@ export const CopyPad: FunctionComponent<
     // eslint-disable-next-line complexity
 > = ({
     text,
+    textView = text,
     iconAlign,
     iconPosition,
     isLoading,
@@ -132,7 +134,7 @@ export const CopyPad: FunctionComponent<
                         <Spinner mx="auto" size="sm" />
                     ) : (
                         <Text textStyle="body2" color="primary" fontFamily="mono" {...textStyles}>
-                            {text}
+                            {textView}
                         </Text>
                     )}
                 </Box>
