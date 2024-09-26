@@ -1,7 +1,7 @@
 import { lazy } from '@loadable/component';
 import { Suspense } from 'react';
 import { Navigate, Route } from 'react-router-dom';
-import { Flex, Button } from '@chakra-ui/react';
+import { Flex, Button, Badge } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { H4, Overlay } from 'src/shared';
 import { SearchInput } from './ui/SearchInput';
@@ -33,8 +33,16 @@ const JettonRouting = (
             index
             element={
                 <Overlay display="flex" flexDirection="column">
-                    <Flex align="flex-start" gap={4} mb="5">
+                    <Flex align="center" gap={4} mb="5">
                         <H4>Jetton Minter</H4>
+                        <Badge
+                            textStyle="label3"
+                            color="accent.orange"
+                            fontFamily="body"
+                            bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
+                        >
+                            BETA
+                        </Badge>
                     </Flex>
                     <Flex align="center" justify="center" gap="4" h="100%" mb="6">
                         <SearchInput />
