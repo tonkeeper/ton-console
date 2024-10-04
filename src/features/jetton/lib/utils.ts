@@ -20,14 +20,12 @@ export function zeroAddress(): Address {
         .loadAddress();
 }
 
-export async function waitForContractDeploy(address: Address, tonApiClient: Api<unknown>) {
+export async function waitForContractDeploy(address: Address, ta: Api<unknown>) {
     let isDeployed = false;
     let maxTries = 25;
     while (!isDeployed && maxTries > 0) {
         maxTries--;
-        isDeployed = await tonApiClient.accounts
-            .getAccount(address)
-            .then(v => v.status === 'active');
+        isDeployed = await ta.accounts.getAccount(address).then(v => v.status === 'active');
         if (isDeployed) return;
         await sleep(3000);
     }

@@ -12,7 +12,7 @@ import { createStandaloneToast } from '@chakra-ui/react';
 import { projectsStore } from 'src/entities';
 import type { AxiosError } from 'axios';
 import { RequestFaucetForm } from './interfaces';
-import { tonApiClient } from 'src/shared';
+import { taTestnet } from 'src/shared';
 
 class FaucetStore {
     tonRate$ = new Loadable<number>(0);
@@ -76,15 +76,22 @@ class FaucetStore {
             const { toast } = createStandaloneToast();
             let title = 'Unknown error';
             let description = 'Unknown api error happened. Try again later';
+            let status: 'error' | 'warning' = 'error';
 
-            if ((e as AxiosError<{ code: number }>)?.response?.data?.code === 3) {
+            const errorData = (e as AxiosError<{ code: number; error: string }>)?.response?.data;
+            if (
+                errorData?.code === 3 ||
+                errorData?.error.includes('the purchase of test coins is available once a minute')
+            ) {
                 title = 'Only one request pre minute is allowed';
                 description = 'Please wait few minutes and try again';
+                status = 'warning';
             }
+
             toast({
                 title,
                 description,
-                status: 'error',
+                status,
                 isClosable: true
             });
         }
@@ -92,11 +99,13 @@ class FaucetStore {
 }
 
 async function fetchTxHash(msgHash: string, attempt = 0): Promise<string> {
-    return tonApiClient.blockchain
+    return taTestnet.blockchain
         .getBlockchainTransactionByMessageHash(msgHash)
         .then(data => data.hash)
-        .catch(e => {
-            if (hasProperty(e, 'message') && e.message === 'transaction not found') {
+        .catch(async e => {
+            // FIXME: after migrate to @ton-api/client v0.2
+            const res = await e.json();
+            if (hasProperty(res, 'error') && res.error === 'transaction not found') {
                 if (attempt > 20) {
                     throw new Error('Tx not found');
                 }

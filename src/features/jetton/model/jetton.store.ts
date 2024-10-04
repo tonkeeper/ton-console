@@ -1,5 +1,5 @@
 import { makeAutoObservable, reaction } from 'mobx';
-import { Loadable, tonApiClient } from 'src/shared';
+import { Loadable, ta } from 'src/shared';
 import { Address, toNano, Cell } from '@ton/core';
 import { JettonBalance, JettonInfo, JettonMetadata as ApiJettonMetadata } from '@ton-api/client';
 import { SendTransactionRequest, TonConnectUI } from '@tonconnect/ui-react';
@@ -65,7 +65,7 @@ export class JettonStore {
     }
 
     private async fetchJettonInfo(jettonAddress: Address) {
-        const jettonInfo = await tonApiClient.jettons.getJettonInfo(jettonAddress).catch(e => {
+        const jettonInfo = await ta.jettons.getJettonInfo(jettonAddress).catch(e => {
             if (e.status === 404) {
                 return null;
             }
@@ -77,7 +77,7 @@ export class JettonStore {
             return null;
         }
 
-        const jettonMetadataFromBlockchainContent = await tonApiClient.blockchain
+        const jettonMetadataFromBlockchainContent = await ta.blockchain
             .execGetMethodForBlockchainAccount(jettonAddress, 'get_jetton_data')
             .then(v => v.decoded.jettonContent)
             .then(v => Cell.fromBoc(Buffer.from(v, 'hex')))
@@ -120,7 +120,7 @@ export class JettonStore {
     );
 
     private async fetchJettonWallet(jettonAddress: Address, showWalletAddress: Address) {
-        return tonApiClient.accounts
+        return ta.accounts
             .getAccountJettonBalance(showWalletAddress, jettonAddress)
             .then(res => {
                 if (res.balance === '') {
