@@ -10,8 +10,7 @@ import {
     MenuList,
     useDisclosure,
     useMenuItem,
-    useOutsideClick,
-    useToast
+    useOutsideClick
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import {
@@ -26,7 +25,8 @@ import {
     Span,
     TickIcon,
     toDate,
-    XMarkCircleIcon16
+    XMarkCircleIcon16,
+    useToast
 } from 'src/shared';
 import { invoicesTableStore, InvoiceTableFiltration, isCustomFiltrationPeriod } from '../../models';
 import { IMask, useIMask } from 'react-imask';
@@ -220,8 +220,7 @@ const MenuInput: FunctionComponent<
                             return toast({
                                 title: 'Error',
                                 description: "'From' date must be less or equal to the 'To' date",
-                                status: 'error',
-                                isClosable: true
+                                status: 'error'
                             });
                         }
 

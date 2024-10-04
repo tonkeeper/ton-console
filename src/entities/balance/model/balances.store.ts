@@ -10,12 +10,12 @@ import {
     setIntervalWhenPageOnFocus,
     TonAddress,
     TonCurrencyAmount,
-    UsdCurrencyAmount
+    UsdCurrencyAmount,
+    createStandaloneToast
 } from 'src/shared';
 import { projectsStore } from '../../project';
 import { Portfolio, Refill } from './interfaces';
 import { ratesStore } from 'src/entities';
-import { createStandaloneToast } from '@chakra-ui/react';
 
 class BalancesStore {
     portfolio$ = new Loadable<Portfolio | null>(null);
@@ -95,7 +95,6 @@ class BalancesStore {
             toast({
                 title: 'Promo code succesfully used',
                 status: 'success',
-                isClosable: true,
                 duration: 2000
             });
             return true;
@@ -103,7 +102,6 @@ class BalancesStore {
             toast({
                 title: 'Invalid Promo Code',
                 status: 'error',
-                isClosable: true,
                 duration: 2000
             });
 

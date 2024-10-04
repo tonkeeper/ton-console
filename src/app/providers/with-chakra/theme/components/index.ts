@@ -14,6 +14,7 @@ import Popover from './popover';
 import Textarea from './textarea';
 import Checkbox from './checkbox';
 import Tooltip from './tooltip';
+import Alert from './alert';
 import Tabs from './tabs';
 import Code from './code';
 import Badge from './badge';
@@ -37,6 +38,7 @@ export default {
     Textarea,
     Checkbox,
     Tooltip,
+    Alert,
     Tabs,
     Code,
     Badge,

@@ -16,8 +16,7 @@ import {
     ModalOverlay,
     FormControl,
     Input,
-    FormHelperText,
-    useToast
+    FormHelperText
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { JettonInfo } from '@ton-api/client';
@@ -27,7 +26,8 @@ import {
     IconButton,
     sliceAddress,
     toDecimals,
-    fromDecimals
+    fromDecimals,
+    useToast
 } from 'src/shared';
 import { ConfirmationDialog } from 'src/entities';
 import { jettonStore } from '../../model';
@@ -243,7 +243,6 @@ const JettonCard: FC<JettonCardProps> = observer(
             const toastId = toast({
                 title: 'Minting jetton',
                 description: 'Please wait...',
-                position: 'bottom-left',
                 duration: null,
                 status: 'loading',
                 isClosable: false
@@ -255,9 +254,7 @@ const JettonCard: FC<JettonCardProps> = observer(
                     toast.update(toastId, {
                         title: 'Success',
                         description: 'Jetton minted successfully',
-                        status: 'success',
-                        duration: 5000,
-                        isClosable: true
+                        status: 'success'
                     });
                 })
                 .catch(() => {
@@ -265,9 +262,7 @@ const JettonCard: FC<JettonCardProps> = observer(
                     toast.update(toastId, {
                         title: 'Traking lost',
                         description: errorMessage,
-                        status: 'warning',
-                        duration: 5000,
-                        isClosable: true
+                        status: 'warning'
                     });
                 })
                 .finally(() => {
@@ -282,7 +277,6 @@ const JettonCard: FC<JettonCardProps> = observer(
             const toastId = toast({
                 title: 'Revoking ownership',
                 description: 'Please wait...',
-                position: 'bottom-left',
                 duration: null,
                 status: 'loading',
                 isClosable: false
@@ -321,10 +315,8 @@ const JettonCard: FC<JettonCardProps> = observer(
             const toastId = toast({
                 title: 'Editing jetton',
                 description: 'Please wait...',
-                position: 'bottom-left',
                 duration: null,
-                status: 'loading',
-                isClosable: false
+                status: 'loading'
             });
 
             jettonStore

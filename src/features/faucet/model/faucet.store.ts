@@ -6,9 +6,9 @@ import {
     hasProperty,
     Loadable,
     testnetExplorer,
-    TonCurrencyAmount
+    TonCurrencyAmount,
+    createStandaloneToast
 } from 'src/shared';
-import { createStandaloneToast } from '@chakra-ui/react';
 import { projectsStore } from 'src/entities';
 import type { AxiosError } from 'axios';
 import { RequestFaucetForm } from './interfaces';
@@ -68,8 +68,7 @@ class FaucetStore {
             const { toast } = createStandaloneToast();
             toast({
                 title: 'Successfully bought testnet assets',
-                status: 'success',
-                isClosable: true
+                status: 'success'
             });
         },
         e => {
@@ -91,8 +90,7 @@ class FaucetStore {
             toast({
                 title,
                 description,
-                status,
-                isClosable: true
+                status
             });
         }
     );

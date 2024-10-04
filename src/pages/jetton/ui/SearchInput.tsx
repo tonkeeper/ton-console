@@ -4,19 +4,18 @@ import {
     InputGroup,
     InputLeftElement,
     InputRightElement,
-    StyleProps,
-    useToast
+    StyleProps
 } from '@chakra-ui/react';
 import { Address } from '@ton/core';
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CloseIcon24, IconButton, SearchIcon24 } from 'src/shared';
+import { CloseIcon24, IconButton, SearchIcon24, useToast } from 'src/shared';
 
 export const SearchInput: FC<StyleProps> = props => {
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [searchValue, setSearchValue] = useState('');
-    const navigate = useNavigate();
     const toast = useToast();
+    const navigate = useNavigate();
 
     const handleSearch = () => {
         try {
@@ -26,10 +25,7 @@ export const SearchInput: FC<StyleProps> = props => {
         } catch (error) {
             toast({
                 title: 'Invalid address',
-                status: 'error',
-                duration: 5000,
-                position: 'bottom-left',
-                isClosable: true
+                status: 'error'
             });
         }
     };

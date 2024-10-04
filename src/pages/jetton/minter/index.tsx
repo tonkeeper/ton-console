@@ -1,4 +1,4 @@
-import { Flex, BoxProps, Button, Spinner, Text, useToast, Link } from '@chakra-ui/react';
+import { Flex, BoxProps, Button, Spinner, Text, Link } from '@chakra-ui/react';
 import { Address } from '@ton/core';
 import {
     TonConnectButton,
@@ -17,7 +17,7 @@ import {
 } from 'src/features/jetton/lib/deploy-controller';
 import { createDeployParams } from 'src/features/jetton/lib/utils';
 import JettonForm, { RawJettonMetadata } from 'src/features/jetton/ui/minter/JettonForm';
-import { H4, Overlay, fromDecimals, ta } from 'src/shared';
+import { H4, Overlay, fromDecimals, useToast, ta } from 'src/shared';
 
 const DEFAULT_DECIMALS = 9;
 
@@ -75,10 +75,8 @@ const JettonNewPage: FC<BoxProps> = () => {
                         </Link>
                     </Text>
                 ),
-                position: 'bottom-left',
                 status: 'error',
-                duration: 1000000,
-                isClosable: true
+                duration: 20000
             });
             return;
         }
@@ -91,9 +89,7 @@ const JettonNewPage: FC<BoxProps> = () => {
                     title: 'Error',
                     description: e.message,
                     status: 'error',
-                    position: 'bottom-left',
-                    duration: 1000000,
-                    isClosable: true
+                    duration: 20000
                 })
             )
             .finally(() => {

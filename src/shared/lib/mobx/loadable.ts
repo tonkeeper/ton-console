@@ -1,7 +1,7 @@
 import { action, computed, makeObservable, observable, runInAction } from 'mobx';
-import { createStandaloneToast, UseToastOptions } from '@chakra-ui/react';
+import { UseToastOptions } from '@chakra-ui/react';
 import { makePersistable } from 'mobx-persist-store';
-import { deserializeState, getWindow, serializeState } from 'src/shared';
+import { deserializeState, getWindow, serializeState, createStandaloneToast } from 'src/shared';
 
 export class Loadable<T> {
     defaultValue: T;
@@ -186,7 +186,6 @@ export class Loadable<T> {
                     toast({
                         title: 'Successful action',
                         status: 'success',
-                        isClosable: true,
                         ...options.successToast
                     });
                 }
@@ -210,7 +209,6 @@ export class Loadable<T> {
                         title: 'Unknown error',
                         description: 'Unknown api error happened. Try again later',
                         status: 'error',
-                        isClosable: true,
                         ...opts
                     });
                 }

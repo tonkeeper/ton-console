@@ -17,12 +17,11 @@ import {
     FormErrorMessage,
     InputGroup,
     InputRightElement,
-    Text,
-    useToast
+    Text
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { Address } from '@ton/core';
-import { CopyPad, Span, isAddressValid, toDecimals, fromDecimals } from 'src/shared';
+import { CopyPad, Span, isAddressValid, toDecimals, fromDecimals, useToast } from 'src/shared';
 import { jettonStore } from 'src/features';
 import { JettonInfo } from '@ton-api/client';
 import { useTonConnectUI } from '@tonconnect/ui-react';
@@ -219,7 +218,6 @@ const JettonWallet: FC<
         const toastId = toast({
             title: 'Burning jetton',
             description: 'Please wait...',
-            position: 'bottom-left',
             duration: null,
             status: 'loading',
             isClosable: false
