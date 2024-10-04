@@ -1,4 +1,4 @@
-import { Address, beginCell, toNano } from '@ton/ton';
+import { Address, beginCell, toNano } from '@ton/core';
 import { JettonDeployParams, JETTON_DEPLOY_GAS } from './deploy-controller';
 import { initData, JETTON_MINTER_CODE, mintBody } from './jetton-minter';
 import { Api } from '@ton-api/client';
