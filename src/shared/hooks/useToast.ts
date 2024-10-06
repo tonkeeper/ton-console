@@ -19,7 +19,6 @@ const wrapToast = (chakraToast: CreateToastFnReturn): CreateToastFnReturn => {
     const newToast = Object.assign(wrappedToast, chakraToast);
 
     newToast.update = (id: ToastId, options: UseToastOptions) => {
-        debugger;
         const newOptions = options.status ? { ...options, variant: options.status } : options;
         return chakraToast.update(id, newOptions);
     };
