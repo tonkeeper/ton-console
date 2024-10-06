@@ -21,16 +21,12 @@ const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => 
     const context = useFormContext<RawJettonMetadata>();
     const { handleSubmit } = context;
 
-    const submitHandler = (form: RawJettonMetadata): void => {
-        onSubmit(form);
-    };
-
     return (
         <chakra.form
             id={id}
             w="100%"
             maxW={600}
-            onSubmit={handleSubmit(submitHandler)}
+            onSubmit={handleSubmit(onSubmit)}
             noValidate
             gap={4}
             display="flex"

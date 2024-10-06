@@ -12,7 +12,7 @@ interface ControlProps<T extends { [controlId]: string }> {
 const Control = <T extends { [controlId]: string }>({
     context: {
         register,
-        formState: { errors }
+        formState: { errors, isSubmitting }
     }
 }: ControlProps<T>) => {
     const fieldName = controlId as Path<T>;
@@ -28,7 +28,7 @@ const Control = <T extends { [controlId]: string }>({
     });
 
     return (
-        <FormControl mb={0} isInvalid={!!fieldErrors} isRequired>
+        <FormControl mb={0} isDisabled={isSubmitting} isInvalid={!!fieldErrors} isRequired>
             <FormLabel htmlFor={fieldName}>Tokens to Mint</FormLabel>
             <Input
                 ref={mergeRefs(maskMintRef, hookMintRef)}
