@@ -2,7 +2,8 @@ import {
     UseToastOptions,
     useToast as useChakraToast,
     createStandaloneToast as chakraCreateStandaloneToast,
-    CreateToastFnReturn
+    CreateToastFnReturn,
+    ToastId
 } from '@chakra-ui/react';
 
 const wrapToast = (chakraToast: CreateToastFnReturn): CreateToastFnReturn => {
@@ -15,7 +16,14 @@ const wrapToast = (chakraToast: CreateToastFnReturn): CreateToastFnReturn => {
             ...options
         });
 
-    return Object.assign(wrappedToast, chakraToast);
+    const newToast = Object.assign(wrappedToast, chakraToast);
+
+    newToast.update = (id: ToastId, options: UseToastOptions) => {
+        const newOptions = options.status ? { ...options, variant: options.status } : options;
+        return chakraToast.update(id, newOptions);
+    };
+
+    return newToast;
 };
 
 export const useToast = () => {
