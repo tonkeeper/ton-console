@@ -1,4 +1,4 @@
-import { Flex, BoxProps, Button, Spinner, Text, Link } from '@chakra-ui/react';
+import { Flex, BoxProps, Button, Text, Link } from '@chakra-ui/react';
 import { Address } from '@ton/core';
 import {
     TonConnectButton,
@@ -7,7 +7,7 @@ import {
     useTonConnectModal
 } from '@tonconnect/ui-react';
 import { observer } from 'mobx-react-lite';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { ContractDeployer } from 'src/features/jetton/lib/contract-deployer';
@@ -27,14 +27,20 @@ const JettonNewPage: FC<BoxProps> = () => {
     const userAddress = useTonAddress();
     const { open: openConnect } = useTonConnectModal();
     const [tonconnect] = useTonConnectUI();
-    const [isDeploying, setIsDeploying] = useState(false);
 
     const formId = 'jetton-form-id';
 
     const methods = useForm<RawJettonMetadata>({});
 
     const handleSubmit = async (form: RawJettonMetadata) => {
-        setIsDeploying(true);
+        const toastId = toast({
+            title: 'Deploying jetton contract',
+            description:
+                'The process of creating and launching a smart contract to issue and manage a Jetton token on the blockchain will take some time.',
+            duration: null,
+            status: 'loading',
+            isClosable: false
+        });
 
         const dataForMint: JettonDeployParams = {
             onchainMetaData: {
@@ -59,8 +65,7 @@ const JettonNewPage: FC<BoxProps> = () => {
         const jettonViewUrl = `/jetton/view?address=${contractAddress.toString()}`;
 
         if (isDeployed) {
-            setIsDeploying(false);
-            toast({
+            toast.update(toastId, {
                 title: 'Contract already deployed',
                 description: (
                     <Text>
@@ -76,35 +81,33 @@ const JettonNewPage: FC<BoxProps> = () => {
                     </Text>
                 ),
                 status: 'error',
-                duration: 20000
+                duration: 20000,
+                isClosable: true
             });
             return;
         }
 
         await jettonDeployController
             .createJetton(dataForMint, tonconnect)
-            .then(() => navigate(jettonViewUrl))
+            .then(() => {
+                toast.update(toastId, {
+                    status: 'success',
+                    title: 'Jetton contract deployed',
+                    duration: 20000,
+                    isClosable: true
+                });
+                navigate(jettonViewUrl);
+            })
             .catch(e =>
-                toast({
+                toast.update(toastId, {
                     title: 'Error',
                     description: e.message,
                     status: 'error',
-                    duration: 20000
+                    duration: 20000,
+                    isClosable: true
                 })
-            )
-            .finally(() => {
-                setIsDeploying(false);
-            });
+            );
     };
-
-    if (isDeploying) {
-        return (
-            <Overlay display="flex" justifyContent="center" alignItems="center">
-                <Spinner />
-                <Text ml={2}>Deploying jetton contract...</Text>
-            </Overlay>
-        );
-    }
 
     return (
         <Overlay display="flex" flexDirection="column">
@@ -121,7 +124,7 @@ const JettonNewPage: FC<BoxProps> = () => {
                     maxW={600}
                     mt={4}
                     form={formId}
-                    isLoading={isDeploying}
+                    isLoading={methods.formState.isSubmitting}
                     type="submit"
                     variant="primary"
                 >

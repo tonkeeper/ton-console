@@ -13,14 +13,14 @@ interface ControlProps<T extends ControlType> {
 const Control = <T extends ControlType>({
     context: {
         register,
-        formState: { errors }
+        formState: { errors, isSubmitting }
     }
 }: ControlProps<T>) => {
     const fieldName = controlId as Path<T>;
     const fieldErrors = errors[controlId] as FieldError | undefined;
 
     return (
-        <FormControl mb={0} isInvalid={!!fieldErrors}>
+        <FormControl mb={0} isDisabled={isSubmitting} isInvalid={!!fieldErrors}>
             <FormLabel htmlFor={fieldName}>Description</FormLabel>
             <Textarea
                 autoComplete="off"
