@@ -17,7 +17,7 @@ import {
 } from 'src/features/jetton/lib/deploy-controller';
 import { createDeployParams } from 'src/features/jetton/lib/utils';
 import JettonForm, { RawJettonMetadata } from 'src/features/jetton/ui/minter/JettonForm';
-import { H4, Overlay, fromDecimals, useToast, ta } from 'src/shared';
+import { H4, Overlay, fromDecimals, useToast, ta, apiClient } from 'src/shared';
 
 const DEFAULT_DECIMALS = 9;
 
@@ -33,7 +33,32 @@ const JettonNewPage: FC<BoxProps> = () => {
     const methods = useForm<RawJettonMetadata>({});
 
     const handleSubmit = async (form: RawJettonMetadata) => {
-        const toastId = toast({
+        let image = form.image instanceof FileList ? undefined : form.image;
+
+        const imageFile =
+            form.image instanceof FileList && form.image?.length ? form.image[0] : undefined;
+
+        const toastId = toast();
+
+        if (imageFile) {
+            toast.update(toastId, {
+                title: 'Deploying jetton contract',
+                description: 'Uploading image...',
+                duration: null,
+                status: 'loading',
+                isClosable: false
+            });
+
+            const ipfsImage = await apiClient.api
+                .uploadMinterJettonMedia({
+                    media: imageFile
+                })
+                .then(v => v.data.url);
+
+            image = ipfsImage;
+        }
+
+        toast.update(toastId, {
             title: 'Deploying jetton contract',
             description:
                 'The process of creating and launching a smart contract to issue and manage a Jetton token on the blockchain will take some time.',
@@ -48,7 +73,7 @@ const JettonNewPage: FC<BoxProps> = () => {
                 symbol: form.symbol,
                 description: form.description,
                 decimals: form.decimals,
-                image: form.image
+                image
             },
             offchainUri: undefined,
             owner: Address.parse(userAddress),

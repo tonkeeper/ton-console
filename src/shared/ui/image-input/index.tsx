@@ -201,7 +201,14 @@ const ImageInput = forwardRef<
                         h="100%"
                         bgColor="background.overlay"
                     />
-                    <Button pos="absolute" right="3" bottom="3" onClick={onReset} size="sm">
+                    <Button
+                        pos="absolute"
+                        right="3"
+                        bottom="3"
+                        disabled={disabled}
+                        onClick={onReset}
+                        size="sm"
+                    >
                         Remove
                     </Button>
                     <Image
@@ -220,7 +227,7 @@ const ImageInput = forwardRef<
                     <Text textStyle="body2" mb="4" color="text.tertiary" textAlign="center">
                         {description || 'Upload image in JPG, GIF, or PNG format.'}
                     </Text>
-                    <Button as="label" htmlFor={nameWithFallback}>
+                    <Button as="label" disabled={disabled} htmlFor={nameWithFallback}>
                         Upload
                     </Button>
                 </Flex>
