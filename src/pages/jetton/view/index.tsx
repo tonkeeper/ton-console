@@ -3,7 +3,8 @@ import { Address } from '@ton/core';
 import { TonConnectButton, useTonAddress } from '@tonconnect/ui-react';
 import { observer } from 'mobx-react-lite';
 import { FC, useEffect, useMemo } from 'react';
-import { JettonCard, jettonStore } from 'src/features';
+import JettonCard from 'src/features/jetton/ui/minter/JettonCard';
+import { jettonStore } from 'src/features/jetton/model';
 import { isValidAddress } from 'src/features/jetton/lib/utils';
 import JettonWallet from 'src/features/jetton/ui/minter/JettonWallet';
 
