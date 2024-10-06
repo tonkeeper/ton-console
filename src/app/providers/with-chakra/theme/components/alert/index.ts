@@ -31,8 +31,10 @@ const AlertStyles = defineMultiStyleConfig({
             color: 'black'
         },
         description: {
-            fontSize: 'sm',
-            color: 'text.secondary'
+            fontSize: 'xs',
+            color: 'text.secondary',
+            maxWidth: '300px',
+            lineHeight: 'lineHeight.5'
         },
         icon: {
             color: 'icon.secondary'
