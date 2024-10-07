@@ -1,4 +1,13 @@
-import { Flex, BoxProps, Button, Text, Link } from '@chakra-ui/react';
+import {
+    Flex,
+    BoxProps,
+    Button,
+    Text,
+    Link,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink
+} from '@chakra-ui/react';
 import { Address } from '@ton/core';
 import {
     TonConnectButton,
@@ -17,7 +26,8 @@ import {
 } from 'src/features/jetton/lib/deploy-controller';
 import { createDeployParams } from 'src/features/jetton/lib/utils';
 import JettonForm, { RawJettonMetadata } from 'src/features/jetton/ui/minter/JettonForm';
-import { H4, Overlay, fromDecimals, useToast, ta, apiClient } from 'src/shared';
+import { H4, Overlay, fromDecimals, useToast, ta, apiClient, ChevronRightIcon16 } from 'src/shared';
+import { Link as RouterLink } from 'react-router-dom';
 
 const DEFAULT_DECIMALS = 9;
 
@@ -135,32 +145,51 @@ const JettonNewPage: FC<BoxProps> = () => {
     };
 
     return (
-        <Overlay display="flex" flexDirection="column">
-            <Flex align="flex-start" justify="space-between" mb="5">
-                <H4>New Jetton</H4>
-                <TonConnectButton />
-            </Flex>
-            <FormProvider {...methods}>
-                <JettonForm onSubmit={handleSubmit} id={formId} />
-            </FormProvider>
-            {userAddress ? (
-                <Button
-                    flex={1}
-                    maxW={600}
-                    mt={4}
-                    form={formId}
-                    isLoading={methods.formState.isSubmitting}
-                    type="submit"
-                    variant="primary"
-                >
-                    Mint
-                </Button>
-            ) : (
-                <Button flex={1} maxW={600} mt={4} onClick={openConnect} variant="primary">
-                    Connect Wallet
-                </Button>
-            )}
-        </Overlay>
+        <>
+            <Breadcrumb
+                mb="3"
+                color="text.secondary"
+                fontSize={14}
+                fontWeight={700}
+                separator={<ChevronRightIcon16 color="text.secondary" />}
+                spacing="8px"
+            >
+                <BreadcrumbItem key={'/sites'}>
+                    <BreadcrumbLink as={RouterLink} to={'/jetton'}>
+                        Jetton Minter
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbItem color="text.primary" isCurrentPage>
+                    <BreadcrumbLink href={'#'}>New</BreadcrumbLink>
+                </BreadcrumbItem>
+            </Breadcrumb>
+            <Overlay display="flex" flexDirection="column" height="calc(100% - 33px)">
+                <Flex align="flex-start" justify="space-between" mb="5">
+                    <H4>New Jetton</H4>
+                    <TonConnectButton />
+                </Flex>
+                <FormProvider {...methods}>
+                    <JettonForm onSubmit={handleSubmit} id={formId} />
+                </FormProvider>
+                {userAddress ? (
+                    <Button
+                        flex={1}
+                        maxW={600}
+                        mt={4}
+                        form={formId}
+                        isLoading={methods.formState.isSubmitting}
+                        type="submit"
+                        variant="primary"
+                    >
+                        Mint
+                    </Button>
+                ) : (
+                    <Button flex={1} maxW={600} mt={4} onClick={openConnect} variant="primary">
+                        Connect Wallet
+                    </Button>
+                )}
+            </Overlay>
+        </>
     );
 };
 

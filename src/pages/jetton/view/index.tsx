@@ -1,4 +1,12 @@
-import { Flex, BoxProps, Spinner, Divider } from '@chakra-ui/react';
+import {
+    Flex,
+    BoxProps,
+    Spinner,
+    Divider,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink
+} from '@chakra-ui/react';
 import { Address } from '@ton/core';
 import { TonConnectButton, useTonAddress } from '@tonconnect/ui-react';
 import { observer } from 'mobx-react-lite';
@@ -7,8 +15,9 @@ import JettonCard from 'src/features/jetton/ui/minter/JettonCard';
 import { jettonStore } from 'src/features/jetton/model';
 import { isValidAddress } from 'src/features/jetton/lib/utils';
 import JettonWallet from 'src/features/jetton/ui/minter/JettonWallet';
+import { Link as RouterLink } from 'react-router-dom';
 
-import { H4, Overlay, useSearchParams } from 'src/shared';
+import { ChevronRightIcon16, H4, Overlay, useSearchParams } from 'src/shared';
 
 const JettonViewPage: FC<BoxProps> = () => {
     const { searchParams } = useSearchParams();
@@ -52,27 +61,46 @@ const JettonViewPage: FC<BoxProps> = () => {
     }
 
     return (
-        <Overlay display="flex" flexDirection="column">
-            <Flex align="flex-start" justify="space-between" mb="5">
-                <H4>Jetton</H4>
-                <TonConnectButton />
-            </Flex>
-            {jettonInfo === null ? (
-                <Overlay display="flex" justifyContent="center" alignItems="center">
-                    <H4>Jetton not found</H4>
-                </Overlay>
-            ) : (
-                <>
-                    <JettonCard data={jettonInfo} />
-                    <Divider mt={6} />
+        <>
+            <Breadcrumb
+                mb="3"
+                color="text.secondary"
+                fontSize={14}
+                fontWeight={700}
+                separator={<ChevronRightIcon16 color="text.secondary" />}
+                spacing="8px"
+            >
+                <BreadcrumbItem key={'/sites'}>
+                    <BreadcrumbLink as={RouterLink} to={'/jetton'}>
+                        Jetton Minter
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbItem color="text.primary" isCurrentPage>
+                    <BreadcrumbLink href={'#'}>View</BreadcrumbLink>
+                </BreadcrumbItem>
+            </Breadcrumb>
+            <Overlay display="flex" flexDirection="column" height="calc(100% - 33px)">
+                <Flex align="flex-start" justify="space-between" mb="5">
+                    <H4>Jetton</H4>
+                    <TonConnectButton />
+                </Flex>
+                {jettonInfo === null ? (
+                    <Overlay display="flex" justifyContent="center" alignItems="center">
+                        <H4>Jetton not found</H4>
+                    </Overlay>
+                ) : (
+                    <>
+                        <JettonCard data={jettonInfo} />
+                        <Divider mt={6} />
 
-                    <JettonWallet
-                        connectedWalletAddress={connectedWalletAddress}
-                        jettonInfo={jettonInfo}
-                    />
-                </>
-            )}
-        </Overlay>
+                        <JettonWallet
+                            connectedWalletAddress={connectedWalletAddress}
+                            jettonInfo={jettonInfo}
+                        />
+                    </>
+                )}
+            </Overlay>
+        </>
     );
 };
 
