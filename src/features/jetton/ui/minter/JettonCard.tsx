@@ -349,10 +349,15 @@ const JettonCard: FC<JettonCardProps> = observer(
         const connectedWalletAddress = jettonStore.connectedWalletAddress;
         const isOwner = connectedWalletAddress && admin?.address.equals(connectedWalletAddress);
 
+        const imageUrl =
+            image && /(^|\/)ipfs[.:]/.test(image)
+                ? image?.replace('ipfs://', 'https://ipfs.io/ipfs/')
+                : image;
+
         return (
             <Box w={440} bgColor="background.contentTint" {...rest} borderRadius={8}>
                 <Flex gap={3} p={4}>
-                    <Avatar name={name} size="md" src={image} />
+                    <Avatar name={name} size="md" src={imageUrl} />
                     <Flex justify="center" direction="column">
                         <Flex gap={1}>
                             <Text textStyle="label1">{name}</Text>

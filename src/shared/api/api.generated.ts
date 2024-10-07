@@ -14,6 +14,11 @@ export interface DTOOk {
     ok: boolean;
 }
 
+export interface DTO_URL {
+    /** @example "ipfs://bafybeifxdx73d2wlllucguvcejwecpdo4gudribllehw6te7pkjfgu5d4e" */
+    url: string;
+}
+
 export interface DTOError {
     /** Error message */
     error: string;
@@ -501,11 +506,11 @@ export enum DTOStatsQueryType {
     DTOChatGptQuery = 'chat_gpt_query'
 }
 
-/** @default "en" */
-export enum DTOLang {
-    DTOEn = 'en',
-    DTORu = 'ru'
-}
+/**
+ * @default "en"
+ * @example "en"
+ */
+export type DTOLang = string;
 
 export enum DTOServiceName {
     DTOMessages = 'messages',
@@ -519,6 +524,7 @@ export enum DTOServiceName {
 export enum DTOProServiceDashboardColumnID {
     DTOAddress = 'address',
     DTOTotalBalance = 'total_balance',
+    DTOJettonsBalance = 'jettons_balance',
     DTOTotalTon = 'total_ton',
     DTOSendCurrentMonth = 'send_current_month',
     DTOSendLastMonth = 'send_last_month',
@@ -531,6 +537,11 @@ export enum DTOProServiceDashboardColumnType {
     DTOAddress = 'address',
     DTONumericFiat = 'numeric_fiat',
     DTONumericCrypto = 'numeric_crypto'
+}
+
+export interface DTOMintlessJetton {
+    /** @example "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
+    account: string;
 }
 
 export interface DTOCnftCollection {
@@ -548,6 +559,28 @@ export interface DTOCnftCollection {
     minted_count: number;
     /** @format uint32 */
     paid_indexing_count: number;
+}
+
+export interface DTOTonSiteReduced {
+    endpoints: string[];
+    /** @example "2ccad26312767b03bfe1ed76f2c97daf8e3df957180fcab8db83614er3c528a9" */
+    adnl_address: string;
+    /** @example "d16f3eed38db798914907071734923fd2d24c16be6dd560b19fe6297091e925d" */
+    private_key: string;
+}
+
+export interface DTOTonSite {
+    /** @example "60ffb075" */
+    id: string;
+    /** @example "lucky.ton" */
+    domain: string;
+    endpoints: string[];
+    adnl_address: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 export interface DTOProServiceInvoiceWebhook {
@@ -612,6 +645,7 @@ export interface DTOInvoicesInvoice {
      * @example 1690889913000
      */
     date_create: number;
+    currency: DTOCryptoCurrency;
 }
 
 export interface DTOInvoicesApp {
@@ -637,6 +671,7 @@ export interface DTOInvoicesApp {
      * @example 1690889913000
      */
     date_create: number;
+    currency: DTOCryptoCurrency;
 }
 
 /** @example "pending" */
@@ -651,6 +686,12 @@ export enum DTOInvoiceStatus {
 export enum DTOChain {
     DTOMainnet = 'mainnet',
     DTOTestnet = 'testnet'
+}
+
+/** @default "TON" */
+export enum DTOCryptoCurrency {
+    DTO_TON = 'TON',
+    DTO_USDT = 'USDT'
 }
 
 /** @example "id" */
@@ -715,6 +756,11 @@ export enum DTOFiatCurrencies {
     DTO_IDR = 'IDR',
     DTO_INR = 'INR',
     DTO_JPY = 'JPY'
+}
+
+export interface DTOAccount {
+    /** @example "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
+    account: string;
 }
 
 /** backend error code */
@@ -1015,6 +1061,29 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
+         * @tags test
+         * @name TestDeleteUser
+         * @summary Delete test user
+         * @request DELETE:/api/v1/test/user
+         */
+        testDeleteUser: (params: RequestParams = {}) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/test/user`,
+                method: 'DELETE',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
          * @tags admin
          * @name AdminGetProjectBalance
          * @summary Private method: Get project balance
@@ -1117,6 +1186,31 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/v1/admin/messages/charge`,
                 method: 'POST',
                 body: data,
+                ...params
+            }),
+
+        /**
+         * @description Private method
+         *
+         * @tags admin
+         * @name AdminGetTonSites
+         * @summary Private method: Get sites
+         * @request GET:/api/v1/admin/sites
+         */
+        adminGetTonSites: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    items: DTOTonSiteReduced[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/admin/sites`,
+                method: 'GET',
                 ...params
             }),
 
@@ -3005,6 +3099,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 webhooks?: string[];
                 /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
                 recipient_address: string;
+                currency?: DTOCryptoCurrency;
             },
             params: RequestParams = {}
         ) =>
@@ -3567,6 +3662,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                          * @example 1000000000
                          */
                         total_amount_pending: number;
+                        currency: DTOCryptoCurrency;
                     };
                 },
                 {
@@ -4193,6 +4289,303 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/v1/services/cnft/paid`,
                 method: 'GET',
                 query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags mintless_jetton_service
+         * @name GetMintlessJettonConfig
+         * @summary Get mintless jetton config
+         * @request GET:/api/v1/services/mintless/config
+         */
+        getMintlessJettonConfig: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    /**
+                     * @format uint64
+                     * @example 100000000
+                     */
+                    price_per_jetton: number;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/mintless/config`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags mintless_jetton_service
+         * @name GetPaidMintlessJettons
+         * @summary Get paid mintless jettons
+         * @request GET:/api/v1/services/mintless/paid
+         */
+        getPaidMintlessJettons: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    jettons: DTOMintlessJetton[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/mintless/paid`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags mintless_jetton_service
+         * @name CheckExistsMintlessJetton
+         * @summary Check if a mintless jetton exists
+         * @request GET:/api/v1/services/mintless/{account}
+         */
+        checkExistsMintlessJetton: (account: string, params: RequestParams = {}) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/mintless/${account}`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags minter_jetton_media
+         * @name GetJettonsByOwner
+         * @summary Get jettons by owner
+         * @request GET:/api/v1/services/minter/owner/jettons
+         */
+        getJettonsByOwner: (
+            query: {
+                /**
+                 * Address
+                 * @example "EQ..fz"
+                 */
+                address: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: DTOAccount[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/minter/owner/jettons`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags minter_jetton_media
+         * @name UploadMinterJettonMedia
+         * @summary Upload jetton media
+         * @request POST:/api/v1/services/minter/jetton/media
+         */
+        uploadMinterJettonMedia: (
+            data: {
+                /** @format binary */
+                media: File;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTO_URL,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/minter/jetton/media`,
+                method: 'POST',
+                body: data,
+                type: ContentType.FormData,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ton_sites_service
+         * @name CreateTonSite
+         * @summary Create a Ton Site
+         * @request POST:/api/v1/services/sites
+         */
+        createTonSite: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: {
+                domain: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    site: DTOTonSite;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/sites`,
+                method: 'POST',
+                query: query,
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ton_sites_service
+         * @name GetTonSites
+         * @summary Get Ton Sites
+         * @request GET:/api/v1/services/sites
+         */
+        getTonSites: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: DTOTonSite[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/sites`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ton_sites_service
+         * @name DeleteTonSite
+         * @summary Delete the Ton Site
+         * @request DELETE:/api/v1/services/sites/{id}
+         */
+        deleteTonSite: (
+            id: string,
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/sites/${id}`,
+                method: 'DELETE',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ton_sites_service
+         * @name UpdateTonSitesEndpoints
+         * @summary Add endpoints to the Ton Site
+         * @request POST:/api/v1/services/sites/{id}/endpoints
+         */
+        updateTonSitesEndpoints: (
+            id: string,
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: string[],
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/sites/${id}/endpoints`,
+                method: 'POST',
+                query: query,
+                body: data,
                 ...params
             })
     };

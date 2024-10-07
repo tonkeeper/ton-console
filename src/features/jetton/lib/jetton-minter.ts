@@ -147,7 +147,6 @@ export type PersistenceType = 'onchain' | 'offchain_private_domain' | 'offchain_
 export async function readJettonMetadata(contentCell: Cell): Promise<{
     persistenceType: PersistenceType;
     metadata: JettonMetadata;
-    isJettonDeployerFaultyOnChainData?: boolean;
 }> {
     const contentSlice = contentCell.beginParse();
     const prefix = contentSlice.loadInt(8);
