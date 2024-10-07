@@ -10,10 +10,7 @@ import MintControl from './controls/MintControl';
 import DescriptionControl from './controls/DescriptionControl';
 import LogoControl from './controls/LogoControl';
 
-export type RawJettonMetadata = Omit<JettonMetadata, 'address' | 'image'> & {
-    mint: string;
-    image?: FileList | string;
-};
+export type RawJettonMetadata = Omit<JettonMetadata, 'address'> & { mint: string };
 
 type JettonFormProps = StyleProps & {
     id?: string;
