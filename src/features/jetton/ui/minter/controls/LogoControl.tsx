@@ -1,10 +1,11 @@
-import { FormControl, FormLabel, Input, FormErrorMessage, FormHelperText } from '@chakra-ui/react';
+import { FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/react';
 import { FieldError, Path, UseFormReturn } from 'react-hook-form';
+import { ImageInput } from 'src/shared';
 
 const controlId = 'image';
 
 interface ControlType {
-    [controlId]?: string;
+    [controlId]?: string | FileList;
 }
 
 interface ControlProps<T extends ControlType> {
@@ -19,14 +20,17 @@ const Control = <T extends ControlType>({
 }: ControlProps<T>) => {
     const fieldName = controlId as Path<T>;
     const fieldErrors = errors[controlId] as FieldError | undefined;
-    return (
-        <FormControl mb={0} isDisabled={isSubmitting} isInvalid={!!fieldErrors}>
-            <FormLabel htmlFor={fieldName}>Jetton Logo</FormLabel>
-            <Input autoComplete="off" id={fieldName} {...register(fieldName)} />
 
-            <FormHelperText>
-                URL of 256x256 pixel PNG image of token logo with transparent background.
-            </FormHelperText>
+    return (
+        <FormControl>
+            <FormLabel htmlFor={fieldName}>Jetton Logo</FormLabel>
+            <ImageInput
+                disabled={isSubmitting}
+                {...register(fieldName)}
+                heading="Provide Logo"
+                description="Please provide image 256x256 pixel PNG image of token logo with transparent background"
+            />
+
             <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
         </FormControl>
     );
