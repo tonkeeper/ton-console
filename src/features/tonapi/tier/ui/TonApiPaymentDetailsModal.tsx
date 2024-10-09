@@ -29,13 +29,14 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
         rest.onClose();
     }, [tier]);
 
+    const unspentMoney = tier.unspentMoney;
     const isFreeTire = tier.price.amount.eq(0);
-    const isFreePriceAfterUnspentMoney = tier.unspentMoney && tier.unspentMoney.isGTE(tier.price);
+    const isFreePriceAfterUnspentMoney = unspentMoney && unspentMoney.isGTE(tier.price);
     const isFree = isFreeTire || isFreePriceAfterUnspentMoney;
 
-    const priceAfterUnspentMoney = !tier.unspentMoney
+    const priceAfterUnspentMoney = !unspentMoney
         ? tier.price
-        : new UsdCurrencyAmount(tier.price.amount.minus(tier.unspentMoney.amount));
+        : new UsdCurrencyAmount(tier.price.amount.minus(unspentMoney.amount));
 
     const correctPrice =
         isFreeTire || isFreePriceAfterUnspentMoney
@@ -79,41 +80,43 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
                                 Monthly
                             </Text>
                         </Flex>
-                        <Flex justify="space-between" gap="10" mb="3">
-                            <Text textStyle="body2" color="text.secondary">
-                                Price
-                            </Text>
-                            <Box>
-                                <Text
-                                    textStyle="body2"
-                                    color="text.primary"
-                                    textAlign="right"
-                                    title={tier.price.stringAmountWithoutRound}
-                                >
-                                    {tier.price.amount.eq(0)
-                                        ? 'Free'
-                                        : tier.price.stringCurrencyAmount}
-                                </Text>
-                            </Box>
-                        </Flex>
-                        {!isFree && tier.unspentMoney && (
+                        {unspentMoney && (
                             <Flex justify="space-between" gap="10" mb="3">
                                 <Text textStyle="body2" color="text.secondary">
-                                    Unspent Money
+                                    Price
+                                </Text>
+                                <Box>
+                                    <Text
+                                        textStyle="body2"
+                                        color="text.primary"
+                                        textAlign="right"
+                                        title={tier.price.stringAmountWithoutRound}
+                                    >
+                                        {tier.price.amount.eq(0)
+                                            ? 'Free'
+                                            : tier.price.stringCurrencyAmount}
+                                    </Text>
+                                </Box>
+                            </Flex>
+                        )}
+                        {!isFree && unspentMoney && (
+                            <Flex justify="space-between" gap="10" mb="3">
+                                <Text textStyle="body2" color="text.secondary">
+                                    Unspent funds
                                 </Text>
                                 <Text
                                     textStyle="body2"
                                     color="text.secondary"
                                     textAlign="right"
-                                    title={tier.unspentMoney.stringAmountWithoutRound}
+                                    title={unspentMoney.stringAmountWithoutRound}
                                 >
-                                    {tier.unspentMoney.stringCurrencyAmount}
+                                    {unspentMoney.stringCurrencyAmount}
                                 </Text>
                             </Flex>
                         )}
                         <Flex justify="space-between" gap="10" mb="3">
                             <Text textStyle="body2" color="text.secondary">
-                                Total
+                                {unspentMoney ? 'Total' : 'Price'}
                             </Text>
                             {correctPrice.amount.eq(0) ? (
                                 <Flex align="center" gap={1}>
@@ -128,7 +131,6 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
                                             </Box>
                                         </InfoTooltip>
                                     )}
-                                    {/* <InfoIcon16 color="text.secondary" /> */}
                                 </Flex>
                             ) : (
                                 <Box>

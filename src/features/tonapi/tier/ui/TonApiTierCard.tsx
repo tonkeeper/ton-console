@@ -103,7 +103,7 @@ export const TonApiTierCard: FunctionComponent<
                         </ListItem>
                     )}
                 </List>
-                {isTonApiSelectedTier(tier) && tier.renewsDate && (
+                {isTonApiSelectedTier(tier) && tier.renewsDate && !tier.price.amount.isZero() && (
                     <Text textStyle="body2" mt="3" color="text.secondary">
                         Available until {toDate(tier.renewsDate)}
                     </Text>
