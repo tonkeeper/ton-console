@@ -10,4 +10,5 @@ export interface TonApiTier {
         mempool: boolean;
     };
     price: UsdCurrencyAmount;
+    unspentMoney?: UsdCurrencyAmount;
 }
