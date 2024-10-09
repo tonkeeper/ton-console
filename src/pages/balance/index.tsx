@@ -47,7 +47,10 @@ const BalancePage: FunctionComponent = () => {
                             {balanceStore.portfolio$.isLoading ? (
                                 <Skeleton w={h2Width || '100px'} h="6" />
                             ) : (
-                                <Span ref={h2Ref}>
+                                <Span
+                                    ref={h2Ref}
+                                    title={balanceStore.balances[0]?.stringAmountWithoutRound}
+                                >
                                     {balanceStore.balances[0]?.stringCurrencyAmount}
                                 </Span>
                             )}

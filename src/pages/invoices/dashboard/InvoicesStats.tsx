@@ -3,6 +3,7 @@ import { Box, Card, CardBody, CardHeader, Grid, Skeleton, Text } from '@chakra-u
 import { observer } from 'mobx-react-lite';
 import { formatNumber, H4, useIntervalUpdate } from 'src/shared';
 import { invoicesAppStore, InvoicesStatistics } from 'src/features';
+import BigNumber from 'bignumber.js';
 
 const StatsCard: FunctionComponent<{
     header: string;
@@ -33,10 +34,18 @@ const InvoicesStats: FunctionComponent<ComponentProps<typeof Box>> = props => {
             </Text>
             <Grid gap="6" templateColumns="repeat(auto-fit, minmax(200px, 1fr))">
                 <StatsCard header="Total Number of Invoices">
-                    {stats => formatNumber(stats.totalInvoices)}
+                    {stats =>
+                        formatNumber(stats.totalInvoices, {
+                            roundingMode: BigNumber.ROUND_DOWN
+                        })
+                    }
                 </StatsCard>
                 <StatsCard header="Active Invoices">
-                    {stats => formatNumber(stats.invoicesInProgress)}
+                    {stats =>
+                        formatNumber(stats.invoicesInProgress, {
+                            roundingMode: BigNumber.ROUND_DOWN
+                        })
+                    }
                 </StatsCard>
                 <StatsCard header="Earned Total">
                     {stats => stats.earnedTotal.stringCurrencyAmount}

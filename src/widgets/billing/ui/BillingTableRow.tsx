@@ -81,6 +81,7 @@ const ItemRow: FunctionComponent<{ historyItem: BillingHistoryItem; style: React
                     color={historyItem.action === 'payment' ? 'text.primary' : 'accent.green'}
                     borderRight="1px"
                     borderRightColor="background.contentTint"
+                    title={historyItem.amount.stringAmountWithoutRound}
                 >
                     {historyItem.action === 'payment' ? (
                         <>

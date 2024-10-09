@@ -21,13 +21,18 @@ export function formatWithSuffix(value: number | string | BigNumber, decimalPlac
 
 export function formatNumber(
     value: number | string | BigNumber,
-    options?: { decimalPlaces?: number; thousandSeparators?: boolean }
+    options?: {
+        decimalPlaces?: number | null;
+        thousandSeparators?: boolean;
+        roundingMode?: BigNumber.RoundingMode;
+    }
 ): string {
     let decimalPlaces = options?.decimalPlaces === undefined ? 2 : options.decimalPlaces;
+    const roundingMode = options?.roundingMode || BigNumber.ROUND_CEIL;
 
     const bnVal = new BigNumber(value);
 
-    if (bnVal.gt(0) && bnVal.lt(new BigNumber(10).pow(-decimalPlaces))) {
+    if (bnVal.gt(0) && decimalPlaces !== null && bnVal.lt(new BigNumber(10).pow(-decimalPlaces))) {
         decimalPlaces =
             bnVal
                 .toFixed()
@@ -44,7 +49,9 @@ export function formatNumber(
         groupSize: 3
     };
 
-    return new BigNumber(value)
-        .decimalPlaces(decimalPlaces, BigNumber.ROUND_FLOOR)
-        .toFormat(format);
+    const res = decimalPlaces
+        ? new BigNumber(value).decimalPlaces(decimalPlaces, roundingMode)
+        : new BigNumber(value);
+
+    return res.toFormat(format);
 }

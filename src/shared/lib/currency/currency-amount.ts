@@ -12,6 +12,8 @@ export interface CurrencyAmount {
 
     stringCurrencyAmount: string;
 
+    stringAmountWithoutRound: string;
+
     toStringAmount(options?: { decimalPlaces?: number; thousandSeparators?: boolean }): string;
 
     toStringCurrencyAmount(options?: {
