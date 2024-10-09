@@ -5,7 +5,7 @@ import TonApiPaymentDetailsModal from './TonApiPaymentDetailsModal';
 import { TonApiTier, tonApiTiersStore } from '../model';
 import { TonApiTierCard } from './TonApiTierCard';
 import { RefillModal } from 'src/entities';
-import { ButtonLink } from 'src/shared';
+import { ButtonLink, UsdCurrencyAmount } from 'src/shared';
 import { TonApiUnlimitedTierCard } from 'src/features';
 
 const TonApiTiersList: FunctionComponent = () => {
@@ -26,17 +26,23 @@ const TonApiTiersList: FunctionComponent = () => {
 
     const onSelectTier = async (tier: TonApiTier): Promise<void> => {
         setCanBuyTierLoading(tier.id);
-        const canBuy = await tonApiTiersStore.checkCanBuyTier(tier.id);
 
         if (currentLoadingCanBuyTierId.current !== tier.id) {
             return;
         }
 
+        const { valid, unspent_money } = await tonApiTiersStore.checkValidChangeTier(tier.id);
+
         // wrapped to setTimeout to fix modal and button visual intersection during modal open animation
         setTimeout(() => setCanBuyTierLoading(undefined), 200);
 
-        if (canBuy) {
-            setSelectedTier(tier);
+        if (valid) {
+            const unspentMoney = unspent_money ? new UsdCurrencyAmount(unspent_money) : undefined;
+
+            setSelectedTier({
+                ...tier,
+                unspentMoney
+            });
         } else {
             onRefillModalOpen();
         }
@@ -98,11 +104,13 @@ const TonApiTiersList: FunctionComponent = () => {
                     <TonApiUnlimitedTierCard h="100%" />
                 </GridItem>
             </Grid>
-            <TonApiPaymentDetailsModal
-                isOpen={!!selectedTier}
-                onClose={onPaymentModalClose}
-                tier={selectedTier}
-            />
+            {selectedTier && (
+                <TonApiPaymentDetailsModal
+                    isOpen={!!selectedTier}
+                    onClose={onPaymentModalClose}
+                    tier={selectedTier}
+                />
+            )}
             <RefillModal isOpen={isRefillModalOpen} onClose={onRefillModalClose} />
         </>
     );
