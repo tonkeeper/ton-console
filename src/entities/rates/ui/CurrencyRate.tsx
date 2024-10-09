@@ -67,7 +67,7 @@ const CurrencyRate: FunctionComponent<
             groupSize: 3
         };
 
-        return result.decimalPlaces(precisionWithFallback).toFormat(format);
+        return result.decimalPlaces(precisionWithFallback, BigNumber.ROUND_CEIL).toFormat(format);
     });
 
     return (
