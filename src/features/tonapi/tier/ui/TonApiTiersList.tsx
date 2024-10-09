@@ -5,7 +5,7 @@ import TonApiPaymentDetailsModal from './TonApiPaymentDetailsModal';
 import { TonApiTier, tonApiTiersStore } from '../model';
 import { TonApiTierCard } from './TonApiTierCard';
 import { RefillModal } from 'src/entities';
-import { ButtonLink, EXTERNAL_LINKS } from 'src/shared';
+import { ButtonLink } from 'src/shared';
 import { TonApiUnlimitedTierCard } from 'src/features';
 
 const TonApiTiersList: FunctionComponent = () => {
@@ -69,8 +69,9 @@ const TonApiTiersList: FunctionComponent = () => {
                                     isCurrentSubscription ? (
                                         <ButtonLink
                                             w="100%"
-                                            href={EXTERNAL_LINKS.SUPPORT}
-                                            isExternal
+                                            onClick={() =>
+                                                setSelectedTier(tonApiTiersStore.freeTier)
+                                            }
                                             variant="secondary"
                                             isDisabled={currentTier?.price.amount.isZero()}
                                         >

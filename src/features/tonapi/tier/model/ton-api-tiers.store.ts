@@ -34,6 +34,10 @@ class TonApiTiersStore {
         );
     }
 
+    get freeTier(): TonApiTier | undefined {
+        return this.tiers$.value.find(tier => tier.price.amount.isZero());
+    }
+
     fetchTiers = this.tiers$.createAsyncAction(async () => {
         const tiers = await apiClient.api.getTonApiTiers();
         return tiers.data.items.map(mapTierDTOToTier);

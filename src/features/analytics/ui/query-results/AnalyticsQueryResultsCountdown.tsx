@@ -26,7 +26,7 @@ export const AnalyticsQueryResultsCountdown: FunctionComponent<
                 '< 1s'
             )}
             &nbsp;·&nbsp;
-            {query.estimatedCost.toStringCurrencyAmount({ decimalPlaces: 'all' })}
+            {query.estimatedCost.toStringCurrencyAmount({ decimalPlaces: null })}
         </Flex>
     );
 };

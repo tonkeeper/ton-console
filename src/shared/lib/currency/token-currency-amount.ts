@@ -21,13 +21,13 @@ export class TokenCurrencyAmount extends BasicCurrencyAmount implements Currency
     }
 
     override toStringAmount(options?: {
-        decimalPlaces?: number | 'all';
+        decimalPlaces?: number | null;
         thousandSeparators?: boolean;
     }): string {
         const decimalPlaces =
             options?.decimalPlaces === undefined
                 ? this.decimalPlaces
-                : options.decimalPlaces === 'all'
+                : options.decimalPlaces === null
                 ? this.decimals
                 : options.decimalPlaces;
 
@@ -43,7 +43,7 @@ export class TokenCurrencyAmount extends BasicCurrencyAmount implements Currency
     }
 
     override toStringCurrencyAmount(options?: {
-        decimalPlaces?: number | 'all';
+        decimalPlaces?: number | null;
         thousandSeparators?: boolean;
     }): string {
         return `${this.toStringAmount(options)}${String.fromCharCode(160)}${this.stringCurrency}`;

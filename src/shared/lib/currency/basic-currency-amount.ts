@@ -23,6 +23,10 @@ export class BasicCurrencyAmount implements CurrencyAmount {
         return this.toStringAmount();
     }
 
+    get stringAmountWithoutRound(): string {
+        return this.toStringAmount({ decimalPlaces: null });
+    }
+
     get stringCurrencyAmount(): string {
         return `${this.stringAmount} ${this.stringCurrency}`;
     }
@@ -57,7 +61,10 @@ export class BasicCurrencyAmount implements CurrencyAmount {
         return this.amount.lte(currencyAmount.amount);
     }
 
-    toStringAmount(options?: { decimalPlaces?: number; thousandSeparators?: boolean }): string {
+    toStringAmount(options?: {
+        decimalPlaces?: number | null;
+        thousandSeparators?: boolean;
+    }): string {
         const decimalPlaces =
             options?.decimalPlaces === undefined ? this.decimalPlaces : options.decimalPlaces;
 

@@ -5,6 +5,7 @@ import { Amount, CRYPTO_CURRENCY, getWindow, subtractPixels } from 'src/shared';
 import { ratesStore } from 'src/entities/rates';
 import { computed } from 'mobx';
 import BigNumber from 'bignumber.js';
+
 const CurrencyRate: FunctionComponent<
     PropsWithChildren<
         ComponentProps<typeof Text> & {
@@ -67,11 +68,23 @@ const CurrencyRate: FunctionComponent<
             groupSize: 3
         };
 
-        return result.decimalPlaces(precisionWithFallback, BigNumber.ROUND_CEIL).toFormat(format);
+        return {
+            fiendly: result
+                .decimalPlaces(precisionWithFallback, BigNumber.ROUND_CEIL)
+                .toFormat(format),
+            full: result.toString()
+        };
     });
 
     return (
-        <Text ref={ref} as={Box} alignItems="center" display="flex" {...rest}>
+        <Text
+            ref={ref}
+            as={Box}
+            alignItems="center"
+            display="flex"
+            title={value.get()?.full}
+            {...rest}
+        >
             {amountLoading || !rate$.isResolved || (rate$.isLoading && showSkeletonOnUpdate) ? (
                 <Skeleton
                     display="inline-block"
@@ -79,8 +92,8 @@ const CurrencyRate: FunctionComponent<
                     h={skeletonHeight}
                     variant={skeletonVariant}
                 />
-            ) : value.get() !== undefined ? (
-                sign + value + (contentUnderSkeleton || '')
+            ) : value.get()?.fiendly !== undefined ? (
+                sign + value.get()?.fiendly + (contentUnderSkeleton || '')
             ) : (
                 ''
             )}
