@@ -98,7 +98,7 @@ const AnalyticsQueryControlPanel: FunctionComponent<
                                 </>
                             )}
                             &nbsp;·&nbsp;
-                            {request.estimatedCost.toStringCurrencyAmount({ decimalPlaces: 'all' })}
+                            {request.estimatedCost.toStringCurrencyAmount({ decimalPlaces: null })}
                         </Span>
                     )
                 ))}

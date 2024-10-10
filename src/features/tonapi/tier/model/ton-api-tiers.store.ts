@@ -34,6 +34,10 @@ class TonApiTiersStore {
         );
     }
 
+    get freeTier(): TonApiTier | undefined {
+        return this.tiers$.value.find(tier => tier.price.amount.isZero());
+    }
+
     fetchTiers = this.tiers$.createAsyncAction(async () => {
         const tiers = await apiClient.api.getTonApiTiers();
         return tiers.data.items.map(mapTierDTOToTier);
@@ -68,17 +72,16 @@ class TonApiTiersStore {
         }
     );
 
-    checkCanBuyTier = createAsyncAction(async (tierId: number) => {
-        try {
-            const result = await apiClient.api.validChangeTonApiTier(tierId, {
-                project_id: projectsStore.selectedProject!.id
-            });
-
-            return result.data.valid;
-        } catch (e) {
-            console.error(e);
-            return false;
+    checkValidChangeTier = createAsyncAction(async (tierId: number) => {
+        if (!projectsStore.selectedProject) {
+            throw new Error('Project is not selected');
         }
+
+        const result = await apiClient.api.validChangeTonApiTier(tierId, {
+            project_id: projectsStore.selectedProject.id
+        });
+
+        return result.data;
     });
 
     clearState(): void {
