@@ -8,7 +8,7 @@ export const SelectPlanFirstly: FunctionComponent = () => {
         <Overlay display="flex" alignItems="center" justifyContent="center">
             <Flex align="center" direction="column" maxW="512px">
                 <CreateIcon96 mb="8" />
-                <H4 mb="2">Your API keys and calls will be shown here</H4>
+                <H4 mb="2">Your API keys will be shown here</H4>
                 <Text textStyle="body2" mb="6" color="text.secondary">
                     For start choose your TON API plan.
                 </Text>
