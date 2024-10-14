@@ -11,7 +11,6 @@ import {
     DTOInvoiceStatus,
     Loadable,
     monthsNames,
-    TokenCurrencyAmount,
     TonAddress
 } from 'src/shared';
 import {
@@ -28,7 +27,11 @@ import {
     isCustomFiltrationPeriod
 } from './interfaces';
 import { invoicesAppStore } from './invoices-app.store';
-import { CRYPTO_CURRENCY_DECIMALS } from 'src/shared/lib/currency/CRYPTO_CURRENCY';
+import {
+    convertCryptoCurrencyToDTOCryptoCurrency,
+    convertDTOCryptoCurrencyToCryptoCurrency,
+    getTokenCurrencyAmountFromDTO
+} from './utils';
 
 class InvoicesTableStore {
     invoices$ = new Loadable<Invoice[]>([]);
@@ -392,39 +395,6 @@ const mapSortColumnToFieldOrder: Record<InvoiceTableSortColumn, DTOInvoiceFieldO
     amount: DTOInvoiceFieldOrder.DTOAmount,
     status: DTOInvoiceFieldOrder.DTOStatus,
     'creation-date': DTOInvoiceFieldOrder.DTODateCreate
-};
-
-const convertDTOCryptoCurrencyToCryptoCurrency = (currency: DTOCryptoCurrency): CRYPTO_CURRENCY => {
-    switch (currency) {
-        case DTOCryptoCurrency.DTO_TON:
-            return CRYPTO_CURRENCY.TON;
-        case DTOCryptoCurrency.DTO_USDT:
-            return CRYPTO_CURRENCY.USDT;
-        default:
-            throw new Error(`Unknown currency: ${currency}`);
-    }
-};
-
-const convertCryptoCurrencyToDTOCryptoCurrency = (currency: CRYPTO_CURRENCY): DTOCryptoCurrency => {
-    switch (currency) {
-        case CRYPTO_CURRENCY.TON:
-            return DTOCryptoCurrency.DTO_TON;
-        case CRYPTO_CURRENCY.USDT:
-            return DTOCryptoCurrency.DTO_USDT;
-        default:
-            throw new Error(`Unknown currency: ${currency}`);
-    }
-};
-
-const getTokenCurrencyAmountFromDTO = (
-    amount: string,
-    currency: DTOCryptoCurrency
-): TokenCurrencyAmount => {
-    return new TokenCurrencyAmount({
-        weiAmount: amount,
-        currency: convertDTOCryptoCurrencyToCryptoCurrency(currency),
-        decimals: CRYPTO_CURRENCY_DECIMALS[currency]
-    });
 };
 
 const preriodToDTO = (
