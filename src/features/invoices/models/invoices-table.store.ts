@@ -17,6 +17,7 @@ import {
 import {
     Invoice,
     InvoiceCommon,
+    InvoiceCurrency,
     InvoiceForm,
     InvoicesTablePagination,
     InvoiceStatus,
@@ -59,6 +60,7 @@ class InvoicesTableStore {
     get isFilterEmpty(): boolean {
         return (
             !this.pagination.filter.status &&
+            !this.pagination.filter.currency &&
             !this.pagination.filter.id &&
             !this.pagination.filter.overpayment
         );
@@ -83,6 +85,12 @@ class InvoicesTableStore {
         if (this.pagination.filter.status?.length) {
             this.pagination.filter.status.forEach(i => {
                 url.searchParams.append('filter_status', mapInvoiceStatusToInvoiceDTOStatus[i]);
+            });
+        }
+
+        if (this.pagination.filter.currency?.length) {
+            this.pagination.filter.currency.forEach(i => {
+                url.searchParams.append('filter_currency', mapInvoiceCurrencyToDTOCurrency[i]);
             });
         }
 
@@ -272,6 +280,16 @@ class InvoicesTableStore {
         }
     };
 
+    toggleFilterByCurrency = (currency: InvoiceCurrency): void => {
+        const filter = this.pagination.filter;
+        const filterCurrency = filter.currency || [];
+        const statusActive = filterCurrency.includes(currency);
+
+        filter.currency = statusActive
+            ? filterCurrency.filter(i => i !== currency)
+            : filterCurrency.concat(currency);
+    };
+
     setFilterByPeriod = (value: InvoiceTableFiltration['period']): void => {
         this.pagination.filter.period = value;
     };
@@ -286,6 +304,10 @@ class InvoicesTableStore {
 
     clearFilterByStatus = (): void => {
         this.pagination.filter.status = undefined;
+    };
+
+    clearFilterByCurrency = (): void => {
+        this.pagination.filter.currency = undefined;
     };
 
     clearState(): void {
@@ -312,6 +334,19 @@ const mapInvoiceDTOStatusToInvoiceStatus: Record<DTOInvoicesInvoice['status'], I
 
 const mapInvoiceStatusToInvoiceDTOStatus: Record<InvoiceStatus, DTOInvoicesInvoice['status']> =
     Object.fromEntries(Object.entries(mapInvoiceDTOStatusToInvoiceStatus).map(a => a.reverse()));
+
+const mapInvoiceDTOCurrencyToInvoiceCurrency: Record<
+    DTOInvoicesInvoice['currency'],
+    InvoiceCurrency
+> = {
+    [DTOCryptoCurrency.DTO_TON]: CRYPTO_CURRENCY.TON,
+    [DTOCryptoCurrency.DTO_USDT]: CRYPTO_CURRENCY.USDT
+};
+
+const mapInvoiceCurrencyToDTOCurrency: Record<InvoiceCurrency, DTOInvoicesInvoice['currency']> =
+    Object.fromEntries(
+        Object.entries(mapInvoiceDTOCurrencyToInvoiceCurrency).map(a => a.reverse())
+    );
 
 function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
     const commonInvoice: InvoiceCommon = {

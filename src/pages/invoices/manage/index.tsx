@@ -6,6 +6,7 @@ import {
     FilterInvoiceByOverpayment,
     FilterInvoiceByPeriod,
     FilterInvoiceByStatus,
+    FilterInvoiceByCurrency,
     InvoicesProjectInfo,
     InvoicesSearchInput,
     InvoicesTable,
@@ -34,6 +35,7 @@ const ManageInvoicesPage: FunctionComponent = () => {
                 <InvoicesSearchInput w="264px" />
                 <FilterInvoiceByStatus />
                 <FilterInvoiceByPeriod />
+                <FilterInvoiceByCurrency />
                 <FilterInvoiceByOverpayment />
                 <ButtonLink
                     ml="auto"
