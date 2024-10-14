@@ -27,7 +27,7 @@ const CurrencyRate: FunctionComponent<
     skeletonVariant,
     showSkeletonOnUpdate,
     leftSign,
-    currency,
+    currency = CRYPTO_CURRENCY.TON,
     amount,
     skeletonWidth,
     precision,
@@ -37,7 +37,6 @@ const CurrencyRate: FunctionComponent<
     thousandSeparators,
     ...rest
 }) => {
-    currency ||= CRYPTO_CURRENCY.TON;
     const sign = leftSign === undefined ? '' : leftSign;
     const precisionWithFallback = precision === undefined ? 2 : precision;
     const thousandSeparatorsWithFallback =

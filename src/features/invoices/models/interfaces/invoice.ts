@@ -1,4 +1,4 @@
-import { TokenCurrencyAmount, TonAddress } from 'src/shared';
+import { CRYPTO_CURRENCY, TokenCurrencyAmount, TonAddress } from 'src/shared';
 
 export const InvoiceStatus = {
     pending: 'pending',
@@ -13,6 +13,7 @@ export type InvoiceStatus = keyof typeof InvoiceStatus;
 export interface InvoiceCommon {
     id: string;
     amount: TokenCurrencyAmount;
+    currency: CRYPTO_CURRENCY;
     validUntil: Date;
     description: string;
     creationDate: Date;

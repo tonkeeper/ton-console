@@ -13,7 +13,7 @@ import {
     useConst
 } from '@chakra-ui/react';
 import { Invoice } from 'src/features';
-import { CopyPad, CURRENCY, H4, Span, toTimeLeft } from 'src/shared';
+import { CopyPad, H4, Span, toTimeLeft } from 'src/shared';
 import { CurrencyRate } from 'src/entities';
 import { useCountdown } from 'src/shared/hooks/useCountdown';
 
@@ -57,7 +57,7 @@ export const ViewInvoiceModalContent: FunctionComponent<{
                                 color="text.secondary"
                                 textStyle="body2"
                                 leftSign="$"
-                                currency={CURRENCY.TON}
+                                currency={invoice.currency}
                                 amount={invoice.amount.amount}
                             />
                         </Flex>

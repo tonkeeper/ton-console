@@ -11,7 +11,8 @@ import { fetchRate } from './rates.api';
 
 class RatesStore {
     rates$: Rates$ = {
-        [CRYPTO_CURRENCY.TON]: new Loadable<BigNumber>(new BigNumber(0))
+        [CRYPTO_CURRENCY.TON]: new Loadable<BigNumber>(new BigNumber(0)),
+        [CRYPTO_CURRENCY.USDT]: new Loadable<BigNumber>(new BigNumber(0))
     };
 
     constructor() {

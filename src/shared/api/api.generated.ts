@@ -501,11 +501,11 @@ export enum DTOStatsQueryType {
     DTOChatGptQuery = 'chat_gpt_query'
 }
 
-/** @default "en" */
-export enum DTOLang {
-    DTOEn = 'en',
-    DTORu = 'ru'
-}
+/**
+ * @default "en"
+ * @example "en"
+ */
+export type DTOLang = string;
 
 export enum DTOServiceName {
     DTOMessages = 'messages',
@@ -519,6 +519,7 @@ export enum DTOServiceName {
 export enum DTOProServiceDashboardColumnID {
     DTOAddress = 'address',
     DTOTotalBalance = 'total_balance',
+    DTOJettonsBalance = 'jettons_balance',
     DTOTotalTon = 'total_ton',
     DTOSendCurrentMonth = 'send_current_month',
     DTOSendLastMonth = 'send_last_month',
@@ -612,6 +613,7 @@ export interface DTOInvoicesInvoice {
      * @example 1690889913000
      */
     date_create: number;
+    currency: DTOCryptoCurrency;
 }
 
 export interface DTOInvoicesApp {
@@ -651,6 +653,12 @@ export enum DTOInvoiceStatus {
 export enum DTOChain {
     DTOMainnet = 'mainnet',
     DTOTestnet = 'testnet'
+}
+
+/** @default "TON" */
+export enum DTOCryptoCurrency {
+    DTO_TON = 'TON',
+    DTO_USDT = 'USDT'
 }
 
 /** @example "id" */
@@ -715,6 +723,11 @@ export enum DTOFiatCurrencies {
     DTO_IDR = 'IDR',
     DTO_INR = 'INR',
     DTO_JPY = 'JPY'
+}
+
+export interface DTOAccount {
+    /** @example "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
+    account: string;
 }
 
 /** backend error code */
@@ -1012,6 +1025,29 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             })
     };
     api = {
+        /**
+         * No description
+         *
+         * @tags test
+         * @name TestDeleteUser
+         * @summary Delete test user
+         * @request DELETE:/api/v1/test/user
+         */
+        testDeleteUser: (params: RequestParams = {}) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/test/user`,
+                method: 'DELETE',
+                ...params
+            }),
+
         /**
          * No description
          *
@@ -3308,6 +3344,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 life_time: number;
                 /** @example "Test description" */
                 description?: string;
+                currency?: DTOCryptoCurrency;
             },
             query?: {
                 /**
@@ -3536,6 +3573,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @format uint32
                  */
                 app_id: number;
+                /** Currency */
+                currency?: DTOCryptoCurrency;
             },
             params: RequestParams = {}
         ) =>
@@ -3567,6 +3606,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                          * @example 1000000000
                          */
                         total_amount_pending: number;
+                        currency: DTOCryptoCurrency;
                     };
                 },
                 {
@@ -3626,6 +3666,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @format int64
                  */
                 end?: number;
+                /** Currency */
+                currency?: DTOCryptoCurrency;
             },
             params: RequestParams = {}
         ) =>
