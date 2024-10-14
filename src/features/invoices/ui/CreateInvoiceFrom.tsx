@@ -8,6 +8,7 @@ import {
     Input,
     InputGroup,
     InputRightElement,
+    Select,
     StyleProps,
     Text
 } from '@chakra-ui/react';
@@ -21,11 +22,14 @@ import {
     OptionsInputText,
     Span,
     numberMask,
-    TonCurrencyAmount,
-    tonMask
+    tonMask,
+    DTOCryptoCurrency,
+    CRYPTO_CURRENCY,
+    TokenCurrencyAmount
 } from 'src/shared';
 import { useIMask } from 'react-imask';
 import { observer } from 'mobx-react-lite';
+import { CRYPTO_CURRENCY_DECIMALS } from 'src/shared/lib/currency/CRYPTO_CURRENCY';
 
 interface InternalForm {
     amount: string;
@@ -33,6 +37,8 @@ interface InternalForm {
     lifeTimeMinutes: number;
 
     description: string;
+
+    currency: CRYPTO_CURRENCY;
 }
 
 const invoiceLifeTimeMask = {
@@ -74,7 +80,7 @@ export const CreateInvoiceFrom: FunctionComponent<
         max: 100000
     });
 
-    const { ref: hookFormRef, ...amountRest } = register('amount', {
+    const { ref: hookAmountFormRef, ...amountRest } = register('amount', {
         required: 'This is required',
         validate(value) {
             if (!isNumber(value)) {
@@ -88,10 +94,16 @@ export const CreateInvoiceFrom: FunctionComponent<
     });
 
     const submitMiddleware = (form: InternalForm): void => {
-        const { amount, ...values } = form;
+        const { amount, currency, ...values } = form;
+
         onSubmit({
-            amount: TonCurrencyAmount.fromRelativeAmount(amount),
+            amount: TokenCurrencyAmount.fromDecimals(
+                amount,
+                currency,
+                CRYPTO_CURRENCY_DECIMALS[currency]
+            ),
             lifeTimeSeconds: Math.floor(values.lifeTimeMinutes * 60),
+            currency,
             ...values
         });
     };
@@ -102,15 +114,21 @@ export const CreateInvoiceFrom: FunctionComponent<
                 <FormLabel htmlFor="amount">Amount</FormLabel>
                 <InputGroup>
                     <Input
-                        ref={mergeRefs(maskRef, hookFormRef)}
+                        ref={mergeRefs(maskRef, hookAmountFormRef)}
                         pr="60px"
                         autoComplete="off"
                         id="name"
                         placeholder="10"
                         {...amountRest}
                     />
-                    <InputRightElement textStyle="body2" w="60px" color="text.secondary">
-                        TON
+                    <InputRightElement textStyle="body2" w="95px" color="text.secondary">
+                        <Select textAlign="end" variant="filled" {...register('currency')}>
+                            {Object.entries(DTOCryptoCurrency).map(([key, value]) => (
+                                <option key={key} value={value}>
+                                    {value}
+                                </option>
+                            ))}
+                        </Select>
                     </InputRightElement>
                 </InputGroup>
                 <FormErrorMessage>

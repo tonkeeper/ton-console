@@ -1,7 +1,7 @@
 import { CurrencyAmount } from './currency-amount';
 import BigNumber from 'bignumber.js';
 import { CURRENCY } from './CURRENCY';
-import { fromWei } from 'src/shared/lib/blockchain/wei';
+import { fromWei, toWei } from 'src/shared/lib/blockchain/wei';
 import { BasicCurrencyAmount } from './basic-currency-amount';
 import { formatNumber } from 'src/shared';
 
@@ -56,6 +56,18 @@ export class TokenCurrencyAmount extends BasicCurrencyAmount implements Currency
             weiAmount: this.weiAmount.toString(),
             decimals: this.decimals
         };
+    }
+
+    static fromDecimals(
+        amount: number | string | bigint,
+        currency: CURRENCY,
+        decimals: number
+    ): TokenCurrencyAmount {
+        return new TokenCurrencyAmount({
+            weiAmount: toWei(amount.toString(), decimals).toString(),
+            currency,
+            decimals
+        });
     }
 
     constructor({ weiAmount, currency, decimals }: TokenCurrencyAmountStruct) {

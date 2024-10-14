@@ -3,14 +3,16 @@ import {
     apiClient,
     backendBaseURL,
     createImmediateReaction,
+    CRYPTO_CURRENCY,
+    DTOCryptoCurrency,
     DTOGetInvoicesParamsTypeOrderEnum,
     DTOInvoiceFieldOrder,
     DTOInvoicesInvoice,
     DTOInvoiceStatus,
     Loadable,
     monthsNames,
-    TonAddress,
-    TonCurrencyAmount
+    TokenCurrencyAmount,
+    TonAddress
 } from 'src/shared';
 import {
     Invoice,
@@ -25,6 +27,7 @@ import {
     isCustomFiltrationPeriod
 } from './interfaces';
 import { invoicesAppStore } from './invoices-app.store';
+import { CRYPTO_CURRENCY_DECIMALS } from 'src/shared/lib/currency/CRYPTO_CURRENCY';
 
 class InvoicesTableStore {
     invoices$ = new Loadable<Invoice[]>([]);
@@ -198,7 +201,8 @@ class InvoicesTableStore {
                 {
                     amount: form.amount.stringWeiAmount,
                     description: form.description,
-                    life_time: form.lifeTimeSeconds
+                    life_time: form.lifeTimeSeconds,
+                    currency: convertCryptoCurrencyToDTOCryptoCurrency(form.currency)
                 },
                 {
                     app_id: invoicesAppStore.invoicesApp$.value!.id
@@ -311,16 +315,17 @@ const mapInvoiceStatusToInvoiceDTOStatus: Record<InvoiceStatus, DTOInvoicesInvoi
 
 function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
     const commonInvoice: InvoiceCommon = {
-        amount: new TonCurrencyAmount(invoiceDTO.amount),
+        amount: getTokenCurrencyAmountFromDTO(invoiceDTO.amount, invoiceDTO.currency),
         creationDate: new Date(invoiceDTO.date_create * 1000),
         id: invoiceDTO.id,
+        currency: convertDTOCryptoCurrencyToCryptoCurrency(invoiceDTO.currency),
         validUntil: new Date(invoiceDTO.date_expire * 1000),
         description: invoiceDTO.description,
         payTo: TonAddress.parse(invoiceDTO.pay_to_address),
         paymentLink: invoiceDTO.payment_link,
         overpayment:
             invoiceDTO.overpayment && Number(invoiceDTO.overpayment) !== 0
-                ? new TonCurrencyAmount(invoiceDTO.overpayment)
+                ? getTokenCurrencyAmountFromDTO(invoiceDTO.overpayment, invoiceDTO.currency)
                 : undefined
     };
 
@@ -352,6 +357,39 @@ const mapSortColumnToFieldOrder: Record<InvoiceTableSortColumn, DTOInvoiceFieldO
     amount: DTOInvoiceFieldOrder.DTOAmount,
     status: DTOInvoiceFieldOrder.DTOStatus,
     'creation-date': DTOInvoiceFieldOrder.DTODateCreate
+};
+
+const convertDTOCryptoCurrencyToCryptoCurrency = (currency: DTOCryptoCurrency): CRYPTO_CURRENCY => {
+    switch (currency) {
+        case DTOCryptoCurrency.DTO_TON:
+            return CRYPTO_CURRENCY.TON;
+        case DTOCryptoCurrency.DTO_USDT:
+            return CRYPTO_CURRENCY.USDT;
+        default:
+            throw new Error(`Unknown currency: ${currency}`);
+    }
+};
+
+const convertCryptoCurrencyToDTOCryptoCurrency = (currency: CRYPTO_CURRENCY): DTOCryptoCurrency => {
+    switch (currency) {
+        case CRYPTO_CURRENCY.TON:
+            return DTOCryptoCurrency.DTO_TON;
+        case CRYPTO_CURRENCY.USDT:
+            return DTOCryptoCurrency.DTO_USDT;
+        default:
+            throw new Error(`Unknown currency: ${currency}`);
+    }
+};
+
+const getTokenCurrencyAmountFromDTO = (
+    amount: string,
+    currency: DTOCryptoCurrency
+): TokenCurrencyAmount => {
+    return new TokenCurrencyAmount({
+        weiAmount: amount,
+        currency: convertDTOCryptoCurrencyToCryptoCurrency(currency),
+        decimals: CRYPTO_CURRENCY_DECIMALS[currency]
+    });
 };
 
 const preriodToDTO = (
