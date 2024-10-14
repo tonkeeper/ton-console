@@ -36,7 +36,7 @@ const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
                             text={`curl -X POST https://tonconsole.com/api/v1/services/invoices/invoice \\
     -H 'Content-Type: application/json' \\
     -H 'Authorization: Bearer ${invoicesAppStore.appToken$.value}' \\
-    -d '{"amount": "1000000000", "life_time": 1800, "description": "Example description"}'`}
+    -d '{"amount": "1000000", "life_time": 1800, "description": "Example description", "currency": "USDT"}'`}
                             iconAlign="start"
                             mb="3"
                         />
@@ -44,8 +44,8 @@ const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
                             <Box mb="1">Where body have properties:</Box>
                             <UnorderedList listStyleType={'"-"'} spacing="1">
                                 <ListItem pl="1">
-                                    <Code>amount</Code> is an amount in nanoTONS (10^-9 TON) to pay
-                                    to the invoice
+                                    <Code>amount</Code> is an amount in nanoTONs (10^-9) for TON and
+                                    microUSDTs (10^-6) for USDT to pay to the invoice
                                 </ListItem>
                                 <ListItem pl="1">
                                     <Code>life_time</Code> is the duration of the invoice validity
