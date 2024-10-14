@@ -10,6 +10,14 @@ export const InvoiceStatus = {
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export type InvoiceStatus = keyof typeof InvoiceStatus;
 
+export const InvoiceCurrency = {
+    [CRYPTO_CURRENCY.TON]: CRYPTO_CURRENCY.TON,
+    [CRYPTO_CURRENCY.USDT]: CRYPTO_CURRENCY.USDT
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export type InvoiceCurrency = keyof typeof InvoiceCurrency;
+
 export interface InvoiceCommon {
     id: string;
     amount: TokenCurrencyAmount;
