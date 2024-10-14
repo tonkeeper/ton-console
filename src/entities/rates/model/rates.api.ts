@@ -5,6 +5,10 @@ const backendCurrenciesMapping = {
     [CRYPTO_CURRENCY.TON]: {
         request: 'ton',
         response: 'TON'
+    },
+    [CRYPTO_CURRENCY.USDT]: {
+        request: 'usdt',
+        response: 'USDT'
     }
 };
 

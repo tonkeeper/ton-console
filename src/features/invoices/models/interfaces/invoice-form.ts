@@ -1,4 +1,4 @@
-import { TokenCurrencyAmount } from 'src/shared';
+import { CRYPTO_CURRENCY, TokenCurrencyAmount } from 'src/shared';
 
 export interface InvoiceForm {
     amount: TokenCurrencyAmount;
@@ -6,4 +6,6 @@ export interface InvoiceForm {
     lifeTimeSeconds: number;
 
     description: string;
+
+    currency: CRYPTO_CURRENCY;
 }

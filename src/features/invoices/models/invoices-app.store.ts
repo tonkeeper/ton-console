@@ -4,18 +4,26 @@ import {
     Loadable,
     createImmediateReaction,
     DTOInvoicesApp,
-    TonCurrencyAmount,
-    TonAddress
+    TonAddress,
+    DTOCryptoCurrency,
+    CRYPTO_CURRENCY,
+    TokenCurrencyAmount
 } from 'src/shared';
 import { projectsStore } from 'src/entities';
-import { InvoicesApp, InvoicesProjectForm, InvoicesStatistics } from './interfaces';
+import {
+    InvoicesAllStatistics,
+    InvoicesApp,
+    InvoicesProjectForm,
+    InvoicesStatistics
+} from './interfaces';
+import { CRYPTO_CURRENCY_DECIMALS } from 'src/shared/lib/currency/CRYPTO_CURRENCY';
 
 class InvoicesAppStore {
     invoicesApp$ = new Loadable<InvoicesApp | null>(null);
 
     appToken$ = new Loadable<string | null>(null);
 
-    statistics$ = new Loadable<InvoicesStatistics | null>(null);
+    statistics$ = new Loadable<InvoicesAllStatistics | null>(null);
 
     get invoicesServiceAvailable(): boolean {
         return !!projectsStore.selectedProject?.capabilities.invoices;
@@ -172,11 +180,28 @@ class InvoicesAppStore {
     );
 
     fetchInvoicesStatistics = this.statistics$.createAsyncAction(async () => {
-        const response = await apiClient.api.getInvoicesStats({
-            app_id: this.invoicesApp$.value!.id
-        });
+        const tonRes = await apiClient.api
+            .getInvoicesStats({
+                app_id: this.invoicesApp$.value!.id,
+                currency: DTOCryptoCurrency.DTO_TON
+            })
+            .then(response =>
+                mapInvoicesStatsDTOToInvoicesStats(response.data.stats, CRYPTO_CURRENCY.TON)
+            );
 
-        return mapInvoicesStatsDTOToInvoicesStats(response.data.stats);
+        const usdtRes = await apiClient.api
+            .getInvoicesStats({
+                app_id: this.invoicesApp$.value!.id,
+                currency: DTOCryptoCurrency.DTO_USDT
+            })
+            .then(response =>
+                mapInvoicesStatsDTOToInvoicesStats(response.data.stats, CRYPTO_CURRENCY.USDT)
+            );
+
+        return {
+            [CRYPTO_CURRENCY.TON]: tonRes,
+            [CRYPTO_CURRENCY.USDT]: usdtRes
+        };
     });
 
     clearState(): void {
@@ -200,14 +225,27 @@ function mapInvoicesAppDTOToInvoicesApp(invoicesAppDTO: DTOInvoicesApp): Invoice
 }
 
 function mapInvoicesStatsDTOToInvoicesStats(
-    invoicesStatsDTO: Awaited<ReturnType<typeof apiClient.api.getInvoicesStats>>['data']['stats']
+    invoicesStatsDTO: Awaited<ReturnType<typeof apiClient.api.getInvoicesStats>>['data']['stats'],
+    currency: CRYPTO_CURRENCY
 ): InvoicesStatistics {
     return {
         totalInvoices: invoicesStatsDTO.total,
-        earnedTotal: new TonCurrencyAmount(invoicesStatsDTO.success_total),
-        earnedLastWeek: new TonCurrencyAmount(invoicesStatsDTO.success_in_week),
+        earnedTotal: new TokenCurrencyAmount({
+            weiAmount: invoicesStatsDTO.success_total.toString(),
+            currency: currency,
+            decimals: CRYPTO_CURRENCY_DECIMALS[currency]
+        }),
+        earnedLastWeek: new TokenCurrencyAmount({
+            weiAmount: invoicesStatsDTO.success_in_week.toString(),
+            currency: currency,
+            decimals: CRYPTO_CURRENCY_DECIMALS[currency]
+        }),
         invoicesInProgress: invoicesStatsDTO.invoices_in_progress,
-        awaitingForPaymentAmount: new TonCurrencyAmount(invoicesStatsDTO.total_amount_pending)
+        awaitingForPaymentAmount: new TokenCurrencyAmount({
+            weiAmount: invoicesStatsDTO.total_amount_pending.toString(),
+            currency: currency,
+            decimals: CRYPTO_CURRENCY_DECIMALS[currency]
+        })
     };
 }
 

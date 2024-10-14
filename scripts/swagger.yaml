@@ -34,8 +34,6 @@ tags:
     description: 'Endpoints for Pro service management and operations.'
   - name: cnft_service
     description: 'Endpoints for cNFT service management and operations.'
-  - name: ton_sites_service
-    description: 'Endpoints for Ton Sites service management and operations.'
 
 paths:
   /ready:
@@ -148,24 +146,6 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/Ok'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/admin/sites:
-    get:
-      summary: "Private method: Get sites"
-      description: "Private method"
-      operationId: adminGetTonSites
-      tags:
-        - admin
-      responses:
-        '200':
-          $ref: '#/components/responses/TonSitesReduced'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -1472,6 +1452,7 @@ paths:
       operationId: getInvoicesStats
       parameters:
         - $ref: '#/components/parameters/queryAppID'
+        - $ref: '#/components/parameters/queryCryptoCurrency'
       tags:
         - invoices_service
       responses:
@@ -1496,6 +1477,7 @@ paths:
         - $ref: '#/components/parameters/queryFilterOverpayment'
         - $ref: '#/components/parameters/queryStartDate'
         - $ref: '#/components/parameters/queryEndDate'
+        - $ref: '#/components/parameters/queryCryptoCurrency'
       tags:
         - invoices_service
       responses:
@@ -1862,183 +1844,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
-  /api/v1/services/mintless/config:
-    get:
-      summary: "Get mintless jetton config"
-      operationId: getMintlessJettonConfig
-      tags:
-        - mintless_jetton_service
-      responses:
-        '200':
-          $ref: '#/components/responses/MintlessJettonConfig'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/mintless/paid:
-    get:
-      summary: "Get paid mintless jettons"
-      operationId: getPaidMintlessJettons
-      tags:
-        - mintless_jetton_service
-      parameters:
-        - $ref: '#/components/parameters/queryProjectID'
-      responses:
-        '200':
-          $ref: '#/components/responses/MintlessJettons'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/mintless/{account}:
-    get:
-      summary: "Check if a mintless jetton exists"
-      operationId: checkExistsMintlessJetton
-      tags:
-        - mintless_jetton_service
-      parameters:
-        - $ref: '#/components/parameters/account'
-      responses:
-        '200':
-          $ref: '#/components/responses/Ok'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  
-  /api/v1/services/minter/owner/jettons:
-    get:
-      summary: "Get jettons by owner"
-      operationId: getJettonsByOwner
-      tags:
-        - minter_jetton_media
-      parameters:
-        - $ref: '#/components/parameters/queryAddress'
-      responses:
-        '200':
-          $ref: '#/components/responses/Accounts'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/minter/jetton/media:
-    post:
-      summary: "Upload jetton media"
-      operationId: uploadMinterJettonMedia
-      tags:
-        - minter_jetton_media
-      requestBody:
-        $ref: "#/components/requestBodies/JettonMedia"
-      responses:
-        '201':
-          $ref: '#/components/responses/URL'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  
-  /api/v1/services/sites:
-    post:
-      summary: "Create a Ton Site"
-      operationId: createTonSite
-      tags:
-        - ton_sites_service
-      parameters:
-        - $ref: '#/components/parameters/queryProjectID'
-      requestBody:
-        $ref: "#/components/requestBodies/NewTonSiteDomain"
-      responses:
-        '201':
-          $ref: '#/components/responses/TonSiteCreated'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-    get:
-      summary: "Get Ton Sites"
-      operationId: getTonSites
-      tags:
-        - ton_sites_service
-      parameters:
-        - $ref: '#/components/parameters/queryProjectID'
-      responses:
-        '200':
-          $ref: '#/components/responses/TonSites'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/sites/{id}:
-    delete:
-      summary: "Delete the Ton Site"
-      operationId: deleteTonSite
-      tags:
-        - ton_sites_service
-      parameters:
-        - $ref: '#/components/parameters/queryProjectID'
-        - $ref: '#/components/parameters/siteID'
-      responses:
-        '200':
-          $ref: '#/components/responses/Ok'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/sites/{id}/endpoints:
-    post:
-      summary: "Add endpoints to the Ton Site"
-      operationId: updateTonSitesEndpoints
-      tags:
-        - ton_sites_service
-      parameters:
-        - $ref: '#/components/parameters/queryProjectID'
-        - $ref: '#/components/parameters/siteID'
-      requestBody:
-        $ref: "#/components/requestBodies/TonSiteEndpoints"
-      responses:
-        '200':
-          $ref: '#/components/responses/Ok'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
 
 components:
   securitySchemes:
@@ -2125,14 +1930,6 @@ components:
       schema:
         type: string
         example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
-    siteID:
-      description: Site ID
-      in: path
-      name: id
-      required: true
-      schema:
-        type: string
-        example: "03cfc582"
     account:
       description: Account
       in: path
@@ -2224,6 +2021,13 @@ components:
       schema:
         type: integer
         format: uint32
+    queryCryptoCurrency:
+      description: Currency
+      in: query
+      name: currency
+      required: false
+      schema:
+        $ref: '#/components/schemas/CryptoCurrency'
     queryLang:
       description: Lang
       in: query
@@ -2349,25 +2153,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ProServiceState'
-    NewTonSiteDomain:
-      description: "Data that is expected"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - domain
-            properties:
-              domain:
-                type: string
-    TonSiteEndpoints:
-      description: "Data that is expected"
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              type: string
     ProjectTonApiTokenReq:
       description: "Data that is expected"
       content:
@@ -2677,8 +2462,6 @@ components:
               recipient_address:
                 type: string
                 example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-              currency:
-                $ref: '#/components/schemas/CryptoCurrency'
     InvoicesAppUpdate:
       description: "Data that is expected"
       content:
@@ -2717,6 +2500,8 @@ components:
               description:
                 type: string
                 example: "Test description"
+              currency:
+                $ref: '#/components/schemas/CryptoCurrency'
     InvoiceChange:
       description: "Data that is expected"
       content:
@@ -2840,14 +2625,6 @@ components:
         ok:
           type: boolean
           example: true
-    URL:
-      type: object
-      required:
-        - url
-      properties:
-        url:
-          type: string
-          example: "ipfs://bafybeifxdx73d2wlllucguvcejwecpdo4gudribllehw6te7pkjfgu5d4e"
     Error:
       type: object
       required:
@@ -3563,14 +3340,6 @@ components:
         - "address"
         - "numeric_fiat"
         - "numeric_crypto"
-    MintlessJetton:
-      type: object
-      required:
-        - account
-      properties:
-        account:
-          type: string
-          example: "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
     CnftCollection:
       type: object
       required:
@@ -3601,50 +3370,6 @@ components:
         paid_indexing_count:
           type: integer
           format: uint32
-    TonSiteReduced:
-      type: object
-      required:
-        - endpoints
-        - adnl_address
-        - private_key
-      properties:
-        endpoints:
-          type: array
-          items:
-            type: string
-            example: "https://lucky.io"
-        adnl_address:
-          type: string
-          example: "2ccad26312767b03bfe1ed76f2c97daf8e3df957180fcab8db83614er3c528a9"
-        private_key:
-          type: string
-          example: "d16f3eed38db798914907071734923fd2d24c16be6dd560b19fe6297091e925d"
-    TonSite:
-      type: object
-      required:
-        - id
-        - domain
-        - endpoints
-        - adnl_address
-        - date_create
-      properties:
-        id:
-          type: string
-          example: "60ffb075"
-        domain:
-          type: string
-          example: "lucky.ton"
-        endpoints:
-          type: array
-          items:
-            type: string
-            example: "https://lucky.io"
-        adnl_address:
-          type: string
-        date_create:
-          type: integer
-          format: int64
-          example: 1690889913000
     ProServiceInvoiceWebhook:
       type: object
       required:
@@ -3749,7 +3474,6 @@ components:
         - description
         - recipient_address
         - date_create
-        - currency
       properties:
         id:
           type: integer
@@ -3774,8 +3498,6 @@ components:
           type: integer
           format: int64
           example: 1690889913000
-        currency:
-          $ref: '#/components/schemas/CryptoCurrency'
 
     InvoiceStatus:
       type: string
@@ -3976,12 +3698,6 @@ components:
               code:
                 type: integer
                 description: "backend error code"
-    URL:
-      description: "URL"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/URL'
     Ok:
       description: "Ok"
       content:
@@ -4736,32 +4452,6 @@ components:
           schema:
             type: string
             format: binary
-    MintlessJettonConfig:
-      description: "Mintless Jetton config"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - price_per_jetton
-            properties:
-              price_per_jetton:
-                type: integer
-                format: uint64
-                example: 100000000
-    MintlessJettons:
-      description: "Mintless Jettons"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - jettons
-            properties:
-              jettons:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MintlessJetton'
     CnftCollectionInfo:
       description: "Compress NFT collection"
       content:
@@ -4794,30 +4484,6 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/CnftCollection'
-    TonSites:
-      description: "Ton Sites"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - items
-            properties:
-              items:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TonSite'
-    TonSiteCreated:
-      description: "Created Ton Site"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - site
-            properties:
-              site:
-                $ref: '#/components/schemas/TonSite'
     ProServiceInvoice:
       description: "Invoice"
       headers:
@@ -4844,19 +4510,7 @@ components:
             properties:
               user:
                 $ref: '#/components/schemas/User'
-    TonSitesReduced:
-      description: "Ton Sites reduced"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - items
-            properties:
-              items:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TonSiteReduced'
+
     Accounts:
       description: "Accounts"
       content:

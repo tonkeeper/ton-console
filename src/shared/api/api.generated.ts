@@ -3403,6 +3403,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 life_time: number;
                 /** @example "Test description" */
                 description?: string;
+                currency?: DTOCryptoCurrency;
             },
             query?: {
                 /**
@@ -3631,6 +3632,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @format uint32
                  */
                 app_id: number;
+                /** Currency */
+                currency?: DTOCryptoCurrency;
             },
             params: RequestParams = {}
         ) =>
@@ -3722,6 +3725,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @format int64
                  */
                 end?: number;
+                /** Currency */
+                currency?: DTOCryptoCurrency;
             },
             params: RequestParams = {}
         ) =>
