@@ -75,7 +75,7 @@ const AppMessagesAuthDocs: FunctionComponent<ComponentProps<typeof Box>> = props
     -H 'Content-Type: application/json'
     -H 'Authorization: Bearer ${appMessagesStore.dappToken$.value}'
     -d 
-    '{"message": "my_message", "address": "EQ...ER", "link": "http://my_dapp.com/event"}'`}
+    '{"message": "my_message", "addresses": ["EQ...ER", "EQ...ER"], "link": "http://my_dapp.com/event"}'`}
                             iconAlign="start"
                             mb="3"
                         />

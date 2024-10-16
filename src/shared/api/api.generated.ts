@@ -3477,6 +3477,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 search_id?: string;
                 /** Filter status */
                 filter_status?: DTOInvoiceStatus[];
+                /** Currency */
+                currency?: DTOCryptoCurrency;
                 /**
                  * Overpayment
                  * @default false
