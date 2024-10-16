@@ -1373,6 +1373,7 @@ paths:
         - $ref: '#/components/parameters/queryTypeOrder'
         - $ref: '#/components/parameters/queryInvoicesSearchID'
         - $ref: '#/components/parameters/queryFilterStatus'
+        - $ref: '#/components/parameters/queryCryptoCurrency'
         - $ref: '#/components/parameters/queryFilterOverpayment'
         - $ref: '#/components/parameters/queryStartDate'
         - $ref: '#/components/parameters/queryEndDate'

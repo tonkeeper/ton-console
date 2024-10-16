@@ -93,7 +93,7 @@ class InvoicesTableStore {
 
         if (this.pagination.filter.currency?.length) {
             this.pagination.filter.currency.forEach(i => {
-                url.searchParams.append('filter_currency', mapInvoiceCurrencyToDTOCurrency[i]);
+                url.searchParams.append('currency', mapInvoiceCurrencyToDTOCurrency[i]);
             });
         }
 
@@ -201,6 +201,10 @@ class InvoicesTableStore {
             field_order: sortByColumn,
             type_order: sortOrder,
             filter_status: filterByStatus,
+            currency:
+                this.pagination.filter.currency?.length === 1
+                    ? mapInvoiceCurrencyToDTOCurrency[this.pagination.filter.currency[0]]
+                    : undefined,
             ...(this.pagination.filter.overpayment && { overpayment: true }),
             ...period
         });
