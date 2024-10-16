@@ -86,6 +86,10 @@ export interface DTOTgAuth {
     auth_date: number;
 }
 
+export enum DTOTokenCapability {
+    DTOStreaming = 'streaming'
+}
+
 export interface DTOTonConnectProof {
     /** @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b" */
     address: string;
@@ -339,6 +343,7 @@ export interface DTOProjectTonApiToken {
      * @example 1690889913000
      */
     date_create: number;
+    capabilities?: DTOTokenCapability[];
 }
 
 export interface DTOStats {
@@ -1714,6 +1719,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 /** @example 5 */
                 limit_rps?: number | null;
                 origins?: string[];
+                capabilities?: DTOTokenCapability[];
             },
             params: RequestParams = {}
         ) =>
@@ -1758,6 +1764,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 /** @example 5 */
                 limit_rps?: number | null;
                 origins?: string[];
+                capabilities?: DTOTokenCapability[];
             },
             params: RequestParams = {}
         ) =>

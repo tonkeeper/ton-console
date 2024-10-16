@@ -2173,6 +2173,10 @@ components:
                 type: array
                 items:
                   type: string
+              capabilities:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TokenCapability'
     TonConnectProofExpected:
       description: "Data that is expected"
       content:
@@ -2709,6 +2713,10 @@ components:
           type: integer
           format: int64
           example: 1678275313
+    TokenCapability:
+      type: string
+      enum:
+        - "streaming"
     TonConnectProof:
       type: object
       required:
@@ -3074,6 +3082,10 @@ components:
           type: integer
           format: int64
           example: 1690889913000
+        capabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenCapability'
     Stats:
       type: object
       required:
