@@ -242,7 +242,7 @@ export const ApiKeyForm: FunctionComponent<
             {!useIPLimit && (
                 <FormControl mt="4" mb="0" isInvalid={!!ipLimitValueErrors} isRequired>
                     <Checkbox size="sm" {...register('availableWebhook')}>
-                        <Text textStyle="label2">Available Webhook</Text>
+                        <Text textStyle="label2">Allow webhook management</Text>
                     </Checkbox>
                 </FormControl>
             )}
