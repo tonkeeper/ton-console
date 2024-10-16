@@ -51,7 +51,7 @@ export const ApiKeyForm: FunctionComponent<
             : undefined;
 
         const capabilities =
-            !form.useIPLimit && form.availableWebhook ? [DTOTokenCapability.DTOStreaming] : [];
+            !form.useIPLimit && form.availableWebhook ? [DTOTokenCapability.DTOWebhooks] : [];
 
         onSubmit({
             name: form.name,
@@ -264,6 +264,6 @@ export function toApiKeyFormDefaultValues(
               name: createApiKeyForm?.name,
               useIPLimit: false,
               availableWebhook:
-                  createApiKeyForm?.capabilities.includes(DTOTokenCapability.DTOStreaming) ?? false
+                  createApiKeyForm?.capabilities.includes(DTOTokenCapability.DTOWebhooks) ?? false
           };
 }

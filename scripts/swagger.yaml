@@ -9,32 +9,6 @@ info:
 servers:
   - url: "http://localhost:8888"
 
-tags:
-  - name: admin
-    description: 'Private endpoints.'
-  - name: test
-    description: 'Test endpoints.'
-  - name: auth
-    description: 'Endpoints for authentication and authorization.'
-  - name: account
-    description: 'Endpoints for account management and operations.'
-  - name: project
-    description: 'Endpoints for project management and operations.'
-  - name: tonapi_service
-    description: 'Endpoints for TonAPI service management and operations.'
-  - name: messages_service
-    description: 'Endpoints for Messages service management and operations.'
-  - name: testnet_service
-    description: 'Endpoints for Testnet service management and operations.'
-  - name: stats_service
-    description: 'Endpoints for Stats service management and operations.'
-  - name: invoices_service
-    description: 'Endpoints for Invoices service management and operations.'
-  - name: pro_service
-    description: 'Endpoints for Pro service management and operations.'
-  - name: cnft_service
-    description: 'Endpoints for cNFT service management and operations.'
-
 paths:
   /ready:
     get:
@@ -72,24 +46,6 @@ paths:
       responses:
         '200':
           description: "Ok"
-        '500':
-          $ref: '#/components/responses/InternalError'
-  
-  /api/v1/test/user:
-    delete:
-      summary: "Delete test user"
-      operationId: testDeleteUser
-      tags:
-        - test
-      responses:
-        '200':
-          $ref: '#/components/responses/Ok'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
   
@@ -1184,7 +1140,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/queryProjectID'
       requestBody:
-        $ref: "#/components/requestBodies/NewInvoicesApp"
+        $ref: "#/components/requestBodies/InvoicesAppCreate"
       responses:
         '201':
           $ref: '#/components/responses/InvoicesAppResp'
@@ -1452,7 +1408,6 @@ paths:
       operationId: getInvoicesStats
       parameters:
         - $ref: '#/components/parameters/queryAppID'
-        - $ref: '#/components/parameters/queryCryptoCurrency'
       tags:
         - invoices_service
       responses:
@@ -1477,7 +1432,6 @@ paths:
         - $ref: '#/components/parameters/queryFilterOverpayment'
         - $ref: '#/components/parameters/queryStartDate'
         - $ref: '#/components/parameters/queryEndDate'
-        - $ref: '#/components/parameters/queryCryptoCurrency'
       tags:
         - invoices_service
       responses:
@@ -1543,6 +1497,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  
   /api/v1/services/pro/user/info:
     get:
       summary: "Get user info"
@@ -1560,6 +1515,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  
   /api/v1/services/pro/tiers:
     get:
       summary: "Get active tiers"
@@ -1578,6 +1534,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  
   /api/v1/services/pro/invoice:
     post:
       summary: "Creating an invoice for Pro tier payment"
@@ -1639,6 +1596,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  
   /api/v1/services/pro/verify:
     get:
       summary: "Verify Pro tier subscription"
@@ -1656,6 +1614,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  
   /api/v1/services/pro/trial:
     post:
       summary: "Activate pro trial period"
@@ -1675,6 +1634,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  
   /api/v1/services/pro/dashboard/columns:
     get:
       summary: "Get dashboard columns"
@@ -1716,6 +1676,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  
   /api/v1/services/pro/state:
     get:
       summary: "Get the state"
@@ -2021,13 +1982,6 @@ components:
       schema:
         type: integer
         format: uint32
-    queryCryptoCurrency:
-      description: Currency
-      in: query
-      name: currency
-      required: false
-      schema:
-        $ref: '#/components/schemas/CryptoCurrency'
     queryLang:
       description: Lang
       in: query
@@ -2108,14 +2062,6 @@ components:
       schema:
         type: string
         example: "EQ..fz,EQ...fa"
-    queryAddress:
-      description: Address
-      in: query
-      name: address
-      required: true
-      schema:
-        type: string
-        example: "EQ..fz"
     queryRepeatInterval:
       in: query
       name: repeat_interval
@@ -2443,7 +2389,7 @@ components:
                 format: int32
                 example: 10
                 description: "cyclic execution of requests"
-    NewInvoicesApp:
+    InvoicesAppCreate:
       description: "Data that is expected"
       content:
         application/json:
@@ -2504,8 +2450,6 @@ components:
               description:
                 type: string
                 example: "Test description"
-              currency:
-                $ref: '#/components/schemas/CryptoCurrency'
     InvoiceChange:
       description: "Data that is expected"
       content:
@@ -2568,18 +2512,6 @@ components:
               count:
                 type: integer
                 format: uint32
-    JettonMedia:
-      description: "Data that is expected"
-      content:
-        multipart/form-data:
-          schema:
-            type: object
-            required:
-              - media
-            properties:
-              media:
-                type: string
-                format: binary
     ProServiceNewDashboardData:
       description: "Data that is expected"
       content:
@@ -2716,7 +2648,7 @@ components:
     TokenCapability:
       type: string
       enum:
-        - "streaming"
+        - "webhooks"
     TonConnectProof:
       type: object
       required:
@@ -3324,7 +3256,9 @@ components:
     Lang:
       type: string
       default: en
-      example: en
+      enum:
+        - en
+        - ru
     ServiceName:
       type: string
       enum:
@@ -3339,7 +3273,6 @@ components:
       enum:
         - "address"
         - "total_balance"
-        - "jettons_balance"
         - "total_ton"
         - "send_current_month"
         - "send_last_month"
@@ -3435,7 +3368,6 @@ components:
         - date_expire
         - date_change
         - date_create
-        - currency
       properties:
         id:
           type: string
@@ -3475,8 +3407,6 @@ components:
           type: integer
           format: int64
           example: 1690889913000
-        currency:
-          $ref: '#/components/schemas/CryptoCurrency'
     InvoicesApp:
       type: object
       required:
@@ -3510,7 +3440,6 @@ components:
           type: integer
           format: int64
           example: 1690889913000
-
     InvoiceStatus:
       type: string
       example: "pending"
@@ -3525,12 +3454,6 @@ components:
         - mainnet
         - testnet
       default: mainnet
-    CryptoCurrency:
-      type: string
-      enum:
-        - TON
-        - USDT
-      default: TON
     InvoiceFieldOrder:
       type: string
       example: "id"
@@ -3636,14 +3559,6 @@ components:
         - IDR
         - INR
         - JPY
-    Account:
-      type: object
-      required:
-        - account
-      properties:
-        account:
-          type: string
-          example: "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
 
   responses:
     NotFound:
@@ -4428,7 +4343,6 @@ components:
                   - success_in_week
                   - invoices_in_progress
                   - total_amount_pending
-                  - currency
                 properties:
                   total:
                     type: integer
@@ -4450,8 +4364,6 @@ components:
                     type: integer
                     format: uint64
                     example: 1000000000
-                  currency:
-                    $ref: '#/components/schemas/CryptoCurrency'
     InvoicesExport:
       description: "Invoices CSV"
       headers:
@@ -4484,7 +4396,7 @@ components:
                 format: uint64
                 example: 100000000
     CnftCollections:
-      description: "cNFT collections"
+      description: "Get cNFT collections"
       content:
         application/json:
           schema:
@@ -4522,19 +4434,3 @@ components:
             properties:
               user:
                 $ref: '#/components/schemas/User'
-
-    Accounts:
-      description: "Accounts"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - items
-            properties:
-              items:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Account'
-
-                

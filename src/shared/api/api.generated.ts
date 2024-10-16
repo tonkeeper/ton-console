@@ -87,7 +87,7 @@ export interface DTOTgAuth {
 }
 
 export enum DTOTokenCapability {
-    DTOStreaming = 'streaming'
+    DTOWebhooks = 'webhooks'
 }
 
 export interface DTOTonConnectProof {
