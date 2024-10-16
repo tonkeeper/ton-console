@@ -11,8 +11,8 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FormProvider, useForm } from 'react-hook-form';
-import { ApiKey, apiKeysStore, CreateApiKeyForm } from '../model';
-import { ApiKeyForm, toApiKeyFormDefaultValues } from './ApiKeyForm';
+import { ApiKey, CreateApiKeyForm, apiKeysStore } from '../model';
+import { ApiKeyForm, ApiKeyFormInternal, toApiKeyFormDefaultValues } from './ApiKeyForm';
 import { tonApiTiersStore } from '../../tier';
 
 const EditApiKeyModal: FunctionComponent<{
@@ -22,7 +22,9 @@ const EditApiKeyModal: FunctionComponent<{
 }> = ({ apiKey, ...rest }) => {
     const formId = 'create-api-key-form';
 
-    const methods = useForm<CreateApiKeyForm>({ defaultValues: toApiKeyFormDefaultValues(apiKey) });
+    const methods = useForm<ApiKeyFormInternal>({
+        defaultValues: toApiKeyFormDefaultValues(apiKey)
+    });
 
     useEffect(() => {
         reset(toApiKeyFormDefaultValues(apiKey));
@@ -36,7 +38,12 @@ const EditApiKeyModal: FunctionComponent<{
     const onSubmit = useCallback(
         (form: CreateApiKeyForm): void => {
             if (apiKey) {
-                apiKeysStore.editApiKey({ id: apiKey.id, ...form }).then(rest.onClose);
+                apiKeysStore
+                    .editApiKey({
+                        id: apiKey.id,
+                        ...form
+                    })
+                    .then(rest.onClose);
             }
         },
         [apiKey, rest.onClose]
