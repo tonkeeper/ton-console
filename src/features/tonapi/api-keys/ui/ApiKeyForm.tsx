@@ -2,6 +2,7 @@ import { FunctionComponent, useEffect } from 'react';
 import {
     Box,
     chakra,
+    Checkbox,
     Flex,
     FormControl,
     FormErrorMessage,
@@ -10,10 +11,12 @@ import {
     Radio,
     RadioGroup,
     StyleProps,
-    Textarea
+    Textarea,
+    Text,
+    Divider
 } from '@chakra-ui/react';
 import { Controller, SubmitHandler, useFormContext } from 'react-hook-form';
-import { isNumber, mergeRefs, Span, toBinaryRadio } from 'src/shared';
+import { DTOTokenCapability, isNumber, mergeRefs, Span, toBinaryRadio } from 'src/shared';
 import { useIMask } from 'react-imask';
 import { FormState } from 'react-hook-form/dist/types/form';
 import { CreateApiKeyForm } from '../model';
@@ -28,6 +31,7 @@ type ApiKeyFormWithLimit = {
 type ApiKeyFormWithoutLimit = {
     name: string;
     useIPLimit: false;
+    availableWebhook: boolean;
 };
 
 export type ApiKeyFormInternal = ApiKeyFormWithLimit | ApiKeyFormWithoutLimit;
@@ -41,12 +45,19 @@ export const ApiKeyForm: FunctionComponent<
     }
 > = ({ id, onSubmit, disableDefaultFocus, maxLimit, ...rest }) => {
     const submitHandler = (form: ApiKeyFormInternal): void => {
+        const limitRps = form.useIPLimit ? Number(form.ipLimitValue) : null;
+        const origins = form.useIPLimit
+            ? form.originsValue.split('\n').filter(x => x !== '')
+            : undefined;
+
+        const capabilities =
+            !form.useIPLimit && form.availableWebhook ? [DTOTokenCapability.DTOWebhooks] : [];
+
         onSubmit({
             name: form.name,
-            limitRps: form.useIPLimit ? Number(form.ipLimitValue) : null,
-            origins: form.useIPLimit
-                ? form.originsValue.split('\n').filter(x => x !== '')
-                : undefined
+            limitRps,
+            origins,
+            capabilities
         });
     };
 
@@ -147,6 +158,8 @@ export const ApiKeyForm: FunctionComponent<
                     )}
                 />
             </FormControl>
+            <Divider />
+
             {useIPLimit && (
                 <>
                     <FormControl isInvalid={!!ipLimitValueErrors} isRequired>
@@ -225,6 +238,14 @@ export const ApiKeyForm: FunctionComponent<
                     </FormControl>
                 </>
             )}
+
+            {!useIPLimit && (
+                <FormControl mt="4" mb="0" isInvalid={!!ipLimitValueErrors} isRequired>
+                    <Checkbox size="sm" {...register('availableWebhook')}>
+                        <Text textStyle="label2">Allow webhook management</Text>
+                    </Checkbox>
+                </FormControl>
+            )}
         </chakra.form>
     );
 };
@@ -232,14 +253,17 @@ export const ApiKeyForm: FunctionComponent<
 export function toApiKeyFormDefaultValues(
     createApiKeyForm?: CreateApiKeyForm
 ): Partial<ApiKeyFormInternal> {
-    return {
-        name: createApiKeyForm?.name,
-        ...(createApiKeyForm?.limitRps != null
-            ? {
-                  useIPLimit: true,
-                  ipLimitValue: createApiKeyForm.limitRps,
-                  originsValue: createApiKeyForm.origins ? createApiKeyForm.origins.join('\n') : ''
-              }
-            : { useIPLimit: false })
-    };
+    return createApiKeyForm?.limitRps != null
+        ? {
+              name: createApiKeyForm?.name,
+              useIPLimit: true,
+              ipLimitValue: createApiKeyForm.limitRps!,
+              originsValue: createApiKeyForm.origins ? createApiKeyForm.origins.join('\n') : ''
+          }
+        : {
+              name: createApiKeyForm?.name,
+              useIPLimit: false,
+              availableWebhook:
+                  createApiKeyForm?.capabilities.includes(DTOTokenCapability.DTOWebhooks) ?? false
+          };
 }

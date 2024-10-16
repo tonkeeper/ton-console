@@ -1,3 +1,5 @@
+import { DTOTokenCapability } from 'src/shared';
+
 export interface ApiKey {
     id: number;
     name: string;
@@ -5,4 +7,5 @@ export interface ApiKey {
     limitRps: number | null;
     origins?: string[];
     creationDate: Date;
+    capabilities: DTOTokenCapability[];
 }

@@ -67,6 +67,7 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                         <Tr>
                             <Th>Name</Th>
                             <Th>API Key</Th>
+                            <Th>Capabilities</Th>
                             <Th>Limit</Th>
                             <Th w="100%" textAlign="right">
                                 <chakra.span pr="34px">Created</chakra.span>
@@ -112,6 +113,7 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                                         )}
                                     </Flex>
                                 </Td>
+                                <Td>{apiKey.capabilities.join(', ') || '-'}</Td>
                                 <Td>
                                     {apiKey.limitRps === null
                                         ? 'Unlimited'
