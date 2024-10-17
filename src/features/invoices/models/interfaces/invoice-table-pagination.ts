@@ -1,4 +1,4 @@
-import type { InvoiceStatus } from '../interfaces';
+import type { InvoiceStatus, InvoiceCurrency } from '../interfaces';
 import { MonthName } from 'src/shared';
 
 export type InvoiceTableColumn = 'id' | 'status' | 'creation-date' | 'description' | 'amount';
@@ -16,6 +16,7 @@ export type InvoiceTableFiltration = {
               from: Date;
               to: Date; // inclusive
           };
+    currency?: InvoiceCurrency[];
     overpayment: boolean;
 };
 

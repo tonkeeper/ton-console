@@ -3,18 +3,20 @@ import {
     apiClient,
     backendBaseURL,
     createImmediateReaction,
+    CRYPTO_CURRENCY,
+    DTOCryptoCurrency,
     DTOGetInvoicesParamsTypeOrderEnum,
     DTOInvoiceFieldOrder,
     DTOInvoicesInvoice,
     DTOInvoiceStatus,
     Loadable,
     monthsNames,
-    TonAddress,
-    TonCurrencyAmount
+    TonAddress
 } from 'src/shared';
 import {
     Invoice,
     InvoiceCommon,
+    InvoiceCurrency,
     InvoiceForm,
     InvoicesTablePagination,
     InvoiceStatus,
@@ -25,6 +27,11 @@ import {
     isCustomFiltrationPeriod
 } from './interfaces';
 import { invoicesAppStore } from './invoices-app.store';
+import {
+    convertCryptoCurrencyToDTOCryptoCurrency,
+    convertDTOCryptoCurrencyToCryptoCurrency,
+    getTokenCurrencyAmountFromDTO
+} from './utils';
 
 class InvoicesTableStore {
     invoices$ = new Loadable<Invoice[]>([]);
@@ -56,6 +63,7 @@ class InvoicesTableStore {
     get isFilterEmpty(): boolean {
         return (
             !this.pagination.filter.status &&
+            !this.pagination.filter.currency &&
             !this.pagination.filter.id &&
             !this.pagination.filter.overpayment
         );
@@ -80,6 +88,12 @@ class InvoicesTableStore {
         if (this.pagination.filter.status?.length) {
             this.pagination.filter.status.forEach(i => {
                 url.searchParams.append('filter_status', mapInvoiceStatusToInvoiceDTOStatus[i]);
+            });
+        }
+
+        if (this.pagination.filter.currency?.length) {
+            this.pagination.filter.currency.forEach(i => {
+                url.searchParams.append('currency', mapInvoiceCurrencyToDTOCurrency[i]);
             });
         }
 
@@ -187,6 +201,10 @@ class InvoicesTableStore {
             field_order: sortByColumn,
             type_order: sortOrder,
             filter_status: filterByStatus,
+            currency:
+                this.pagination.filter.currency?.length === 1
+                    ? mapInvoiceCurrencyToDTOCurrency[this.pagination.filter.currency[0]]
+                    : undefined,
             ...(this.pagination.filter.overpayment && { overpayment: true }),
             ...period
         });
@@ -198,7 +216,8 @@ class InvoicesTableStore {
                 {
                     amount: form.amount.stringWeiAmount,
                     description: form.description,
-                    life_time: form.lifeTimeSeconds
+                    life_time: form.lifeTimeSeconds,
+                    currency: convertCryptoCurrencyToDTOCryptoCurrency(form.currency)
                 },
                 {
                     app_id: invoicesAppStore.invoicesApp$.value!.id
@@ -268,6 +287,16 @@ class InvoicesTableStore {
         }
     };
 
+    toggleFilterByCurrency = (currency: InvoiceCurrency): void => {
+        const filter = this.pagination.filter;
+        const filterCurrency = filter.currency || [];
+        const statusActive = filterCurrency.includes(currency);
+
+        filter.currency = statusActive
+            ? filterCurrency.filter(i => i !== currency)
+            : filterCurrency.concat(currency);
+    };
+
     setFilterByPeriod = (value: InvoiceTableFiltration['period']): void => {
         this.pagination.filter.period = value;
     };
@@ -282,6 +311,10 @@ class InvoicesTableStore {
 
     clearFilterByStatus = (): void => {
         this.pagination.filter.status = undefined;
+    };
+
+    clearFilterByCurrency = (): void => {
+        this.pagination.filter.currency = undefined;
     };
 
     clearState(): void {
@@ -309,18 +342,32 @@ const mapInvoiceDTOStatusToInvoiceStatus: Record<DTOInvoicesInvoice['status'], I
 const mapInvoiceStatusToInvoiceDTOStatus: Record<InvoiceStatus, DTOInvoicesInvoice['status']> =
     Object.fromEntries(Object.entries(mapInvoiceDTOStatusToInvoiceStatus).map(a => a.reverse()));
 
+const mapInvoiceDTOCurrencyToInvoiceCurrency: Record<
+    DTOInvoicesInvoice['currency'],
+    InvoiceCurrency
+> = {
+    [DTOCryptoCurrency.DTO_TON]: CRYPTO_CURRENCY.TON,
+    [DTOCryptoCurrency.DTO_USDT]: CRYPTO_CURRENCY.USDT
+};
+
+const mapInvoiceCurrencyToDTOCurrency: Record<InvoiceCurrency, DTOInvoicesInvoice['currency']> =
+    Object.fromEntries(
+        Object.entries(mapInvoiceDTOCurrencyToInvoiceCurrency).map(a => a.reverse())
+    );
+
 function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
     const commonInvoice: InvoiceCommon = {
-        amount: new TonCurrencyAmount(invoiceDTO.amount),
+        amount: getTokenCurrencyAmountFromDTO(invoiceDTO.amount, invoiceDTO.currency),
         creationDate: new Date(invoiceDTO.date_create * 1000),
         id: invoiceDTO.id,
+        currency: convertDTOCryptoCurrencyToCryptoCurrency(invoiceDTO.currency),
         validUntil: new Date(invoiceDTO.date_expire * 1000),
         description: invoiceDTO.description,
         payTo: TonAddress.parse(invoiceDTO.pay_to_address),
         paymentLink: invoiceDTO.payment_link,
         overpayment:
             invoiceDTO.overpayment && Number(invoiceDTO.overpayment) !== 0
-                ? new TonCurrencyAmount(invoiceDTO.overpayment)
+                ? getTokenCurrencyAmountFromDTO(invoiceDTO.overpayment, invoiceDTO.currency)
                 : undefined
     };
 
