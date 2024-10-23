@@ -21,7 +21,7 @@ import {
 import { toJS } from 'mobx';
 import { AnalyticsHistoryTableContext } from './analytics-history-table-context';
 import { AnalyticsQueryStatusBadge } from './AnalyticsQueryStatusBadge';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { formatRepeatInterval } from '../utils';
 import { TestnetBadge } from 'src/features/analytics/ui/history/TestnetBadge';
 
@@ -49,7 +49,6 @@ const ItemRow: FunctionComponent<{
     query: AnalyticsQuery | AnalyticsRepeatingQueryAggregated | AnalyticsGraphQuery;
     style: React.CSSProperties;
 }> = observer(({ query: q, style }) => {
-    const navigate = useNavigate();
     const renderTime = useConst(Date.now());
 
     const { rowHeight } = useContext(AnalyticsHistoryTableContext);
@@ -67,11 +66,6 @@ const ItemRow: FunctionComponent<{
     const durationSeconds = useCountup(passedSeconds);
     const formattedDuration = durationSeconds === 0 ? '' : toTimeLeft(durationSeconds * 1000);
 
-    const onRowClick = (): void => {
-        const path = query.type === 'graph' ? 'graph' : 'query';
-        navigate(`../${path}?id=${query.id}`);
-    };
-
     const repeatInterval = formatRepeatInterval(
         'repeatFrequencyMs' in q ? q.repeatFrequencyMs : undefined
     );
@@ -83,132 +77,151 @@ const ItemRow: FunctionComponent<{
     const beforeNextRepetition = useCountdown(secondsBeforeNextRepetition);
 
     return (
-        <Tr
-            sx={{ td: { px: 2, py: 0 } }}
-            pos="absolute"
-            top={parseFloat(style.top!.toString()) + parseFloat(rowHeight) + 'px'}
-            left="0"
-            display="table-row"
-            w="100%"
-            h={rowHeight}
-            maxH={rowHeight}
-            cursor="pointer"
-            onClick={onRowClick}
-        >
-            <Td
-                minW="246px"
+        <Link to={`../${query.type === 'graph' ? 'graph' : 'query'}?id=${query.id}`}>
+            <Tr
+                sx={{ td: { px: 2, py: 0 } }}
+                pos="absolute"
+                top={parseFloat(style.top!.toString()) + parseFloat(rowHeight) + 'px'}
+                left="0"
+                display="table-row"
+                w="100%"
                 h={rowHeight}
                 maxH={rowHeight}
-                borderLeft="1px"
-                borderLeftColor="background.contentTint"
-                boxSizing="content-box"
             >
-                {isAggregated ? (
-                    isCurrentlyRepeating ? (
+                <Td
+                    alignContent="center"
+                    minW="246px"
+                    h={rowHeight}
+                    maxH={rowHeight}
+                    borderLeft="1px"
+                    borderLeftColor="background.contentTint"
+                    boxSizing="content-box"
+                >
+                    {isAggregated ? (
+                        isCurrentlyRepeating ? (
+                            <Flex align="center" wrap="wrap" color="text.secondary">
+                                Every {repeatInterval}
+                                <InfoTooltip ml="2px">
+                                    <Box w="280px" color="text.primary">
+                                        <Flex justify="space-between" mb="3">
+                                            <Span color="text.secondary">Periodicity</Span>
+                                            <Span>Every {repeatInterval}</Span>
+                                        </Flex>
+                                        <Flex justify="space-between" mb="3">
+                                            <Span color="text.secondary">
+                                                Number of repetitions
+                                            </Span>
+                                            <Span>{q.totalRepetitions}</Span>
+                                        </Flex>
+                                        <Flex justify="space-between" mb="3">
+                                            <Span color="text.secondary">Recent request</Span>
+                                            <Span>{toDateTime(q.lastQueryDate)}</Span>
+                                        </Flex>
+                                        <Flex align="center">
+                                            <Span color="text.secondary">Next</Span>
+                                            <Box ml="auto">
+                                                <Span>
+                                                    {toTimeLeft(beforeNextRepetition * 1000)}
+                                                </Span>
+                                                {beforeNextRepetition === 0 && (
+                                                    <Button
+                                                        ml="2"
+                                                        onClick={() =>
+                                                            analyticsHistoryTableStore.loadFirstPage()
+                                                        }
+                                                        size="sm"
+                                                    >
+                                                        Refresh
+                                                    </Button>
+                                                )}
+                                            </Box>
+                                        </Flex>
+                                    </Box>
+                                </InfoTooltip>
+                                &nbsp;· {q.totalCost.stringCurrencyAmount}
+                            </Flex>
+                        ) : (
+                            <Flex align="center" wrap="wrap" color="text.secondary">
+                                <Span>{q.totalRepetitions} times</Span>
+                                &nbsp;· {q.totalCost.stringCurrencyAmount} total
+                            </Flex>
+                        )
+                    ) : query.status === 'success' || query.status === 'error' ? (
                         <Flex align="center" wrap="wrap" color="text.secondary">
-                            Every {repeatInterval}
-                            <InfoTooltip ml="2px">
-                                <Box w="280px" color="text.primary">
-                                    <Flex justify="space-between" mb="3">
-                                        <Span color="text.secondary">Periodicity</Span>
-                                        <Span>Every {repeatInterval}</Span>
-                                    </Flex>
-                                    <Flex justify="space-between" mb="3">
-                                        <Span color="text.secondary">Number of repetitions</Span>
-                                        <Span>{q.totalRepetitions}</Span>
-                                    </Flex>
-                                    <Flex justify="space-between" mb="3">
-                                        <Span color="text.secondary">Recent request</Span>
-                                        <Span>{toDateTime(q.lastQueryDate)}</Span>
-                                    </Flex>
-                                    <Flex align="center">
-                                        <Span color="text.secondary">Next</Span>
-                                        <Box ml="auto">
-                                            <Span>{toTimeLeft(beforeNextRepetition * 1000)}</Span>
-                                            {beforeNextRepetition === 0 && (
-                                                <Button
-                                                    ml="2"
-                                                    onClick={() =>
-                                                        analyticsHistoryTableStore.loadFirstPage()
-                                                    }
-                                                    size="sm"
-                                                >
-                                                    Refresh
-                                                </Button>
-                                            )}
-                                        </Box>
-                                    </Flex>
-                                </Box>
-                            </InfoTooltip>
-                            &nbsp;· {q.totalCost.stringCurrencyAmount}
+                            {query.spentTimeMS < 1000 ? (
+                                '≈1s'
+                            ) : (
+                                <Span>{toTimeLeft(query.spentTimeMS)}</Span>
+                            )}
+                            &nbsp;· {query.cost.stringCurrencyAmount}
                         </Flex>
                     ) : (
-                        <Flex align="center" wrap="wrap" color="text.secondary">
-                            <Span>{q.totalRepetitions} times</Span>
-                            &nbsp;· {q.totalCost.stringCurrencyAmount} total
-                        </Flex>
-                    )
-                ) : query.status === 'success' || query.status === 'error' ? (
-                    <Flex align="center" wrap="wrap" color="text.secondary">
-                        {query.spentTimeMS < 1000 ? (
-                            '≈1s'
-                        ) : (
-                            <Span>{toTimeLeft(query.spentTimeMS)}</Span>
-                        )}
-                        &nbsp;· {query.cost.stringCurrencyAmount}
-                    </Flex>
-                ) : (
-                    formattedDuration
-                )}
-            </Td>
-            <Td minW="108px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
-                {query.status === 'error' ? (
-                    <TooltipHoverable
-                        canBeShown
-                        host={<AnalyticsQueryStatusBadge status={query.status} />}
-                    >
-                        {query.errorReason}
-                    </TooltipHoverable>
-                ) : (
-                    <AnalyticsQueryStatusBadge status={query.status} />
-                )}
-            </Td>
-            <Td w="100%" minW="300px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
-                <Flex gap="2">
-                    <Box wordBreak="break-word" noOfLines={2}>
-                        {query.type === 'graph' ? (
-                            <>
-                                Graph:&nbsp;
-                                <Span color="accent.blue">
-                                    {query.addresses
-                                        .map(a => sliceAddress(a.userFriendly))
-                                        .join(', ')}
-                                </Span>
-                            </>
-                        ) : (
-                            query.gptPrompt || query.request
-                        )}
-                    </Box>
-                    {query.type !== 'graph' && query.network === 'testnet' && (
-                        <TestnetBadge flexShrink={0} alignSelf="center" />
+                        formattedDuration
                     )}
-                </Flex>
-            </Td>
-            <Td
-                w="120px"
-                minW="120px"
-                maxW="120px"
-                h={rowHeight}
-                maxH={rowHeight}
-                color="text.secondary"
-                textAlign="right"
-                borderRight="1px"
-                borderRightColor="background.contentTint"
-                boxSizing="content-box"
-            >
-                {toDateTime(query.creationDate)}
-            </Td>
-        </Tr>
+                </Td>
+                <Td
+                    alignContent="center"
+                    minW="108px"
+                    h={rowHeight}
+                    maxH={rowHeight}
+                    boxSizing="content-box"
+                >
+                    {query.status === 'error' ? (
+                        <TooltipHoverable
+                            canBeShown
+                            host={<AnalyticsQueryStatusBadge status={query.status} />}
+                        >
+                            {query.errorReason}
+                        </TooltipHoverable>
+                    ) : (
+                        <AnalyticsQueryStatusBadge status={query.status} />
+                    )}
+                </Td>
+                <Td
+                    alignContent="center"
+                    w="100%"
+                    minW="300px"
+                    h={rowHeight}
+                    maxH={rowHeight}
+                    boxSizing="content-box"
+                >
+                    <Flex gap="2">
+                        <Box wordBreak="break-word" noOfLines={2}>
+                            {query.type === 'graph' ? (
+                                <>
+                                    Graph:&nbsp;
+                                    <Span color="accent.blue">
+                                        {query.addresses
+                                            .map(a => sliceAddress(a.userFriendly))
+                                            .join(', ')}
+                                    </Span>
+                                </>
+                            ) : (
+                                query.gptPrompt || query.request
+                            )}
+                        </Box>
+                        {query.type !== 'graph' && query.network === 'testnet' && (
+                            <TestnetBadge flexShrink={0} alignSelf="center" />
+                        )}
+                    </Flex>
+                </Td>
+                <Td
+                    alignContent="center"
+                    w="120px"
+                    minW="120px"
+                    maxW="120px"
+                    h={rowHeight}
+                    maxH={rowHeight}
+                    color="text.secondary"
+                    textAlign="right"
+                    borderRight="1px"
+                    borderRightColor="background.contentTint"
+                    boxSizing="content-box"
+                >
+                    {toDateTime(query.creationDate)}
+                </Td>
+            </Tr>
+        </Link>
     );
 });
 
