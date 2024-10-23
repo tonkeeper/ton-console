@@ -68,11 +68,10 @@ export default ({ mode }) => {
                 },
                 '/streaming-api': {
                     target: VITE_BASE_PROXY_URL,
-                    // changeOrigin: true,
+                    changeOrigin: true,
                     secure: true,
                     cookiePathRewrite: '/',
                     headers: {
-                        Accept: 'application/json',
                         Connection: 'keep-alive'
                     }
                 }
