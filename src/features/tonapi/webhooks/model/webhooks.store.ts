@@ -14,6 +14,12 @@ class WebhooksStore {
 
     subscriptions$ = new Loadable<Subscription[]>([]);
 
+    subscriptionsPage = 1;
+
+    subscriptionsLimit = 20;
+
+    subscriptionsTotalPages = 0;
+
     constructor() {
         makeAutoObservable(this);
 
@@ -32,13 +38,29 @@ class WebhooksStore {
             () => this.selectedWebhook,
             selectedWebhook => {
                 if (selectedWebhook) {
-                    this.fetchSubscriptions(selectedWebhook.id);
+                    this.fetchSubscriptions(selectedWebhook.id, 1);
+                    this.subscriptionsTotalPages = Math.ceil(
+                        selectedWebhook.subscribed_accounts / this.subscriptionsLimit
+                    );
                 } else {
                     this.subscriptions$.clear();
                 }
             }
         );
+
+        createImmediateReaction(
+            () => this.subscriptionsPage,
+            page => {
+                if (this.selectedWebhook) {
+                    this.fetchSubscriptions(this.selectedWebhook.id, page);
+                }
+            }
+        );
     }
+
+    setSubscriptionsPage = (page: number): void => {
+        this.subscriptionsPage = page;
+    };
 
     setSelectedWebhookId = async (id: string | null): Promise<void> => {
         if (!this.webhooks$.isResolved) {
@@ -153,8 +175,8 @@ class WebhooksStore {
                     accounts: accounts.map(account => Object({ account_id: account.toRawString() }))
                 }
             );
-
-            return this.fetchSubscriptions(webhookId);
+            this.subscriptionsPage = 1;
+            return this.fetchSubscriptions(webhookId, 1);
         },
         {
             successToast: {
@@ -166,15 +188,25 @@ class WebhooksStore {
         }
     );
 
-    fetchSubscriptions = this.subscriptions$.createAsyncAction(async (webhookId: number) => {
-        const response = await rtTonApiClient.webhooks
-            .webhookAccountTxSubscriptions(webhookId, {
-                project_id: String(projectsStore.selectedProject!.id)
-            })
-            .then(res => res.data.account_tx_subscriptions);
+    fetchSubscriptions = this.subscriptions$.createAsyncAction(
+        async (webhookId: number, page: number) => {
+            if (!this.selectedWebhook) {
+                throw new Error('Webhook is not selected');
+            }
 
-        return response;
-    });
+            const offset = (page - 1) * this.subscriptionsLimit;
+
+            const response = await rtTonApiClient.webhooks
+                .webhookAccountTxSubscriptions(webhookId, {
+                    project_id: String(projectsStore.selectedProject!.id),
+                    limit: this.subscriptionsLimit,
+                    offset
+                })
+                .then(res => res.data.account_tx_subscriptions);
+
+            return response;
+        }
+    );
 
     clearStore(): void {
         this.webhooks$.clear();

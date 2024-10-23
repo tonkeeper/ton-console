@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@chakra-ui/anatomy": "^2.1.2",
+    "@chakra-ui/icons": "^2.2.4",
     "@chakra-ui/react": "^2.6.1",
     "@codemirror/lang-sql": "^6.5.4",
     "@emotion/react": "^11.10.6",

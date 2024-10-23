@@ -14,7 +14,13 @@ import {
     TableContainerProps
 } from '@chakra-ui/react';
 import { FC, useCallback, useState } from 'react';
-import { DeleteIcon24, EditIcon24, VerticalDotsIcon16, MenuButtonIcon } from 'src/shared';
+import {
+    DeleteIcon24,
+    EditIcon24,
+    VerticalDotsIcon16,
+    MenuButtonIcon,
+    Pagination
+} from 'src/shared';
 import { webhooksStore } from '../model';
 import { observer } from 'mobx-react-lite';
 import { Subscription } from '../model/webhooks.store';
@@ -105,6 +111,11 @@ const SubscriptionsTable: FC<TableContainerProps> = props => {
                     </Tbody>
                 </Table>
             </TableContainer>
+            <Pagination
+                currentPage={webhooksStore.subscriptionsPage}
+                totalPages={webhooksStore.subscriptionsTotalPages}
+                onPageChange={(page: number) => webhooksStore.setSubscriptionsPage(page)}
+            />
             {modal && (
                 <DeleteSubscriptionsModal
                     isOpen={modal?.action === 'delete'}

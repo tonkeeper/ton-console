@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react';
 import AddSubscriptionsModal from 'src/features/tonapi/webhooks/ui/AddSubscriptionsModal';
 import { Link as RouterLink } from 'react-router-dom';
+import { ChevronRightIcon16 } from 'src/shared/ui/icons/ChevronRightIcon16';
 
 const SubscriptionsViewPage: FC = () => {
     const { searchParams } = useSearchParams();
@@ -54,11 +55,11 @@ const SubscriptionsViewPage: FC = () => {
                 color="text.secondary"
                 fontSize={14}
                 fontWeight={700}
-                // separator={<ChevronRightIcon16 color="text.secondary" />}
+                separator={<ChevronRightIcon16 color="text.secondary" />}
                 spacing="8px"
             >
                 <BreadcrumbItem>
-                    <BreadcrumbLink as={RouterLink} to={'/webhooks'}>
+                    <BreadcrumbLink as={RouterLink} to={'/tonapi/webhooks'}>
                         Webhooks
                     </BreadcrumbLink>
                 </BreadcrumbItem>
