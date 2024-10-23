@@ -43,12 +43,12 @@ export const WebhookForm: FunctionComponent<
 
     return (
         <chakra.form id={id} w="100%" onSubmit={handleSubmit(submitHandler)} noValidate {...rest}>
-            <FormControl mb="30px" isInvalid={!!errors.endpoint} isRequired>
-                <FormLabel htmlFor="name">URL</FormLabel>
+            <FormControl isInvalid={!!errors.endpoint} isRequired>
+                <FormLabel htmlFor="name">Webhook URL</FormLabel>
                 <Input
                     autoComplete="off"
                     id="name"
-                    placeholder="Name"
+                    placeholder="Your webhook URL"
                     {...register('endpoint', {
                         required: 'This is required',
                         minLength: { value: 3, message: 'Minimum length should be 3' },
@@ -57,42 +57,6 @@ export const WebhookForm: FunctionComponent<
                 />
                 <FormErrorMessage>{errors.endpoint && errors.endpoint.message}</FormErrorMessage>
             </FormControl>
-            {/* <FormControl isInvalid={!!errors.initiations}>
-                <FormLabel htmlFor="initiations">Initiations</FormLabel>
-                <Controller
-                    name="initiations"
-                    control={control}
-                    render={({ field }) => (
-                        <RadioGroup display="flex" flexDirection="column" {...toBinaryRadio(field)}>
-                            <Radio
-                                alignItems="flex-start"
-                                mb="2"
-                                isDisabled
-                                variant="withDescription"
-                            >
-                                <Box textStyle="label2" mb="0.5">
-                                    Finalized trace
-                                </Box>
-                            </Radio>
-                            <Radio alignItems="flex-start" variant="withDescription" defaultChecked>
-                                <Box textStyle="label2" mb="0.5">
-                                    Transactions
-                                </Box>
-                            </Radio>
-                        </RadioGroup>
-                    )}
-                />
-            </FormControl>
-            <FormControl isInvalid={!!errors.accounts} isRequired>
-                <FormLabel htmlFor="accounts">Accounts</FormLabel>
-                <Input
-                    id="accounts"
-                    placeholder="Accounts"
-                    {...register('accounts', {
-                        required: 'This is required'
-                    })}
-                />
-            </FormControl> */}
         </chakra.form>
     );
 };

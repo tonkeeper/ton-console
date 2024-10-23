@@ -4,6 +4,7 @@ import { webhooksStore } from '../model';
 import { observer } from 'mobx-react-lite';
 import { ConfirmationDialog } from 'src/entities';
 import { Subscription } from '../model/webhooks.store';
+import { Address } from '@ton/core';
 
 const DeleteSubscriptionsModal: FunctionComponent<{
     isOpen: boolean;
@@ -12,7 +13,9 @@ const DeleteSubscriptionsModal: FunctionComponent<{
 }> = ({ subscription, isOpen, onClose }) => {
     const onConfirm = useCallback(() => {
         if (subscription) {
-            webhooksStore.unsubscribeWebhook([]).then(onClose);
+            webhooksStore
+                .unsubscribeWebhook([Address.parse(subscription.account_id)])
+                .then(onClose);
         }
     }, [subscription]);
 

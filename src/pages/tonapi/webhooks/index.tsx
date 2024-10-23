@@ -2,8 +2,8 @@ import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 import { CreateWebhookModal, WebhooksTable, webhooksStore } from 'src/features/tonapi/webhooks';
 import { EmptyWebhooks } from './EmptyWebhooks';
-import { Overlay } from 'src/shared';
-import { Button, Center, Spinner, useDisclosure } from '@chakra-ui/react';
+import { EXTERNAL_LINKS, H4, Overlay } from 'src/shared';
+import { Badge, Button, Center, Flex, Spinner, useDisclosure, Text, Link } from '@chakra-ui/react';
 
 const WebhooksPage: FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -23,9 +23,37 @@ const WebhooksPage: FC = () => {
     return (
         <>
             <Overlay h="fit-content">
-                <Button mb="6" onClick={onOpen} variant="secondary">
-                    Create Webhook
-                </Button>
+                <Flex mb="5">
+                    <Flex direction="column" gap={2}>
+                        <Flex align="center" gap={4}>
+                            <H4>Webhooks</H4>
+                            <Badge
+                                textStyle="label3"
+                                color="accent.orange"
+                                fontFamily="body"
+                                bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
+                            >
+                                BETA
+                            </Badge>
+                        </Flex>
+                        <Flex>
+                            <Text textStyle="text.body2" color="text.secondary" fontSize={14}>
+                                Webhooks are available via the API. For details, see{' '}
+                                <Link
+                                    color="accent.blue"
+                                    href={EXTERNAL_LINKS.DOCUMENTATION_WEBHOOKS}
+                                    isExternal
+                                >
+                                    Webhooks API documentation
+                                </Link>
+                            </Text>
+                        </Flex>
+                    </Flex>
+
+                    <Button mb="6" ml="auto" onClick={onOpen}>
+                        Add Webhook
+                    </Button>
+                </Flex>
                 <WebhooksTable />
             </Overlay>
             <CreateWebhookModal isOpen={isOpen} onClose={onClose} />

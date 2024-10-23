@@ -60,7 +60,7 @@ class WebhooksStore {
             .getWebhooks({
                 project_id: String(projectsStore.selectedProject!.id)
             })
-            .then(res => res.data.webhooks);
+            .then(res => res.data.webhooks.toSorted((a, b) => b.id - a.id));
 
         return response;
     });
@@ -73,9 +73,13 @@ class WebhooksStore {
                     { endpoint }
                 )
                 .then(res => res.data);
-            const newWebhook = { id: resCreateWebhook.webhook_id, endpoint };
+            const newWebhook = {
+                id: resCreateWebhook.webhook_id,
+                endpoint,
+                subscribed_accounts: 0
+            };
 
-            this.webhooks$.value.push(newWebhook);
+            this.webhooks$.value.unshift(newWebhook);
             this.selectedWebhook = newWebhook;
         },
         {
@@ -118,7 +122,7 @@ class WebhooksStore {
                     project_id: String(projectsStore.selectedProject!.id)
                 },
                 {
-                    accounts: accounts.map(account => Object({ account_id: account.toRawString() }))
+                    accounts: accounts.map(account => Object(account.toRawString()))
                 }
             );
         },

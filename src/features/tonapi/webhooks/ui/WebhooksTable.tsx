@@ -12,7 +12,8 @@ import {
     MenuItem,
     Menu,
     Box,
-    TableContainerProps
+    TableContainerProps,
+    Link as ChakraLink
 } from '@chakra-ui/react';
 import { FC, useCallback, useState } from 'react';
 import {
@@ -25,19 +26,11 @@ import {
 import { Webhook, webhooksStore } from '../model';
 import { observer } from 'mobx-react-lite';
 import DeleteWebhookModal from './DeleteWebhookModal';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as ReactRouterLink } from 'react-router-dom';
 
 const WebhooksTable: FC<TableContainerProps> = props => {
     const navigate = useNavigate();
     const [modal, setModal] = useState<{ key: Webhook; action: 'edit' | 'delete' } | null>();
-    // const [copiedKey, setCopiedKey] = useState<number | undefined>();
-
-    // useEffect(() => {
-    //     if (copiedKey !== undefined) {
-    //         const timeout = setTimeout(() => setCopiedKey(undefined), 1500);
-    //         return () => clearTimeout(timeout);
-    //     }
-    // }, [copiedKey]);
 
     const goToWebhookPage = useCallback((key: Webhook) => {
         navigate(`./view?webhookId=${key.id}`);
@@ -64,30 +57,36 @@ const WebhooksTable: FC<TableContainerProps> = props => {
                         <Tr>
                             <Th>ID</Th>
                             <Th>Webhook</Th>
+                            <Th>Subscriptions</Th>
                         </Tr>
                     </Thead>
                     <Tbody>
                         {webhooksStore.webhooks$.value.map(webhook => (
-                            <Tr key={webhook.id}>
-                                <Td overflow="hidden" maxW="200px">
-                                    <TooltipHoverable
-                                        host={
-                                            <Box
-                                                layerStyle="textEllipse"
-                                                w="fit-content"
-                                                maxW="100%"
-                                            >
-                                                {webhook.id}
-                                            </Box>
-                                        }
-                                        offset={[-16, 8]}
-                                        placement="bottom-start"
-                                    >
-                                        {webhook.id}
-                                    </TooltipHoverable>
-                                </Td>
-                                <Td overflow="hidden" maxW="200px">
-                                    <Flex align="center" justify="space-between" gap="4">
+                            <ChakraLink
+                                key={webhook.id}
+                                as={ReactRouterLink}
+                                display="contents"
+                                to={`./view?webhookId=${webhook.id}`}
+                            >
+                                <Tr>
+                                    <Td overflow="hidden" maxW="200px">
+                                        <TooltipHoverable
+                                            host={
+                                                <Box
+                                                    layerStyle="textEllipse"
+                                                    w="fit-content"
+                                                    maxW="100%"
+                                                >
+                                                    {webhook.id}
+                                                </Box>
+                                            }
+                                            offset={[-16, 8]}
+                                            placement="bottom-start"
+                                        >
+                                            {webhook.id}
+                                        </TooltipHoverable>
+                                    </Td>
+                                    <Td overflow="hidden">
                                         <TooltipHoverable
                                             host={
                                                 <Box
@@ -103,27 +102,41 @@ const WebhooksTable: FC<TableContainerProps> = props => {
                                         >
                                             {webhook.endpoint}
                                         </TooltipHoverable>
+                                    </Td>
+                                    <Td maxW="170px">
+                                        <Flex
+                                            align="center"
+                                            justify="space-between"
+                                            gap="4"
+                                            onClick={e => e.preventDefault()}
+                                        >
+                                            {webhook.subscribed_accounts}
 
-                                        <Menu placement="bottom-end">
-                                            <MenuButtonIcon icon={<VerticalDotsIcon16 />} />
-                                            <MenuList w="132px">
-                                                <MenuItem onClick={() => goToWebhookPage(webhook)}>
-                                                    <EditIcon24 mr="2" />
-                                                    <Text textStyle="label2" fontFamily="body">
-                                                        Edit
-                                                    </Text>
-                                                </MenuItem>
-                                                <MenuItem onClick={() => openDeleteModal(webhook)}>
-                                                    <DeleteIcon24 mr="2" />
-                                                    <Text textStyle="label2" fontFamily="body">
-                                                        Delete
-                                                    </Text>
-                                                </MenuItem>
-                                            </MenuList>
-                                        </Menu>
-                                    </Flex>
-                                </Td>
-                            </Tr>
+                                            <Menu placement="bottom-end">
+                                                <MenuButtonIcon icon={<VerticalDotsIcon16 />} />
+                                                <MenuList w="132px">
+                                                    <MenuItem
+                                                        onClick={() => goToWebhookPage(webhook)}
+                                                    >
+                                                        <EditIcon24 mr="2" />
+                                                        <Text textStyle="label2" fontFamily="body">
+                                                            View
+                                                        </Text>
+                                                    </MenuItem>
+                                                    <MenuItem
+                                                        onClick={() => openDeleteModal(webhook)}
+                                                    >
+                                                        <DeleteIcon24 mr="2" />
+                                                        <Text textStyle="label2" fontFamily="body">
+                                                            Delete
+                                                        </Text>
+                                                    </MenuItem>
+                                                </MenuList>
+                                            </Menu>
+                                        </Flex>
+                                    </Td>
+                                </Tr>
+                            </ChakraLink>
                         ))}
                     </Tbody>
                 </Table>

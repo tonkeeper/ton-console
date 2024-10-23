@@ -11,21 +11,15 @@ import {
     MenuList,
     MenuItem,
     Menu,
-    Box,
     TableContainerProps
 } from '@chakra-ui/react';
 import { FC, useCallback, useState } from 'react';
-import {
-    DeleteIcon24,
-    EditIcon24,
-    TooltipHoverable,
-    VerticalDotsIcon16,
-    MenuButtonIcon
-} from 'src/shared';
+import { DeleteIcon24, EditIcon24, VerticalDotsIcon16, MenuButtonIcon } from 'src/shared';
 import { webhooksStore } from '../model';
 import { observer } from 'mobx-react-lite';
 import { Subscription } from '../model/webhooks.store';
 import DeleteSubscriptionsModal from './DeleteSubscriptionModal';
+import { Address } from '@ton/core';
 
 const SubscriptionsTable: FC<TableContainerProps> = props => {
     const [modal, setModal] = useState<{ key: Subscription; action: 'edit' | 'delete' } | null>();
@@ -42,8 +36,6 @@ const SubscriptionsTable: FC<TableContainerProps> = props => {
         setModal(null);
     }, []);
 
-    console.log(webhooksStore.subscriptions$.value);
-
     return (
         <>
             <TableContainer
@@ -56,46 +48,34 @@ const SubscriptionsTable: FC<TableContainerProps> = props => {
                     <Thead>
                         <Tr>
                             <Th>Account</Th>
-                            <Th>Subscription</Th>
+                            <Th>Last Delivered LT</Th>
+                            <Th>Failed Attempts</Th>
+                            <Th>Failed LT</Th>
+                            <Th>Failed At</Th>
                         </Tr>
                     </Thead>
                     <Tbody>
                         {webhooksStore.subscriptions$.value.map(subscription => (
                             <Tr key={subscription.account_id}>
+                                <Td overflow="hidden" minW={250}>
+                                    {Address.parse(subscription.account_id).toString({
+                                        bounceable: false
+                                    })}
+                                </Td>
                                 <Td overflow="hidden" maxW="200px">
-                                    <TooltipHoverable
-                                        host={
-                                            <Box
-                                                layerStyle="textEllipse"
-                                                w="fit-content"
-                                                maxW="100%"
-                                            >
-                                                {subscription.account_id}
-                                            </Box>
-                                        }
-                                        offset={[-16, 8]}
-                                        placement="bottom-start"
-                                    >
-                                        {subscription.account_id}
-                                    </TooltipHoverable>
+                                    {subscription.last_delivered_lt ?? '-'}
+                                </Td>
+
+                                <Td overflow="hidden" maxW="200px">
+                                    {subscription.failed_attempts ?? '-'}
+                                </Td>
+
+                                <Td overflow="hidden" maxW="200px">
+                                    {subscription.failed_lt ?? '-'}
                                 </Td>
                                 <Td overflow="hidden" maxW="200px">
                                     <Flex align="center" justify="space-between" gap="4">
-                                        <TooltipHoverable
-                                            host={
-                                                <Box
-                                                    layerStyle="textEllipse"
-                                                    w="fit-content"
-                                                    maxW="100%"
-                                                >
-                                                    {subscription.last_delivered_lt}
-                                                </Box>
-                                            }
-                                            offset={[-16, 8]}
-                                            placement="bottom-start"
-                                        >
-                                            {subscription.failed_lt}
-                                        </TooltipHoverable>
+                                        {subscription.failed_at ?? '-'}
 
                                         <Menu placement="bottom-end">
                                             <MenuButtonIcon icon={<VerticalDotsIcon16 />} />

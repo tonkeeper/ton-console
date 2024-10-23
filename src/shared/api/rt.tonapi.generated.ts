@@ -19,6 +19,7 @@ export interface RTWebhookList {
         /** @format int64 */
         id: number;
         endpoint: string;
+        subscribed_accounts: number;
     }[];
 }
 
