@@ -6,7 +6,12 @@ import AddSubscriptionsModal from 'src/features/tonapi/webhooks/ui/AddSubscripti
 export const EmptySubscriptions: FC = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     return (
-        <Overlay display="flex" alignItems="center" justifyContent="center">
+        <Overlay
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            height="calc(100% - 33px)"
+        >
             <Flex align="center" direction="column" maxW="512px">
                 <CreateIcon96 mb="8" />
                 <H4 mb="2">Your Subscriptions will be shown here</H4>

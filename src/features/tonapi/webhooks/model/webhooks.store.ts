@@ -44,6 +44,7 @@ class WebhooksStore {
                     );
                 } else {
                     this.subscriptions$.clear();
+                    this.subscriptionsPage = 1;
                 }
             }
         );
@@ -68,13 +69,7 @@ class WebhooksStore {
         }
         const webhook = this.webhooks$.value.find(item => String(item.id) === id);
 
-        if (webhook) {
-            this.selectedWebhook = webhook;
-        }
-
-        if (!this.selectedWebhook) {
-            this.selectedWebhook = null;
-        }
+        this.selectedWebhook = webhook ?? null;
     };
 
     fetchWebhooks = this.webhooks$.createAsyncAction(async () => {

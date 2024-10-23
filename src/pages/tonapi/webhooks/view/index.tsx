@@ -14,11 +14,14 @@ import {
     useDisclosure,
     Flex,
     Link,
-    Text
+    Text,
+    Box,
+    Divider
 } from '@chakra-ui/react';
 import AddSubscriptionsModal from 'src/features/tonapi/webhooks/ui/AddSubscriptionsModal';
 import { Link as RouterLink } from 'react-router-dom';
 import { ChevronRightIcon16 } from 'src/shared/ui/icons/ChevronRightIcon16';
+import { StatsCard } from 'src/entities/stats/Card';
 
 const SubscriptionsViewPage: FC = () => {
     const { searchParams } = useSearchParams();
@@ -44,33 +47,41 @@ const SubscriptionsViewPage: FC = () => {
         );
     }
 
+    const breadcrumb = (
+        <Breadcrumb
+            mb="3"
+            color="text.secondary"
+            fontSize={14}
+            fontWeight={700}
+            separator={<ChevronRightIcon16 color="text.secondary" />}
+            spacing="8px"
+        >
+            <BreadcrumbItem>
+                <BreadcrumbLink as={RouterLink} to={'/tonapi/webhooks'}>
+                    Webhooks
+                </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbItem color="text.primary" isCurrentPage>
+                <BreadcrumbLink href={'#'}>{webhooksStore.selectedWebhook.endpoint}</BreadcrumbLink>
+            </BreadcrumbItem>
+        </Breadcrumb>
+    );
+
     if (!webhooksStore.subscriptions$.value.length) {
-        return <EmptySubscriptions />;
+        return (
+            <>
+                {breadcrumb}
+                <EmptySubscriptions />
+            </>
+        );
     }
 
     return (
         <>
-            <Breadcrumb
-                mb="3"
-                color="text.secondary"
-                fontSize={14}
-                fontWeight={700}
-                separator={<ChevronRightIcon16 color="text.secondary" />}
-                spacing="8px"
-            >
-                <BreadcrumbItem>
-                    <BreadcrumbLink as={RouterLink} to={'/tonapi/webhooks'}>
-                        Webhooks
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbItem color="text.primary" isCurrentPage>
-                    <BreadcrumbLink href={'#'}>
-                        {webhooksStore.selectedWebhook.endpoint}
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-            </Breadcrumb>
-            <Overlay h="fit-content">
-                <Flex mb="5">
+            {breadcrumb}
+
+            <Overlay h="fit-content" height="calc(100% - 33px)">
+                <Flex mb="4">
                     <Flex direction="column" gap={2}>
                         <Flex align="center" gap={4}>
                             <H4>Webhook Subscriptions</H4>
@@ -97,10 +108,27 @@ const SubscriptionsViewPage: FC = () => {
                         </Flex>
                     </Flex>
 
-                    <Button mb="6" ml="auto" onClick={onOpen}>
+                    <Button mb="4" ml="auto" onClick={onOpen}>
                         Add Subscription
                     </Button>
                 </Flex>
+
+                <Divider mb="4" />
+
+                <Box mb={4}>
+                    <H4>Statistics</H4>
+                    <Flex gap="6" mt={2} mb={4}>
+                        <StatsCard
+                            header="Total Number of Accounts"
+                            value={webhooksStore.selectedWebhook.subscribed_accounts.toString()}
+                        />
+                        <StatsCard header="Active Subscriptions" value="0" />
+                        <StatsCard header="Inactive Subscriptions" value="0" />
+                    </Flex>
+                </Box>
+
+                <Divider mb="4" />
+
                 <SubscriptionsTable />
             </Overlay>
             <AddSubscriptionsModal isOpen={isOpen} onClose={onClose} />
