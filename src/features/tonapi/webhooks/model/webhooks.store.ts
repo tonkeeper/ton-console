@@ -73,8 +73,10 @@ class WebhooksStore {
                     { endpoint }
                 )
                 .then(res => res.data);
+            const newWebhook = { id: resCreateWebhook.webhook_id, endpoint };
 
-            this.webhooks$.value.push({ id: resCreateWebhook.webhook_id, endpoint });
+            this.webhooks$.value.push(newWebhook);
+            this.selectedWebhook = newWebhook;
         },
         {
             successToast: {

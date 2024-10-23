@@ -13,8 +13,10 @@ import { observer } from 'mobx-react-lite';
 import { webhooksStore, CreateWebhookForm } from '../model';
 import { WebhookForm } from './WebhooksForm';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
 const CreateWebhookModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
+    const navigate = useNavigate();
     const formId = 'create-webhook-form';
 
     const methods = useForm<CreateWebhookForm>();
@@ -26,7 +28,13 @@ const CreateWebhookModal: FC<{ isOpen: boolean; onClose: () => void }> = props =
 
     const onSubmit = useCallback(
         (form: CreateWebhookForm): void => {
-            webhooksStore.createWebhook(form).then(props.onClose);
+            webhooksStore.createWebhook(form).then(() => {
+                if (!webhooksStore.selectedWebhook) {
+                    throw new Error('Webhook was not created');
+                }
+
+                navigate(`./view?webhookId=${webhooksStore.selectedWebhook.id}`);
+            });
         },
         [props.onClose]
     );

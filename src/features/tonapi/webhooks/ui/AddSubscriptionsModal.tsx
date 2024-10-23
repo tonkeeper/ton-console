@@ -58,7 +58,7 @@ const AddSubscriptionsModal: FC<{ isOpen: boolean; onClose: () => void }> = prop
                         flex={1}
                         form={formId}
                         isDisabled={!isDirty}
-                        isLoading={webhooksStore.createWebhook.isLoading}
+                        isLoading={webhooksStore.addSubscriptions.isLoading}
                         type="submit"
                         variant="primary"
                     >
