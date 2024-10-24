@@ -1,60 +1,61 @@
-import { ComponentProps, FunctionComponent, ReactNode } from 'react';
+import { ComponentProps, FC, ReactNode } from 'react';
 import {
     Box,
+    Button,
     Card,
-    CardBody,
-    CardFooter,
-    CardHeader,
+    CardProps,
+    Flex,
     List,
     ListIcon,
     ListItem,
+    Stack,
     Text
 } from '@chakra-ui/react';
-import { CURRENCY, H2, InfoTooltip, Span, TickIcon, toDate } from 'src/shared';
-import { isTonApiSelectedTier, TonApiSelectedTier, TonApiTier } from '../model';
+import { CURRENCY, H2, InfoTooltip, Span, DoneIconCircle24, toDate } from 'src/shared';
+import { TonApiSelectedTier, TonApiTier } from '../model';
 import { CurrencyRate } from 'src/entities';
 
-export const TonApiTierCard: FunctionComponent<
-    ComponentProps<typeof Card> & {
+export const TonApiTierCard: FC<
+    CardProps & {
         tier: TonApiTier | TonApiSelectedTier;
-        button?: ReactNode;
         tonPriceStyles?: ComponentProps<typeof Text>;
         zeroTonPricePlaceholder?: ReactNode;
+        onChoseTier?: (tier: TonApiTier) => void;
+        isChosen?: boolean;
     }
-> = ({ tier, button, tonPriceStyles, zeroTonPricePlaceholder, ...rest }) => {
-    return (
-        <Card size="xl" variant="outline" {...rest}>
-            <CardHeader>
-                <Text textStyle="label2" color="text.primary">
-                    {tier.name}
-                </Text>
-            </CardHeader>
-            <CardBody flexDir="column" display="flex">
-                {tier.price.amount.isZero() ? (
-                    <>
-                        <H2 mb={zeroTonPricePlaceholder ? '0' : '9'}>FREE</H2>
-                        {zeroTonPricePlaceholder}
-                    </>
-                ) : (
-                    <>
-                        <H2>{tier.price.stringCurrencyAmount}</H2>
-                        <CurrencyRate
-                            textStyle="body2"
-                            mb="4"
-                            leftSign=""
-                            color="text.secondary"
-                            currency={CURRENCY.TON}
-                            amount={tier.price.amount}
-                            reverse
-                            {...tonPriceStyles}
-                        >
-                            &nbsp;TON monthly
-                        </CurrencyRate>
-                    </>
-                )}
+> = ({ tier, tonPriceStyles, zeroTonPricePlaceholder, isChosen = false, onChoseTier, ...rest }) => (
+    <Card
+        direction={{ base: 'column', md: 'row' }}
+        gap="6"
+        display={'flex'}
+        p="6"
+        pt="5"
+        size="xl"
+        {...rest}
+    >
+        <Flex direction="column" w="109px">
+            <Text textStyle="label2" color="text.primary">
+                {tier.name}
+            </Text>
+
+            <H2>{tier.price.stringCurrencyAmount}</H2>
+            <CurrencyRate
+                textStyle="body2"
+                color="text.secondary"
+                mb="4"
+                currency={CURRENCY.TON}
+                amount={tier.price.amount}
+                reverse
+                {...tonPriceStyles}
+            >
+                &nbsp;TON monthly
+            </CurrencyRate>
+        </Flex>
+        <Stack spacing={0}>
+            <Flex direction="column">
                 <List flex="1" spacing="2">
                     <ListItem display="flex">
-                        <ListIcon as={TickIcon} color="accent.green" />
+                        <ListIcon as={DoneIconCircle24} color="accent.green" />
                         <Box textStyle="body2" color="text.primary">
                             {tier.description.requestsPerSecondLimit} requests per second
                             {tier.price.amount.isZero() && (
@@ -70,7 +71,7 @@ export const TonApiTierCard: FunctionComponent<
                         </Box>
                     </ListItem>
                     <ListItem display="flex">
-                        <ListIcon as={TickIcon} color="accent.green" />
+                        <ListIcon as={DoneIconCircle24} color="accent.green" />
                         <Box textStyle="body2" color="text.primary">
                             {tier.description.realtimeConnectionsLimit} realtime connections&nbsp;
                             <Span whiteSpace="nowrap">
@@ -82,7 +83,7 @@ export const TonApiTierCard: FunctionComponent<
                         </Box>
                     </ListItem>
                     <ListItem display="flex">
-                        <ListIcon as={TickIcon} color="accent.green" />
+                        <ListIcon as={DoneIconCircle24} color="accent.green" />
                         <Box textStyle="body2" color="text.primary">
                             Watch up to {tier.description.entitiesPerRealtimeConnectionLimit}{' '}
                             accounts for each connection
@@ -90,7 +91,7 @@ export const TonApiTierCard: FunctionComponent<
                     </ListItem>
                     {tier.description.mempool && (
                         <ListItem display="flex">
-                            <ListIcon as={TickIcon} color="accent.green" />
+                            <ListIcon as={DoneIconCircle24} color="accent.green" />
                             <Box textStyle="body2" color="text.primary">
                                 mempool events{' '}
                                 <Span whiteSpace="nowrap">
@@ -103,13 +104,28 @@ export const TonApiTierCard: FunctionComponent<
                         </ListItem>
                     )}
                 </List>
-                {isTonApiSelectedTier(tier) && tier.renewsDate && !tier.price.amount.isZero() && (
-                    <Text textStyle="body2" mt="3" color="text.secondary">
-                        Available until {toDate(tier.renewsDate)}
-                    </Text>
-                )}
-            </CardBody>
-            {!!button && <CardFooter>{button}</CardFooter>}
-        </Card>
-    );
-};
+            </Flex>
+            {onChoseTier && (
+                <Flex mt="4">
+                    {isChosen ? (
+                        <Text textStyle="body2" color="text.secondary">
+                            Available until{' '}
+                            {'renewsDate' in tier && tier.renewsDate
+                                ? toDate(tier.renewsDate)
+                                : 'unknown'}
+                        </Text>
+                    ) : (
+                        <Button
+                            isLoading={false}
+                            onClick={() => onChoseTier(tier)}
+                            size="sm"
+                            variant="primary"
+                        >
+                            Choose {tier.name}
+                        </Button>
+                    )}
+                </Flex>
+            )}
+        </Stack>
+    </Card>
+);

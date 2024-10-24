@@ -1,21 +1,23 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { H4, Overlay, TgChannelCardLink } from 'src/shared';
-import { Box, Flex, Text } from '@chakra-ui/react';
-import { TonApiTiersList } from 'src/features';
+import { Box, Divider, Flex, Text } from '@chakra-ui/react';
+import { TonApiTiers } from 'src/features';
+import { Link } from 'react-router-dom';
 
-const PricingPage: FunctionComponent = () => {
+const PricingPage: FC = () => {
     return (
         <Overlay h="fit-content">
             <Flex align="center" justify="space-between" pb="4">
                 <Box>
                     <H4 mb="1">Pricing</H4>
-                    <Text textStyle="body2" color="text.secondary">
-                        Choose your plan for start
+                    <Text textStyle="body2" color="accent.blue">
+                        <Link to="/balance">All bills</Link>
                     </Text>
                 </Box>
                 <TgChannelCardLink />
             </Flex>
-            <TonApiTiersList />
+            <Divider mb="4" />
+            <TonApiTiers />
         </Overlay>
     );
 };
