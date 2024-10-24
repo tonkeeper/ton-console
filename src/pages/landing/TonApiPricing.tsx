@@ -14,27 +14,18 @@ const TonApiPricing: FunctionComponent<ComponentProps<typeof Box>> = forwardRef(
             <H3 mb={{ base: '5', md: '7' }} textAlign={{ base: 'left', md: 'center' }}>
                 TON API Pricing
             </H3>
-            <Grid
-                gap="4"
-                autoRows="1fr"
-                templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
-                w="100%"
-            >
+            <Grid gap="4" templateColumns="repeat(auto-fit, minmax(300px, 1fr))" w="100%">
                 {tonApiTiersStore.tiers$.value.map(tier => (
                     <TonApiTierCard
                         tier={tier}
                         key={tier.id}
                         variant="elevated"
-                        tonPriceStyles={{ mt: '1', mb: '6', textStyle: 'h3Thin' }}
+                        tonPriceStyles={{ mt: '1', mb: '6' }}
                         zeroTonPricePlaceholder={<H3Thin mb="6" mt="1" color="text.secondary" />}
                     />
                 ))}
 
-                <TonApiUnlimitedTierCard
-                    h="100%"
-                    variant="elevated"
-                    buttonProps={{ variant: 'contrast' }}
-                />
+                <TonApiUnlimitedTierCard h="100%" variant="elevated" />
             </Grid>
         </Box>
     );
