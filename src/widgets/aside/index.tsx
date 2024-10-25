@@ -28,6 +28,7 @@ const Aside: FunctionComponent = () => {
             </DropDownMenuItem>
             <DropDownMenuItemExpandable leftIcon={<TonapiIcon />} content="TON API" linkTo="tonapi">
                 <DropDownMenuItem linkTo="api-keys">API keys</DropDownMenuItem>
+                <DropDownMenuItem linkTo="webhooks">Webhooks</DropDownMenuItem>
                 <DropDownMenuItem linkTo="pricing">Pricing</DropDownMenuItem>
             </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="tonkeeper-messages" leftIcon={<MessageIcon24 />}>
