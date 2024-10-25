@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Center, Spinner, useDisclosure, Text, Flex } from '@chakra-ui/react';
 import TonApiPaymentDetailsModal from './TonApiPaymentDetailsModal';
@@ -10,16 +10,34 @@ import { SelectTier } from './SelectTier';
 import { TonApiUnlimitedTierCard } from './TonApiUnlimitedTierCard';
 
 const TonApiTiers: FC = () => {
+    const storeSelectedTier = tonApiTiersStore.selectedTier$.value;
     const [tierForChange, setTierForChange] = useState<TonApiTier | undefined>();
-    const [currentTier, setCurrentTier] = useState<TonApiTier | 'custom' | undefined>(
-        tonApiTiersStore.selectedTier$.value ?? undefined
-    );
+    const [currentTier, setCurrentTier] = useState<TonApiTier | 'custom' | null>(storeSelectedTier);
+
+    useEffect(() => {
+        setCurrentTier(storeSelectedTier);
+
+        return () => setCurrentTier(null);
+    }, [storeSelectedTier]);
 
     const {
         isOpen: isRefillModalOpen,
         onClose: onRefillModalClose,
         onOpen: onRefillModalOpen
     } = useDisclosure();
+
+    if (
+        !tonApiTiersStore.tiers$.isResolved ||
+        !tonApiTiersStore.selectedTier$.isResolved ||
+        !currentTier ||
+        !storeSelectedTier
+    ) {
+        return (
+            <Center h="360px">
+                <Spinner />
+            </Center>
+        );
+    }
 
     const onChoseTier = async (tier: TonApiTier): Promise<void> => {
         const { valid, unspent_money } = await tonApiTiersStore.checkValidChangeTier(tier.id);
@@ -36,23 +54,17 @@ const TonApiTiers: FC = () => {
         });
     };
 
+    const handleSelectTier = (tier: TonApiTier | 'custom'): void => {
+        if (tier === 'custom') {
+            setCurrentTier('custom');
+        } else if (storeSelectedTier.id === tier.id) {
+            setCurrentTier(storeSelectedTier);
+        } else {
+            setCurrentTier(tier);
+        }
+    };
+
     const onPaymentModalClose = (): void => setTierForChange(undefined);
-
-    if (!tonApiTiersStore.tiers$.isResolved || !tonApiTiersStore.selectedTier$.isResolved) {
-        return (
-            <Center h="360px">
-                <Spinner />
-            </Center>
-        );
-    }
-
-    if (!currentTier) {
-        return (
-            <Center h="360px">
-                <Spinner />
-            </Center>
-        );
-    }
 
     const isCurrentSubscription =
         currentTier !== 'custom' && tonApiTiersStore.selectedTier$.value?.id === currentTier?.id;
@@ -63,7 +75,7 @@ const TonApiTiers: FC = () => {
                 TON API
             </Text>
             <Flex direction={{ base: 'column', lg: 'row' }} gap={6} mb="4">
-                <SelectTier onSelectTier={setCurrentTier} currentTier={currentTier} />
+                <SelectTier onSelectTier={handleSelectTier} currentTier={currentTier} />
                 {currentTier === 'custom' ? (
                     <TonApiUnlimitedTierCard w="100%" maxW="497px" />
                 ) : (
