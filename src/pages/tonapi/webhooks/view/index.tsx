@@ -67,20 +67,12 @@ const SubscriptionsViewPage: FC = () => {
         </Breadcrumb>
     );
 
-    if (!webhooksStore.subscriptions$.value.length) {
-        return (
-            <>
-                {breadcrumb}
-                <EmptySubscriptions />
-            </>
-        );
-    }
+    const isEmpty =
+        !webhooksStore.subscriptions$.isResolved || !webhooksStore.subscriptions$.value.length;
 
     return (
         <>
-            {breadcrumb}
-
-            <Overlay h="fit-content" height="calc(100% - 33px)">
+            <Overlay breadcrumbs={breadcrumb}>
                 <Flex mb="4">
                     <Flex direction="column" gap={2}>
                         <Flex align="center" gap={4}>
@@ -108,28 +100,34 @@ const SubscriptionsViewPage: FC = () => {
                         </Flex>
                     </Flex>
 
-                    <Button mb="4" ml="auto" onClick={onOpen}>
-                        Add Subscription
-                    </Button>
+                    {!isEmpty && (
+                        <Button mb="4" ml="auto" onClick={onOpen}>
+                            Add Subscription
+                        </Button>
+                    )}
                 </Flex>
 
-                <Divider mb="4" />
+                {isEmpty ? (
+                    <EmptySubscriptions />
+                ) : (
+                    <>
+                        <Divider mb="4" />
 
-                <Box mb={4}>
-                    <H4>Statistics</H4>
-                    <Flex gap="6" mt={2} mb={4}>
-                        <StatsCard
-                            header="Total Number of Accounts"
-                            value={webhooksStore.selectedWebhook.subscribed_accounts.toString()}
-                        />
-                        <StatsCard header="Active Subscriptions" value="0" />
-                        <StatsCard header="Inactive Subscriptions" value="0" />
-                    </Flex>
-                </Box>
+                        <Box mb={4}>
+                            <H4>Statistics</H4>
+                            <Flex gap="6" mt={2} mb={4}>
+                                <StatsCard
+                                    header="Total Number of Accounts"
+                                    value={webhooksStore.selectedWebhook.subscribed_accounts.toString()}
+                                />
+                            </Flex>
+                        </Box>
 
-                <Divider mb="4" />
+                        <Divider mb="4" />
 
-                <SubscriptionsTable />
+                        <SubscriptionsTable />
+                    </>
+                )}
             </Overlay>
             <AddSubscriptionsModal isOpen={isOpen} onClose={onClose} />
         </>
