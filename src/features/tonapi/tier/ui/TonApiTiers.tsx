@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Center, Spinner, useDisclosure, Text, Flex } from '@chakra-ui/react';
+import { Center, Spinner, useDisclosure, Text, Flex, Button, Icon } from '@chakra-ui/react';
 import TonApiPaymentDetailsModal from './TonApiPaymentDetailsModal';
 import { TonApiTier, tonApiTiersStore } from '../model';
 import { TonApiTierCard } from './TonApiTierCard';
@@ -8,6 +8,8 @@ import { RefillModal } from 'src/entities';
 import { UsdCurrencyAmount } from 'src/shared';
 import { SelectTier } from './SelectTier';
 import { TonApiUnlimitedTierCard } from './TonApiUnlimitedTierCard';
+import { ChevronRightIcon16 } from 'src/shared/ui/icons/ChevronRightIcon16';
+import TonApiPricingModal from './TonApiPricingModal';
 
 const TonApiTiers: FC = () => {
     const storeSelectedTier = tonApiTiersStore.selectedTier$.value;
@@ -24,6 +26,12 @@ const TonApiTiers: FC = () => {
         isOpen: isRefillModalOpen,
         onClose: onRefillModalClose,
         onOpen: onRefillModalOpen
+    } = useDisclosure();
+
+    const {
+        isOpen: isTonApiPricingModalOpen,
+        onClose: onTonApiPricingModalClose,
+        onOpen: onTonApiPricingModalOpen
     } = useDisclosure();
 
     if (
@@ -71,9 +79,15 @@ const TonApiTiers: FC = () => {
 
     return (
         <>
-            <Text textStyle="text.label2" mb="4" fontWeight={600}>
-                TON API
-            </Text>
+            <Flex align="center" justify="space-between" mb="4">
+                <Text textStyle="text.label2" mb="4" fontWeight={600}>
+                    TON API
+                </Text>
+                <Button onClick={onTonApiPricingModalOpen} size="sm" variant="secondary">
+                    Pricing
+                    <Icon as={ChevronRightIcon16} w={4} h={4} ml="2" />
+                </Button>
+            </Flex>
             <Flex direction={{ base: 'column', lg: 'row' }} gap={6} mb="4">
                 <SelectTier onSelectTier={handleSelectTier} currentTier={currentTier} />
                 {currentTier === 'custom' ? (
@@ -95,6 +109,10 @@ const TonApiTiers: FC = () => {
                 />
             )}
             <RefillModal isOpen={isRefillModalOpen} onClose={onRefillModalClose} />
+            <TonApiPricingModal
+                isOpen={isTonApiPricingModalOpen}
+                onClose={onTonApiPricingModalClose}
+            />
         </>
     );
 };
