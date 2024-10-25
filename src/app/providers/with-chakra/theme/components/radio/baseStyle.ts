@@ -10,6 +10,11 @@ export default definePartsStyle({
         _focus: {
             boxShadow: 'none'
         },
+        _disabled: {
+            _hover: {
+                borderColor: 'gray.100'
+            }
+        },
         _hover: {
             borderColor: 'icon.secondary'
         },

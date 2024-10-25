@@ -121,7 +121,4 @@ describe('fromDecimals Function Tests', () => {
             });
         }
     });
-
-    console.log(fromDecimals('--123.456', 3));
-    console.log(fromDecimals('-+123.456', 3));
 });
