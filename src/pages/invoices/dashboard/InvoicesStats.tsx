@@ -1,10 +1,9 @@
 import { ComponentProps, FC } from 'react';
-import { Box, Grid, Text } from '@chakra-ui/react';
+import { Box, Card, CardBody, CardHeader, Grid, Skeleton, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { CRYPTO_CURRENCY, formatNumber, useIntervalUpdate } from 'src/shared';
+import { CRYPTO_CURRENCY, formatNumber, H4, useIntervalUpdate } from 'src/shared';
 import { invoicesAppStore, InvoicesStatistics } from 'src/features';
 import BigNumber from 'bignumber.js';
-import { StatsCard as StatsCardEntity } from 'src/entities/stats/Card';
 
 const StatsCard: FC<{
     header: string;
@@ -19,11 +18,14 @@ const StatsCard: FC<{
     }
 
     return (
-        <StatsCardEntity
-            header={header}
-            value={canShow ? getValue(stats!) : ''}
-            loading={!canShow}
-        />
+        <Card size="lg">
+            <CardHeader textStyle="label2" pb="1" color="text.secondary">
+                {header}
+            </CardHeader>
+            <CardBody>
+                {canShow ? <H4>{getValue(stats)}</H4> : <Skeleton w="100px" h="3" />}
+            </CardBody>
+        </Card>
     );
 });
 

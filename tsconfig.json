@@ -1,29 +1,28 @@
 {
-    "compilerOptions": {
-        "allowImportingTsExtensions": true,
-        "target": "ESNext",
-        "useDefineForClassFields": true,
-        "lib": ["DOM", "DOM.Iterable", "ESNext"],
-        "allowJs": false,
-        "skipLibCheck": true,
-        "esModuleInterop": false,
-        "allowSyntheticDefaultImports": true,
-        "strict": true,
-        "forceConsistentCasingInFileNames": true,
-        "module": "ESNext",
-        "moduleResolution": "Node",
-        "resolveJsonModule": true,
-        "isolatedModules": true,
-        "noEmit": true,
-        "jsx": "react-jsx",
-        "baseUrl": "./",
-        "rootDir": ".",
-        "paths": {
-            "src/*": ["./src/*"]
-        },
-        "incremental": true
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "baseUrl": "./",
+    "rootDir": ".",
+    "paths": {
+      "src/*": ["./src/*"]
     },
-    "include": ["src"],
-    "exclude": ["tests"],
-    "references": [{ "path": "./tsconfig.vite.json" }]
+    "incremental": true
+  },
+  "include": ["src"],
+  "exclude": ["tests"],
+  "references": [{ "path": "./tsconfig.vite.json" }]
 }
