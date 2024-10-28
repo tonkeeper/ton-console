@@ -1,5 +1,5 @@
 import { ComponentProps, FunctionComponent } from 'react';
-import { TonApiSelectedTier } from '../../tier';
+import { TonApiSelectedTier } from '../../pricing';
 import { Card, CardBody, CardHeader, List, ListIcon, ListItem, Text } from '@chakra-ui/react';
 import { TickIcon, toDate } from 'src/shared';
 

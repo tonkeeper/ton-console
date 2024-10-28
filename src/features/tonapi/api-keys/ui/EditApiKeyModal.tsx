@@ -13,7 +13,7 @@ import { observer } from 'mobx-react-lite';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ApiKey, CreateApiKeyForm, apiKeysStore } from '../model';
 import { ApiKeyForm, ApiKeyFormInternal, toApiKeyFormDefaultValues } from './ApiKeyForm';
-import { tonApiTiersStore } from '../../tier';
+import { tonApiTiersStore } from '../../pricing';
 
 const EditApiKeyModal: FunctionComponent<{
     isOpen: boolean;
