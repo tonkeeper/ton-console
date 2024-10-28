@@ -74,7 +74,7 @@ const TonApiPricingModal: FC<{
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>
-                    <H4 mb="1">TON API plans</H4>
+                    <H4 mb="1">REST API plans</H4>
                     <Text textStyle="body2" color="text.secondary">
                         You are currently using the {currentTier.name} plan
                     </Text>

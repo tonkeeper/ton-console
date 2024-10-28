@@ -1,6 +1,16 @@
 import { FC, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Center, Spinner, useDisclosure, Text, Flex, Button, Icon } from '@chakra-ui/react';
+import {
+    Center,
+    Spinner,
+    useDisclosure,
+    Text,
+    Flex,
+    Button,
+    Icon,
+    Box,
+    Link
+} from '@chakra-ui/react';
 import TonApiPaymentDetailsModal from './TonApiPaymentDetailsModal';
 import { TonApiTier, tonApiTiersStore } from '../model';
 import { TonApiTierCard } from './TonApiTierCard';
@@ -10,6 +20,8 @@ import { SelectTier } from './SelectTier';
 import { TonApiUnlimitedTierCard } from './TonApiUnlimitedTierCard';
 import { ChevronRightIcon16 } from 'src/shared/ui/icons/ChevronRightIcon16';
 import TonApiPricingModal from './TonApiPricingModal';
+import WebhooksPricingModal from './WebhooksPricingModal';
+import { Link as RouterLink } from 'react-router-dom';
 
 const TonApiTiers: FC = () => {
     const storeSelectedTier = tonApiTiersStore.selectedTier$.value;
@@ -32,6 +44,12 @@ const TonApiTiers: FC = () => {
         isOpen: isTonApiPricingModalOpen,
         onClose: onTonApiPricingModalClose,
         onOpen: onTonApiPricingModalOpen
+    } = useDisclosure();
+
+    const {
+        isOpen: isWebhooksPricingModalOpen,
+        onClose: onWebhooksPricingModalClose,
+        onOpen: onWebhooksPricingModalOpen
     } = useDisclosure();
 
     if (
@@ -81,7 +99,7 @@ const TonApiTiers: FC = () => {
         <>
             <Flex align="center" justify="space-between" mb="4">
                 <Text textStyle="text.label2" mb="4" fontWeight={600}>
-                    TON API
+                    REST API
                 </Text>
                 <Button onClick={onTonApiPricingModalOpen} size="sm" variant="secondary">
                     Pricing
@@ -101,6 +119,25 @@ const TonApiTiers: FC = () => {
                     />
                 )}
             </Flex>
+            <Flex align="center" justify="space-between" mb="4">
+                <Text textStyle="text.label2" mb="4" fontWeight={600}>
+                    Webhooks
+                </Text>
+                <Button onClick={onWebhooksPricingModalOpen} size="sm" variant="secondary">
+                    Pricing
+                    <Icon as={ChevronRightIcon16} w={4} h={4} ml="2" />
+                </Button>
+            </Flex>
+            <Box>
+                <Text textStyle="body2" mb="4" color="text.secondary">
+                    The service is currently not in use. To use it, go to the{' '}
+                    <Link as={RouterLink} color="accent.blue" to="../webhooks">
+                        Webhooks
+                    </Link>{' '}
+                    section
+                </Text>
+            </Box>
+
             {tierForChange && (
                 <TonApiPaymentDetailsModal
                     isOpen={!!tierForChange}
@@ -112,6 +149,10 @@ const TonApiTiers: FC = () => {
             <TonApiPricingModal
                 isOpen={isTonApiPricingModalOpen}
                 onClose={onTonApiPricingModalClose}
+            />
+            <WebhooksPricingModal
+                isOpen={isWebhooksPricingModalOpen}
+                onClose={onWebhooksPricingModalClose}
             />
         </>
     );
