@@ -108,12 +108,15 @@ export const TonApiTierCard: FC<
             {onChoseTier && (
                 <Flex mt="4">
                     {isChosen ? (
-                        <Text textStyle="body2" color="text.secondary">
-                            Available until{' '}
-                            {'renewsDate' in tier && tier.renewsDate
-                                ? toDate(tier.renewsDate)
-                                : 'unknown'}
-                        </Text>
+                        // hidden until date if tier is free
+                        !tier.price.amount.eq(0) && (
+                            <Text textStyle="body2" color="text.secondary">
+                                Available until{' '}
+                                {'renewsDate' in tier && tier.renewsDate
+                                    ? toDate(tier.renewsDate)
+                                    : 'unknown'}
+                            </Text>
+                        )
                     ) : (
                         <Button
                             isLoading={false}
