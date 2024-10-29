@@ -4,5 +4,6 @@ export enum EXTERNAL_LINKS {
     TONCONNECT_MANIFEST = 'https://tonconsole.com/tonconnect-manifest.json',
 
     DOCUMENTATION = 'https://docs.tonconsole.com',
-    DOCUMENTATION_WEBHOOKS = 'https://docs.tonconsole.com/tonapi/webhooks-api'
+    DOCUMENTATION_WEBHOOKS = 'https://docs.tonconsole.com/tonapi/webhooks-api',
+    DOCUMENTATION_LITEPROXY = 'https://docs.tonconsole.com/tonapi/liteproxy'
 }
