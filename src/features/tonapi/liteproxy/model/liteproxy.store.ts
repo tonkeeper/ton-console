@@ -1,9 +1,19 @@
-import { apiClient, createImmediateReaction, DTOLiteproxyKey, Loadable } from 'src/shared';
+import {
+    apiClient,
+    createImmediateReaction,
+    DTOLiteproxyKey,
+    DTOLiteproxyTier,
+    Loadable
+} from 'src/shared';
 import { projectsStore } from 'src/entities';
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, reaction } from 'mobx';
 
 class LiteproxysStore {
     liteproxyList$ = new Loadable<DTOLiteproxyKey[]>([]);
+
+    liteproxyTiers$ = new Loadable<DTOLiteproxyTier[] | null>(null);
+
+    selectedTier: DTOLiteproxyTier | null = null;
 
     constructor() {
         makeAutoObservable(this);
@@ -19,6 +29,25 @@ class LiteproxysStore {
                 }
             }
         );
+
+        reaction(
+            () => [this.liteproxyList$.state, this.liteproxyTiers$.state],
+            () => {
+                if (this.liteproxyList$.isResolved && this.liteproxyTiers$.isResolved) {
+                    this.updateSelectedTier();
+                }
+            }
+        );
+    }
+
+    updateSelectedTier(): void {
+        if (!this.liteproxyList$.value || !this.liteproxyTiers$.value) return;
+
+        const matchingTier = this.liteproxyTiers$.value!.find(tier =>
+            this.liteproxyList$.value!.some(key => key.rps === tier.rps)
+        );
+
+        this.selectedTier = matchingTier || null;
     }
 
     fetchLiteproxyList = this.liteproxyList$.createAsyncAction(() =>
@@ -36,6 +65,18 @@ class LiteproxysStore {
             })
     );
 
+    fetchLiteproxyTiers = this.liteproxyTiers$.createAsyncAction(() =>
+        apiClient.api.getLiteproxyTiers().then(({ data }) => data.tiers)
+    );
+
+    // fetchSelectedTier = this.selectedTier$.createAsyncAction(
+    //     async () => {
+    //         return apiClient.api
+    //             .get(id)
+    //             .then(({ data }) => data.tier);
+    //     }
+    // );
+
     createLiteproxy = this.liteproxyList$.createAsyncAction(
         () =>
             apiClient.api
@@ -51,54 +92,9 @@ class LiteproxysStore {
         }
     );
 
-    // editLiteproxy = this.liteproxyList$.createAsyncAction(
-    //     async ({ id, name, limitRps, origins, capabilities }: EditLiteproxyForm) => {
-    //         await apiClient.api.updateProjectTonApiToken(
-    //             id,
-    //             { project_id: projectsStore.selectedProject!.id },
-    //             { name, limit_rps: limitRps, origins, capabilities }
-    //         );
-
-    //         const key = this.liteproxyList$.value.find(item => item.id === id);
-
-    //         if (key) {
-    //             key.name = name;
-    //             key.limitRps = limitRps;
-    //             key.origins = origins;
-    //             key.capabilities = capabilities;
-    //         }
-    //     },
-    //     {
-    //         successToast: {
-    //             title: 'Api key has been modified successfully'
-    //         },
-    //         errorToast: {
-    //             title: "Api key wasn't modified"
-    //         }
-    //     }
-    // );
-
-    // deleteLiteproxy = this.liteproxyList$.createAsyncAction(
-    //     async (id: number) => {
-    //         await apiClient.api.deleteProjectTonApiToken(id, {
-    //             project_id: projectsStore.selectedProject!.id
-    //         });
-
-    //         return this.liteproxyList$.value.filter(item => item.id !== id);
-    //     },
-    //     {
-    //         successToast: {
-    //             title: 'Api key has been deleted successfully'
-    //         },
-    //         errorToast: {
-    //             title: "Api key wasn't deleted"
-    //         }
-    //     }
-    // );
-
     clearStore(): void {
         this.liteproxyList$.clear();
-        this.liteproxyTier$.clear();
+        this.liteproxyTiers$.clear();
     }
 }
 
