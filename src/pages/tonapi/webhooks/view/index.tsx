@@ -72,7 +72,7 @@ const SubscriptionsViewPage: FC = () => {
 
     return (
         <>
-            <Overlay breadcrumbs={breadcrumb}>
+            <Overlay breadcrumbs={breadcrumb} h="fit-content">
                 <Flex mb="4">
                     <Flex direction="column" gap={2}>
                         <Flex align="center" gap={4}>
@@ -94,7 +94,7 @@ const SubscriptionsViewPage: FC = () => {
                                     href={EXTERNAL_LINKS.DOCUMENTATION_WEBHOOKS}
                                     isExternal
                                 >
-                                    Webhooks API documentation
+                                    Webhooks documentation
                                 </Link>
                             </Text>
                         </Flex>
@@ -108,7 +108,7 @@ const SubscriptionsViewPage: FC = () => {
                 </Flex>
 
                 {isEmpty ? (
-                    <EmptySubscriptions />
+                    <EmptySubscriptions onOpenCreate={onOpen} />
                 ) : (
                     <>
                         <Divider mb="4" />
