@@ -12,7 +12,7 @@ import {
     TextWithSkeleton,
     TonapiIcon
 } from 'src/shared';
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Flex, Text } from '@chakra-ui/react';
 import { balanceStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
@@ -20,7 +20,7 @@ import { invoicesAppStore } from 'src/features';
 import { NftIcon24 } from 'src/shared';
 import { JettonIcon24 } from 'src/shared/ui/icons/JettonIcon24';
 
-const Aside: FunctionComponent = () => {
+const Aside: FC = () => {
     return (
         <DropDownMenu>
             <DropDownMenuItem linkTo="dashboard" leftIcon={<DashboardIcon />}>
@@ -29,6 +29,7 @@ const Aside: FunctionComponent = () => {
             <DropDownMenuItemExpandable leftIcon={<TonapiIcon />} content="TON API" linkTo="tonapi">
                 <DropDownMenuItem linkTo="api-keys">API keys</DropDownMenuItem>
                 <DropDownMenuItem linkTo="webhooks">Webhooks</DropDownMenuItem>
+                <DropDownMenuItem linkTo="liteproxy">Liteproxy</DropDownMenuItem>
                 <DropDownMenuItem linkTo="pricing">Pricing</DropDownMenuItem>
             </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="tonkeeper-messages" leftIcon={<MessageIcon24 />}>
