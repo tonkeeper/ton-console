@@ -735,6 +735,38 @@ export interface DTOAccount {
     account: string;
 }
 
+export interface DTOLiteproxyPrivateKey {
+    /** @format uint32 */
+    app_id: number;
+    /** @example 10 */
+    rps: number;
+    /** @example "da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
+    private_key: string;
+}
+
+export interface DTOLiteproxyKey {
+    /** @example "11.111.111.111:5050" */
+    server: string;
+    /** @example 10 */
+    rps: number;
+    /** @example "da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
+    public_key: string;
+}
+
+export interface DTOLiteproxyTier {
+    /**
+     * @format uint32
+     * @example 1
+     */
+    id: number;
+    /** @example "Test" */
+    name: string;
+    /** @example 10 */
+    usd_price: number;
+    /** @example 10 */
+    rps: number;
+}
+
 /** backend error code */
 export enum DTOErrorCodeEnum {
     DTOValue1 = 1,
@@ -1961,6 +1993,177 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/v1/services/tonapi/stats`,
                 method: 'GET',
                 query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags tonapi_service
+         * @name AdminGetLiteproxyPrivateKeys
+         * @summary Get private keys for the liteproxy server
+         * @request GET:/api/v1/services/tonapi/liteproxy/private_keys
+         */
+        adminGetLiteproxyPrivateKeys: (
+            query: {
+                /**
+                 * Liteproxy server address
+                 * @example "1.2.3.4:123"
+                 */
+                server: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    keys: DTOLiteproxyPrivateKey[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/tonapi/liteproxy/private_keys`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags tonapi_service
+         * @name CreateLiteproxyKeys
+         * @summary Create liteproxy keys
+         * @request POST:/api/v1/services/tonapi/liteproxy/keys
+         */
+        createLiteproxyKeys: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    keys: DTOLiteproxyKey[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/tonapi/liteproxy/keys`,
+                method: 'POST',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags tonapi_service
+         * @name GetLiteproxyKeys
+         * @summary Get keys for connecting to liteproxy servers
+         * @request GET:/api/v1/services/tonapi/liteproxy/keys
+         */
+        getLiteproxyKeys: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    keys: DTOLiteproxyKey[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/tonapi/liteproxy/keys`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags tonapi_service
+         * @name GetLiteproxyTiers
+         * @summary Get list of active tiers for the liteproxy server
+         * @request GET:/api/v1/services/tonapi/liteproxy/tiers
+         */
+        getLiteproxyTiers: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    tiers: DTOLiteproxyTier[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/tonapi/liteproxy/tiers`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags tonapi_service
+         * @name UpdateLiteproxyTier
+         * @summary Switch to a new tier for liteproxy server
+         * @request PATCH:/api/v1/services/tonapi/liteproxy/tier
+         */
+        updateLiteproxyTier: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: {
+                /**
+                 * @format uint32
+                 * @example 1
+                 */
+                tier_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/tonapi/liteproxy/tier`,
+                method: 'PATCH',
+                query: query,
+                body: data,
                 ...params
             }),
 
@@ -4015,7 +4218,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          */
         proServiceDashboardData: (
             data: {
-                /** @maxItems 500 */
+                /** @maxItems 1000 */
                 accounts: string[];
                 columns: string[];
             },

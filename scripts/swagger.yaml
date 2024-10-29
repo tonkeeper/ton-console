@@ -651,7 +651,101 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+  /api/v1/services/tonapi/liteproxy/private_keys:
+    get:
+      summary: "Get private keys for the liteproxy server"
+      operationId: adminGetLiteproxyPrivateKeys
+      tags:
+        - tonapi_service
+      parameters:
+        - $ref: '#/components/parameters/queryLiteproxyServer'
+      responses:
+        '200':
+          $ref: '#/components/responses/LiteproxyPrivateKeys'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/liteproxy/keys:
+    post:
+      summary: "Create liteproxy keys"
+      operationId: createLiteproxyKeys
+      tags:
+        - tonapi_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '201':
+          $ref: '#/components/responses/LiteproxyKeys'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    get:
+      summary: "Get keys for connecting to liteproxy servers"
+      operationId: getLiteproxyKeys
+      tags:
+        - tonapi_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/LiteproxyKeys'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/liteproxy/tiers:
+    get:
+      summary: "Get list of active tiers for the liteproxy server"
+      operationId: getLiteproxyTiers
+      tags:
+        - tonapi_service
+      responses:
+        '200':
+          $ref: '#/components/responses/LiteproxyTiers'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/liteproxy/tier:
+    patch:
+      summary: "Switch to a new tier for liteproxy server"
+      operationId: updateLiteproxyTier
+      tags:
+        - tonapi_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/NewTier"
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
   /api/v1/services/messages/packages:
     get:
       summary: "Get messages packages"
@@ -1947,6 +2041,14 @@ components:
       schema:
         type: integer
         format: uint32
+    queryLiteproxyServer:
+      description: Liteproxy server address
+      in: query
+      name: server
+      required: true
+      schema:
+        type: string
+        example: "1.2.3.4:123"
     queryChain:
       description: chain
       in: query
@@ -2593,7 +2695,7 @@ components:
             properties:
               accounts:
                 type: array
-                maxItems: 500
+                maxItems: 1000
                 items:
                   type: string
                   example: "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
@@ -3645,6 +3747,59 @@ components:
         account:
           type: string
           example: "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
+    LiteproxyPrivateKey:
+      type: object
+      required:
+        - app_id
+        - rps
+        - private_key
+      properties:
+        app_id:
+          type: integer
+          format: uint32
+        rps:
+          type: number
+          example: 10.0
+        private_key:
+          type: string
+          example: "da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
+    LiteproxyKey:
+      type: object
+      required:
+        - server
+        - rps
+        - public_key
+      properties:
+        server:
+          type: string
+          example: "11.111.111.111:5050"
+        rps:
+          type: number
+          example: 10.0
+        public_key:
+          type: string
+          example: "da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
+    LiteproxyTier:
+      type: object
+      required:
+        - id
+        - name
+        - usd_price
+        - rps
+      properties:
+        id:
+          type: integer
+          format: uint32
+          example: 1
+        name:
+          type: string
+          example: "Test"
+        usd_price:
+          type: number
+          example: 10.0
+        rps:
+          type: number
+          example: 10.0
 
   responses:
     NotFound:
@@ -3804,6 +3959,45 @@ components:
               stats:
                 additionalProperties: true
                 example: { }
+    LiteproxyPrivateKeys:
+      description: "Private keys for the liteproxy server"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - keys
+            properties:
+              keys:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LiteproxyPrivateKey'
+    LiteproxyKeys:
+      description: "Keys for connecting to liteproxy servers"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - keys
+            properties:
+              keys:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LiteproxyKey'
+    LiteproxyTiers:
+      description: "Active tiers for the liteproxy server"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - tiers
+            properties:
+              tiers:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LiteproxyTier'
     StatsDashboard:
       description: "Dashboard"
       content:
@@ -3901,6 +4095,8 @@ components:
           $ref: "#/components/headers/accessControlAllowOrigin"
         Access-Control-Allow-Headers:
           $ref: "#/components/headers/accessControlAllowHeaders"
+        Set-Cookie:
+          $ref: "#/components/headers/setCookie"
       content:
         application/json:
           schema:

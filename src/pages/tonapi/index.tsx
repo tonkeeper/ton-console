@@ -5,6 +5,7 @@ import { Navigate, Route } from 'react-router-dom';
 const PricingPage = lazy(() => import('./pricing'));
 const ApiKeysPage = lazy(() => import('./api-keys'));
 const WebhooksPage = lazy(() => import('./webhooks'));
+const LiteproxyPage = lazy(() => import('./liteproxy'));
 const WebhookViewPage = lazy(() => import('./webhooks/view'));
 
 const TonapiRouting = (
@@ -30,6 +31,14 @@ const TonapiRouting = (
             element={
                 <Suspense>
                     <WebhookViewPage />
+                </Suspense>
+            }
+        />
+        <Route
+            path="liteproxy"
+            element={
+                <Suspense>
+                    <LiteproxyPage />
                 </Suspense>
             }
         />
