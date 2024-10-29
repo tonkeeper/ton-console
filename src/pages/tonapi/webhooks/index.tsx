@@ -16,9 +16,7 @@ const WebhooksPage: FC = () => {
         );
     }
 
-    if (!webhooksStore.webhooks$.value.length) {
-        return <EmptyWebhooks />;
-    }
+    const isEmptyWebhooks = webhooksStore.webhooks$.value.length === 0;
 
     return (
         <>
@@ -44,17 +42,19 @@ const WebhooksPage: FC = () => {
                                     href={EXTERNAL_LINKS.DOCUMENTATION_WEBHOOKS}
                                     isExternal
                                 >
-                                    Webhooks API documentation
+                                    Webhooks documentation
                                 </Link>
                             </Text>
                         </Flex>
                     </Flex>
 
-                    <Button mb="6" ml="auto" onClick={onOpen}>
-                        Add Webhook
-                    </Button>
+                    {!isEmptyWebhooks && (
+                        <Button mb="6" ml="auto" onClick={onOpen}>
+                            Add Webhook
+                        </Button>
+                    )}
                 </Flex>
-                <WebhooksTable />
+                {isEmptyWebhooks ? <EmptyWebhooks onOpenCreate={onOpen} /> : <WebhooksTable />}
             </Overlay>
             <CreateWebhookModal isOpen={isOpen} onClose={onClose} />
         </>
