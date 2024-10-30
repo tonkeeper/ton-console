@@ -2,10 +2,12 @@ import { FC } from 'react';
 import {
     Button,
     Modal,
+    ModalBody,
     ModalContent,
     ModalFooter,
     ModalHeader,
-    ModalOverlay
+    ModalOverlay,
+    Text
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { liteproxysStore } from '../model';
@@ -17,8 +19,14 @@ const CreateLiteproxyModal: FC<{ isOpen: boolean; onClose: () => void }> = props
         <Modal scrollBehavior="inside" {...props} size="sm">
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Create Liteproxy?</ModalHeader>
-                {/* <ModalCloseButton /> */}
+                <ModalHeader>Create Liteserver?</ModalHeader>
+
+                <ModalBody py={0}>
+                    <Text textStyle="body2" color="text.secondary">
+                        Will be created a two Liteserver nodes on free tier with 0.1 RPS. You can
+                        change the tier later.
+                    </Text>
+                </ModalBody>
 
                 <ModalFooter gap="3">
                     <Button flex={1} onClick={props.onClose} variant="secondary">
