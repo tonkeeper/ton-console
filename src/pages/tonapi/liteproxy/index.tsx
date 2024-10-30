@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 import { ButtonLink, ConsoleDocsIcon32, EXTERNAL_LINKS, H4, Overlay } from 'src/shared';
 import { Badge, Center, Flex, Spinner, useDisclosure, Text } from '@chakra-ui/react';
-import LiteproxyTable from 'src/features/tonapi/liteproxy/ui/LiteproxyTable';
+import LiteproxyView from 'src/features/tonapi/liteproxy/ui/LiteproxyView';
 import { CreateLiteproxyModal, liteproxysStore } from 'src/features/tonapi/liteproxy';
 import { EmptyLiteservers } from './EmptyLiteservers';
 
@@ -17,11 +17,11 @@ const LiteproxyPage: FC = () => {
         );
     }
 
-    // if (!liteproxysStore.selectedTier$.value) {
-    //     return <SelectPlanFirstly />;
-    // }
-
     const isEmpty = liteproxysStore.liteproxyList$.value.length === 0;
+
+    if (isEmpty) {
+        return <EmptyLiteservers onOpenCreate={onOpen} />;
+    }
 
     return (
         <>
@@ -47,18 +47,6 @@ const LiteproxyPage: FC = () => {
                                 </Text>
                             )}
                         </Flex>
-                        {/* <Flex>
-                            <Text textStyle="text.body2" color="text.secondary" fontSize={14}>
-                                For details, see{' '}
-                                <Link
-                                    color="accent.blue"
-                                    href={EXTERNAL_LINKS.DOCUMENTATION_LITEPROXY}
-                                    isExternal
-                                >
-                                    Liteproxy documentation
-                                </Link>
-                            </Text>
-                        </Flex> */}
                     </Flex>
                     <ButtonLink
                         ml="auto"
@@ -73,7 +61,7 @@ const LiteproxyPage: FC = () => {
                         Liteservers Doc
                     </ButtonLink>
                 </Flex>
-                {isEmpty ? <EmptyLiteservers onOpenCreate={onOpen} /> : <LiteproxyTable />}
+                <LiteproxyView />
             </Overlay>
             <CreateLiteproxyModal isOpen={isOpen} onClose={onClose} />
         </>

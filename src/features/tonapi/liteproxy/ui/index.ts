@@ -1,2 +1,2 @@
 export { default as CreateLiteproxyModal } from './CreateLiteproxyModal';
-export { default as LiteproxysTable } from './LiteproxyTable';
+export { default as LiteproxysTable } from './LiteproxyView';

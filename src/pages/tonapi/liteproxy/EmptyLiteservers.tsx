@@ -10,15 +10,16 @@ export const EmptyLiteservers: FC<{
         <EmptyPage
             title="Liteservers"
             mainButtonAction={onOpenCreate}
-            mainButtonText="Add Liteserver"
+            mainButtonText="Create Liteserver"
             guideButtonLink={EXTERNAL_LINKS.DOCUMENTATION_LITEPROXY}
         >
             <Text textStyle="body2">
-                The cNFT Indexing Service allows you to add and index your cNFTs via the Tonconsole
-                interface.
+                The LiteServers service allows you to create and gain direct access to LiteServers
+                in the TON network.
             </Text>
             <Text textStyle="body2" mt={4}>
-                Making them available through TonAPI without requiring immediate on-chain minting.
+                Enjoy seamless access to TON blockchain data without the complexity and overhead of
+                full synchronization on your infrastructure.
             </Text>
         </EmptyPage>
     );
