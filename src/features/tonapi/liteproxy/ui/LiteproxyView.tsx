@@ -1,4 +1,4 @@
-import { TableContainer, Box, Text, Flex } from '@chakra-ui/react';
+import { TableContainer, Text, Flex } from '@chakra-ui/react';
 import { ComponentProps, FC } from 'react';
 import { CopyPad } from 'src/shared';
 import { liteproxysStore } from '../model';
@@ -14,20 +14,19 @@ const LiteproxyView: FC<ComponentProps<typeof TableContainer>> = () => {
             </Text>
             {liteproxyList.length > 0 &&
                 liteproxyList.map((liteproxy, index) => (
-                    <Box key={liteproxy.server} mb={1}>
+                    <Flex key={liteproxy.server} direction="column" gap={1} mb={4}>
                         <Flex align="baseline" gap={2}>
                             <Text textStyle="text.label2">
                                 {index === 0 ? 'Primary' : 'Backup'}:
                             </Text>
                             <CopyPad text={liteproxy.server} variant="flat" width="190px" />
                         </Flex>
-                    </Box>
+                        <Flex align="baseline" gap={2}>
+                            <Text textStyle="text.label2">Public key:</Text>
+                            <CopyPad text={liteproxy.public_key} variant="flat" width="400px" />
+                        </Flex>
+                    </Flex>
                 ))}
-
-            <Text textStyle="text.label1" mt={4} mb={2} fontSize={18} fontWeight={600}>
-                Your public key
-            </Text>
-            <CopyPad text={`${liteproxyList[0].public_key}`} width="450px" mb={3} />
         </>
     );
 };
