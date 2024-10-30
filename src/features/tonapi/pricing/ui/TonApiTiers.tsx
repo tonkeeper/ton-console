@@ -7,9 +7,9 @@ import {
     Text,
     Flex,
     Button,
-    Icon,
-    Box,
-    Link
+    Icon
+    // Box,
+    // Link
 } from '@chakra-ui/react';
 import TonApiPaymentDetailsModal from './TonApiPaymentDetailsModal';
 import { TonApiTier, tonApiTiersStore } from '../model';
@@ -21,7 +21,7 @@ import { TonApiUnlimitedTierCard } from './TonApiUnlimitedTierCard';
 import { ChevronRightIcon16 } from 'src/shared/ui/icons/ChevronRightIcon16';
 import TonApiPricingModal from './TonApiPricingModal';
 import WebhooksPricingModal from './WebhooksPricingModal';
-import { Link as RouterLink } from 'react-router-dom';
+// import { Link as RouterLink } from 'react-router-dom';
 
 const TonApiTiers: FC = () => {
     const storeSelectedTier = tonApiTiersStore.selectedTier$.value;
@@ -48,8 +48,8 @@ const TonApiTiers: FC = () => {
 
     const {
         isOpen: isWebhooksPricingModalOpen,
-        onClose: onWebhooksPricingModalClose,
-        onOpen: onWebhooksPricingModalOpen
+        onClose: onWebhooksPricingModalClose
+        // onOpen: onWebhooksPricingModalOpen
     } = useDisclosure();
 
     if (
@@ -119,7 +119,7 @@ const TonApiTiers: FC = () => {
                     />
                 )}
             </Flex>
-            <Flex align="center" justify="space-between" mb="4">
+            {/* <Flex align="center" justify="space-between" mb="4">
                 <Text textStyle="text.label2" mb="4" fontWeight={600}>
                     Webhooks
                 </Text>
@@ -136,7 +136,7 @@ const TonApiTiers: FC = () => {
                     </Link>{' '}
                     section
                 </Text>
-            </Box>
+            </Box> */}
 
             {tierForChange && (
                 <TonApiPaymentDetailsModal
