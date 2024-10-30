@@ -725,6 +725,24 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/tonapi/liteproxy/tier:
+    get:
+      summary: "Get the current tier for liteproxy server"
+      operationId: getProjectLiteproxyTier
+      tags:
+        - tonapi_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProjectLiteproxyTier'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
     patch:
       summary: "Switch to a new tier for liteproxy server"
       operationId: updateLiteproxyTier
@@ -3437,6 +3455,7 @@ components:
         - testnet
         - pro
         - cnft
+        - liteproxy
     ProServiceDashboardColumnID:
       type: string
       enum:
@@ -3753,6 +3772,7 @@ components:
         - app_id
         - rps
         - private_key
+        - date_create
       properties:
         app_id:
           type: integer
@@ -3763,12 +3783,17 @@ components:
         private_key:
           type: string
           example: "da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
+        date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
     LiteproxyKey:
       type: object
       required:
         - server
         - rps
         - public_key
+        - date_create
       properties:
         server:
           type: string
@@ -3779,6 +3804,10 @@ components:
         public_key:
           type: string
           example: "da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
+        date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
     LiteproxyTier:
       type: object
       required:
@@ -3800,6 +3829,36 @@ components:
         rps:
           type: number
           example: 10.0
+    ProjectLiteproxyTierDetail:
+      type: object
+      required:
+        - id
+        - name
+        - rps
+        - usd_price
+        - date_create
+      properties:
+        id:
+          type: integer
+          format: uint32
+          example: 1
+        name:
+          type: string
+          example: "Test tier"
+        rps:
+          type: number
+          example: 5
+        usd_price:
+          type: number
+          example: 100
+        next_payment:
+          type: integer
+          format: int64
+          example: 1690889913000
+        date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
 
   responses:
     NotFound:
@@ -3998,6 +4057,17 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/LiteproxyTier'
+    ProjectLiteproxyTier:
+      description: "Active the project tier for the liteproxy server"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - tier
+            properties:
+              tier:
+                $ref: '#/components/schemas/ProjectLiteproxyTierDetail'
     StatsDashboard:
       description: "Dashboard"
       content:

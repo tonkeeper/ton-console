@@ -28,6 +28,8 @@ const LiteproxyPage: FC = () => {
         );
     }
 
+    const selectedTier = liteproxysStore.selectedTier$.value;
+
     return (
         <Overlay h="fit-content">
             <Flex gap={4} mb="4">
@@ -44,12 +46,12 @@ const LiteproxyPage: FC = () => {
                         </Badge>
                     </Flex>
                     <Flex>
-                        {liteproxysStore.selectedTier && (
-                            <Text textStyle="text.body2" color="text.secondary" fontSize={14}>
-                                Your current plan: {liteproxysStore.selectedTier.name} (
-                                {liteproxysStore.selectedTier.rps} RPS)
-                            </Text>
-                        )}
+                        <Text textStyle="text.body2" color="text.secondary" fontSize={14}>
+                            Your current plan:{' '}
+                            {selectedTier
+                                ? `${selectedTier.name} (${selectedTier.rps} RPS)`
+                                : '...'}
+                        </Text>
                     </Flex>
                 </Flex>
                 <ButtonLink

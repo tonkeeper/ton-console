@@ -6,14 +6,14 @@ import {
     Loadable
 } from 'src/shared';
 import { projectsStore } from 'src/entities';
-import { makeAutoObservable, reaction } from 'mobx';
+import { makeAutoObservable } from 'mobx';
 
 class LiteproxysStore {
     liteproxyList$ = new Loadable<DTOLiteproxyKey[]>([]);
 
     liteproxyTiers$ = new Loadable<DTOLiteproxyTier[] | null>(null);
 
-    selectedTier: DTOLiteproxyTier | null = null;
+    selectedTier$ = new Loadable<DTOLiteproxyTier | null>(null);
 
     constructor() {
         makeAutoObservable(this);
@@ -26,28 +26,10 @@ class LiteproxysStore {
                 if (project) {
                     this.fetchLiteproxyList();
                     this.fetchLiteproxyTiers();
+                    this.fetchSelectedTier();
                 }
             }
         );
-
-        reaction(
-            () => [this.liteproxyList$.state, this.liteproxyTiers$.state],
-            () => {
-                if (this.liteproxyList$.isResolved && this.liteproxyTiers$.isResolved) {
-                    this.updateSelectedTier();
-                }
-            }
-        );
-    }
-
-    updateSelectedTier(): void {
-        if (!this.liteproxyList$.value || !this.liteproxyTiers$.value) return;
-
-        const matchingTier = this.liteproxyTiers$.value!.find(tier =>
-            this.liteproxyList$.value!.some(key => key.rps === tier.rps)
-        );
-
-        this.selectedTier = matchingTier || null;
     }
 
     fetchLiteproxyList = this.liteproxyList$.createAsyncAction(() =>
@@ -69,13 +51,11 @@ class LiteproxysStore {
         apiClient.api.getLiteproxyTiers().then(({ data }) => data.tiers)
     );
 
-    // fetchSelectedTier = this.selectedTier$.createAsyncAction(
-    //     async () => {
-    //         return apiClient.api
-    //             .get(id)
-    //             .then(({ data }) => data.tier);
-    //     }
-    // );
+    fetchSelectedTier = this.selectedTier$.createAsyncAction(async () => {
+        return apiClient.api
+            .getProjectLiteproxyTier({ project_id: projectsStore.selectedProject!.id })
+            .then(({ data }) => data.tier);
+    });
 
     createLiteproxy = this.liteproxyList$.createAsyncAction(
         () =>

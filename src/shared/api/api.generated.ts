@@ -518,7 +518,8 @@ export enum DTOServiceName {
     DTOTonapi = 'tonapi',
     DTOTestnet = 'testnet',
     DTOPro = 'pro',
-    DTOCnft = 'cnft'
+    DTOCnft = 'cnft',
+    DTOLiteproxy = 'liteproxy'
 }
 
 export enum DTOProServiceDashboardColumnID {
@@ -742,6 +743,11 @@ export interface DTOLiteproxyPrivateKey {
     rps: number;
     /** @example "da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
     private_key: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 export interface DTOLiteproxyKey {
@@ -751,6 +757,11 @@ export interface DTOLiteproxyKey {
     rps: number;
     /** @example "da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
     public_key: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 export interface DTOLiteproxyTier {
@@ -765,6 +776,30 @@ export interface DTOLiteproxyTier {
     usd_price: number;
     /** @example 10 */
     rps: number;
+}
+
+export interface DTOProjectLiteproxyTierDetail {
+    /**
+     * @format uint32
+     * @example 1
+     */
+    id: number;
+    /** @example "Test tier" */
+    name: string;
+    /** @example 5 */
+    rps: number;
+    /** @example 100 */
+    usd_price: number;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    next_payment?: number;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 /** backend error code */
@@ -2123,6 +2158,41 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             >({
                 path: `/api/v1/services/tonapi/liteproxy/tiers`,
                 method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags tonapi_service
+         * @name GetProjectLiteproxyTier
+         * @summary Get the current tier for liteproxy server
+         * @request GET:/api/v1/services/tonapi/liteproxy/tier
+         */
+        getProjectLiteproxyTier: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    tier: DTOProjectLiteproxyTierDetail;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/tonapi/liteproxy/tier`,
+                method: 'GET',
+                query: query,
                 ...params
             }),
 
