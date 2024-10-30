@@ -5,5 +5,6 @@ export enum EXTERNAL_LINKS {
 
     DOCUMENTATION = 'https://docs.tonconsole.com',
     DOCUMENTATION_WEBHOOKS = 'https://docs.tonconsole.com/tonapi/webhooks-api',
-    DOCUMENTATION_LITEPROXY = 'https://docs.tonconsole.com/tonapi/liteproxy'
+    DOCUMENTATION_LITEPROXY = 'https://docs.tonconsole.com/tonapi/liteproxy',
+    DOCUMENTATION_CNFT = 'https://docs.tonconsole.com/tonconsole/nft/cnft#cnft-indexing-service'
 }

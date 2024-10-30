@@ -1,10 +1,10 @@
 import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 import { ButtonLink, ConsoleDocsIcon32, EXTERNAL_LINKS, H4, Overlay } from 'src/shared';
-import { Badge, Button, Center, Flex, Spinner, useDisclosure, Text } from '@chakra-ui/react';
+import { Badge, Center, Flex, Spinner, useDisclosure, Text } from '@chakra-ui/react';
 import LiteproxyTable from 'src/features/tonapi/liteproxy/ui/LiteproxyTable';
 import { CreateLiteproxyModal, liteproxysStore } from 'src/features/tonapi/liteproxy';
-import { EmptyLiteproxy } from './EmptyLiteproxy';
+import { EmptyLiteservers } from './EmptyLiteservers';
 
 const LiteproxyPage: FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -29,7 +29,7 @@ const LiteproxyPage: FC = () => {
                 <Flex gap={4} mb="4">
                     <Flex direction="column" gap={2}>
                         <Flex align="center" gap={4}>
-                            <H4>Liteproxy</H4>
+                            <H4>Liteservers</H4>
                             <Badge
                                 textStyle="label3"
                                 color="accent.orange"
@@ -70,16 +70,10 @@ const LiteproxyPage: FC = () => {
                         href={EXTERNAL_LINKS.DOCUMENTATION_LITEPROXY}
                         isExternal
                     >
-                        Liteproxy Docs
+                        Liteservers Doc
                     </ButtonLink>
-
-                    {!isEmpty && (
-                        <Button mb="4" onClick={onOpen}>
-                            Create Liteproxy
-                        </Button>
-                    )}
                 </Flex>
-                {isEmpty ? <EmptyLiteproxy onOpenCreate={onOpen} /> : <LiteproxyTable />}
+                {isEmpty ? <EmptyLiteservers onOpenCreate={onOpen} /> : <LiteproxyTable />}
             </Overlay>
             <CreateLiteproxyModal isOpen={isOpen} onClose={onClose} />
         </>
