@@ -12,7 +12,7 @@ import {
 import { observer } from 'mobx-react-lite';
 import { apiKeysStore, CreateApiKeyForm } from '../model';
 import { ApiKeyForm } from './ApiKeyForm';
-import { tonApiTiersStore } from '../../tier';
+import { tonApiTiersStore } from '../../pricing';
 import { FormProvider, useForm } from 'react-hook-form';
 
 const CreateApiKeyModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
