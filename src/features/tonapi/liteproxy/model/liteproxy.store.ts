@@ -72,6 +72,27 @@ class LiteproxysStore {
         }
     );
 
+    selectTier = this.selectedTier$.createAsyncAction(
+        async (tierId: number) => {
+            await apiClient.api.updateLiteproxyTier(
+                { project_id: projectsStore.selectedProject!.id },
+                {
+                    tier_id: tierId
+                }
+            );
+
+            this.fetchSelectedTier();
+        },
+        {
+            successToast: {
+                title: 'Successful purchase'
+            },
+            errorToast: {
+                title: 'Unsuccessful purchase'
+            }
+        }
+    );
+
     clearStore(): void {
         this.liteproxyList$.clear();
         this.liteproxyTiers$.clear();
