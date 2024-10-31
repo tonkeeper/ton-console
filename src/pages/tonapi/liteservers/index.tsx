@@ -66,7 +66,7 @@ const LiteserversPage: FC = () => {
                     height="100%"
                     variant="secondary"
                     zIndex="3"
-                    href={EXTERNAL_LINKS.DOCUMENTATION_LITEPROXY}
+                    href={EXTERNAL_LINKS.DOCUMENTATION_LITESERVERS}
                     isExternal
                 >
                     Liteservers Doc

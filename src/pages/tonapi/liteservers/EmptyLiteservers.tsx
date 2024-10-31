@@ -11,7 +11,8 @@ export const EmptyLiteservers: FC<{
             title="Liteservers"
             mainButtonAction={onOpenCreate}
             mainButtonText="Create Liteserver"
-            guideButtonLink={EXTERNAL_LINKS.DOCUMENTATION_LITEPROXY}
+            guideButtonLink={EXTERNAL_LINKS.DOCUMENTATION_LITESERVERS}
+            isBeta={true}
         >
             <Text textStyle="body2">
                 The LiteServers service allows you to create and gain direct access to LiteServers
