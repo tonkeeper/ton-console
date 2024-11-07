@@ -528,7 +528,8 @@ export enum DTOServiceName {
     DTOTestnet = 'testnet',
     DTOPro = 'pro',
     DTOCnft = 'cnft',
-    DTOLiteproxy = 'liteproxy'
+    DTOLiteproxy = 'liteproxy',
+    DTOStreaming = 'streaming'
 }
 
 export enum DTOProServiceDashboardColumnID {

@@ -3709,6 +3709,7 @@ components:
         - pro
         - cnft
         - liteproxy
+        - streaming
     ProServiceDashboardColumnID:
       type: string
       enum:

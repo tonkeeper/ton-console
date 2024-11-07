@@ -54,6 +54,8 @@ class PaymentsTableStore {
                         return mapChargeToCnftPayment(charge);
                     case DTOServiceName.DTOLiteproxy:
                         return mapChargeToLiteproxyPayment(charge, liteproxyTiers);
+                    case DTOServiceName.DTOStreaming:
+                        return mapChargeToStreamingPayment(charge);
                     default:
                         return null;
                 }
@@ -234,6 +236,20 @@ function mapChargeToLiteproxyPayment(charge: DTOCharge, tiers: DTOLiteproxyTier[
     return {
         id: `liteproxy-${charge.id}`,
         name: `Liteservers ${tier.name}`,
+        date: new Date(charge.date_create),
+        amount: tonAmount,
+        amountUsdEquivalent: new UsdCurrencyAmount(
+            tonAmount.amount.multipliedBy(charge.exchange_rate)
+        )
+    };
+}
+
+function mapChargeToStreamingPayment(charge: DTOCharge): Payment {
+    const tonAmount = new TonCurrencyAmount(charge.amount);
+
+    return {
+        id: `streaming-${charge.id}`,
+        name: 'Webhooks',
         date: new Date(charge.date_create),
         amount: tonAmount,
         amountUsdEquivalent: new UsdCurrencyAmount(
