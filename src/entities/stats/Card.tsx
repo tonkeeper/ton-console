@@ -6,9 +6,16 @@ export const StatsCard: FC<{
     header: string;
     value: string;
     loading?: boolean;
-}> = ({ header, value, loading = false }) => {
+    onClick?: () => void;
+}> = ({ header, value, loading = false, onClick }) => {
     return (
-        <Card size="lg">
+        <Card
+            as={onClick ? 'button' : 'div'}
+            w="fit-content"
+            _hover={onClick ? { transform: 'scale(1.01)' } : undefined}
+            cursor={onClick ? 'pointer' : 'default'}
+            onClick={onClick}
+        >
             <CardHeader textStyle="label2" pb="1" color="text.secondary">
                 {header}
             </CardHeader>

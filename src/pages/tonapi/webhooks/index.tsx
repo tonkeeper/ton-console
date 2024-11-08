@@ -3,10 +3,22 @@ import { observer } from 'mobx-react-lite';
 import { CreateWebhookModal, WebhooksTable, webhooksStore } from 'src/features/tonapi/webhooks';
 import { EmptyWebhooks } from './EmptyWebhooks';
 import { EXTERNAL_LINKS, H4, Overlay } from 'src/shared';
-import { Badge, Button, Center, Flex, Spinner, useDisclosure, Text, Link } from '@chakra-ui/react';
+import {
+    Badge,
+    Button,
+    Center,
+    Flex,
+    Spinner,
+    useDisclosure,
+    Text,
+    Link,
+    Box
+} from '@chakra-ui/react';
+import WebhookChartModal from './ChatrWebhooks';
 
 const WebhooksPage: FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isChartOpen, onOpen: onChartOpen, onClose: onChartClose } = useDisclosure();
 
     if (!webhooksStore.webhooks$.isResolved) {
         return (
@@ -17,11 +29,12 @@ const WebhooksPage: FC = () => {
     }
 
     const isEmptyWebhooks = webhooksStore.webhooks$.value.length === 0;
+    const WebhooksStats = webhooksStore.stats$.value;
 
     return (
         <>
             <Overlay h="fit-content">
-                <Flex mb="5">
+                <Flex mb="3">
                     <Flex direction="column" gap={2}>
                         <Flex align="center" gap={4}>
                             <H4>Webhooks</H4>
@@ -54,9 +67,32 @@ const WebhooksPage: FC = () => {
                         </Button>
                     )}
                 </Flex>
-                {isEmptyWebhooks ? <EmptyWebhooks onOpenCreate={onOpen} /> : <WebhooksTable />}
+                {isEmptyWebhooks ? (
+                    <EmptyWebhooks onOpenCreate={onOpen} />
+                ) : (
+                    <>
+                        <Box mb={4}>
+                            <Button onClick={onChartOpen} variant="secondary">
+                                Statistics
+                            </Button>
+
+                            {/* <H4>Statistics</H4>
+                            <Flex gap="6" mt={2} mb={4}>
+                                <Button onClick={onChartOpen}>Statistics</Button>
+                                <StatsCard
+                                    onClick={onChartOpen}
+                                    header="Delivered events"
+                                    value={'101'}
+                                />
+                                <StatsCard onClick={onChartOpen} header="Failed sent" value={'0'} />
+                            </Flex> */}
+                        </Box>
+                        <WebhooksTable />
+                    </>
+                )}
             </Overlay>
             <CreateWebhookModal isOpen={isOpen} onClose={onClose} />
+            <WebhookChartModal data={WebhooksStats} isOpen={isChartOpen} onClose={onChartClose} />
         </>
     );
 };

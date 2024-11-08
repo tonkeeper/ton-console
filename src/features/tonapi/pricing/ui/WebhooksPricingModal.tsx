@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { H4, UsdCurrencyAmount } from 'src/shared';
 import { observer } from 'mobx-react-lite';
-import { calculateExpectedPrice } from '../utils/calculating';
+import { WebhookTiers, calculateExpectedPrice } from '../utils/calculating';
 
 const PricingDiagram = () => {
     return (
@@ -37,7 +37,7 @@ const PricingDiagram = () => {
                         bg="#6C727E"
                         borderLeftRadius="md"
                     >
-                        $20
+                        ${WebhookTiers.accounts[0].price}
                     </Box>
                     <Box
                         flex="1"
@@ -47,7 +47,7 @@ const PricingDiagram = () => {
                         textAlign="center"
                         bg="#9EA4B0"
                     >
-                        $5
+                        ${WebhookTiers.accounts[1].price}
                     </Box>
                     <Box
                         flex="1"
@@ -59,7 +59,7 @@ const PricingDiagram = () => {
                         bgGradient="linear(to-r, #C6CCD8 50%, transparent 100%)"
                         borderRightRadius="md"
                     >
-                        $2
+                        ${WebhookTiers.accounts[2].price}
                     </Box>
                     <Text color="text.secondary" variant="body2">
                         million
@@ -87,7 +87,7 @@ const PricingDiagram = () => {
                         bg="#6C727E"
                         borderLeftRadius="md"
                     >
-                        $100
+                        ${WebhookTiers.messages[0].price}
                     </Box>
                     <Box
                         flex="1"
@@ -97,7 +97,7 @@ const PricingDiagram = () => {
                         textAlign="center"
                         bg="#9EA4B0"
                     >
-                        $20
+                        ${WebhookTiers.messages[1].price}
                     </Box>
                     <Box
                         flex="1"
@@ -108,7 +108,7 @@ const PricingDiagram = () => {
                         bgGradient="linear(to-r, #C6CCD8 50%, transparent 100%)"
                         borderRightRadius="md"
                     >
-                        $10
+                        ${WebhookTiers.messages[2].price}
                     </Box>
                     <Text color="text.secondary" variant="body2">
                         million

@@ -3,7 +3,7 @@ import { observer, useLocalObservable } from 'mobx-react-lite';
 import { FC } from 'react';
 import { EmptyPage } from 'src/entities';
 import { CNFTAddModal, CNFTTable, CNFTStore } from 'src/features';
-import { H4, Overlay } from 'src/shared';
+import { EXTERNAL_LINKS, H4, Overlay } from 'src/shared';
 
 const CnftPage: FC<BoxProps> = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
@@ -25,7 +25,7 @@ const CnftPage: FC<BoxProps> = () => {
                     title="Compressed NFTs"
                     mainButtonAction={onOpen}
                     mainButtonText="Add cNFT"
-                    guideButtonLink="https://docs.tonconsole.com/tonconsole/nft/cnft#cnft-indexing-service"
+                    guideButtonLink={EXTERNAL_LINKS.DOCUMENTATION_CNFT}
                 >
                     <Text textStyle="body2">
                         The cNFT Indexing Service allows you to add and index your cNFTs via the

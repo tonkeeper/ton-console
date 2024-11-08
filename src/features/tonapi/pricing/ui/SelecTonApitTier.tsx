@@ -21,7 +21,7 @@ import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 import { TonApiTier, tonApiTiersStore } from '../model';
 
-const SelectTierItem = observer<{
+const SelectTonApiTierItem = observer<{
     name: string;
     amount?: string;
     onSelect: () => void;
@@ -59,12 +59,12 @@ const SelectTierItem = observer<{
     );
 });
 
-interface SelectTierProps extends BoxProps {
+interface SelectTonApiTierProps extends BoxProps {
     onSelectTier: (value: TonApiTier | 'custom') => void;
     currentTier: TonApiTier | 'custom';
 }
 
-export const SelectTier: FC<SelectTierProps> = observer(
+export const SelectTonApiTier: FC<SelectTonApiTierProps> = observer(
     ({ onSelectTier, currentTier, ...props }) => {
         const chosedTier = tonApiTiersStore.selectedTier$.value;
 
@@ -84,7 +84,7 @@ export const SelectTier: FC<SelectTierProps> = observer(
                     </MenuButtonDefault>
                     <MenuList zIndex={100} w="316px">
                         {tonApiTiersStore.tiers$.value.map(tier => (
-                            <SelectTierItem
+                            <SelectTonApiTierItem
                                 key={tier.id}
                                 name={tier.name}
                                 amount={tier.price.stringCurrencyAmount}
@@ -92,7 +92,10 @@ export const SelectTier: FC<SelectTierProps> = observer(
                                 isCurrent={tier.id === chosedTier.id}
                             />
                         ))}
-                        <SelectTierItem name="Custom" onSelect={() => onSelectTier('custom')} />
+                        <SelectTonApiTierItem
+                            name="Custom"
+                            onSelect={() => onSelectTier('custom')}
+                        />
                     </MenuList>
                 </Menu>
             </Box>

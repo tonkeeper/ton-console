@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { ButtonLink, H3, Overlay } from 'src/shared';
-import { Box, Button, Flex, IconProps } from '@chakra-ui/react';
+import { Badge, Box, Button, Flex, IconProps } from '@chakra-ui/react';
 
 export const EmptyPage: FC<{
     Icon?: FC<IconProps>;
@@ -10,6 +10,7 @@ export const EmptyPage: FC<{
     guideButtonText?: string;
     mainButtonAction?: () => void;
     mainButtonText?: string;
+    isBeta?: boolean;
 }> = ({
     Icon,
     title,
@@ -17,12 +18,26 @@ export const EmptyPage: FC<{
     guideButtonLink,
     guideButtonText = 'Read Guide',
     mainButtonAction,
+    isBeta = false,
     mainButtonText = 'Contact Us'
 }) => {
     return (
         <Overlay pt="60px" display="flex" flexDirection="column" alignItems="center">
             {Icon && <Icon boxSize="40px" mb="5" />}
-            <H3 mb="4">{title}</H3>
+            <Flex align="center" gap={2} mb="4">
+                <H3>{title}</H3>
+
+                {isBeta && (
+                    <Badge
+                        textStyle="label3"
+                        color="accent.orange"
+                        fontFamily="body"
+                        bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
+                    >
+                        BETA
+                    </Badge>
+                )}
+            </Flex>
             <Box textStyle="body2" maxW="392px" mb="9" color="text.secondary">
                 {children}
             </Box>

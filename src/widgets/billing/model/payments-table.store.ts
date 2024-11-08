@@ -3,6 +3,7 @@ import {
     apiClient,
     createImmediateReaction,
     DTOCharge,
+    DTOLiteproxyTier,
     DTOServiceName,
     DTOStatsQueryType,
     Loadable,
@@ -19,6 +20,7 @@ import {
     tonApiTiersStore
 } from 'src/features';
 import BigNumber from 'bignumber.js';
+import { liteproxysStore } from 'src/features/tonapi/liteproxy';
 
 class PaymentsTableStore {
     charges$ = new Loadable<DTOCharge[]>([]);
@@ -31,8 +33,9 @@ class PaymentsTableStore {
         const tonapiTiers = tonApiTiersStore.tiers$.value;
         const appMessagesPackages = appMessagesStore.packages$.value;
         const tonRate = faucetStore.tonRate$.value;
+        const liteproxyTiers = liteproxysStore.liteproxyTiers$.value;
 
-        if (!tonapiTiers.length || !appMessagesPackages.length || !tonRate) {
+        if (!tonapiTiers.length || !appMessagesPackages.length || !tonRate || !liteproxyTiers) {
             return [];
         }
 
@@ -49,6 +52,10 @@ class PaymentsTableStore {
                         return mapChargeToAnalyticsPayment(charge);
                     case DTOServiceName.DTOCnft:
                         return mapChargeToCnftPayment(charge);
+                    case DTOServiceName.DTOLiteproxy:
+                        return mapChargeToLiteproxyPayment(charge, liteproxyTiers);
+                    case DTOServiceName.DTOStreaming:
+                        return mapChargeToStreamingPayment(charge);
                     default:
                         return null;
                 }
@@ -210,6 +217,39 @@ function mapChargeToCnftPayment(charge: DTOCharge): Payment {
     return {
         id: `cnft-${charge.id}`,
         name: `Indexing ${charge.cnft_count} item(s) of cNFT`,
+        date: new Date(charge.date_create),
+        amount: tonAmount,
+        amountUsdEquivalent: new UsdCurrencyAmount(
+            tonAmount.amount.multipliedBy(charge.exchange_rate)
+        )
+    };
+}
+
+function mapChargeToLiteproxyPayment(charge: DTOCharge, tiers: DTOLiteproxyTier[]): Payment | null {
+    const tier = tiers.find(item => item.id === Number(charge.tier_id));
+    if (!tier) {
+        return null;
+    }
+
+    const tonAmount = new TonCurrencyAmount(charge.amount);
+
+    return {
+        id: `liteproxy-${charge.id}`,
+        name: `Liteservers ${tier.name}`,
+        date: new Date(charge.date_create),
+        amount: tonAmount,
+        amountUsdEquivalent: new UsdCurrencyAmount(
+            tonAmount.amount.multipliedBy(charge.exchange_rate)
+        )
+    };
+}
+
+function mapChargeToStreamingPayment(charge: DTOCharge): Payment {
+    const tonAmount = new TonCurrencyAmount(charge.amount);
+
+    return {
+        id: `streaming-${charge.id}`,
+        name: 'Webhooks',
         date: new Date(charge.date_create),
         amount: tonAmount,
         amountUsdEquivalent: new UsdCurrencyAmount(

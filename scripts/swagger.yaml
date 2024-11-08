@@ -34,6 +34,8 @@ tags:
     description: 'Endpoints for Pro service management and operations.'
   - name: cnft_service
     description: 'Endpoints for cNFT service management and operations.'
+  - name: ton_sites_service
+    description: 'Endpoints for Ton Sites service management and operations.'
 
 paths:
   /ready:
@@ -146,6 +148,24 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/admin/sites:
+    get:
+      summary: "Private method: Get sites"
+      description: "Private method"
+      operationId: adminGetTonSites
+      tags:
+        - admin
+      responses:
+        '200':
+          $ref: '#/components/responses/TonSitesReduced'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -640,6 +660,7 @@ paths:
         - $ref: '#/components/parameters/queryEndDateRequired'
         - $ref: '#/components/parameters/queryStep'
         - $ref: '#/components/parameters/queryDetailed'
+        - $ref: '#/components/parameters/queryGrafanaDashboard'
       responses:
         '200':
           $ref: '#/components/responses/ProjectTonApiStats'
@@ -651,7 +672,119 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+  /api/v1/services/tonapi/liteproxy/private_keys:
+    get:
+      summary: "Get private keys for the liteproxy server"
+      operationId: adminGetLiteproxyPrivateKeys
+      tags:
+        - tonapi_service
+      parameters:
+        - $ref: '#/components/parameters/queryLiteproxyServer'
+      responses:
+        '200':
+          $ref: '#/components/responses/LiteproxyPrivateKeys'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/liteproxy/keys:
+    post:
+      summary: "Create liteproxy keys"
+      operationId: createLiteproxyKeys
+      tags:
+        - tonapi_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '201':
+          $ref: '#/components/responses/LiteproxyKeys'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    get:
+      summary: "Get keys for connecting to liteproxy servers"
+      operationId: getLiteproxyKeys
+      tags:
+        - tonapi_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/LiteproxyKeys'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/liteproxy/tiers:
+    get:
+      summary: "Get list of active tiers for the liteproxy server"
+      operationId: getLiteproxyTiers
+      tags:
+        - tonapi_service
+      responses:
+        '200':
+          $ref: '#/components/responses/LiteproxyTiers'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/liteproxy/tier:
+    get:
+      summary: "Get the current tier for liteproxy server"
+      operationId: getProjectLiteproxyTier
+      tags:
+        - tonapi_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProjectLiteproxyTier'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      summary: "Switch to a new tier for liteproxy server"
+      operationId: updateLiteproxyTier
+      tags:
+        - tonapi_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/NewTier"
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
   /api/v1/services/messages/packages:
     get:
       summary: "Get messages packages"
@@ -1018,6 +1151,7 @@ paths:
         - $ref: '#/components/parameters/queryLimit'
         - $ref: '#/components/parameters/queryStatsType'
         - $ref: '#/components/parameters/queryStatsIsRepetitive'
+        - $ref: '#/components/parameters/queryChain'
       responses:
         '200':
           $ref: '#/components/responses/StatsQueryHistory'
@@ -1845,6 +1979,183 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  
+  /api/v1/services/mintless/config:
+    get:
+      summary: "Get mintless jetton config"
+      operationId: getMintlessJettonConfig
+      tags:
+        - mintless_jetton_service
+      responses:
+        '200':
+          $ref: '#/components/responses/MintlessJettonConfig'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/mintless/paid:
+    get:
+      summary: "Get paid mintless jettons"
+      operationId: getPaidMintlessJettons
+      tags:
+        - mintless_jetton_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/MintlessJettons'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/mintless/{account}:
+    get:
+      summary: "Check if a mintless jetton exists"
+      operationId: checkExistsMintlessJetton
+      tags:
+        - mintless_jetton_service
+      parameters:
+        - $ref: '#/components/parameters/account'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
+  /api/v1/services/minter/owner/jettons:
+    get:
+      summary: "Get jettons by owner"
+      operationId: getJettonsByOwner
+      tags:
+        - minter_jetton_media
+      parameters:
+        - $ref: '#/components/parameters/queryAddress'
+      responses:
+        '200':
+          $ref: '#/components/responses/Accounts'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/minter/jetton/media:
+    post:
+      summary: "Upload jetton media"
+      operationId: uploadMinterJettonMedia
+      tags:
+        - minter_jetton_media
+      requestBody:
+        $ref: "#/components/requestBodies/JettonMedia"
+      responses:
+        '201':
+          $ref: '#/components/responses/URL'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  
+  /api/v1/services/sites:
+    post:
+      summary: "Create a Ton Site"
+      operationId: createTonSite
+      tags:
+        - ton_sites_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/NewTonSiteDomain"
+      responses:
+        '201':
+          $ref: '#/components/responses/TonSiteCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    get:
+      summary: "Get Ton Sites"
+      operationId: getTonSites
+      tags:
+        - ton_sites_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/TonSites'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/sites/{id}:
+    delete:
+      summary: "Delete the Ton Site"
+      operationId: deleteTonSite
+      tags:
+        - ton_sites_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+        - $ref: '#/components/parameters/siteID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/sites/{id}/endpoints:
+    post:
+      summary: "Add endpoints to the Ton Site"
+      operationId: updateTonSitesEndpoints
+      tags:
+        - ton_sites_service
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+        - $ref: '#/components/parameters/siteID'
+      requestBody:
+        $ref: "#/components/requestBodies/TonSiteEndpoints"
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
 components:
   securitySchemes:
@@ -1931,6 +2242,14 @@ components:
       schema:
         type: string
         example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+    siteID:
+      description: Site ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        example: "03cfc582"
     account:
       description: Account
       in: path
@@ -1947,6 +2266,14 @@ components:
       schema:
         type: integer
         format: uint32
+    queryLiteproxyServer:
+      description: Liteproxy server address
+      in: query
+      name: server
+      required: true
+      schema:
+        type: string
+        example: "1.2.3.4:123"
     queryChain:
       description: chain
       in: query
@@ -2095,6 +2422,15 @@ components:
       schema:
         type: boolean
         example: true
+    queryGrafanaDashboard:
+      in: query
+      name: dashboard
+      schema:
+        type: string
+        enum:
+          - tonapi_token
+          - tonapi_webhook
+        default: tonapi_token
     queryOnlyBetween:
       in: query
       name: only_between
@@ -2154,6 +2490,25 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ProServiceState'
+    NewTonSiteDomain:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - domain
+            properties:
+              domain:
+                type: string
+    TonSiteEndpoints:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: string
     ProjectTonApiTokenReq:
       description: "Data that is expected"
       content:
@@ -2412,9 +2767,10 @@ components:
         application/json:
           schema:
             type: object
-            required:
-              - repeat_interval
             properties:
+              name:
+                type: string
+                example: "test query"
               repeat_interval:
                 type: integer
                 format: int32
@@ -2433,6 +2789,9 @@ components:
                 type: integer
                 format: uint32
                 example: 1647024163
+              name:
+                type: string
+                example: "test query"
               query:
                 type: string
                 example: "select id from test"
@@ -2593,7 +2952,7 @@ components:
             properties:
               accounts:
                 type: array
-                maxItems: 500
+                maxItems: 1000
                 items:
                   type: string
                   example: "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
@@ -2630,6 +2989,14 @@ components:
         ok:
           type: boolean
           example: true
+    URL:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          example: "ipfs://bafybeifxdx73d2wlllucguvcejwecpdo4gudribllehw6te7pkjfgu5d4e"
     Error:
       type: object
       required:
@@ -3218,6 +3585,9 @@ components:
     StatsQuery:
       type: object
       properties:
+        name:
+          type: string
+          example: "test query"
         addresses:
           type: array
           items:
@@ -3247,6 +3617,9 @@ components:
         id:
           type: string
           example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+        name:
+          type: string
+          example: "test query"
         status:
           $ref: '#/components/schemas/StatsQueryStatus'
         query:
@@ -3335,6 +3708,8 @@ components:
         - testnet
         - pro
         - cnft
+        - liteproxy
+        - streaming
     ProServiceDashboardColumnID:
       type: string
       enum:
@@ -3353,6 +3728,14 @@ components:
         - "address"
         - "numeric_fiat"
         - "numeric_crypto"
+    MintlessJetton:
+      type: object
+      required:
+        - account
+      properties:
+        account:
+          type: string
+          example: "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
     CnftCollection:
       type: object
       required:
@@ -3383,6 +3766,50 @@ components:
         paid_indexing_count:
           type: integer
           format: uint32
+    TonSiteReduced:
+      type: object
+      required:
+        - endpoints
+        - adnl_address
+        - private_key
+      properties:
+        endpoints:
+          type: array
+          items:
+            type: string
+            example: "https://lucky.io"
+        adnl_address:
+          type: string
+          example: "2ccad26312767b03bfe1ed76f2c97daf8e3df957180fcab8db83614er3c528a9"
+        private_key:
+          type: string
+          example: "d16f3eed38db798914907071734923fd2d24c16be6dd560b19fe6297091e925d"
+    TonSite:
+      type: object
+      required:
+        - id
+        - domain
+        - endpoints
+        - adnl_address
+        - date_create
+      properties:
+        id:
+          type: string
+          example: "60ffb075"
+        domain:
+          type: string
+          example: "lucky.ton"
+        endpoints:
+          type: array
+          items:
+            type: string
+            example: "https://lucky.io"
+        adnl_address:
+          type: string
+        date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
     ProServiceInvoiceWebhook:
       type: object
       required:
@@ -3511,7 +3938,6 @@ components:
           type: integer
           format: int64
           example: 1690889913000
-
     InvoiceStatus:
       type: string
       example: "pending"
@@ -3531,7 +3957,6 @@ components:
       enum:
         - TON
         - USDT
-      default: TON
     InvoiceFieldOrder:
       type: string
       example: "id"
@@ -3645,6 +4070,99 @@ components:
         account:
           type: string
           example: "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
+    LiteproxyPrivateKey:
+      type: object
+      required:
+        - app_id
+        - rps
+        - private_key
+        - date_create
+      properties:
+        app_id:
+          type: integer
+          format: uint32
+        rps:
+          type: number
+          example: 10.0
+        private_key:
+          type: string
+          example: "da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
+        date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
+    LiteproxyKey:
+      type: object
+      required:
+        - server
+        - rps
+        - public_key
+        - date_create
+      properties:
+        server:
+          type: string
+          example: "11.111.111.111:5050"
+        rps:
+          type: number
+          example: 10.0
+        public_key:
+          type: string
+          example: "da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
+        date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
+    LiteproxyTier:
+      type: object
+      required:
+        - id
+        - name
+        - usd_price
+        - rps
+      properties:
+        id:
+          type: integer
+          format: uint32
+          example: 1
+        name:
+          type: string
+          example: "Test"
+        usd_price:
+          type: number
+          example: 10.0
+        rps:
+          type: number
+          example: 10.0
+    ProjectLiteproxyTierDetail:
+      type: object
+      required:
+        - id
+        - name
+        - rps
+        - usd_price
+        - date_create
+      properties:
+        id:
+          type: integer
+          format: uint32
+          example: 1
+        name:
+          type: string
+          example: "Test tier"
+        rps:
+          type: number
+          example: 5
+        usd_price:
+          type: number
+          example: 100
+        next_payment:
+          type: integer
+          format: int64
+          example: 1690889913000
+        date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
 
   responses:
     NotFound:
@@ -3711,6 +4229,12 @@ components:
               code:
                 type: integer
                 description: "backend error code"
+    URL:
+      description: "URL"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/URL'
     Ok:
       description: "Ok"
       content:
@@ -3804,6 +4328,56 @@ components:
               stats:
                 additionalProperties: true
                 example: { }
+    LiteproxyPrivateKeys:
+      description: "Private keys for the liteproxy server"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - keys
+            properties:
+              keys:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LiteproxyPrivateKey'
+    LiteproxyKeys:
+      description: "Keys for connecting to liteproxy servers"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - keys
+            properties:
+              keys:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LiteproxyKey'
+    LiteproxyTiers:
+      description: "Active tiers for the liteproxy server"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - tiers
+            properties:
+              tiers:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LiteproxyTier'
+    ProjectLiteproxyTier:
+      description: "Active the project tier for the liteproxy server"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - tier
+            properties:
+              tier:
+                $ref: '#/components/schemas/ProjectLiteproxyTierDetail'
     StatsDashboard:
       description: "Dashboard"
       content:
@@ -3901,6 +4475,8 @@ components:
           $ref: "#/components/headers/accessControlAllowOrigin"
         Access-Control-Allow-Headers:
           $ref: "#/components/headers/accessControlAllowHeaders"
+        Set-Cookie:
+          $ref: "#/components/headers/setCookie"
       content:
         application/json:
           schema:
@@ -4465,6 +5041,32 @@ components:
           schema:
             type: string
             format: binary
+    MintlessJettonConfig:
+      description: "Mintless Jetton config"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - price_per_jetton
+            properties:
+              price_per_jetton:
+                type: integer
+                format: uint64
+                example: 100000000
+    MintlessJettons:
+      description: "Mintless Jettons"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - jettons
+            properties:
+              jettons:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MintlessJetton'
     CnftCollectionInfo:
       description: "Compress NFT collection"
       content:
@@ -4497,6 +5099,30 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/CnftCollection'
+    TonSites:
+      description: "Ton Sites"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - items
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TonSite'
+    TonSiteCreated:
+      description: "Created Ton Site"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - site
+            properties:
+              site:
+                $ref: '#/components/schemas/TonSite'
     ProServiceInvoice:
       description: "Invoice"
       headers:
@@ -4523,7 +5149,19 @@ components:
             properties:
               user:
                 $ref: '#/components/schemas/User'
-
+    TonSitesReduced:
+      description: "Ton Sites reduced"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - items
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TonSiteReduced'
     Accounts:
       description: "Accounts"
       content:

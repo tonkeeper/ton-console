@@ -145,9 +145,7 @@ const TonApiPricingModal: FC<{
                                 <Td minW={235}>Price</Td>
                                 {tiers.map(({ id, price }) => (
                                     <Td key={id}>
-                                        <Text textStyle="body2" color="text.secondary">
-                                            {price}
-                                        </Text>
+                                        <Text textStyle="body2">{price}</Text>
                                     </Td>
                                 ))}
                             </Tr>

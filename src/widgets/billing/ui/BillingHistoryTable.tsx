@@ -1,5 +1,5 @@
-import { ComponentProps, FunctionComponent } from 'react';
-import { Box } from '@chakra-ui/react';
+import { FC } from 'react';
+import { Box, BoxProps } from '@chakra-ui/react';
 import { Observer, observer } from 'mobx-react-lite';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -9,7 +9,7 @@ import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 import { billingStore } from '../model';
 import BillingTableRow from './BillingTableRow';
 
-const BillingHistoryTable: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const BillingHistoryTable: FC<BoxProps> = props => {
     const rowHeight = '48px';
 
     const minH = billingStore.isResolved

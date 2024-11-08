@@ -14,6 +14,11 @@ export interface DTOOk {
     ok: boolean;
 }
 
+export interface DTO_URL {
+    /** @example "ipfs://bafybeifxdx73d2wlllucguvcejwecpdo4gudribllehw6te7pkjfgu5d4e" */
+    url: string;
+}
+
 export interface DTOError {
     /** Error message */
     error: string;
@@ -426,6 +431,8 @@ export enum DTOStatsQueryStatus {
 }
 
 export interface DTOStatsQuery {
+    /** @example "test query" */
+    name?: string;
     addresses?: string[];
     /** @example false */
     only_between?: boolean;
@@ -444,6 +451,8 @@ export interface DTOStatsQuery {
 export interface DTOStatsQueryResult {
     /** @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b" */
     id: string;
+    /** @example "test query" */
+    name?: string;
     status: DTOStatsQueryStatus;
     query?: DTOStatsQuery;
     type?: DTOStatsQueryType;
@@ -518,7 +527,9 @@ export enum DTOServiceName {
     DTOTonapi = 'tonapi',
     DTOTestnet = 'testnet',
     DTOPro = 'pro',
-    DTOCnft = 'cnft'
+    DTOCnft = 'cnft',
+    DTOLiteproxy = 'liteproxy',
+    DTOStreaming = 'streaming'
 }
 
 export enum DTOProServiceDashboardColumnID {
@@ -539,6 +550,11 @@ export enum DTOProServiceDashboardColumnType {
     DTONumericCrypto = 'numeric_crypto'
 }
 
+export interface DTOMintlessJetton {
+    /** @example "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
+    account: string;
+}
+
 export interface DTOCnftCollection {
     /** @example "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
     account: string;
@@ -554,6 +570,28 @@ export interface DTOCnftCollection {
     minted_count: number;
     /** @format uint32 */
     paid_indexing_count: number;
+}
+
+export interface DTOTonSiteReduced {
+    endpoints: string[];
+    /** @example "2ccad26312767b03bfe1ed76f2c97daf8e3df957180fcab8db83614er3c528a9" */
+    adnl_address: string;
+    /** @example "d16f3eed38db798914907071734923fd2d24c16be6dd560b19fe6297091e925d" */
+    private_key: string;
+}
+
+export interface DTOTonSite {
+    /** @example "60ffb075" */
+    id: string;
+    /** @example "lucky.ton" */
+    domain: string;
+    endpoints: string[];
+    adnl_address: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
 }
 
 export interface DTOProServiceInvoiceWebhook {
@@ -660,7 +698,6 @@ export enum DTOChain {
     DTOTestnet = 'testnet'
 }
 
-/** @default "TON" */
 export enum DTOCryptoCurrency {
     DTO_TON = 'TON',
     DTO_USDT = 'USDT'
@@ -735,6 +772,72 @@ export interface DTOAccount {
     account: string;
 }
 
+export interface DTOLiteproxyPrivateKey {
+    /** @format uint32 */
+    app_id: number;
+    /** @example 10 */
+    rps: number;
+    /** @example "da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
+    private_key: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
+}
+
+export interface DTOLiteproxyKey {
+    /** @example "11.111.111.111:5050" */
+    server: string;
+    /** @example 10 */
+    rps: number;
+    /** @example "da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf" */
+    public_key: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
+}
+
+export interface DTOLiteproxyTier {
+    /**
+     * @format uint32
+     * @example 1
+     */
+    id: number;
+    /** @example "Test" */
+    name: string;
+    /** @example 10 */
+    usd_price: number;
+    /** @example 10 */
+    rps: number;
+}
+
+export interface DTOProjectLiteproxyTierDetail {
+    /**
+     * @format uint32
+     * @example 1
+     */
+    id: number;
+    /** @example "Test tier" */
+    name: string;
+    /** @example 5 */
+    rps: number;
+    /** @example 100 */
+    usd_price: number;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    next_payment?: number;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
+}
+
 /** backend error code */
 export enum DTOErrorCodeEnum {
     DTOValue1 = 1,
@@ -755,6 +858,12 @@ export enum DTOParticipantPermissionsEnum {
 export enum DTOProjectCapabilitiesEnum {
     DTOInvoices = 'invoices',
     DTOStats = 'stats'
+}
+
+/** @default "tonapi_token" */
+export enum DTOGetProjectTonApiStatsParamsDashboardEnum {
+    DTOTonapiToken = 'tonapi_token',
+    DTOTonapiWebhook = 'tonapi_webhook'
 }
 
 /**
@@ -1158,6 +1267,31 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/v1/admin/messages/charge`,
                 method: 'POST',
                 body: data,
+                ...params
+            }),
+
+        /**
+         * @description Private method
+         *
+         * @tags admin
+         * @name AdminGetTonSites
+         * @summary Private method: Get sites
+         * @request GET:/api/v1/admin/sites
+         */
+        adminGetTonSites: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    items: DTOTonSiteReduced[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/admin/sites`,
+                method: 'GET',
                 ...params
             }),
 
@@ -1943,6 +2077,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @example true
                  */
                 detailed?: boolean;
+                /** @default "tonapi_token" */
+                dashboard?: DTOGetProjectTonApiStatsParamsDashboardEnum;
             },
             params: RequestParams = {}
         ) =>
@@ -1961,6 +2097,212 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/v1/services/tonapi/stats`,
                 method: 'GET',
                 query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags tonapi_service
+         * @name AdminGetLiteproxyPrivateKeys
+         * @summary Get private keys for the liteproxy server
+         * @request GET:/api/v1/services/tonapi/liteproxy/private_keys
+         */
+        adminGetLiteproxyPrivateKeys: (
+            query: {
+                /**
+                 * Liteproxy server address
+                 * @example "1.2.3.4:123"
+                 */
+                server: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    keys: DTOLiteproxyPrivateKey[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/tonapi/liteproxy/private_keys`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags tonapi_service
+         * @name CreateLiteproxyKeys
+         * @summary Create liteproxy keys
+         * @request POST:/api/v1/services/tonapi/liteproxy/keys
+         */
+        createLiteproxyKeys: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    keys: DTOLiteproxyKey[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/tonapi/liteproxy/keys`,
+                method: 'POST',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags tonapi_service
+         * @name GetLiteproxyKeys
+         * @summary Get keys for connecting to liteproxy servers
+         * @request GET:/api/v1/services/tonapi/liteproxy/keys
+         */
+        getLiteproxyKeys: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    keys: DTOLiteproxyKey[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/tonapi/liteproxy/keys`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags tonapi_service
+         * @name GetLiteproxyTiers
+         * @summary Get list of active tiers for the liteproxy server
+         * @request GET:/api/v1/services/tonapi/liteproxy/tiers
+         */
+        getLiteproxyTiers: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    tiers: DTOLiteproxyTier[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/tonapi/liteproxy/tiers`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags tonapi_service
+         * @name GetProjectLiteproxyTier
+         * @summary Get the current tier for liteproxy server
+         * @request GET:/api/v1/services/tonapi/liteproxy/tier
+         */
+        getProjectLiteproxyTier: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    tier: DTOProjectLiteproxyTierDetail;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/tonapi/liteproxy/tier`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags tonapi_service
+         * @name UpdateLiteproxyTier
+         * @summary Switch to a new tier for liteproxy server
+         * @request PATCH:/api/v1/services/tonapi/liteproxy/tier
+         */
+        updateLiteproxyTier: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: {
+                /**
+                 * @format uint32
+                 * @example 1
+                 */
+                tier_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/tonapi/liteproxy/tier`,
+                method: 'PATCH',
+                query: query,
+                body: data,
                 ...params
             }),
 
@@ -2524,6 +2866,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @example 1647024163
                  */
                 project_id: number;
+                /** @example "test query" */
+                name?: string;
                 /** @example "select id from test" */
                 query?: string;
                 /** @example "give me random id from accounts table" */
@@ -2572,6 +2916,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                  * @example 1647024163
                  */
                 project_id: number;
+                /** @example "test query" */
+                name?: string;
                 /** @example "select id from test" */
                 query?: string;
                 /** @example "give me random id from accounts table" */
@@ -2646,12 +2992,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 project_id: number;
             },
             data: {
+                /** @example "test query" */
+                name?: string;
                 /**
                  * cyclic execution of requests
                  * @format int32
                  * @example 10
                  */
-                repeat_interval: number;
+                repeat_interval?: number;
             },
             params: RequestParams = {}
         ) =>
@@ -2699,6 +3047,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 limit?: number;
                 type?: DTOStatsQueryType[];
                 is_repetitive?: boolean;
+                /** chain */
+                chain?: DTOChain;
             },
             params: RequestParams = {}
         ) =>
@@ -4015,7 +4365,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          */
         proServiceDashboardData: (
             data: {
-                /** @maxItems 500 */
+                /** @maxItems 1000 */
                 accounts: string[];
                 columns: string[];
             },
@@ -4244,6 +4594,303 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/v1/services/cnft/paid`,
                 method: 'GET',
                 query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags mintless_jetton_service
+         * @name GetMintlessJettonConfig
+         * @summary Get mintless jetton config
+         * @request GET:/api/v1/services/mintless/config
+         */
+        getMintlessJettonConfig: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    /**
+                     * @format uint64
+                     * @example 100000000
+                     */
+                    price_per_jetton: number;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/mintless/config`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags mintless_jetton_service
+         * @name GetPaidMintlessJettons
+         * @summary Get paid mintless jettons
+         * @request GET:/api/v1/services/mintless/paid
+         */
+        getPaidMintlessJettons: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    jettons: DTOMintlessJetton[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/mintless/paid`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags mintless_jetton_service
+         * @name CheckExistsMintlessJetton
+         * @summary Check if a mintless jetton exists
+         * @request GET:/api/v1/services/mintless/{account}
+         */
+        checkExistsMintlessJetton: (account: string, params: RequestParams = {}) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/mintless/${account}`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags minter_jetton_media
+         * @name GetJettonsByOwner
+         * @summary Get jettons by owner
+         * @request GET:/api/v1/services/minter/owner/jettons
+         */
+        getJettonsByOwner: (
+            query: {
+                /**
+                 * Address
+                 * @example "EQ..fz"
+                 */
+                address: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: DTOAccount[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/minter/owner/jettons`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags minter_jetton_media
+         * @name UploadMinterJettonMedia
+         * @summary Upload jetton media
+         * @request POST:/api/v1/services/minter/jetton/media
+         */
+        uploadMinterJettonMedia: (
+            data: {
+                /** @format binary */
+                media: File;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTO_URL,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/minter/jetton/media`,
+                method: 'POST',
+                body: data,
+                type: ContentType.FormData,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ton_sites_service
+         * @name CreateTonSite
+         * @summary Create a Ton Site
+         * @request POST:/api/v1/services/sites
+         */
+        createTonSite: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: {
+                domain: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    site: DTOTonSite;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/sites`,
+                method: 'POST',
+                query: query,
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ton_sites_service
+         * @name GetTonSites
+         * @summary Get Ton Sites
+         * @request GET:/api/v1/services/sites
+         */
+        getTonSites: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    items: DTOTonSite[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/sites`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ton_sites_service
+         * @name DeleteTonSite
+         * @summary Delete the Ton Site
+         * @request DELETE:/api/v1/services/sites/{id}
+         */
+        deleteTonSite: (
+            id: string,
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/sites/${id}`,
+                method: 'DELETE',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ton_sites_service
+         * @name UpdateTonSitesEndpoints
+         * @summary Add endpoints to the Ton Site
+         * @request POST:/api/v1/services/sites/{id}/endpoints
+         */
+        updateTonSitesEndpoints: (
+            id: string,
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: string[],
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/sites/${id}/endpoints`,
+                method: 'POST',
+                query: query,
+                body: data,
                 ...params
             })
     };
