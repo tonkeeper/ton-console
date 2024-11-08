@@ -10,14 +10,14 @@ interface WebhooksPricingTiers {
 
 export const WebhookTiers: WebhooksPricingTiers = {
     accounts: [
-        { limit: 1_000_000, price: 20 },
-        { limit: 10_000_000, price: 5 },
-        { limit: Infinity, price: 2 }
+        { limit: 1_000_000, price: 60 },
+        { limit: 10_000_000, price: 15 },
+        { limit: Infinity, price: 6 }
     ],
     messages: [
-        { limit: 1_000_000, price: 100 },
-        { limit: 10_000_000, price: 20 },
-        { limit: Infinity, price: 10 }
+        { limit: 1_000_000, price: 300 },
+        { limit: 10_000_000, price: 60 },
+        { limit: Infinity, price: 30 }
     ]
 };
 

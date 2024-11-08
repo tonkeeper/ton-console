@@ -14,7 +14,6 @@ import {
     Link,
     Box
 } from '@chakra-ui/react';
-import { StatsCard } from 'src/entities/stats/Card';
 import WebhookChartModal from './ChatrWebhooks';
 
 const WebhooksPage: FC = () => {
@@ -73,15 +72,20 @@ const WebhooksPage: FC = () => {
                 ) : (
                     <>
                         <Box mb={4}>
-                            <H4>Statistics</H4>
+                            <Button onClick={onChartOpen} variant="secondary">
+                                Statistics
+                            </Button>
+
+                            {/* <H4>Statistics</H4>
                             <Flex gap="6" mt={2} mb={4}>
+                                <Button onClick={onChartOpen}>Statistics</Button>
                                 <StatsCard
                                     onClick={onChartOpen}
                                     header="Delivered events"
                                     value={'101'}
                                 />
                                 <StatsCard onClick={onChartOpen} header="Failed sent" value={'0'} />
-                            </Flex>
+                            </Flex> */}
                         </Box>
                         <WebhooksTable />
                     </>
