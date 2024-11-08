@@ -28,6 +28,7 @@ import { liteproxysStore } from '../../liteproxy';
 // import { LiteserversTierCard } from './LiteserversTierCard';
 import LiteserversPaymentDetailsModal from './LiteserversPaymentDetailsModal';
 import LiteserversPricingModal from './LiteserversPricingModal';
+import { webhooksStore } from '../../webhooks';
 
 const TonApiTiers: FC = () => {
     const storeSelectedTonApiTier = tonApiTiersStore.selectedTier$.value;
@@ -138,6 +139,8 @@ const TonApiTiers: FC = () => {
 
     // const liteserversExists = liteproxysStore.liteproxyList$.value.length > 0;
 
+    const isEmptyWebhooks = webhooksStore.webhooks$.value.length === 0;
+
     return (
         <>
             <Flex align="center" justify="space-between" mb="4">
@@ -174,7 +177,10 @@ const TonApiTiers: FC = () => {
             </Flex>
             <Box>
                 <Text textStyle="body2" mb="4" color="text.secondary">
-                    The service is currently not in use. To use it, go to the{' '}
+                    {isEmptyWebhooks
+                        ? 'The service is currently not in use'
+                        : 'The service is currently active.'}
+                    . To use it, go to the{' '}
                     <Link as={RouterLink} color="accent.blue" to="../webhooks">
                         Webhooks
                     </Link>{' '}
