@@ -59,94 +59,98 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
 
     return (
         <Flex direction="column" {...props}>
-            <Flex align="center" h="8" mb="3">
-                <Span textStyle="label1">Query Results</Span>
+            <Flex align="center" gap="2" h="8">
+                <Span textStyle="label1" minW="110px">
+                    Query Results
+                </Span>
                 {query?.status === 'executing' && (
                     <AnalyticsQueryResultsCountdown query={toJS(query)} ml="2" />
                 )}
                 {query && isAnalyticsQuerySuccessful(query) && (
-                    <Flex align="center" justify="space-between" flex="1" pl="3">
+                    // <Flex align="center" justify="space-between" flex="1" pl="3">
+                    // <Flex gap="2" ml="auto" align="center">
+                    <>
                         {!query.preview.isAllDataPresented && (
-                            <Span mr="3" color="text.secondary" textStyle="body2">
+                            <Span
+                                mr="auto"
+                                color="text.secondary"
+                                textStyle="body2"
+                                textOverflow="ellipsis"
+                                overflow="hidden"
+                                whiteSpace="nowrap"
+                            >
                                 The first {query.preview.data.length} lines are shown; download the
                                 rest for the full results
                             </Span>
                         )}
-                        <Flex gap="2" ml="auto">
-                            <Menu placement="bottom">
-                                <MenuButtonDefault
-                                    pl="3"
-                                    size="sm"
-                                    leftIcon={<PlusIcon16 color="icon.primary" />}
-                                    rightIcon={<ArrowIcon color="icon.primary" />}
+                        <Menu placement="bottom">
+                            <MenuButtonDefault
+                                pl="3"
+                                size="sm"
+                                minW="185px"
+                                leftIcon={<PlusIcon16 color="icon.primary" />}
+                                rightIcon={<ArrowIcon color="icon.primary" />}
+                            >
+                                Add Visualisation
+                            </MenuButtonDefault>
+                            <MenuList w="200px">
+                                <MenuItem
+                                    isDisabled={charts.some(c => c.type === 'bar')}
+                                    onClick={() => analyticsQueryStore.addChart({ type: 'bar' })}
                                 >
-                                    Add Visualisation
-                                </MenuButtonDefault>
-                                <MenuList w="200px">
-                                    <MenuItem
-                                        isDisabled={charts.some(c => c.type === 'bar')}
-                                        onClick={() =>
-                                            analyticsQueryStore.addChart({ type: 'bar' })
-                                        }
-                                    >
-                                        <ChartBarIcon24 mr="2" />
-                                        Bar Chart
-                                    </MenuItem>
-                                    <MenuItem
-                                        isDisabled={charts.some(c => c.type === 'area')}
-                                        onClick={() =>
-                                            analyticsQueryStore.addChart({ type: 'area' })
-                                        }
-                                    >
-                                        <ChartAreaIcon24 mr="2" />
-                                        Area Chart
-                                    </MenuItem>
-                                    <MenuItem
-                                        isDisabled={charts.some(c => c.type === 'line')}
-                                        onClick={() =>
-                                            analyticsQueryStore.addChart({ type: 'line' })
-                                        }
-                                    >
-                                        <ChartLineIcon24 mr="2" />
-                                        Line Chart
-                                    </MenuItem>
-                                    <MenuItem
-                                        isDisabled={charts.some(c => c.type === 'pie')}
-                                        onClick={() =>
-                                            analyticsQueryStore.addChart({ type: 'pie' })
-                                        }
-                                    >
-                                        <ChartPieIcon24 mr="2" />
-                                        Pie Chart
-                                    </MenuItem>
-                                </MenuList>
-                            </Menu>
-                            <Button
-                                isLoading={analyticsQueryStore.isQueryIntervalUpdateLoading}
-                                leftIcon={<RefreshIcon16 color="icon.primary" />}
-                                onClick={onOpen}
-                                size="sm"
-                                variant="secondary"
-                            >
-                                Repeat Request
-                                {!!query.repeatFrequencyMs && (
-                                    <Span color="text.secondary">
-                                        &nbsp;·&nbsp;{repeatInterval}
-                                    </Span>
-                                )}
-                            </Button>
-                            <ButtonLink
-                                leftIcon={<DownloadIcon16 />}
-                                size="sm"
-                                variant="secondary"
-                                href={query.csvUrl}
-                                isExternal
-                                download="customers.csv"
-                            >
-                                Download CSV
-                            </ButtonLink>
-                        </Flex>
-                    </Flex>
+                                    <ChartBarIcon24 mr="2" />
+                                    Bar Chart
+                                </MenuItem>
+                                <MenuItem
+                                    isDisabled={charts.some(c => c.type === 'area')}
+                                    onClick={() => analyticsQueryStore.addChart({ type: 'area' })}
+                                >
+                                    <ChartAreaIcon24 mr="2" />
+                                    Area Chart
+                                </MenuItem>
+                                <MenuItem
+                                    isDisabled={charts.some(c => c.type === 'line')}
+                                    onClick={() => analyticsQueryStore.addChart({ type: 'line' })}
+                                >
+                                    <ChartLineIcon24 mr="2" />
+                                    Line Chart
+                                </MenuItem>
+                                <MenuItem
+                                    isDisabled={charts.some(c => c.type === 'pie')}
+                                    onClick={() => analyticsQueryStore.addChart({ type: 'pie' })}
+                                >
+                                    <ChartPieIcon24 mr="2" />
+                                    Pie Chart
+                                </MenuItem>
+                            </MenuList>
+                        </Menu>
+                        <Button
+                            minW="150px"
+                            isLoading={analyticsQueryStore.isQueryIntervalUpdateLoading}
+                            leftIcon={<RefreshIcon16 color="icon.primary" />}
+                            onClick={onOpen}
+                            size="sm"
+                            variant="secondary"
+                        >
+                            Repeat Request
+                            {!!query.repeatFrequencyMs && (
+                                <Span color="text.secondary">&nbsp;·&nbsp;{repeatInterval}</Span>
+                            )}
+                        </Button>
+                        <ButtonLink
+                            leftIcon={<DownloadIcon16 />}
+                            size="sm"
+                            variant="secondary"
+                            href={query.csvUrl}
+                            isExternal
+                            minW="150px"
+                            download="customers.csv"
+                        >
+                            Download CSV
+                        </ButtonLink>
+                        {/* </Flex> */}
+                        {/* </Flex> */}
+                    </>
                 )}
             </Flex>
             {analyticsQueryStore.chartsDatasource$.isLoading ? (

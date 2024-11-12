@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext } from 'react';
+import { FC, useContext, CSSProperties } from 'react';
 import { Box, Button, Center, Flex, Spinner, Td, Tr, useConst } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import {
@@ -25,9 +25,7 @@ import { Link } from 'react-router-dom';
 import { formatRepeatInterval } from '../utils';
 import { TestnetBadge } from 'src/features/analytics/ui/history/TestnetBadge';
 
-const LoadingRow: FunctionComponent<{ style: React.CSSProperties }> = ({
-    style: { top, ...style }
-}) => {
+const LoadingRow: FC<{ style: React.CSSProperties }> = ({ style: { top, ...style } }) => {
     const { rowHeight } = useContext(AnalyticsHistoryTableContext);
     return (
         <Tr
@@ -45,9 +43,9 @@ const LoadingRow: FunctionComponent<{ style: React.CSSProperties }> = ({
     );
 };
 
-const ItemRow: FunctionComponent<{
+const ItemRow: FC<{
     query: AnalyticsQuery | AnalyticsRepeatingQueryAggregated | AnalyticsGraphQuery;
-    style: React.CSSProperties;
+    style: CSSProperties;
 }> = observer(({ query: q, style }) => {
     const renderTime = useConst(Date.now());
 
@@ -90,7 +88,7 @@ const ItemRow: FunctionComponent<{
             >
                 <Td
                     alignContent="center"
-                    minW="246px"
+                    minW="176px"
                     h={rowHeight}
                     maxH={rowHeight}
                     borderLeft="1px"
@@ -197,7 +195,7 @@ const ItemRow: FunctionComponent<{
                                     </Span>
                                 </>
                             ) : (
-                                query.gptPrompt || query.request
+                                query.name || query.gptPrompt || query.request
                             )}
                         </Box>
                         {query.type !== 'graph' && query.network === 'testnet' && (
@@ -225,7 +223,7 @@ const ItemRow: FunctionComponent<{
     );
 });
 
-const AnalyticsHistoryTableRow: FunctionComponent<{
+const AnalyticsHistoryTableRow: FC<{
     index: number;
     style: React.CSSProperties;
 }> = ({ index, style }) => {
