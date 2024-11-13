@@ -1,6 +1,7 @@
-import { ComponentProps, FunctionComponent, useCallback } from 'react';
+import { ComponentProps, FC, useCallback } from 'react';
 import {
     Box,
+    BoxProps,
     Button,
     Center,
     Flex,
@@ -9,7 +10,9 @@ import {
     Menu,
     MenuItem,
     MenuList,
+    Spacer,
     Spinner,
+    Text,
     useDisclosure
 } from '@chakra-ui/react';
 import {
@@ -24,7 +27,8 @@ import {
     ChartAreaIcon24,
     ChartBarIcon24,
     ChartLineIcon24,
-    ChartPieIcon24
+    ChartPieIcon24,
+    TooltipHoverable
 } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { analyticsQueryStore, isAnalyticsQuerySuccessful } from '../../model';
@@ -34,6 +38,7 @@ import { AnalyticsTable } from './AnalyticsQueryResultsTable';
 import RepeatRequestModal from './RepeatRequestModal';
 import { formatRepeatInterval } from '../utils';
 import { AreaChartCard, BarChartCard, LineChartCard, PieChartCard } from './charts';
+import { EditNameControl } from './AnalyticsQueryName';
 
 const ChartsCards = {
     area: AreaChartCard,
@@ -42,7 +47,7 @@ const ChartsCards = {
     pie: PieChartCard
 };
 
-const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const AnalyticsQueryResults: FC<BoxProps> = props => {
     const query = analyticsQueryStore.query$.value;
     const { isOpen, onClose, onOpen } = useDisclosure();
 
@@ -53,26 +58,49 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
     }, [query?.status]);
     useIntervalUpdate(callback, 1000);
 
-    const repeatInterval = formatRepeatInterval(query?.repeatFrequencyMs);
+    const handleChageName = (name: string) => {
+        analyticsQueryStore.setNameForQuery(name);
+    };
 
+    const repeatInterval = formatRepeatInterval(query?.repeatFrequencyMs);
     const charts = query?.status === 'success' ? query.charts : [];
+    const isExecuting = query?.status === 'executing';
 
     return (
         <Flex direction="column" {...props}>
+            {query && (
+                <Flex align="center" gap="2" h="8">
+                    <Text textStyle="label2" fontSize="16px">
+                        Name:
+                    </Text>
+                    <EditNameControl onChangeName={handleChageName} defaultName={query.name} />
+                </Flex>
+            )}
             <Flex align="center" gap="2" h="8">
                 <Span textStyle="label1" minW="110px">
                     Query Results
                 </Span>
-                {query?.status === 'executing' && (
-                    <AnalyticsQueryResultsCountdown query={toJS(query)} ml="2" />
-                )}
-                {query && isAnalyticsQuerySuccessful(query) && (
-                    // <Flex align="center" justify="space-between" flex="1" pl="3">
-                    // <Flex gap="2" ml="auto" align="center">
-                    <>
-                        {!query.preview.isAllDataPresented && (
+                {isExecuting && <AnalyticsQueryResultsCountdown query={toJS(query)} />}
+                {query &&
+                    isAnalyticsQuerySuccessful(query) &&
+                    !query.preview.isAllDataPresented && (
+                        <TooltipHoverable
+                            canBeShown={true}
+                            placement="bottom"
+                            host={
+                                <Span
+                                    color="text.secondary"
+                                    textStyle="body2"
+                                    textOverflow="ellipsis"
+                                    overflow="hidden"
+                                    whiteSpace="nowrap"
+                                >
+                                    The first {query.preview.data.length} lines are shown; download
+                                    the rest for the full results
+                                </Span>
+                            }
+                        >
                             <Span
-                                mr="auto"
                                 color="text.secondary"
                                 textStyle="body2"
                                 textOverflow="ellipsis"
@@ -82,7 +110,11 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
                                 The first {query.preview.data.length} lines are shown; download the
                                 rest for the full results
                             </Span>
-                        )}
+                        </TooltipHoverable>
+                    )}
+                <Spacer mr="auto" />
+                {query && isAnalyticsQuerySuccessful(query) && (
+                    <>
                         <Menu placement="bottom">
                             <MenuButtonDefault
                                 pl="3"
@@ -148,8 +180,6 @@ const AnalyticsQueryResults: FunctionComponent<ComponentProps<typeof Box>> = pro
                         >
                             Download CSV
                         </ButtonLink>
-                        {/* </Flex> */}
-                        {/* </Flex> */}
                     </>
                 )}
             </Flex>

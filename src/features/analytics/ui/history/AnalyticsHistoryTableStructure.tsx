@@ -124,7 +124,7 @@ export const AnalyticsHistoryTableStructure = observer(
                                 bg="background.contentTint"
                                 boxSizing="content-box"
                             >
-                                Name
+                                Name / Request
                             </Th>
                             <Th
                                 pos="relative"

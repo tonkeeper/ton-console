@@ -195,7 +195,19 @@ const ItemRow: FC<{
                                     </Span>
                                 </>
                             ) : (
-                                query.name || query.gptPrompt || query.request
+                                <TooltipHoverable
+                                    canBeShown={true}
+                                    placement="top"
+                                    host={
+                                        <Span cursor="default">
+                                            {query.name || query.gptPrompt || query.request}
+                                        </Span>
+                                    }
+                                >
+                                    <Span color="text.primary" overflow="auto">
+                                        <pre>{query.request}</pre>
+                                    </Span>
+                                </TooltipHoverable>
                             )}
                         </Box>
                         {query.type !== 'graph' && query.network === 'testnet' && (
