@@ -43,18 +43,16 @@ const LoadingRow: FC<{ style: React.CSSProperties }> = ({ style: { top, ...style
     );
 };
 
-const ItemRow: FC<{
-    query: AnalyticsQuery | AnalyticsRepeatingQueryAggregated | AnalyticsGraphQuery;
-    style: CSSProperties;
-}> = observer(({ query: q, style }) => {
+const DurationValueCell: FC<{
+    query: AnalyticsQuery | AnalyticsGraphQuery | AnalyticsRepeatingQueryAggregated;
+}> = ({ query: q }) => {
     const renderTime = useConst(Date.now());
 
-    const { rowHeight } = useContext(AnalyticsHistoryTableContext);
-
     const isAggregated = isAnalyticsRepeatingQueryAggregated(q);
-    const isCurrentlyRepeating = isAggregated && q.repeatFrequencyMs;
 
     const query = isAggregated ? q.lastQuery : q;
+
+    const isCurrentlyRepeating = isAggregated && q.repeatFrequencyMs;
 
     const passedSeconds =
         query.status === 'executing'
@@ -73,6 +71,69 @@ const ItemRow: FC<{
         : 0;
 
     const beforeNextRepetition = useCountdown(secondsBeforeNextRepetition);
+
+    return isAggregated ? (
+        isCurrentlyRepeating ? (
+            <Flex align="center" wrap="wrap" color="text.secondary">
+                Every {repeatInterval}
+                <InfoTooltip ml="2px">
+                    <Box w="280px" color="text.primary">
+                        <Flex justify="space-between" mb="3">
+                            <Span color="text.secondary">Periodicity</Span>
+                            <Span>Every {repeatInterval}</Span>
+                        </Flex>
+                        <Flex justify="space-between" mb="3">
+                            <Span color="text.secondary">Number of repetitions</Span>
+                            <Span>{q.totalRepetitions}</Span>
+                        </Flex>
+                        <Flex justify="space-between" mb="3">
+                            <Span color="text.secondary">Recent request</Span>
+                            <Span>{toDateTime(q.lastQueryDate)}</Span>
+                        </Flex>
+                        <Flex align="center">
+                            <Span color="text.secondary">Next</Span>
+                            <Box ml="auto">
+                                <Span>{toTimeLeft(beforeNextRepetition * 1000)}</Span>
+                                {beforeNextRepetition === 0 && (
+                                    <Button
+                                        ml="2"
+                                        onClick={() => analyticsHistoryTableStore.loadFirstPage()}
+                                        size="sm"
+                                    >
+                                        Refresh
+                                    </Button>
+                                )}
+                            </Box>
+                        </Flex>
+                    </Box>
+                </InfoTooltip>
+                &nbsp;· {q.totalCost.stringCurrencyAmount}
+            </Flex>
+        ) : (
+            <Flex align="center" wrap="wrap" color="text.secondary">
+                <Span>{q.totalRepetitions} times</Span>
+                &nbsp;· {q.totalCost.stringCurrencyAmount} total
+            </Flex>
+        )
+    ) : query.status === 'success' || query.status === 'error' ? (
+        <Flex align="center" wrap="wrap" color="text.secondary">
+            {query.spentTimeMS < 1000 ? '≈1s' : <Span>{toTimeLeft(query.spentTimeMS)}</Span>}
+            &nbsp;· {query.cost.stringCurrencyAmount}
+        </Flex>
+    ) : (
+        formattedDuration
+    );
+};
+
+const ItemRow: FC<{
+    query: AnalyticsQuery | AnalyticsRepeatingQueryAggregated | AnalyticsGraphQuery;
+    style: CSSProperties;
+}> = observer(({ query: q, style }) => {
+    const { rowHeight } = useContext(AnalyticsHistoryTableContext);
+
+    const isAggregated = isAnalyticsRepeatingQueryAggregated(q);
+
+    const query = isAggregated ? q.lastQuery : q;
 
     return (
         <Link to={`../${query.type === 'graph' ? 'graph' : 'query'}?id=${query.id}`}>
@@ -95,67 +156,7 @@ const ItemRow: FC<{
                     borderLeftColor="background.contentTint"
                     boxSizing="content-box"
                 >
-                    {isAggregated ? (
-                        isCurrentlyRepeating ? (
-                            <Flex align="center" wrap="wrap" color="text.secondary">
-                                Every {repeatInterval}
-                                <InfoTooltip ml="2px">
-                                    <Box w="280px" color="text.primary">
-                                        <Flex justify="space-between" mb="3">
-                                            <Span color="text.secondary">Periodicity</Span>
-                                            <Span>Every {repeatInterval}</Span>
-                                        </Flex>
-                                        <Flex justify="space-between" mb="3">
-                                            <Span color="text.secondary">
-                                                Number of repetitions
-                                            </Span>
-                                            <Span>{q.totalRepetitions}</Span>
-                                        </Flex>
-                                        <Flex justify="space-between" mb="3">
-                                            <Span color="text.secondary">Recent request</Span>
-                                            <Span>{toDateTime(q.lastQueryDate)}</Span>
-                                        </Flex>
-                                        <Flex align="center">
-                                            <Span color="text.secondary">Next</Span>
-                                            <Box ml="auto">
-                                                <Span>
-                                                    {toTimeLeft(beforeNextRepetition * 1000)}
-                                                </Span>
-                                                {beforeNextRepetition === 0 && (
-                                                    <Button
-                                                        ml="2"
-                                                        onClick={() =>
-                                                            analyticsHistoryTableStore.loadFirstPage()
-                                                        }
-                                                        size="sm"
-                                                    >
-                                                        Refresh
-                                                    </Button>
-                                                )}
-                                            </Box>
-                                        </Flex>
-                                    </Box>
-                                </InfoTooltip>
-                                &nbsp;· {q.totalCost.stringCurrencyAmount}
-                            </Flex>
-                        ) : (
-                            <Flex align="center" wrap="wrap" color="text.secondary">
-                                <Span>{q.totalRepetitions} times</Span>
-                                &nbsp;· {q.totalCost.stringCurrencyAmount} total
-                            </Flex>
-                        )
-                    ) : query.status === 'success' || query.status === 'error' ? (
-                        <Flex align="center" wrap="wrap" color="text.secondary">
-                            {query.spentTimeMS < 1000 ? (
-                                '≈1s'
-                            ) : (
-                                <Span>{toTimeLeft(query.spentTimeMS)}</Span>
-                            )}
-                            &nbsp;· {query.cost.stringCurrencyAmount}
-                        </Flex>
-                    ) : (
-                        formattedDuration
-                    )}
+                    <DurationValueCell query={q} />
                 </Td>
                 <Td
                     alignContent="center"
@@ -184,7 +185,15 @@ const ItemRow: FC<{
                     boxSizing="content-box"
                 >
                     <Flex gap="2">
-                        <Box wordBreak="break-word" noOfLines={2}>
+                        <Box
+                            color={
+                                query.type === 'graph' || query.name
+                                    ? 'text.prymary'
+                                    : 'text.secondary'
+                            }
+                            wordBreak="break-word"
+                            noOfLines={2}
+                        >
                             {query.type === 'graph' ? (
                                 <>
                                     Graph:&nbsp;
@@ -195,19 +204,7 @@ const ItemRow: FC<{
                                     </Span>
                                 </>
                             ) : (
-                                <TooltipHoverable
-                                    canBeShown={true}
-                                    placement="top"
-                                    host={
-                                        <Span cursor="default">
-                                            {query.name || query.gptPrompt || query.request}
-                                        </Span>
-                                    }
-                                >
-                                    <Span color="text.primary" overflow="auto">
-                                        <pre>{query.request}</pre>
-                                    </Span>
-                                </TooltipHoverable>
+                                <Span>{query.name || query.gptPrompt || query.request}</Span>
                             )}
                         </Box>
                         {query.type !== 'graph' && query.network === 'testnet' && (
