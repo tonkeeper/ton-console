@@ -9,21 +9,24 @@ import {
 } from 'src/features';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-import { projectsStore } from 'src/entities';
+// import { projectsStore } from 'src/entities';
 
 const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
     useEffect(() => {
         analyticsHistoryTableStore.loadFirstPage();
     }, []);
 
-    const queryAllowed = projectsStore.selectedProject?.capabilities.stats.query;
+    // const queryAllowed = projectsStore.selectedProject?.capabilities.stats.query;
 
     return (
         <Overlay display="flex" flexDirection="column">
-            <Flex align="flex-start" justify="space-between" mb="5">
+            <Flex align="flex-start" justify="space-between" gap="3" mb="5">
                 <H4>History</H4>
-                <Button as={Link} to={queryAllowed ? '../query' : '../graph'} variant="secondary">
-                    New Request
+                <Button as={Link} ml="auto" to={'../query'} variant="secondary">
+                    New Query
+                </Button>
+                <Button as={Link} to={'../graph'} variant="secondary">
+                    New Graph
                 </Button>
             </Flex>
             <Flex align="center" gap="4" mb="6">

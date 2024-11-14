@@ -1,5 +1,5 @@
-import { ComponentProps, FunctionComponent, useEffect } from 'react';
-import { Box, Button, Center, Flex, Skeleton, useDisclosure } from '@chakra-ui/react';
+import { FC, useEffect } from 'react';
+import { BoxProps, Button, Center, Flex, Skeleton, useDisclosure } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { InfoIcon16, Span, TooltipHoverable, toTimeLeft } from 'src/shared';
 import {
@@ -11,9 +11,7 @@ import { useSearchParams } from 'react-router-dom';
 import { computed } from 'mobx';
 import ExplainSQLModal from './ExplainSQLModal';
 
-const AnalyticsQueryControlPanel: FunctionComponent<
-    ComponentProps<typeof Box> & { type: 'sql' | 'gpt' }
-> = ({ type, ...props }) => {
+const AnalyticsQueryControlPanel: FC<BoxProps & { type: 'sql' | 'gpt' }> = ({ type, ...props }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const store = type === 'sql' ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
     const request = store.request$.value;
@@ -114,7 +112,12 @@ const AnalyticsQueryControlPanel: FunctionComponent<
             >
                 Run
             </Button>
-            <ExplainSQLModal type={type} isOpen={isOpen} onClose={onClose} />
+            <ExplainSQLModal
+                isOpen={isOpen}
+                onClose={onClose}
+                explanation={store.request$.value?.explanation}
+                request={store.request$.value?.request}
+            />
         </Flex>
     );
 };

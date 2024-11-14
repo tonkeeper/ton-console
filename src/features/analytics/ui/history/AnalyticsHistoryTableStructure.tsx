@@ -96,7 +96,7 @@ export const AnalyticsHistoryTableStructure = observer(
                             <Th
                                 pos="relative"
                                 zIndex={1}
-                                minW="246px"
+                                minW="176px"
                                 bg="background.contentTint"
                                 borderTop="1px"
                                 borderTopColor="background.contentTint"
@@ -124,7 +124,7 @@ export const AnalyticsHistoryTableStructure = observer(
                                 bg="background.contentTint"
                                 boxSizing="content-box"
                             >
-                                Request
+                                Name / Request
                             </Th>
                             <Th
                                 pos="relative"

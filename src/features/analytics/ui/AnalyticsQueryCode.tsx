@@ -54,7 +54,13 @@ const AnalyticsQueryCode: FC<AnalyticsQueryCodeProps> = ({
 
     useEffect(() => {
         if (debouncedValue) {
-            store.estimateRequest(debouncedValue, undefined, { cancelAllPreviousCalls: true });
+            store.estimateRequest(
+                {
+                    request: debouncedValue,
+                    name: 'sql'
+                },
+                { cancelAllPreviousCalls: true }
+            );
         } else {
             store.clearRequest();
         }

@@ -145,6 +145,35 @@ class AnalyticsQueryStore {
         }
     );
 
+    setNameForQuery = this.query$.createAsyncAction(
+        async (name: string) => {
+            await apiClient.api.updateStatsQuery(
+                this.query$.value!.id,
+                {
+                    project_id: projectsStore.selectedProject!.id
+                },
+                { name }
+            );
+
+            this.query$.value!.name = name;
+        },
+        {
+            successToast: {
+                title: 'Query name updated successfully',
+                status: 'success',
+                isClosable: true
+            },
+            errorToast: e => ({
+                title: 'Query name update error',
+                description:
+                    (e as { response: { data: { error: string } } }).response?.data?.error ||
+                    'Unknown api error happened. Try again later',
+                status: 'error',
+                isClosable: true
+            })
+        }
+    );
+
     removeRepeatOnQuery = this.query$.createAsyncAction(
         async () => {
             await apiClient.api.updateStatsQuery(
@@ -208,6 +237,7 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         estimatedTimeMS: value.estimate!.approximate_time,
         estimatedCost: new TonCurrencyAmount(value.estimate!.approximate_cost),
         explanation: value.estimate!.explain!,
+        name: value.name,
         ...(value.query?.repeat_interval && {
             repeatFrequencyMs: value.query?.repeat_interval * 1000
         }),

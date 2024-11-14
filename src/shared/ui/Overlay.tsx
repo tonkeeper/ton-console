@@ -10,6 +10,7 @@ export const Overlay: FC<OverlayProps> = ({ breadcrumbs, children, ...rest }) =>
         <>
             {breadcrumbs}
             <Box
+                maxW="100%"
                 h={breadcrumbs ? 'calc(100% - 28px)' : '100%'}
                 px="6"
                 py="5"

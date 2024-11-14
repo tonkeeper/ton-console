@@ -35,16 +35,26 @@ class AnalyticsQueryRequestStore {
     }
 
     public estimateRequest = this.request$.createAsyncAction(
-        async (request: string, network?: Network) => {
+        async ({
+            request,
+            name,
+            network
+        }: {
+            request: string;
+            name?: string;
+            network?: Network;
+        }) => {
             try {
                 const chain =
                     (network || this.network) === Network.TESTNET
                         ? DTOChain.DTOTestnet
                         : DTOChain.DTOMainnet;
+
                 const result = await apiClient.api.estimateStatsQuery(
                     {
                         project_id: projectsStore.selectedProject!.id,
-                        query: request
+                        query: request,
+                        name
                     },
                     { chain }
                 );
@@ -72,7 +82,10 @@ class AnalyticsQueryRequestStore {
         this.estimateRequest.cancelAllPendingCalls();
         this._network = network;
         if (this.request$.value && this.request$.value.network !== network) {
-            await this.estimateRequest(this.request$.value.request, network);
+            await this.estimateRequest({
+                request: this.request$.value.request,
+                network
+            });
         }
     });
 
