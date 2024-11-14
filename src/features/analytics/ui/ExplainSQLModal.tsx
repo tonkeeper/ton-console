@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Modal,
@@ -11,31 +11,23 @@ import {
 } from '@chakra-ui/react';
 import { CopyPad, H4, Pad } from 'src/shared';
 import { observer } from 'mobx-react-lite';
-import { analyticsQueryGPTRequestStore, analyticsQuerySQLRequestStore } from 'src/features';
 import CodeMirror from '@uiw/react-codemirror';
 import { PostgreSQL, sql as sqlExtension } from '@codemirror/lang-sql';
 
-const ExplainSQLModal: FunctionComponent<{
+const ExplainSQLModal: FC<{
     isOpen: boolean;
     onClose: () => void;
-    type: 'sql' | 'gpt';
-}> = ({ isOpen, onClose, type }) => {
-    const text =
-        (type === 'sql'
-            ? analyticsQuerySQLRequestStore.request$.value?.explanation
-            : analyticsQueryGPTRequestStore.request$.value?.explanation) || '';
-
-    const sql =
-        (type === 'sql'
-            ? analyticsQuerySQLRequestStore.request$.value?.request
-            : analyticsQueryGPTRequestStore.request$.value?.request) || '';
+    request?: string;
+    explanation?: string;
+    title?: string;
+}> = ({ isOpen, onClose, title = 'Explain', request = '', explanation = '' }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside" size="5xl">
             <ModalOverlay />
             <ModalContent mx="30px">
                 <ModalCloseButton />
                 <ModalHeader>
-                    <H4>Explain</H4>
+                    <H4>{title}</H4>
                 </ModalHeader>
                 <ModalBody py="0">
                     <Pad
@@ -75,17 +67,19 @@ const ExplainSQLModal: FunctionComponent<{
                             ]}
                             readOnly={true}
                             editable={true}
-                            value={sql.trim()}
+                            value={request.trim()}
                         />
                     </Pad>
-                    <CopyPad
-                        maxH="400px"
-                        iconAlign="start"
-                        w="100%"
-                        whiteSpace="pre"
-                        iconPosition="sticky"
-                        text={text.trim()}
-                    />
+                    {explanation && (
+                        <CopyPad
+                            maxH="400px"
+                            iconAlign="start"
+                            w="100%"
+                            whiteSpace="pre"
+                            iconPosition="sticky"
+                            text={explanation.trim()}
+                        />
+                    )}
                 </ModalBody>
                 <ModalFooter>
                     <Button flex={1} onClick={onClose} variant="secondary">

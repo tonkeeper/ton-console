@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext, useEffect, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 import {
     Box,
     Button,
@@ -37,9 +37,7 @@ import CancelInvoiceConfirmation from '../CancelInvoiceConfirmation';
 import { InvoiceOverpayment } from './InvoiceOverpayment';
 import { toJS } from 'mobx';
 
-const LoadingRaw: FunctionComponent<{ style: React.CSSProperties }> = ({
-    style: { top, ...style }
-}) => {
+const LoadingRaw: FC<{ style: React.CSSProperties }> = ({ style: { top, ...style } }) => {
     const { rawHeight } = useContext(InvoicesTableContext);
     return (
         <Tr
@@ -57,7 +55,7 @@ const LoadingRaw: FunctionComponent<{ style: React.CSSProperties }> = ({
     );
 };
 
-const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties }> = observer(
+const ItemRaw: FC<{ invoice: Invoice; style: React.CSSProperties }> = observer(
     ({ invoice, style }) => {
         const renderTime = useConst(Date.now());
         const { isOpen: isOpenView, onClose: onCloseView, onOpen: onOpenView } = useDisclosure();
@@ -267,10 +265,7 @@ const ItemRaw: FunctionComponent<{ invoice: Invoice; style: React.CSSProperties 
     }
 );
 
-const InvoicesTableRaw: FunctionComponent<{ index: number; style: React.CSSProperties }> = ({
-    index,
-    style
-}) => {
+const InvoicesTableRaw: FC<{ index: number; style: React.CSSProperties }> = ({ index, style }) => {
     if (invoicesTableStore.isItemLoaded(index)) {
         const invoice = toJS(invoicesTableStore.invoices$.value[index]);
         return <ItemRaw key={invoice.id} style={style} invoice={invoice} />;

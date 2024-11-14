@@ -125,11 +125,39 @@ const DurationValueCell: FC<{
     );
 };
 
+const NameRequestCell: FC<{
+    query: AnalyticsQuery | AnalyticsGraphQuery;
+}> = ({ query }) => {
+    return (
+        <Flex gap="2">
+            <Box
+                color={query.type === 'graph' || query.name ? 'text.prymary' : 'text.secondary'}
+                wordBreak="break-word"
+                noOfLines={2}
+            >
+                {query.type === 'graph' ? (
+                    <>
+                        Graph:&nbsp;
+                        <Span color="accent.blue">
+                            {query.addresses.map(a => sliceAddress(a.userFriendly)).join(', ')}
+                        </Span>
+                    </>
+                ) : (
+                    <Span>{query.name || query.gptPrompt || query.request}</Span>
+                )}
+            </Box>
+            {query.type !== 'graph' && query.network === 'testnet' && (
+                <TestnetBadge flexShrink={0} alignSelf="center" />
+            )}
+        </Flex>
+    );
+};
+
 const ItemRow: FC<{
     query: AnalyticsQuery | AnalyticsRepeatingQueryAggregated | AnalyticsGraphQuery;
     style: CSSProperties;
 }> = observer(({ query: q, style }) => {
-    const { rowHeight } = useContext(AnalyticsHistoryTableContext);
+    const { rowHeight, setQueryForModal } = useContext(AnalyticsHistoryTableContext);
 
     const isAggregated = isAnalyticsRepeatingQueryAggregated(q);
 
@@ -184,33 +212,38 @@ const ItemRow: FC<{
                     maxH={rowHeight}
                     boxSizing="content-box"
                 >
-                    <Flex gap="2">
-                        <Box
-                            color={
-                                query.type === 'graph' || query.name
-                                    ? 'text.prymary'
-                                    : 'text.secondary'
-                            }
-                            wordBreak="break-word"
-                            noOfLines={2}
+                    <NameRequestCell query={query} />
+                </Td>
+                <Td
+                    alignContent="center"
+                    w="120px"
+                    minW="120px"
+                    maxW="120px"
+                    h={rowHeight}
+                    maxH={rowHeight}
+                    color="text.secondary"
+                    borderRight="1px"
+                    borderRightColor="background.contentTint"
+                    boxSizing="content-box"
+                >
+                    {query.type !== 'graph' && (
+                        <Button
+                            textStyle="body2"
+                            color="text.secondary"
+                            fontSize={14}
+                            fontWeight={500}
+                            _hover={{
+                                color: 'text.primary'
+                            }}
+                            onClick={e => {
+                                e.preventDefault();
+                                setQueryForModal(query.request);
+                            }}
+                            variant="unstyled"
                         >
-                            {query.type === 'graph' ? (
-                                <>
-                                    Graph:&nbsp;
-                                    <Span color="accent.blue">
-                                        {query.addresses
-                                            .map(a => sliceAddress(a.userFriendly))
-                                            .join(', ')}
-                                    </Span>
-                                </>
-                            ) : (
-                                <Span>{query.name || query.gptPrompt || query.request}</Span>
-                            )}
-                        </Box>
-                        {query.type !== 'graph' && query.network === 'testnet' && (
-                            <TestnetBadge flexShrink={0} alignSelf="center" />
-                        )}
-                    </Flex>
+                            Request
+                        </Button>
+                    )}
                 </Td>
                 <Td
                     alignContent="center"
