@@ -13,7 +13,9 @@ import {
     Spacer,
     Spinner,
     Text,
-    useDisclosure
+    Link,
+    useDisclosure,
+    useToast
 } from '@chakra-ui/react';
 import {
     ButtonLink,
@@ -28,7 +30,8 @@ import {
     ChartBarIcon24,
     ChartLineIcon24,
     ChartPieIcon24,
-    TooltipHoverable
+    TooltipHoverable,
+    CopyIcon16
 } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { analyticsQueryStore, isAnalyticsQuerySuccessful } from '../../model';
@@ -50,6 +53,7 @@ const ChartsCards = {
 const AnalyticsQueryResults: FC<BoxProps> = props => {
     const query = analyticsQueryStore.query$.value;
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const toast = useToast();
 
     const callback = useCallback(() => {
         if (query?.status === 'executing') {
@@ -60,6 +64,41 @@ const AnalyticsQueryResults: FC<BoxProps> = props => {
 
     const handleChageName = (name: string) => {
         analyticsQueryStore.setNameForQuery(name);
+    };
+
+    const handleCopy = () => {
+        if (!query || !isAnalyticsQuerySuccessful(query)) {
+            toast({
+                title: 'Error',
+                description: 'Dada not available',
+                status: 'error',
+                duration: 5000
+            });
+            return;
+        }
+
+        const headers = query.preview.headings.join('\t');
+        const data = query.preview.data.map(row => row.join('\t')).join('\n');
+
+        navigator.clipboard.writeText(`${headers}\n${data}`).then(() => {
+            const copyTitle = query.preview.isAllDataPresented
+                ? 'Data copied to clipboard'
+                : `Copied preview of ${query.preview.data.length} rows to clipboard`;
+
+            toast({
+                title: copyTitle,
+                description: (
+                    <Text>
+                        To get all rows,
+                        <Link ml="1" color="#E0FFE7" href={query.csvUrl} isExternal>
+                            download CSV
+                        </Link>
+                    </Text>
+                ),
+                status: 'success',
+                duration: 5000
+            });
+        });
     };
 
     const repeatInterval = formatRepeatInterval(query?.repeatFrequencyMs);
@@ -169,6 +208,9 @@ const AnalyticsQueryResults: FC<BoxProps> = props => {
                                 <Span color="text.secondary">&nbsp;·&nbsp;{repeatInterval}</Span>
                             )}
                         </Button>
+                        <Button onClick={handleCopy} size="sm" variant="secondary">
+                            <CopyIcon16 color="text.primary" />
+                        </Button>
                         <ButtonLink
                             leftIcon={<DownloadIcon16 />}
                             size="sm"
@@ -176,7 +218,6 @@ const AnalyticsQueryResults: FC<BoxProps> = props => {
                             href={query.csvUrl}
                             isExternal
                             minW="150px"
-                            download="customers.csv"
                         >
                             Download CSV
                         </ButtonLink>
