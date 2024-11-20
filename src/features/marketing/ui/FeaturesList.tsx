@@ -1,10 +1,10 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Box, Button, SimpleGrid } from '@chakra-ui/react';
 import { FeatureCard } from './FeatureCard';
-import { ButtonLink, EXTERNAL_LINKS } from 'src/shared';
 import { userStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { useNavigate } from 'react-router-dom';
+import { openFeedbackModal } from 'src/features/feedback/model/feedback';
 
 const FeaturesList: FunctionComponent<
     ComponentProps<typeof Box> & { onTonapiClick?: () => void; isContrast?: boolean }
@@ -41,9 +41,9 @@ const FeaturesList: FunctionComponent<
                 imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
-                <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
+                <Button onClick={openFeedbackModal('on-ramp')} variant={buttonVariant}>
                     Become Partner
-                </ButtonLink>
+                </Button>
             </FeatureCard>
 
             <FeatureCard
@@ -56,9 +56,9 @@ const FeaturesList: FunctionComponent<
                 imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
-                <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
+                <Button onClick={openFeedbackModal('tonkeeper-browser')} variant={buttonVariant}>
                     Request Slot
-                </ButtonLink>
+                </Button>
             </FeatureCard>
 
             <FeatureCard
@@ -71,9 +71,9 @@ const FeaturesList: FunctionComponent<
                 imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
-                <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
+                <Button onClick={openFeedbackModal('nft-themes')} variant={buttonVariant}>
                     Become Partner
-                </ButtonLink>
+                </Button>
             </FeatureCard>
 
             <FeatureCard
@@ -86,9 +86,9 @@ const FeaturesList: FunctionComponent<
                 imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
-                <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
+                <Button onClick={openFeedbackModal('swap')} variant={buttonVariant}>
                     Become Partner
-                </ButtonLink>
+                </Button>
             </FeatureCard>
 
             <FeatureCard
@@ -101,9 +101,9 @@ const FeaturesList: FunctionComponent<
                 imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
-                <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
+                <Button onClick={openFeedbackModal('token-stats')} variant={buttonVariant}>
                     Become Partner
-                </ButtonLink>
+                </Button>
             </FeatureCard>
 
             <FeatureCard
@@ -193,9 +193,12 @@ const FeaturesList: FunctionComponent<
                 description="Promote your own project through most convenient blockchain explorer in the TON ecosystem."
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
-                <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
+                <Button
+                    onClick={openFeedbackModal('tonviewer-custom-pages')}
+                    variant={buttonVariant}
+                >
                     Become Partner
-                </ButtonLink>
+                </Button>
             </FeatureCard>
 
             <FeatureCard
@@ -213,9 +216,9 @@ const FeaturesList: FunctionComponent<
                 description="Add a custom widget with stats and actions to your decentralized app."
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
-                <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
+                <Button onClick={openFeedbackModal('tonviewer-app-widget')} variant={buttonVariant}>
                     Become Partner
-                </ButtonLink>
+                </Button>
             </FeatureCard>
 
             <FeatureCard
@@ -233,9 +236,9 @@ const FeaturesList: FunctionComponent<
                 description="Get unique offers for your project: Ton Apps provides exclusive terms for a limited number of partners."
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
-                <ButtonLink variant={buttonVariant} href={EXTERNAL_LINKS.SUPPORT} isExternal>
-                    Become Partner
-                </ButtonLink>
+                <Button onClick={openFeedbackModal('premium-partnership')} variant={buttonVariant}>
+                    Request Partnership
+                </Button>
             </FeatureCard>
         </SimpleGrid>
     );

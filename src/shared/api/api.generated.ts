@@ -29,13 +29,13 @@ export interface DTOError {
 export interface DTOUser {
     /**
      * @format int64
-     * @example "1464363297"
+     * @example 1464363297
      */
     id: number;
     /**
      * ID from the Telegram service
      * @format int64
-     * @example "1260831881"
+     * @example 1260831881
      */
     tg_id?: number;
     /**
@@ -54,8 +54,17 @@ export interface DTOUser {
      * @example false
      */
     is_ban: boolean;
-    /** Authorization token */
-    token?: string;
+    /**
+     * @format uint32
+     * @example 1464363297
+     */
+    invited_by?: number;
+    referral_id: string;
+    /**
+     * @format int32
+     * @example 10
+     */
+    referrals_count: number;
     /**
      * @format int64
      * @example 1678275313
@@ -84,6 +93,8 @@ export interface DTOTgAuth {
      * @example 1678275313
      */
     auth_date: number;
+    /** @example "ref_test" */
+    referral_id?: string;
 }
 
 export enum DTOTokenCapability {
@@ -772,6 +783,23 @@ export interface DTOAccount {
     account: string;
 }
 
+export interface DTOReferral {
+    /**
+     * @format uint32
+     * @example 1647024163
+     */
+    id: number;
+    /** @example "Test" */
+    first_name?: string;
+    /** @example "Test" */
+    last_name?: string;
+    /**
+     * @format int64
+     * @example 1000000000
+     */
+    profit: number;
+}
+
 export interface DTOLiteproxyPrivateKey {
     /** @format uint32 */
     app_id: number;
@@ -1142,6 +1170,30 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         /**
          * No description
          *
+         * @tags utils
+         * @name Feedback
+         * @summary Send user feedback
+         * @request POST:/api/v1/feedback
+         */
+        feedback: (data: Record<string, any>, params: RequestParams = {}) =>
+            this.request<
+                DTOOk,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/feedback`,
+                method: 'POST',
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
          * @tags test
          * @name TestDeleteUser
          * @summary Delete test user
@@ -1390,6 +1442,36 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 }
             >({
                 path: `/api/v1/me`,
+                method: 'GET',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags account
+         * @name GetUserReferrals
+         * @summary Get user referrals
+         * @request GET:/api/v1/user/referrals
+         */
+        getUserReferrals: (params: RequestParams = {}) =>
+            this.request<
+                {
+                    items: DTOReferral[];
+                    /**
+                     * @format int64
+                     * @example 1000000000
+                     */
+                    total_profit: number;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/user/referrals`,
                 method: 'GET',
                 ...params
             }),
@@ -4081,7 +4163,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          */
         proServiceTonConnectAuth: (data: DTOTonConnectProof, params: RequestParams = {}) =>
             this.request<
-                DTOOk,
+                {
+                    ok: boolean;
+                    auth_token: string;
+                },
                 {
                     /** Error message */
                     error: string;
@@ -4105,7 +4190,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          */
         proServiceLogout: (params: RequestParams = {}) =>
             this.request<
-                DTOOk,
+                {
+                    ok: boolean;
+                    auth_token: string;
+                },
                 {
                     /** Error message */
                     error: string;
@@ -4286,6 +4374,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                      * @example 1678275313
                      */
                     next_charge?: number;
+                    auth_token: string;
                 },
                 {
                     /** Error message */
@@ -4309,7 +4398,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          */
         proServiceTrial: (data: DTOTgAuth, params: RequestParams = {}) =>
             this.request<
-                DTOOk,
+                {
+                    ok: boolean;
+                    auth_token: string;
+                },
                 {
                     /** Error message */
                     error: string;
@@ -4433,7 +4525,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          */
         proServiceUpdateState: (data: DTOProServiceState, params: RequestParams = {}) =>
             this.request<
-                DTOOk,
+                {
+                    ok: boolean;
+                    auth_token: string;
+                },
                 {
                     /** Error message */
                     error: string;
@@ -4457,7 +4552,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          */
         proServiceDeleteState: (params: RequestParams = {}) =>
             this.request<
-                DTOOk,
+                {
+                    ok: boolean;
+                    auth_token: string;
+                },
                 {
                     /** Error message */
                     error: string;

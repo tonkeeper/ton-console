@@ -7,5 +7,5 @@ export interface Subscription {
     renewsDate: Date;
     price: CurrencyAmount;
 
-    onCancel(): void;
+    // onCancel(): void;
 }
