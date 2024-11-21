@@ -32,6 +32,7 @@ import { Webhook, webhooksStore } from '../model';
 import { observer } from 'mobx-react-lite';
 import DeleteWebhookModal from './DeleteWebhookModal';
 import { useNavigate, Link as ReactRouterLink } from 'react-router-dom';
+import { RTWebhookListStatusEnum } from 'src/shared/api/streaming-api';
 
 const WebhooksTable: FC<TableContainerProps> = props => {
     const navigate = useNavigate();
@@ -57,6 +58,10 @@ const WebhooksTable: FC<TableContainerProps> = props => {
         setModal(null);
     }, []);
 
+    const backWebhookToOnline = useCallback((webhook: Webhook) => {
+        webhooksStore.backWebhookToOnline(webhook);
+    }, []);
+
     return (
         <>
             <TableContainer
@@ -71,6 +76,7 @@ const WebhooksTable: FC<TableContainerProps> = props => {
                             <Th>ID</Th>
                             <Th>Webhook</Th>
                             <Th>Subscriptions</Th>
+                            <Th>Status</Th>
                             <Th>Token</Th>
                         </Tr>
                     </Thead>
@@ -118,6 +124,25 @@ const WebhooksTable: FC<TableContainerProps> = props => {
                                         </TooltipHoverable>
                                     </Td>
                                     <Td maxW="100px">{webhook.subscribed_accounts}</Td>
+                                    <Td maxW="100px" onClick={e => e.preventDefault()}>
+                                        {webhook.status === RTWebhookListStatusEnum.RTOnline
+                                            ? 'Online'
+                                            : 'Offline'}
+                                        {webhook.status === RTWebhookListStatusEnum.RTOffline && (
+                                            <Menu placement="bottom-end">
+                                                <MenuButtonIcon icon={<VerticalDotsIcon16 />} />
+                                                <MenuList w="132px">
+                                                    <MenuItem
+                                                        onClick={() => backWebhookToOnline(webhook)}
+                                                    >
+                                                        <Text textStyle="label2" fontFamily="body">
+                                                            Back to Online
+                                                        </Text>
+                                                    </MenuItem>
+                                                </MenuList>
+                                            </Menu>
+                                        )}
+                                    </Td>
                                     <Td w="100px">
                                         <Flex
                                             align="center"

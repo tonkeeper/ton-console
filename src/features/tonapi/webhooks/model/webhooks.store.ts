@@ -8,7 +8,11 @@ import {
 import { Webhook, CreateWebhookForm } from './interfaces';
 import { projectsStore } from 'src/entities';
 import { makeAutoObservable } from 'mobx';
-import { rtTonApiClient, RTWebhookAccountTxSubscriptions } from 'src/shared/api/streaming-api';
+import {
+    rtTonApiClient,
+    RTWebhookAccountTxSubscriptions,
+    RTWebhookListStatusEnum
+} from 'src/shared/api/streaming-api';
 import { Address } from '@ton/core';
 import { WebhooksStat } from './interfaces/webhooks';
 
@@ -145,10 +149,12 @@ class WebhooksStore {
                     { endpoint }
                 )
                 .then(res => res.data);
+
             const newWebhook = {
                 id: resCreateWebhook.webhook_id,
                 endpoint,
                 token: resCreateWebhook.token,
+                status: RTWebhookListStatusEnum.RTOnline,
                 subscribed_accounts: 0
             };
 
@@ -207,6 +213,31 @@ class WebhooksStore {
             },
             errorToast: {
                 title: "Webhook wasn't unsubscribed"
+            }
+        }
+    );
+
+    backWebhookToOnline = this.webhooks$.createAsyncAction(
+        async (webhook: Webhook) => {
+            await rtTonApiClient.webhooks.webhookBackOnline(webhook.id, {
+                project_id: this.getProjectId(),
+                network: this.network
+            });
+
+            return this.webhooks$.value.map(item => {
+                if (item.id === webhook.id) {
+                    return { ...item, status: RTWebhookListStatusEnum.RTOnline };
+                }
+
+                return item;
+            });
+        },
+        {
+            successToast: {
+                title: 'Webhook successfully back to online'
+            },
+            errorToast: {
+                title: "Webhook status wasn't updated"
             }
         }
     );
