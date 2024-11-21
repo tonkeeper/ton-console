@@ -2,7 +2,16 @@ import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 import { CreateWebhookModal, WebhooksTable, webhooksStore } from 'src/features/tonapi/webhooks';
 import { EmptyWebhooks } from './EmptyWebhooks';
-import { EXTERNAL_LINKS, H4, Overlay } from 'src/shared';
+import {
+    ArrowIcon,
+    EXTERNAL_LINKS,
+    H4,
+    MenuButtonDefault,
+    Network,
+    Overlay,
+    Span,
+    TickIcon
+} from 'src/shared';
 import {
     Badge,
     Button,
@@ -12,6 +21,9 @@ import {
     useDisclosure,
     Text,
     Link,
+    Menu,
+    MenuItem,
+    MenuList,
     Box
 } from '@chakra-ui/react';
 import WebhookChartModal from './ChatrWebhooks';
@@ -46,6 +58,34 @@ const WebhooksPage: FC = () => {
                             >
                                 BETA
                             </Badge>
+
+                            <Menu placement="bottom">
+                                <MenuButtonDefault
+                                    variant="flat"
+                                    aria-label="network"
+                                    rightIcon={<ArrowIcon />}
+                                    textStyle="label2"
+                                    color="text.secondary"
+                                >
+                                    <Span textTransform="capitalize">{webhooksStore.network}</Span>
+                                </MenuButtonDefault>
+                                <MenuList w="122px">
+                                    <MenuItem
+                                        gap="2"
+                                        onClick={() => webhooksStore.setNetwork(Network.MAINNET)}
+                                    >
+                                        <Span textStyle="label2">Mainnet</Span>
+                                        {webhooksStore.network === Network.MAINNET && <TickIcon />}
+                                    </MenuItem>
+                                    <MenuItem
+                                        gap="2"
+                                        onClick={() => webhooksStore.setNetwork(Network.TESTNET)}
+                                    >
+                                        <Span textStyle="label2">Testnet</Span>
+                                        {webhooksStore.network === Network.TESTNET && <TickIcon />}
+                                    </MenuItem>
+                                </MenuList>
+                            </Menu>
                         </Flex>
                         <Flex>
                             <Text textStyle="text.body2" color="text.secondary" fontSize={14}>

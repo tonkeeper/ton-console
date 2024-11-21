@@ -2,7 +2,8 @@ import {
     apiClient,
     createImmediateReaction,
     DTOGetProjectTonApiStatsParamsDashboardEnum,
-    Loadable
+    Loadable,
+    Network
 } from 'src/shared';
 import { Webhook, CreateWebhookForm } from './interfaces';
 import { projectsStore } from 'src/entities';
@@ -28,6 +29,8 @@ class WebhooksStore {
 
     subscriptionsTotalPages = 0;
 
+    network: Network = Network.MAINNET;
+
     constructor() {
         makeAutoObservable(this);
 
@@ -39,6 +42,15 @@ class WebhooksStore {
                 if (project) {
                     this.fetchWebhooks();
                     this.fetchWebhooksStats();
+                }
+            }
+        );
+
+        createImmediateReaction(
+            () => this.network,
+            () => {
+                if (projectsStore.selectedProject) {
+                    this.fetchWebhooks();
                 }
             }
         );
@@ -81,10 +93,24 @@ class WebhooksStore {
         this.selectedWebhook = webhook ?? null;
     };
 
+    getProjectId(): string {
+        const project = projectsStore.selectedProject;
+        if (!project) {
+            throw new Error('Project is not selected');
+        }
+
+        return String(project.id);
+    }
+
+    setNetwork(network: Network): void {
+        this.network = network;
+    }
+
     fetchWebhooks = this.webhooks$.createAsyncAction(async () => {
         const response = await rtTonApiClient.webhooks
             .getWebhooks({
-                project_id: String(projectsStore.selectedProject!.id)
+                project_id: this.getProjectId(),
+                network: this.network
             })
             .then(res => res.data.webhooks.toSorted((a, b) => b.id - a.id));
 
@@ -115,7 +141,7 @@ class WebhooksStore {
         async ({ endpoint }: CreateWebhookForm) => {
             const resCreateWebhook = await rtTonApiClient.webhooks
                 .createWebhook(
-                    { project_id: String(projectsStore.selectedProject!.id) },
+                    { project_id: this.getProjectId(), network: this.network },
                     { endpoint }
                 )
                 .then(res => res.data);
@@ -141,7 +167,8 @@ class WebhooksStore {
     deleteWebhook = this.webhooks$.createAsyncAction(
         async (id: number) => {
             await rtTonApiClient.webhooks.deleteWebhook(id, {
-                project_id: String(projectsStore.selectedProject!.id)
+                project_id: this.getProjectId(),
+                network: this.network
             });
 
             return this.webhooks$.value.filter(item => item.id !== id);
@@ -165,7 +192,8 @@ class WebhooksStore {
             await rtTonApiClient.webhooks.webhookAccountTxUnsubscribe(
                 this.selectedWebhook.id,
                 {
-                    project_id: String(projectsStore.selectedProject!.id)
+                    project_id: this.getProjectId(),
+                    network: this.network
                 },
                 {
                     accounts: accounts.map(account => Object(account.toRawString()))
@@ -193,7 +221,8 @@ class WebhooksStore {
             await rtTonApiClient.webhooks.webhookAccountTxSubscribe(
                 webhookId,
                 {
-                    project_id: String(projectsStore.selectedProject!.id)
+                    project_id: this.getProjectId(),
+                    network: this.network
                 },
                 {
                     accounts: accounts.map(account => Object({ account_id: account.toRawString() }))
@@ -222,7 +251,8 @@ class WebhooksStore {
 
             const response = await rtTonApiClient.webhooks
                 .webhookAccountTxSubscriptions(webhookId, {
-                    project_id: String(projectsStore.selectedProject!.id),
+                    project_id: this.getProjectId(),
+                    network: this.network,
                     limit: this.subscriptionsLimit,
                     offset
                 })
@@ -234,6 +264,12 @@ class WebhooksStore {
 
     clearStore(): void {
         this.webhooks$.clear();
+        this.stats$.clear();
+        this.selectedWebhook = null;
+        this.subscriptions$.clear();
+        this.subscriptionsPage = 1;
+        this.subscriptionsTotalPages = 0;
+        this.network = Network.MAINNET;
     }
 }
 

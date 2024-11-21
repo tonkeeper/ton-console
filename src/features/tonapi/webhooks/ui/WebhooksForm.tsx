@@ -51,8 +51,7 @@ export const WebhookForm: FunctionComponent<
                     placeholder="Your webhook URL"
                     {...register('endpoint', {
                         required: 'This is required',
-                        minLength: { value: 3, message: 'Minimum length should be 3' },
-                        maxLength: { value: 64, message: 'Maximum length is 64' }
+                        minLength: { value: 3, message: 'Minimum length should be 3' }
                     })}
                 />
                 <FormErrorMessage>{errors.endpoint && errors.endpoint.message}</FormErrorMessage>

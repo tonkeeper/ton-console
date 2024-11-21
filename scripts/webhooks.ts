@@ -1,4 +1,4 @@
-import { GenerateApiParams, generateApi } from 'swagger-typescript-api'
+import { GenerateApiParams, generateApi } from 'swagger-typescript-api';
 import path from 'path';
 
 const generateApiParams: GenerateApiParams = {
