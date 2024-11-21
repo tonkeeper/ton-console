@@ -148,6 +148,7 @@ class WebhooksStore {
             const newWebhook = {
                 id: resCreateWebhook.webhook_id,
                 endpoint,
+                token: resCreateWebhook.token,
                 subscribed_accounts: 0
             };
 

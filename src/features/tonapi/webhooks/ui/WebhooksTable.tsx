@@ -13,15 +13,20 @@ import {
     Menu,
     Box,
     TableContainerProps,
-    Link as ChakraLink
+    Link as ChakraLink,
+    chakra
 } from '@chakra-ui/react';
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import {
     DeleteIcon24,
     EditIcon24,
     TooltipHoverable,
     VerticalDotsIcon16,
-    MenuButtonIcon
+    MenuButtonIcon,
+    CopyIcon16,
+    TickIcon,
+    copyToClipboard,
+    IconButton
 } from 'src/shared';
 import { Webhook, webhooksStore } from '../model';
 import { observer } from 'mobx-react-lite';
@@ -31,6 +36,14 @@ import { useNavigate, Link as ReactRouterLink } from 'react-router-dom';
 const WebhooksTable: FC<TableContainerProps> = props => {
     const navigate = useNavigate();
     const [modal, setModal] = useState<{ key: Webhook; action: 'edit' | 'delete' } | null>();
+    const [copiedToken, setCopiedToken] = useState<number | undefined>();
+
+    useEffect(() => {
+        if (copiedToken !== undefined) {
+            const timeout = setTimeout(() => setCopiedToken(undefined), 1500);
+            return () => clearTimeout(timeout);
+        }
+    }, [copiedToken]);
 
     const goToWebhookPage = useCallback((key: Webhook) => {
         navigate(`./view?webhookId=${key.id}`);
@@ -58,6 +71,7 @@ const WebhooksTable: FC<TableContainerProps> = props => {
                             <Th>ID</Th>
                             <Th>Webhook</Th>
                             <Th>Subscriptions</Th>
+                            <Th>Token</Th>
                         </Tr>
                     </Thead>
                     <Tbody>
@@ -103,14 +117,36 @@ const WebhooksTable: FC<TableContainerProps> = props => {
                                             {webhook.endpoint}
                                         </TooltipHoverable>
                                     </Td>
-                                    <Td maxW="170px">
+                                    <Td maxW="100px">{webhook.subscribed_accounts}</Td>
+                                    <Td w="100px">
                                         <Flex
                                             align="center"
                                             justify="space-between"
                                             gap="4"
                                             onClick={e => e.preventDefault()}
                                         >
-                                            {webhook.subscribed_accounts}
+                                            <Flex align="center" gap="1">
+                                                <chakra.span
+                                                    flexShrink="1"
+                                                    w="80px"
+                                                    layerStyle="textEllipse"
+                                                >
+                                                    {webhook.token}
+                                                </chakra.span>
+                                                {copiedToken !== undefined &&
+                                                copiedToken === webhook.id ? (
+                                                    <TickIcon />
+                                                ) : (
+                                                    <IconButton
+                                                        aria-label="copy"
+                                                        icon={<CopyIcon16 />}
+                                                        onClick={() => {
+                                                            setCopiedToken(webhook.id);
+                                                            copyToClipboard(webhook.token);
+                                                        }}
+                                                    />
+                                                )}
+                                            </Flex>
 
                                             <Menu placement="bottom-end">
                                                 <MenuButtonIcon icon={<VerticalDotsIcon16 />} />
