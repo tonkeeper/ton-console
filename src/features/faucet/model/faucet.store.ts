@@ -12,7 +12,7 @@ import { createStandaloneToast } from '@chakra-ui/react';
 import { projectsStore } from 'src/entities';
 import type { AxiosError } from 'axios';
 import { RequestFaucetForm } from './interfaces';
-import { tonApiClient } from 'src/shared';
+import { tonapiTestnet } from 'src/shared/api/tonapi';
 
 class FaucetStore {
     tonRate$ = new Loadable<number>(0);
@@ -92,7 +92,7 @@ class FaucetStore {
 }
 
 async function fetchTxHash(msgHash: string, attempt = 0): Promise<string> {
-    return tonApiClient.blockchain
+    return tonapiTestnet.blockchain
         .getBlockchainTransactionByMessageHash(msgHash)
         .then(data => data.hash)
         .catch(e => {
