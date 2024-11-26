@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { BoxProps, Button, Center, Flex, Skeleton, useDisclosure } from '@chakra-ui/react';
+import { BoxProps, Button, Center, Flex, Skeleton, Spacer, useDisclosure } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { InfoIcon16, Span, TooltipHoverable, toTimeLeft } from 'src/shared';
 import {
@@ -53,18 +53,38 @@ const AnalyticsQueryControlPanel: FC<BoxProps & { type: 'sql' | 'gpt' }> = ({ ty
         };
     }, []);
 
+    const explanation = store.request$.value?.explanation;
+    const isEstimationAlert =
+        explanation &&
+        (explanation.includes('Seq Scan on transactions') ||
+            explanation.includes('Seq Scan on messages') ||
+            explanation.includes('Seq Scan on blocks'));
+
     return (
         <Flex {...props} align="center" justify="flex-end" w="100%">
             {!!request && !store.request$.error && !store.request$.isLoading && (
-                <Button
-                    minH="unset"
-                    mr="auto"
-                    color="button.primary.foreground"
-                    onClick={onOpen}
-                    variant="flat"
-                >
-                    Explain
-                </Button>
+                <>
+                    <Button
+                        minH="unset"
+                        color="button.primary.foreground"
+                        onClick={onOpen}
+                        variant="flat"
+                    >
+                        Explain
+                    </Button>
+                    {isEstimationAlert && (
+                        <TooltipHoverable
+                            canBeShown
+                            host={<InfoIcon16 color="accent.red" ml="1" />}
+                        >
+                            <Span w="180px" color="text.primary" textAlign="center">
+                                Full scan on transaction, messages or blocks can require too much
+                                time
+                            </Span>
+                        </TooltipHoverable>
+                    )}
+                    <Spacer />
+                </>
             )}
             {store.request$.isLoading && (
                 <Skeleton display="inline-block" w="100px" h="20px" variant="dark" />
@@ -83,20 +103,49 @@ const AnalyticsQueryControlPanel: FC<BoxProps & { type: 'sql' | 'gpt' }> = ({ ty
                         <Span color="text.primary">{store.request$.error.toString()}</Span>
                     </TooltipHoverable>
                 ) : (
-                    !!request && (
-                        <Span display="inline-flex" opacity="0.6" fontFamily="mono">
-                            {request.estimatedTimeMS < 1000 ? (
-                                '< 1s'
-                            ) : (
-                                <>
-                                    <Span paddingRight="5px" fontSize={20} lineHeight="24px">
-                                        ≈
-                                    </Span>
-                                    <Span>{toTimeLeft(request.estimatedTimeMS)}</Span>
-                                </>
-                            )}
-                            &nbsp;·&nbsp;
-                            {request.estimatedCost.toStringCurrencyAmount({ decimalPlaces: null })}
+                    request && (
+                        <Span>
+                            <TooltipHoverable
+                                canBeShown
+                                host={
+                                    request.estimatedTimeMS < 1000 ? (
+                                        '< 1s'
+                                    ) : (
+                                        <Span
+                                            opacity={
+                                                request.estimatedTimeMS < 20 * 60 * 1000 ? 0.6 : 1
+                                            }
+                                            fontFamily="mono"
+                                            color={
+                                                request.estimatedTimeMS < 20 * 60 * 1000
+                                                    ? 'text.white'
+                                                    : 'accent.red'
+                                            }
+                                        >
+                                            <Span
+                                                paddingRight="5px"
+                                                fontSize={20}
+                                                lineHeight="24px"
+                                            >
+                                                ≈
+                                            </Span>
+                                            <Span>{toTimeLeft(request.estimatedTimeMS)}</Span>
+                                        </Span>
+                                    )
+                                }
+                            >
+                                <Span maxW="450px" color="text.primary">
+                                    The actual time and cost may vary. If the query exceeds 30
+                                    minutes, it will be terminated, and you will be charged for 30
+                                    minutes of execution.
+                                </Span>
+                            </TooltipHoverable>
+                            <Span opacity="0.6" fontFamily="mono">
+                                &nbsp;·&nbsp;
+                                {request.estimatedCost.toStringCurrencyAmount({
+                                    decimalPlaces: null
+                                })}
+                            </Span>
                         </Span>
                     )
                 ))}
@@ -115,7 +164,7 @@ const AnalyticsQueryControlPanel: FC<BoxProps & { type: 'sql' | 'gpt' }> = ({ ty
             <ExplainSQLModal
                 isOpen={isOpen}
                 onClose={onClose}
-                explanation={store.request$.value?.explanation}
+                explanation={explanation}
                 request={store.request$.value?.request}
             />
         </Flex>
