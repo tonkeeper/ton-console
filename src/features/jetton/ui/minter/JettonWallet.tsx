@@ -203,7 +203,7 @@ const JettonWallet: FC<
         ? walletUserAddress?.equals(connectedWalletAddress) ?? false
         : true;
 
-    const showBurnButton = isConnectedWallet && jettonWallet?.balance !== '0';
+    const showBurnButton = isConnectedWallet && jettonWallet?.balance !== 0n;
 
     const handleWalletChange = () => {
         if (isConnectedWallet) {

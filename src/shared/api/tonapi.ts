@@ -1,11 +1,13 @@
-import { TonApiClient, Api } from '@ton-api/client';
+import { TonApiClient } from '@ton-api/client';
 
 const authToken = import.meta.env.VITE_TONAPI_TOKEN;
-const host = 'https://tonapi.io';
 
-const httpClient = new TonApiClient({
-    baseUrl: host,
+export const tonapiMainnet = new TonApiClient({
+    baseUrl: 'https://tonapi.io',
     apiKey: authToken
 });
 
-export const tonApiClient = new Api(httpClient);
+export const tonapiTestnet = new TonApiClient({
+    baseUrl: 'https://testnet.tonapi.io',
+    apiKey: authToken
+});

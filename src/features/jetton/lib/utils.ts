@@ -1,7 +1,7 @@
 import { Address, beginCell, toNano } from '@ton/ton';
 import { JettonDeployParams, JETTON_DEPLOY_GAS } from './deploy-controller';
 import { initData, JETTON_MINTER_CODE, mintBody } from './jetton-minter';
-import { Api } from '@ton-api/client';
+import { TonApiClient } from '@ton-api/client';
 
 export async function sleep(time: number) {
     return new Promise(resolve => {
@@ -20,14 +20,15 @@ export function zeroAddress(): Address {
         .loadAddress();
 }
 
-export async function waitForContractDeploy(address: Address, tonApiClient: Api<unknown>) {
+export async function waitForContractDeploy(address: Address, tonapiMainnet: TonApiClient) {
     let isDeployed = false;
     let maxTries = 25;
     while (!isDeployed && maxTries > 0) {
         maxTries--;
-        isDeployed = await tonApiClient.accounts
+        isDeployed = await tonapiMainnet.accounts
             .getAccount(address)
             .then(v => v.status === 'active');
+
         if (isDeployed) return;
         await sleep(3000);
     }
