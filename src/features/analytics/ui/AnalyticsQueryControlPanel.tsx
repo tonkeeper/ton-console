@@ -103,20 +103,49 @@ const AnalyticsQueryControlPanel: FC<BoxProps & { type: 'sql' | 'gpt' }> = ({ ty
                         <Span color="text.primary">{store.request$.error.toString()}</Span>
                     </TooltipHoverable>
                 ) : (
-                    !!request && (
-                        <Span display="inline-flex" opacity="0.6" fontFamily="mono">
-                            {request.estimatedTimeMS < 1000 ? (
-                                '< 1s'
-                            ) : (
-                                <>
-                                    <Span paddingRight="5px" fontSize={20} lineHeight="24px">
-                                        ≈
-                                    </Span>
-                                    <Span>{toTimeLeft(request.estimatedTimeMS)}</Span>
-                                </>
-                            )}
-                            &nbsp;·&nbsp;
-                            {request.estimatedCost.toStringCurrencyAmount({ decimalPlaces: null })}
+                    request && (
+                        <Span>
+                            <TooltipHoverable
+                                canBeShown
+                                host={
+                                    request.estimatedTimeMS < 1000 ? (
+                                        '< 1s'
+                                    ) : (
+                                        <Span
+                                            opacity={
+                                                request.estimatedTimeMS < 20 * 60 * 1000 ? 0.6 : 1
+                                            }
+                                            fontFamily="mono"
+                                            color={
+                                                request.estimatedTimeMS < 20 * 60 * 1000
+                                                    ? 'text.white'
+                                                    : 'accent.red'
+                                            }
+                                        >
+                                            <Span
+                                                paddingRight="5px"
+                                                fontSize={20}
+                                                lineHeight="24px"
+                                            >
+                                                ≈
+                                            </Span>
+                                            <Span>{toTimeLeft(request.estimatedTimeMS)}</Span>
+                                        </Span>
+                                    )
+                                }
+                            >
+                                <Span maxW="450px" color="text.primary">
+                                    The actual time and cost may vary. If the query exceeds 30
+                                    minutes, it will be terminated, and you will be charged for 30
+                                    minutes of execution.
+                                </Span>
+                            </TooltipHoverable>
+                            <Span opacity="0.6" fontFamily="mono">
+                                &nbsp;·&nbsp;
+                                {request.estimatedCost.toStringCurrencyAmount({
+                                    decimalPlaces: null
+                                })}
+                            </Span>
                         </Span>
                     )
                 ))}
