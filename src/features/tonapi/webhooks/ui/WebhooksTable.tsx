@@ -58,10 +58,6 @@ const WebhooksTable: FC<TableContainerProps> = props => {
         setModal(null);
     }, []);
 
-    const backWebhookToOnline = useCallback((webhook: Webhook) => {
-        webhooksStore.backWebhookToOnline(webhook);
-    }, []);
-
     return (
         <>
             <TableContainer
@@ -138,20 +134,6 @@ const WebhooksTable: FC<TableContainerProps> = props => {
                                         {webhook.status === RTWebhookListStatusEnum.RTOnline
                                             ? 'Online'
                                             : 'Offline'}
-                                        {webhook.status === RTWebhookListStatusEnum.RTOffline && (
-                                            <Menu placement="bottom-end">
-                                                <MenuButtonIcon icon={<VerticalDotsIcon16 />} />
-                                                <MenuList w="132px">
-                                                    <MenuItem
-                                                        onClick={() => backWebhookToOnline(webhook)}
-                                                    >
-                                                        <Text textStyle="label2" fontFamily="body">
-                                                            Back to Online
-                                                        </Text>
-                                                    </MenuItem>
-                                                </MenuList>
-                                            </Menu>
-                                        )}
                                     </Td>
                                     <Td w="100px">
                                         <Flex
