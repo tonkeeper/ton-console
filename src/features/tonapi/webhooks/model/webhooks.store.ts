@@ -82,6 +82,17 @@ class WebhooksStore {
                 }
             }
         );
+
+        createImmediateReaction(
+            () => this.webhooks$.value,
+            () => {
+                if (this.selectedWebhook) {
+                    const webhookId = this.selectedWebhook.id;
+                    const webhook = this.webhooks$.value.find(item => item.id === webhookId);
+                    this.selectedWebhook = webhook ?? null;
+                }
+            }
+        );
     }
 
     setSubscriptionsPage = (page: number): void => {
