@@ -150,12 +150,18 @@ class WebhooksStore {
                 )
                 .then(res => res.data);
 
-            const newWebhook = {
+            const newWebhook: Webhook = {
                 id: resCreateWebhook.webhook_id,
                 endpoint,
                 token: resCreateWebhook.token,
                 status: RTWebhookListStatusEnum.RTOnline,
-                subscribed_accounts: 0
+                subscribed_accounts: 0,
+                subscribed_msg_opcodes: 0,
+                subscribed_to_mempool: false,
+                subscribed_to_new_contracts: false,
+                status_updated_at: new Date().toISOString(),
+                last_online_at: new Date().toISOString(),
+                status_failed_attempts: 0
             };
 
             this.webhooks$.value.unshift(newWebhook);
