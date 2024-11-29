@@ -22,6 +22,8 @@ import AddSubscriptionsModal from 'src/features/tonapi/webhooks/ui/AddSubscripti
 import { Link as RouterLink } from 'react-router-dom';
 import { ChevronRightIcon16 } from 'src/shared/ui/icons/ChevronRightIcon16';
 import { StatsCard } from 'src/entities/stats/Card';
+import StatusIndicator from 'src/shared/ui/StatusIndicator';
+import { RTWebhookListStatusEnum } from 'src/shared/api/streaming-api';
 
 const SubscriptionsViewPage: FC = () => {
     const { searchParams } = useSearchParams();
@@ -70,6 +72,8 @@ const SubscriptionsViewPage: FC = () => {
     const isEmpty =
         !webhooksStore.subscriptions$.isResolved || !webhooksStore.subscriptions$.value.length;
 
+    const isOnline = webhooksStore.selectedWebhook.status === RTWebhookListStatusEnum.RTOnline;
+
     return (
         <>
             <Overlay breadcrumbs={breadcrumb} h="fit-content">
@@ -115,7 +119,26 @@ const SubscriptionsViewPage: FC = () => {
                         <Divider mb="4" />
 
                         <Box mb={4}>
-                            <H4>Status</H4>
+                            <Flex align="center" justify="space-between" gap={4}>
+                                <H4>Status</H4>
+                                <Flex gap="3">
+                                    <StatusIndicator isOnline={isOnline} label />
+                                    {!isOnline && (
+                                        <Button
+                                            isLoading={webhooksStore.backWebhookToOnline.isLoading}
+                                            onClick={() =>
+                                                webhooksStore.selectedWebhook &&
+                                                webhooksStore.backWebhookToOnline(
+                                                    webhooksStore.selectedWebhook
+                                                )
+                                            }
+                                            size={'sm'}
+                                        >
+                                            Try Online
+                                        </Button>
+                                    )}
+                                </Flex>
+                            </Flex>
                             <Flex
                                 wrap={{
                                     base: 'wrap',
