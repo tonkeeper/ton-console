@@ -75,7 +75,10 @@ const WebhooksTable: FC<TableContainerProps> = props => {
                         <Tr>
                             <Th>ID</Th>
                             <Th>Webhook</Th>
-                            <Th>Subscriptions</Th>
+                            <Th>Accounts</Th>
+                            <Th>Opcodes</Th>
+                            <Th>Mempool</Th>
+                            <Th>New Contracts</Th>
                             <Th>Status</Th>
                             <Th>Token</Th>
                         </Tr>
@@ -123,7 +126,14 @@ const WebhooksTable: FC<TableContainerProps> = props => {
                                             {webhook.endpoint}
                                         </TooltipHoverable>
                                     </Td>
-                                    <Td maxW="100px">{webhook.subscribed_accounts}</Td>
+                                    <Td maxW="70px">{webhook.subscribed_accounts}</Td>
+                                    <Td maxW="70px">{webhook.subscribed_msg_opcodes}</Td>
+                                    <Td maxW="70px">
+                                        {webhook.subscribed_to_mempool ? 'Yes' : 'No'}
+                                    </Td>
+                                    <Td maxW="70px">
+                                        {webhook.subscribed_to_new_contracts ? 'Yes' : 'No'}
+                                    </Td>
                                     <Td maxW="100px" onClick={e => e.preventDefault()}>
                                         {webhook.status === RTWebhookListStatusEnum.RTOnline
                                             ? 'Online'

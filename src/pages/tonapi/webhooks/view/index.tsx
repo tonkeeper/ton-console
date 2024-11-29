@@ -88,7 +88,8 @@ const SubscriptionsViewPage: FC = () => {
                         </Flex>
                         <Flex>
                             <Text textStyle="text.body2" color="text.secondary" fontSize={14}>
-                                Webhooks are available via the API. For details, see{' '}
+                                More webhook options can be explored through the API. For details,
+                                see{' '}
                                 <Link
                                     color="accent.blue"
                                     href={EXTERNAL_LINKS.DOCUMENTATION_WEBHOOKS}
@@ -114,18 +115,101 @@ const SubscriptionsViewPage: FC = () => {
                         <Divider mb="4" />
 
                         <Box mb={4}>
-                            <H4>Statistics</H4>
-                            <Flex gap="6" mt={2} mb={4}>
+                            <H4>Status</H4>
+                            <Flex
+                                wrap={{
+                                    base: 'wrap',
+                                    lg: 'nowrap'
+                                }}
+                                gap="6"
+                                mt={2}
+                                mb={4}
+                            >
                                 <StatsCard
-                                    header="Total Number of Accounts"
-                                    value={webhooksStore.selectedWebhook.subscribed_accounts.toString()}
+                                    header="Total of Accounts"
+                                    value={webhooksStore.selectedWebhook.subscribed_accounts}
                                 />
+                                <StatsCard
+                                    header="Total of Opcodes"
+                                    value={webhooksStore.selectedWebhook.subscribed_msg_opcodes}
+                                />
+                                <StatsCard
+                                    header="Failed Attempts"
+                                    value={webhooksStore.selectedWebhook.status_failed_attempts}
+                                />
+
+                                <Flex direction="column" ml="auto" fontSize="14px">
+                                    <Text
+                                        textStyle="text.body2"
+                                        align="end"
+                                        textColor="text.secondary"
+                                    >
+                                        Last online at:{' '}
+                                        {webhooksStore.selectedWebhook.last_online_at}
+                                    </Text>
+                                    <Text
+                                        textStyle="text.body2"
+                                        align="end"
+                                        textColor="text.secondary"
+                                    >
+                                        Status updated at:{' '}
+                                        {webhooksStore.selectedWebhook.status_updated_at}
+                                    </Text>
+                                    <Text textStyle="text.body2" align="end" mt="1">
+                                        Subscribed to Mempool:{' '}
+                                        {webhooksStore.selectedWebhook.subscribed_to_mempool
+                                            ? 'Yes'
+                                            : 'No'}
+                                    </Text>
+                                    <Text textStyle="text.body2" align="end">
+                                        Subscribed to New Contracts:{' '}
+                                        {webhooksStore.selectedWebhook.subscribed_to_new_contracts
+                                            ? 'Yes'
+                                            : 'No'}
+                                    </Text>
+                                </Flex>
+                                {/* <StatsCard
+                                    ml={{
+                                        base: '0',
+                                        lg: 'auto'
+                                    }}
+                                    header="Subscribed to Mempool"
+                                    value={
+                                        webhooksStore.selectedWebhook.subscribed_to_mempool
+                                            ? 'Yes'
+                                            : 'No'
+                                    }
+                                />
+                                <StatsCard
+                                    header="Subscribed to New Contracts"
+                                    value={
+                                        webhooksStore.selectedWebhook.subscribed_to_new_contracts
+                                            ? 'Yes'
+                                            : 'No'
+                                    }
+                                /> */}
                             </Flex>
                         </Box>
 
                         <Divider mb="4" />
 
-                        <SubscriptionsTable />
+                        <H4>Subscribed opcodes</H4>
+                        <Text textStyle="text.body2" mt="3" color="text.secondary" fontSize={14}>
+                            To get the list of opcodes or subscribing to specific opcodes, refer to
+                            the API methods described{' '}
+                            <Link
+                                color="accent.blue"
+                                href="https://docs.tonconsole.com/tonapi/webhooks-api"
+                                isExternal
+                            >
+                                here
+                            </Link>
+                        </Text>
+
+                        <Divider my="4" />
+
+                        <H4>Subscribed accounts</H4>
+                        <SubscriptionsTable mt="3" />
                     </>
                 )}
             </Overlay>
