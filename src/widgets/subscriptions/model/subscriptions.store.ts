@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx';
-import { createAsyncAction, EXTERNAL_LINKS, openLinkBlank } from 'src/shared';
+import { createAsyncAction } from 'src/shared';
 import { TonApiSelectedTier, tonApiTiersStore } from 'src/features';
 import { Subscription } from 'src/widgets/subscriptions/model/interfaces/subscription';
 
@@ -32,10 +32,10 @@ function mapTonapiTierToSubscription(tier: Required<TonApiSelectedTier>): Subscr
         plan: `TonAPI ${tier.name}`,
         interval: 'Monthly',
         renewsDate: tier.renewsDate,
-        price: tier.price,
-        onCancel() {
-            openLinkBlank(EXTERNAL_LINKS.SUPPORT);
-        }
+        price: tier.price
+        // onCancel() {
+        //     openLinkBlank(EXTERNAL_LINKS.SUPPORT);
+        // }
     };
 }
 

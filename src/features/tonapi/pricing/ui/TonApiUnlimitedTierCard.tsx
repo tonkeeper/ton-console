@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import {
     Box,
+    Button,
     Card,
     CardBody,
     CardFooter,
@@ -11,7 +12,8 @@ import {
     ListItem,
     Text
 } from '@chakra-ui/react';
-import { ButtonLink, EXTERNAL_LINKS, H2, TickIcon } from 'src/shared';
+import { H2, TickIcon } from 'src/shared';
+import { openFeedbackModal } from 'src/features/feedback/model/feedback';
 
 export const TonApiUnlimitedTierCard: FC<CardProps> = props => {
     const { ...rest } = props;
@@ -42,9 +44,9 @@ export const TonApiUnlimitedTierCard: FC<CardProps> = props => {
                 </List>
             </CardBody>
             <CardFooter>
-                <ButtonLink w="100%" href={EXTERNAL_LINKS.SUPPORT} isExternal variant="contrast">
-                    Contact support
-                </ButtonLink>
+                <Button w="100%" onClick={openFeedbackModal('unlimited-tonapi')} variant="contrast">
+                    Make request
+                </Button>
             </CardFooter>
         </Card>
     );

@@ -16,11 +16,14 @@ import {
     Spinner
 } from '@chakra-ui/react';
 import { ComponentProps, FunctionComponent } from 'react';
-import { CancelIcon24, toDate, VerticalDotsIcon16, MenuButtonIcon } from 'src/shared';
+import { toDate, VerticalDotsIcon16, MenuButtonIcon } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { subscriptionsStore } from 'src/widgets';
+import { useNavigate } from 'react-router-dom';
 
 const SubscriptionsTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
+    const navigate = useNavigate();
+
     if (subscriptionsStore.subscriptionsLoading) {
         return (
             <Center h="100px">
@@ -65,9 +68,8 @@ const SubscriptionsTable: FunctionComponent<ComponentProps<typeof TableContainer
                                             icon={<VerticalDotsIcon16 />}
                                         />
                                         <MenuList w="132px">
-                                            <MenuItem onClick={subscription.onCancel}>
-                                                <CancelIcon24 mr="2" />
-                                                <Text textStyle="label2">Cancel</Text>
+                                            <MenuItem onClick={() => navigate('/tonapi/pricing')}>
+                                                <Text textStyle="label2">Change plan</Text>
                                             </MenuItem>
                                         </MenuList>
                                     </Menu>
