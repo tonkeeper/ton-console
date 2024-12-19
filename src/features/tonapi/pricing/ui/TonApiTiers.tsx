@@ -18,14 +18,14 @@ import { TonApiTierCard } from './TonApiTierCard';
 import { RefillModal } from 'src/entities';
 import { DTOLiteproxyTier, UsdCurrencyAmount } from 'src/shared';
 import { SelectTonApiTier } from './SelecTonApitTier';
-import { SelectLiteserverTier } from './SelectLiteserverTier';
+// import { SelectLiteserverTier } from './SelectLiteserverTier';
 import { TonApiUnlimitedTierCard } from './TonApiUnlimitedTierCard';
 import { ChevronRightIcon16 } from 'src/shared/ui/icons/ChevronRightIcon16';
 import TonApiPricingModal from './TonApiPricingModal';
 import WebhooksPricingModal from './WebhooksPricingModal';
 import { Link as RouterLink } from 'react-router-dom';
 import { liteproxysStore } from '../../liteproxy';
-import { LiteserversTierCard } from './LiteserversTierCard';
+// import { LiteserversTierCard } from './LiteserversTierCard';
 import LiteserversPaymentDetailsModal from './LiteserversPaymentDetailsModal';
 import LiteserversPricingModal from './LiteserversPricingModal';
 import { webhooksStore } from '../../webhooks';
@@ -63,8 +63,8 @@ const TonApiTiers: FC = () => {
 
     const {
         isOpen: isRefillLiteproxyModalOpen,
-        onClose: onRefillLiteproxyModalClose,
-        onOpen: onRefillLiteproxyModalOpen
+        onClose: onRefillLiteproxyModalClose
+        // onOpen: onRefillLiteproxyModalOpen
     } = useDisclosure();
 
     const {
@@ -81,8 +81,8 @@ const TonApiTiers: FC = () => {
 
     const {
         isOpen: isLiteserversPricingModalOpen,
-        onClose: onLiteserversPricingModalClose,
-        onOpen: onLiteserversPricingModalOpen
+        onClose: onLiteserversPricingModalClose
+        // onOpen: onLiteserversPricingModalOpen
     } = useDisclosure();
 
     if (
@@ -127,13 +127,17 @@ const TonApiTiers: FC = () => {
         }
     };
 
+    // const handleSelectLiteserverTier = (tier: DTOLiteproxyTier): void => {
+    //     setCurrentLiteserversTier(tier);
+    // };
+
     const onPaymentModalClose = (): void => setTierTonApiForChange(undefined);
 
     const isCurrentSubscription =
         currentTonApiTier !== 'custom' &&
         tonApiTiersStore.selectedTier$.value?.id === currentTonApiTier?.id;
 
-    const liteserversExists = liteproxysStore.liteproxyList$.value.length > 0;
+    // const liteserversExists = liteproxysStore.liteproxyList$.value.length > 0;
 
     const isEmptyWebhooks = webhooksStore.webhooks$.value.length === 0;
 
@@ -184,7 +188,7 @@ const TonApiTiers: FC = () => {
                 </Text>
             </Box>
 
-            <Divider my="4" />
+            {/* <Divider my="4" />
 
             <Flex align="center" justify="space-between" mb="4">
                 <Text textStyle="text.label2" mb="4" fontWeight={600}>
@@ -202,7 +206,7 @@ const TonApiTiers: FC = () => {
                 storeLiteseversTiers ? (
                     <>
                         <SelectLiteserverTier
-                            onSelectTier={setCurrentLiteserversTier}
+                            onSelectTier={handleSelectLiteserverTier}
                             selectedTier={currentLiteserversTier}
                             currentTier={storeSelectedLiteserversTier}
                             tiers={storeLiteseversTiers}
@@ -210,7 +214,7 @@ const TonApiTiers: FC = () => {
                         <LiteserversTierCard
                             h="100%"
                             tier={currentLiteserversTier}
-                            onChoseTier={onRefillLiteproxyModalOpen}
+                            onChoseTier={onChoseLiteserversTier}
                             isChosen={storeSelectedLiteserversTier.id === currentLiteserversTier.id}
                         />
                     </>
@@ -223,7 +227,7 @@ const TonApiTiers: FC = () => {
                         section
                     </Text>
                 )}
-            </Flex>
+            </Flex> */}
 
             {tierTonApiForChange && (
                 <TonApiPaymentDetailsModal
