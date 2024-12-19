@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { CopyPad } from 'src/shared';
 import { liteproxysStore } from '../model';
 import { observer } from 'mobx-react-lite';
+import DownloadConfigButton from './DownloadConfigButton';
 
 const LiteproxyView: FC = () => {
     const liteproxyList = liteproxysStore.liteproxyList$.value;
@@ -12,7 +13,7 @@ const LiteproxyView: FC = () => {
             {liteproxyList.map((liteproxy, index) => (
                 <Flex key={liteproxy.server} direction="column" gap={1} mb={4}>
                     <Text textStyle="text.label1" fontWeight={600}>
-                        {index === 0 ? 'Primary' : 'Backup'}
+                        Server #{index + 1}
                     </Text>
 
                     <Flex align="baseline" gap={2}>
@@ -25,6 +26,7 @@ const LiteproxyView: FC = () => {
                     </Flex>
                 </Flex>
             ))}
+            <DownloadConfigButton liteproxyList={liteproxyList} mt={4} />
         </>
     );
 };
