@@ -29,7 +29,7 @@ const Aside: FC = () => {
             <DropDownMenuItemExpandable leftIcon={<TonapiIcon />} content="TON API" linkTo="tonapi">
                 <DropDownMenuItem linkTo="api-keys">API keys</DropDownMenuItem>
                 <DropDownMenuItem linkTo="webhooks">Webhooks</DropDownMenuItem>
-                {/* <DropDownMenuItem linkTo="liteservers">Liteservers</DropDownMenuItem> */}
+                <DropDownMenuItem linkTo="liteservers">Liteservers</DropDownMenuItem>
                 <DropDownMenuItem linkTo="pricing">Pricing</DropDownMenuItem>
             </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="tonkeeper-messages" leftIcon={<MessageIcon24 />}>
