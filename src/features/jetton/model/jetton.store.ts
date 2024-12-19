@@ -1,5 +1,5 @@
 import { makeAutoObservable, reaction } from 'mobx';
-import { Loadable, tonapiMainnet } from 'src/shared';
+import { apiClient, Loadable, tonapiMainnet } from 'src/shared';
 import { Address, toNano, Cell } from '@ton/core';
 import { JettonBalance, JettonInfo, JettonMetadata as ApiJettonMetadata } from '@ton-api/client';
 import { SendTransactionRequest, TonConnectUI } from '@tonconnect/ui-react';
@@ -187,6 +187,20 @@ export class JettonStore {
         await tonConnection.sendTransaction(tx);
 
         await this.waiter(supplyFetcher, v => v === beforeTotalSupply - amount);
+    }
+
+    async uploadMetadata() {
+        const uploaded = await apiClient.api.uploadMinterJettonMeta({
+            meta: {
+                name: 'string',
+                symbol: 'string',
+                decimals: '9',
+                image: 'string',
+                description: 'string'
+            }
+        });
+
+        console.log(uploaded);
     }
 
     async mintJetton(amount: bigint, tonConnection: TonConnectUI) {

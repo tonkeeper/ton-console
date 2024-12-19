@@ -1175,7 +1175,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @summary Send user feedback
          * @request POST:/api/v1/feedback
          */
-        feedback: (data: Record<string, any>, params: RequestParams = {}) =>
+        feedback: (data: Record<string, string>, params: RequestParams = {}) =>
             this.request<
                 DTOOk,
                 {
@@ -4845,6 +4845,36 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 method: 'POST',
                 body: data,
                 type: ContentType.FormData,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags minter_jetton_media
+         * @name UploadMinterJettonMeta
+         * @summary Upload jetton meta
+         * @request POST:/api/v1/services/minter/jetton/meta
+         */
+        uploadMinterJettonMeta: (
+            data: {
+                /** @example {} */
+                meta: any;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTO_URL,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/minter/jetton/meta`,
+                method: 'POST',
+                body: data,
                 ...params
             }),
 

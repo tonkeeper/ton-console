@@ -252,6 +252,10 @@ const JettonWallet: FC<
             });
     };
 
+    const uploadMetadata = () => {
+        jettonStore.uploadMetadata();
+    };
+
     return (
         <>
             <Text textStyle="label1" py={5}>
@@ -320,6 +324,9 @@ const JettonWallet: FC<
                     jettomDecimals={jettonMetadata.decimals}
                 />
             )}
+            <Button mt={5} onClick={uploadMetadata} variant="primary">
+                Upload metadata
+            </Button>
         </>
     );
 });

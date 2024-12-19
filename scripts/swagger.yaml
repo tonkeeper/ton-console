@@ -2113,6 +2113,25 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v1/services/minter/jetton/meta:
+    post:
+      summary: "Upload jetton meta"
+      operationId: uploadMinterJettonMeta
+      tags:
+        - minter_jetton_media
+      requestBody:
+        $ref: "#/components/requestBodies/JettonMeta"
+      responses:
+        '201':
+          $ref: '#/components/responses/URL'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
   
   /api/v1/services/sites:
     post:
@@ -2772,8 +2791,11 @@ components:
         application/json:
           schema:
             type: object
-            additionalProperties: true
-            example: { }
+            additionalProperties:
+              type: string
+            example:
+              key1: "name"
+              key2: "test"
     ProjectCharge:
       description: "Data that is expected"
       content:
@@ -2987,6 +3009,18 @@ components:
               media:
                 type: string
                 format: binary
+    JettonMeta:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - meta
+            properties:
+              meta:
+                additionalProperties: true
+                example: { }
     ProServiceNewDashboardData:
       description: "Data that is expected"
       content:
