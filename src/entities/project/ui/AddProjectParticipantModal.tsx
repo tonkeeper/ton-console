@@ -119,7 +119,7 @@ const AddProjectParticipantModal: FC<{
                                             <PopoverBody>
                                                 <video
                                                     autoPlay={true}
-                                                    src="/assets/videos/find-user-id.webm"
+                                                    src="/assets/videos/where-user-id.webm"
                                                 />
                                             </PopoverBody>
                                         </PopoverContent>
