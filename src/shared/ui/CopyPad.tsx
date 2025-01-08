@@ -1,14 +1,14 @@
-import { ComponentProps, FunctionComponent, useLayoutEffect, useRef, useState } from 'react';
+import { ComponentProps, FC, useLayoutEffect, useRef, useState } from 'react';
 import { Pad } from './Pad';
-import { Box, Spinner, Text, Tooltip, useClipboard, useToken } from '@chakra-ui/react';
+import { Box, Spinner, Text, TextProps, Tooltip, useClipboard, useToken } from '@chakra-ui/react';
 import { CopyIcon16, CopyIcon24 } from './icons';
 import { hexToRGBA } from 'src/shared';
 
-export const CopyPad: FunctionComponent<
+export const CopyPad: FC<
     ComponentProps<typeof Pad> & {
         text: string;
         textView?: string;
-        textStyles?: ComponentProps<typeof Text>;
+        textStyles?: TextProps;
         iconAlign?: 'start' | 'center';
         iconPosition?: 'sticky' | 'static';
         isLoading?: boolean;

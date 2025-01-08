@@ -22,6 +22,7 @@ const BalancePage = lazy(() => import('./balance'));
 const DashboardPage = lazy(() => import('./dashboard'));
 const AppMessagesPage = lazy(() => import('./app-messages'));
 const FaucetPage = lazy(() => import('./faucet'));
+const UserProfilePage = lazy(() => import('./user-profile'));
 
 const Routing: FunctionComponent = () => {
     const location = useLocation();
@@ -135,6 +136,14 @@ const Routing: FunctionComponent = () => {
                     element={
                         <Suspense>
                             <FaucetPage />
+                        </Suspense>
+                    }
+                />
+                <Route
+                    path="profile"
+                    element={
+                        <Suspense>
+                            <UserProfilePage />
                         </Suspense>
                     }
                 />

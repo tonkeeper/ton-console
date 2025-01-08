@@ -5,5 +5,11 @@ export interface User {
 
     lastName?: string;
 
+    name: string;
+
     imageUrl?: string;
+
+    referralId: string;
+
+    referralCount: number;
 }
