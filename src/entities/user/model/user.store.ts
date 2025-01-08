@@ -10,6 +10,13 @@ class UserStore {
         makePersistable: { storeKey: 'User', notModifyStatusAfter: true }
     });
 
+    // referrals$ = new Loadable<{ items: Array<DTOReferral>; totalProfit: number } | null>(
+    //     null,
+    //     {
+    //         makePersistable: { storeKey: 'UserReferrals', notModifyStatusAfter: false }
+    //     }
+    // );
+
     constructor() {
         makeAutoObservable(this);
 
@@ -21,6 +28,11 @@ class UserStore {
         });
     }
 
+    private async fetchMe() {
+        const userRes = await apiClient.api.getUserInfo();
+        return mapDTOUserToUser(userRes.data.user);
+    }
+
     login = this.user$.createAsyncAction(async () => {
         const tgOAuthResponse = await loginViaTG();
 
@@ -28,17 +40,40 @@ class UserStore {
             return;
         }
 
-        await apiClient.api.authViaTg(tgOAuthResponse);
+        const url = window.location.href;
+        const params = new URLSearchParams(new URL(url).search);
+        const referral_id = params.get('referral') ?? undefined;
 
-        const userRes = await apiClient.api.getUserInfo();
+        await apiClient.api.authViaTg({ ...tgOAuthResponse, referral_id });
 
         await projectsStore.fetchProjects();
         if (projectsStore.projects$.value.length && !projectsStore.selectedProject) {
             projectsStore.selectProject(projectsStore.projects$.value[0].id);
         }
 
-        return mapDTOUserToUser(userRes.data.user);
+        return this.fetchMe();
     });
+
+    updateMe = this.user$.createAsyncAction(async () => {
+        return this.fetchMe();
+    });
+
+    // fetchReferrals = this.referrals$.createAsyncAction(async () => {
+    //     try {
+    //         const response = await apiClient.api.getUserReferrals();
+    //         const { items, total_profit: totalProfit } = response.data;
+
+    //         return {
+    //             items,
+    //             totalProfit
+    //         };
+    //     } catch (e) {
+    //         if (e instanceof AxiosError) {
+    //             console.error('Failed to fetch referrals:', e.message);
+    //         }
+    //         throw e;
+    //     }
+    // });
 
     logoutIfSessionExpired = this.user$.createAsyncAction(async () => {
         try {
@@ -58,6 +93,7 @@ class UserStore {
         }
 
         this.user$.value = null;
+        // this.referrals$.value = null;
     });
 
     isAuthorized(): this is { user$: Loadable<User> } {
@@ -70,7 +106,10 @@ function mapDTOUserToUser(user: DTOUser): User {
         id: user.id,
         firstName: user.first_name,
         lastName: user.last_name,
-        imageUrl: user.avatar
+        name: [user.first_name, user.last_name].join(' '),
+        imageUrl: user.avatar,
+        referralId: user.referral_id,
+        referralCount: user.referrals_count
     };
 }
 
