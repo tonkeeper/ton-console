@@ -1,25 +1,32 @@
 import { lazy } from '@loadable/component';
 import { Suspense } from 'react';
 import { Navigate, Route } from 'react-router-dom';
-import { Flex, Button, Badge } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
-import { H4, Overlay } from 'src/shared';
-import { SearchInput } from './ui/SearchInput';
 
-const JettonNewPage = lazy(() => import('./minter'));
+const JettonNewPage = lazy(() => import('./new-jetton'));
+const JettonMinerPage = lazy(() => import('./minter'));
 const JettonViewPage = lazy(() => import('./view'));
+const AirdropPage = lazy(() => import('./airdrop'));
+const AirdropsPage = lazy(() => import('./airdrops'));
+const NewAirdropPage = lazy(() => import('./new-airdrop'));
 
 const JettonRouting = (
     <>
         <Route
-            path="minter"
+            path="new-jetton"
             element={
                 <Suspense>
                     <JettonNewPage />
                 </Suspense>
             }
         />
-
+        <Route
+            path="minter"
+            element={
+                <Suspense>
+                    <JettonMinerPage />
+                </Suspense>
+            }
+        />
         <Route
             path="view"
             element={
@@ -28,32 +35,32 @@ const JettonRouting = (
                 </Suspense>
             }
         />
-
         <Route
-            index
+            path="airdrop"
             element={
-                <Overlay display="flex" flexDirection="column">
-                    <Flex align="center" gap={4} mb="5">
-                        <H4>Jetton Minter</H4>
-                        <Badge
-                            textStyle="label3"
-                            color="accent.orange"
-                            fontFamily="body"
-                            bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
-                        >
-                            BETA
-                        </Badge>
-                    </Flex>
-                    <Flex align="center" justify="center" gap="4" h="100%" mb="6">
-                        <SearchInput />
-                        <Button as={Link} to={'/jetton/minter'}>
-                            New Jetton
-                        </Button>
-                    </Flex>
-                </Overlay>
+                <Suspense>
+                    <AirdropPage />
+                </Suspense>
             }
         />
-        <Route path="*" element={<Navigate to="minter" replace />} />
+        <Route
+            path="airdrops"
+            element={
+                <Suspense>
+                    <AirdropsPage />
+                </Suspense>
+            }
+        />
+        <Route
+            path="new-airdrop"
+            element={
+                <Suspense>
+                    <NewAirdropPage />
+                </Suspense>
+            }
+        />
+        <Route index element={<Navigate to="new-jetton" replace />} />
+        <Route path="*" element={<Navigate to="new-jetton" replace />} />
     </>
 );
 

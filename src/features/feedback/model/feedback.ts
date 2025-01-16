@@ -43,10 +43,10 @@ class FeetbackStore {
         async (form: FeedbackFromI) => {
             const res = await apiClient.api.feedback({
                 ...form,
-                x_source: this.params?.source,
-                x_project_id: projectsStore.selectedProject?.id.toString(),
-                x_project_name: projectsStore.selectedProject?.name,
-                x_tg_user_id: userStore.user$.value?.id.toString(),
+                x_source: this.params?.source as string,
+                x_project_id: projectsStore.selectedProject?.id.toString() as string,
+                x_project_name: projectsStore.selectedProject?.name as string,
+                x_tg_user_id: userStore.user$.value?.id.toString() as string,
                 x_tg_user_name: userStore.user$.value
                     ? `${userStore.user$.value?.firstName} ${userStore.user$.value?.lastName}`
                     : ''

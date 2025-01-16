@@ -1,0 +1,522 @@
+openapi: 3.0.1
+info:
+  title: "Airdrop API for TON Console"
+  version: 0.0.1
+
+servers:
+  - url: "http://localhost:8888"
+
+tags:
+  - name: admin
+    description: 'Endpoints for airdrop administrator'
+  - name: claim
+    description: 'Endpoints for claim by users'
+
+paths:
+
+  /v1/airdrop:
+    get:
+      summary: "Get airdrop info"
+      operationId: getAirdropData
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/airdropIDParameter'
+      responses:
+        '200':
+          description: airdrop data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AirdropData'
+        'default':
+          $ref: '#/components/responses/Error'
+    post:
+      summary: "Generate new airdrop"
+      operationId: newAirdrop
+      tags:
+        - admin
+      requestBody:
+        $ref: "#/components/requestBodies/NewAirdropRequest"
+      responses:
+        '201':
+          description: airdrop ID
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    type: string
+                    example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+        'default':
+          $ref: '#/components/responses/Error'
+
+  /v1/airdrop/upload:
+    post:
+      summary: "Upload withdrawals file"
+      operationId: fileUpload
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/airdropIDParameter'
+      requestBody:
+        $ref: "#/components/requestBodies/FileUploadRequest"
+      responses:
+        '202':
+          description: No content
+        'default':
+          $ref: '#/components/responses/Error'
+
+  /v1/airdrop/distributors:
+    get:
+      summary: "Get distributors info"
+      operationId: getDistributorsData
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/airdropIDParameter'
+      responses:
+        '200':
+          description: distributors data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributorsData'
+        'default':
+          $ref: '#/components/responses/Error'
+
+  /v1/airdrop/royalty:
+    get:
+      summary: "Get royalty info"
+      operationId: getRoyaltyData
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/airdropIDParameter'
+      responses:
+        '200':
+          description: royalty data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoyaltiesData'
+        'default':
+          $ref: '#/components/responses/Error'
+
+  /v1/config:
+    get:
+      summary: "Get config params"
+      operationId: getConfig
+      tags:
+        - admin
+      responses:
+        '200':
+          description: config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        'default':
+          $ref: '#/components/responses/Error'
+
+  /v1/airdrop/start:
+    post:
+      summary: "Open claim method for users"
+      operationId: openClaim
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/airdropIDParameter'
+      responses:
+        '202':
+          description: No content
+        'default':
+          $ref: '#/components/responses/Error'
+
+  /v1/airdrop/stop:
+    post:
+      summary: "Close claim method for users"
+      operationId: closeClaim
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/airdropIDParameter'
+      responses:
+        '202':
+          description: No content
+        'default':
+          $ref: '#/components/responses/Error'
+
+  /v1/airdrop/claim/{account}:
+    get:
+      summary: "Get user claim data"
+      operationId: getUserClaim
+      tags:
+        - claim
+      parameters:
+        - $ref: '#/components/parameters/airdropIDParameter'
+        - $ref: '#/components/parameters/accountParameter'
+      responses:
+        '200':
+          description: user claim data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserClaim'
+        'default':
+          $ref: '#/components/responses/Error'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    airdropIDParameter:
+      description: Airdrop ID
+      in: query
+      name: id
+      required: true
+      schema:
+        type: string
+        example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+    accountParameter:
+      description: Account
+      in: path
+      name: account
+      required: true
+      schema:
+        type: string
+        example: "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
+
+  requestBodies:
+    NewAirdropRequest:
+      description: "Data for generating a new airdrop"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - admin
+              - jetton
+              - royalty_parameters
+            properties:
+              admin:
+                type: string
+                description: claim admin wallet address
+              jetton:
+                type: string
+                description: jetton master contract address
+              royalty_parameters:
+                $ref: '#/components/schemas/RoyaltyParameters'
+    FileUploadRequest:
+      description: "File with withdrawals for airdrop"
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              url:
+                type: string
+              file:
+                type: string
+                format: binary
+                description: The CSV file to upload
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+          example: "Unexpected error"
+    AirdropData:
+      type: object
+      required:
+        - clam_status
+        - jetton
+        - admin
+        - processed
+        - royalty_parameters
+      properties:
+        clam_status:
+          type: string
+          enum:
+            - opened
+            - closed
+        jetton:
+          $ref: '#/components/schemas/JettonInfo'
+        admin:
+          type: string
+          example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+          description: "Admin`s wallet address"
+        processed:
+          type: boolean
+          example: false
+          description: "Status of data readiness for airdrop"
+        royalty_parameters:
+          $ref: '#/components/schemas/RoyaltyParameters'
+        total_amount:
+          type: string
+          x-js-format: bigint
+          example: "597968399"
+        recipients:
+          type: integer
+          format: int32
+          example: 10000000
+          description: "Total number of recipients"
+        shards:
+          type: integer
+          format: int32
+          example: 16
+          description: "Number of distributor contracts"
+        file_hash:
+          type: string
+          example: "97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+          description: "Sha256 hash of uploaded CSV file"
+        file_name:
+          type: string
+          example: "airdrop.csv"
+          description: "Name of uploaded CSV file"
+        upload_in_progress:
+          type: boolean
+          example: false
+          description: "True if the file is uploaded but not saved in the database"
+        upload_error:
+          type: string
+          example: "Address duplication error. Two identical recipient addresses in the file."
+          description: "File upload error"
+    RoyaltyParameters:
+      type: object
+      required:
+        - min_commission
+      description: royalty parameters for airdrop
+      properties:
+        min_commission:
+          type: string
+          example: "100000000"
+          x-js-format: bigint
+    DistributorData:
+      type: object
+      required:
+        - account
+        - airdrop_status
+        - total_amount
+        - recipients
+        - shard
+      properties:
+        account:
+          type: string
+          example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+          description: "Distributor contract address"
+        airdrop_status:
+          type: string
+          enum:
+            - not_deployed
+            - lack_of_jettons
+            - ready
+            - blocked
+        total_amount:
+          type: string
+          x-js-format: bigint
+          example: "597968399"
+          description: "Total airdrop amount"
+        recipients:
+          type: integer
+          format: int32
+          example: 10000000
+          description: "Total number of recipients"
+        shard:
+          type: integer
+          format: int32
+          example: 3
+          description: "Shard number of distributor contract"
+        deploy_message:
+          $ref: '#/components/schemas/InternalMessage'
+        top_up_message:
+          $ref: '#/components/schemas/InternalMessage'
+        ton_withdrawal_message:
+          $ref: '#/components/schemas/InternalMessage'
+        jetton_withdrawal_message:
+          $ref: '#/components/schemas/InternalMessage'
+        block_message:
+          $ref: '#/components/schemas/InternalMessage'
+        need_jettons:
+          type: string
+          x-js-format: bigint
+          example: "597968399"
+          description: "Jettons to-up amount"
+        completed_claims:
+          type: integer
+          format: int32
+          example: 10000000
+          description: "Number of completed claims"
+        claimed_amount:
+          type: string
+          x-js-format: bigint
+          example: "597968399"
+          description: "Total claimed amount"
+        accumulated_commission:
+          type: string
+          x-js-format: bigint
+          example: "597968399"
+          description: "Accumulated commission (estimated, admin gets)"
+        jetton_balance:
+          type: string
+          x-js-format: bigint
+          example: "597968399"
+          description: "Jetton balance"
+    RoyaltyData:
+      type: object
+      required:
+        - account
+        - shard
+        - accumulated_royalty
+        - total_accumulated_royalty
+      properties:
+        account:
+          type: string
+          example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+          description: "Distributor contract address"
+        shard:
+          type: integer
+          format: int32
+          example: 3
+          description: "Shard number of distributor contract"
+        royalty_withdrawal_message:
+          $ref: '#/components/schemas/InternalMessage'
+        accumulated_royalty:
+          type: string
+          x-js-format: bigint
+          example: "597968399"
+          default: "0"
+          description: "Accumulated royalty (royalty receiver gets)"
+        total_accumulated_royalty:
+          type: string
+          x-js-format: bigint
+          example: "597968399"
+          default: "0"
+          description: "Total accumulated royalty (royalty receiver gets)"
+    InternalMessage:
+      type: object
+      required:
+        - mode
+        - address
+        - amount
+        - payload
+      properties:
+        mode:
+          type: integer
+          format: int32
+          example: 3
+          description: "Message sending mode"
+        address:
+          type: string
+          example: "kQABcHP_oXkYNCx3HHKd4rxL371RRl-O6IwgwqYZ7IT6Ha-u"
+          description: "Destination address in user-friendly form with bounce flag"
+        state_init:
+          type: string
+          description: "Message state init (base64 format)"
+        payload:
+          type: string
+          description: "Message payload (base64 format)"
+        amount:
+          type: string
+          x-js-format: bigint
+          example: "597968399"
+          description: "TON attached amount"
+    JettonInfo:
+      type: object
+      required:
+        - address
+        - name
+        - symbol
+        - decimals
+        - preview
+      properties:
+        address:
+          type: string
+          format: address
+          example: 0:0BB5A9F69043EEBDDA5AD2E946EB953242BD8F603FE795D90698CEEC6BFC60A0
+        name:
+          type: string
+          example: Wrapped TON
+        description:
+          type: string
+          example: Wrapped Toncoin
+        symbol:
+          type: string
+          example: WTON
+        decimals:
+          type: string
+          example: "9"
+        preview:
+          type: string
+          example: "https://cache.tonapi.io/images/jetton.jpg"
+    DistributorsData:
+      type: object
+      required:
+        - distributors
+      properties:
+        distributors:
+          type: array
+          description: "List of distributor contracts"
+          items:
+            $ref: '#/components/schemas/DistributorData'
+    RoyaltiesData:
+      type: object
+      required:
+        - royalties
+      properties:
+        royalties:
+          type: array
+          description: "List of distributor`s royalty info"
+          items:
+            $ref: '#/components/schemas/RoyaltyData'
+    Config:
+      type: object
+      required:
+        - royalty_numerator
+        - royalty_denominator
+      properties:
+        royalty_numerator:
+          type: integer
+          format: int32
+          example: 1
+        royalty_denominator:
+          type: integer
+          format: int32
+          example: 2
+    UserClaim:
+      type: object
+      required:
+        - claim_message
+        - jetton
+        - jetton_amount
+      properties:
+        claim_message:
+          $ref: '#/components/schemas/InternalMessage'
+        jetton_amount:
+          type: string
+          x-js-format: bigint
+          example: "597968399"
+        jetton:
+          type: string
+          example: "kQABcHP_oXkYNCx3HHKd4rxL371RRl-O6IwgwqYZ7IT6Ha-u"
+          description: "Jetton master contract in user-friendly form"
+
+  responses:
+    Error:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

@@ -75,7 +75,7 @@ export default {
             bg: 'white'
         },
         th: {
-            ...textStyles.body2, // Убедитесь, что textStyles определены
+            ...textStyles.body2,
             py: '14px',
             borderBottom: '1px',
             borderTop: '1px',

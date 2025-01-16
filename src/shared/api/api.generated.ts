@@ -605,6 +605,20 @@ export interface DTOTonSite {
     date_create: number;
 }
 
+export interface DTOJettonAirdrop {
+    /** @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b" */
+    id: string;
+    /** @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b" */
+    api_id: string;
+    /** @example "My airdrops" */
+    name: string;
+    /**
+     * @format int64
+     * @example 1690889913000
+     */
+    date_create: number;
+}
+
 export interface DTOProServiceInvoiceWebhook {
     /** @example "60ffb075" */
     id: string;
@@ -1175,7 +1189,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @summary Send user feedback
          * @request POST:/api/v1/feedback
          */
-        feedback: (data: Record<string, any>, params: RequestParams = {}) =>
+        feedback: (data: Record<string, string>, params: RequestParams = {}) =>
             this.request<
                 DTOOk,
                 {
@@ -4845,6 +4859,111 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 method: 'POST',
                 body: data,
                 type: ContentType.FormData,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags minter_jetton_media
+         * @name UploadMinterJettonMeta
+         * @summary Upload jetton meta
+         * @request POST:/api/v1/services/minter/jetton/meta
+         */
+        uploadMinterJettonMeta: (
+            data: {
+                /** @example {} */
+                meta: any;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                DTO_URL,
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/minter/jetton/meta`,
+                method: 'POST',
+                body: data,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags airdrops
+         * @name GetJettonAirdrops
+         * @summary Get all jetton airdrops for a specific project id
+         * @request GET:/api/v1/services/airdrops/jettons
+         */
+        getJettonAirdrops: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    airdrops: DTOJettonAirdrop[];
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/airdrops/jettons`,
+                method: 'GET',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags airdrops
+         * @name CreateJettonAirdrop
+         * @summary Create new jetton airdrops
+         * @request POST:/api/v1/services/airdrops/jettons
+         */
+        createJettonAirdrop: (
+            query: {
+                /**
+                 * Project ID
+                 * @format uint32
+                 */
+                project_id: number;
+            },
+            data: {
+                api_id: string;
+                name: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    airdrop: DTOJettonAirdrop;
+                },
+                {
+                    /** Error message */
+                    error: string;
+                    /** backend error code */
+                    code: number;
+                }
+            >({
+                path: `/api/v1/services/airdrops/jettons`,
+                method: 'POST',
+                query: query,
+                body: data,
                 ...params
             }),
 
