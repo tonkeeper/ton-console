@@ -11,10 +11,12 @@
     "build:staging2": "tsc && vite build --mode staging2",
     "preview": "vite preview",
     "test": "vitest",
+    "test:ts": "tsc -p tsconfig.json --noemit",
     "lint": "eslint ./",
     "prepare": "husky install",
     "generate-api": "npx tsx ./scripts/swagger.ts",
     "generate-webhooks": "npx tsx ./scripts/webhooks.ts",
+    "generate-airdrop": "npx tsx ./scripts/airdrop.ts",
     "postinstall": "patch-package"
   },
   "dependencies": {
