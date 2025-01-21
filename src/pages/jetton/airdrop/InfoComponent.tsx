@@ -15,8 +15,16 @@ const TextItem = (props: { title: string; text: string }) => {
 };
 
 export const InfoComponent = (props: { airdrop: ADAirdropData }) => {
-    const { admin, jetton, royalty_parameters, file_name, file_hash, total_amount, recipients } =
-        props.airdrop;
+    const {
+        admin,
+        jetton,
+        royalty_parameters,
+        file_name,
+        file_hash,
+        total_amount,
+        recipients,
+        shards
+    } = props.airdrop;
     return (
         <Card bg="background.contentTint">
             <Flex align="center" direction="row" gap="12px" overflow="hidden" p="16px">
@@ -68,6 +76,7 @@ export const InfoComponent = (props: { airdrop: ADAirdropData }) => {
                             )} ${jetton.symbol}`}
                         />
                         <TextItem title="Recepients" text={prettifyAmount(recipients)} />
+                        {!!shards && <TextItem title="Contracts" text={prettifyAmount(shards)} />}
                     </Flex>
                 )}
             </Flex>

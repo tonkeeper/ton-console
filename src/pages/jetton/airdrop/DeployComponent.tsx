@@ -25,7 +25,6 @@ const DeployComponentInner = (props: { queryId: string }) => {
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const airdrop = airdropsStore.airdrop$.value!;
-    // const distributors = airdropsStore.distributors$.value;
 
     const fetchDistributors = async () => {
         const res = await airdropsStore.loadDistributors(props.queryId);
@@ -67,10 +66,6 @@ const DeployComponentInner = (props: { queryId: string }) => {
 
         const messages = getMessages(distributors, status);
 
-        console.log('need------', needAmount);
-
-        console.log('msgs---------', messages);
-
         const checkAmount = await checkAccount({
             admin: airdrop.admin,
             jetton: airdrop.jetton.address,
@@ -98,7 +93,6 @@ const DeployComponentInner = (props: { queryId: string }) => {
                 messages: messages
             });
             setLoading(true);
-            console.log('-------transaction completed-----');
         } catch (error) {
             console.log(error);
         }
@@ -120,10 +114,6 @@ const DeployComponentInner = (props: { queryId: string }) => {
         text = `You need ${prettifyAmount(fromNano(amount.ton))} TON and ${prettifyAmount(
             amount.jetton! / 10 ** parseFloat(airdrop.jetton.decimals)
         )} ${airdrop.jetton.symbol} on your wallet`;
-    }
-
-    if (status === 'ready') {
-        buttonText = 'Block';
     }
 
     return (

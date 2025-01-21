@@ -10,9 +10,11 @@ import { makeAutoObservable } from 'mobx';
 import { projectsStore } from 'src/entities';
 import { toNano } from '@ton/ton';
 import { AirdropMetadata } from 'src/features/airdrop/model/interfaces/AirdropMetadata';
+import { getAirdropStatus, AirdropStatusT } from 'src/pages/jetton/airdrop/deployUtils';
 
 type AirdropFullT = ADAirdropData & {
     name: string;
+    status: AirdropStatusT;
 };
 
 export class AirdropStore {
@@ -73,12 +75,20 @@ export class AirdropStore {
         const airdrop = await airdropApiClient.v1
             .getAirdropData({ id, project_id: `${projectsStore.selectedProject!.id}` })
             .then(v => v.data);
+        const distributors = await airdropApiClient.v1
+            .getDistributorsData({
+                id,
+                project_id: `${projectsStore.selectedProject!.id}`
+            })
+            .then(v => v.data.distributors);
 
         const current = this.airdrops$.value.find(i => i.api_id === id)!;
+        const status = getAirdropStatus(airdrop, distributors);
 
-        const data = {
+        const data: AirdropFullT = {
             ...airdrop,
-            name: current.name
+            name: current.name,
+            status: status
         };
 
         console.log(data);
@@ -95,6 +105,34 @@ export class AirdropStore {
             .then(data => data.data.distributors);
 
         return res;
+    };
+
+    switchClaim = async (id: string, type: 'enable' | 'disable') => {
+        if (type === 'enable') {
+            await airdropApiClient.v1
+                .openClaim({
+                    id,
+                    project_id: `${projectsStore.selectedProject!.id}`
+                })
+                .then(d => {
+                    console.log(d);
+                })
+                .finally(async () => {
+                    await this.loadAirdrop(id);
+                });
+        } else {
+            await airdropApiClient.v1
+                .closeClaim({
+                    id,
+                    project_id: `${projectsStore.selectedProject!.id}`
+                })
+                .then(d => {
+                    console.log(d);
+                })
+                .finally(async () => {
+                    await this.loadAirdrop(id);
+                });
+        }
     };
 
     clearAirdrop() {

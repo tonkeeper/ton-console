@@ -1,4 +1,4 @@
-import { ADDistributorData } from 'src/shared/api/airdrop-api';
+import { ADAirdropData, ADDistributorData } from 'src/shared/api/airdrop-api';
 import { tonapiClient } from 'src/shared';
 import { Address } from '@ton/core';
 
@@ -139,6 +139,41 @@ export const getMessages = (distributors: ADDistributorData[], status: StatusT) 
     }
 
     return messages;
+};
+
+export type AirdropStatusT =
+    | 'need_file'
+    | 'need_deploy'
+    | 'claim_active'
+    | 'claim_stopped'
+    | 'blocked';
+
+export const getAirdropStatus = (airdrop: ADAirdropData, distributors: ADDistributorData[]) => {
+    const distStatus = getStatus(distributors);
+
+    let status: AirdropStatusT = 'need_file';
+
+    if (distStatus === 'waiting') {
+        status = 'need_file';
+    }
+
+    if (distStatus === 'deploy' || distStatus === 'topup') {
+        status = 'need_deploy';
+    }
+
+    if (distStatus === 'ready' && airdrop.clam_status === 'opened') {
+        status = 'claim_active';
+    }
+
+    if (distStatus === 'ready' && airdrop.clam_status === 'closed') {
+        status = 'claim_stopped';
+    }
+
+    if (distStatus === 'block') {
+        status = 'blocked';
+    }
+
+    return status;
 };
 
 export const prettifyAmount = (v: number | string) => {
