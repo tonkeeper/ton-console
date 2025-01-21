@@ -101,13 +101,12 @@ export interface ADDistributorData {
     top_up_message?: ADInternalMessage;
     ton_withdrawal_message?: ADInternalMessage;
     jetton_withdrawal_message?: ADInternalMessage;
-    royalty_withdrawal_message?: ADInternalMessage;
     block_message?: ADInternalMessage;
     /**
      * Jettons to-up amount
      * @example "597968399"
      */
-    top_up_amount?: string;
+    need_jettons?: string;
     /**
      * Number of completed claims
      * @format int32
@@ -120,20 +119,42 @@ export interface ADDistributorData {
      */
     claimed_amount?: string;
     /**
-     * Total accumulated commission (estimated, admin gets)
+     * Accumulated commission (estimated, admin gets)
      * @example "597968399"
      */
     accumulated_commission?: string;
-    /**
-     * Total accumulated royalty (royalty receiver gets)
-     * @example "597968399"
-     */
-    accumulated_royalty?: string;
     /**
      * Jetton balance
      * @example "597968399"
      */
     jetton_balance?: string;
+}
+
+export interface ADRoyaltyData {
+    /**
+     * Distributor contract address
+     * @example "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+     */
+    account: string;
+    /**
+     * Shard number of distributor contract
+     * @format int32
+     * @example 3
+     */
+    shard: number;
+    royalty_withdrawal_message?: ADInternalMessage;
+    /**
+     * Accumulated royalty (royalty receiver gets)
+     * @default "0"
+     * @example "597968399"
+     */
+    accumulated_royalty: string;
+    /**
+     * Total accumulated royalty (royalty receiver gets)
+     * @default "0"
+     * @example "597968399"
+     */
+    total_accumulated_royalty: string;
 }
 
 export interface ADInternalMessage {
@@ -143,8 +164,20 @@ export interface ADInternalMessage {
      * @example 3
      */
     mode: number;
-    /** Internal message (base64 format) */
-    message: string;
+    /**
+     * Destination address in user-friendly form with bounce flag
+     * @example "kQABcHP_oXkYNCx3HHKd4rxL371RRl-O6IwgwqYZ7IT6Ha-u"
+     */
+    address: string;
+    /** Message state init (base64 format) */
+    state_init?: string;
+    /** Message payload (base64 format) */
+    payload: string;
+    /**
+     * TON attached amount
+     * @example "597968399"
+     */
+    amount: string;
 }
 
 export interface ADJettonInfo {
@@ -170,9 +203,13 @@ export interface ADDistributorsData {
     distributors: ADDistributorData[];
 }
 
+export interface ADRoyaltiesData {
+    /** List of distributor`s royalty info */
+    royalties: ADRoyaltyData[];
+}
+
 export interface ADUserClaim {
-    /** Claim internal message (base64 format) */
-    claim_message: string;
+    claim_message: ADInternalMessage;
     /** @example "597968399" */
     amount: string;
 }
@@ -411,6 +448,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             >({
                 path: `/v1/airdrop`,
                 method: 'POST',
+                query: query,
                 body: data,
                 format: 'json',
                 ...params
@@ -472,6 +510,33 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<ADDistributorsData, ADError>({
                 path: `/v1/airdrop/distributors`,
+                method: 'GET',
+                query: query,
+                format: 'json',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags admin
+         * @name GetRoyaltyData
+         * @summary Get royalty info
+         * @request GET:/v1/airdrop/royalty
+         */
+        getRoyaltyData: (
+            query: {
+                /**
+                 * Airdrop ID
+                 * @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+                 */
+                id: string;
+                project_id: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<ADRoyaltiesData, ADError>({
+                path: `/v1/airdrop/royalty`,
                 method: 'GET',
                 query: query,
                 format: 'json',

@@ -88,6 +88,24 @@ paths:
         'default':
           $ref: '#/components/responses/Error'
 
+  /v1/airdrop/royalty:
+    get:
+      summary: "Get royalty info"
+      operationId: getRoyaltyData
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/airdropIDParameter'
+      responses:
+        '200':
+          description: royalty data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoyaltiesData'
+        'default':
+          $ref: '#/components/responses/Error'
+
   /v1/airdrop/start:
     post:
       summary: "Open claim method for users"
@@ -313,11 +331,9 @@ components:
           $ref: '#/components/schemas/InternalMessage'
         jetton_withdrawal_message:
           $ref: '#/components/schemas/InternalMessage'
-        royalty_withdrawal_message:
-          $ref: '#/components/schemas/InternalMessage'
         block_message:
           $ref: '#/components/schemas/InternalMessage'
-        top_up_amount:
+        need_jettons:
           type: string
           x-js-format: bigint
           example: "597968399"
@@ -336,31 +352,71 @@ components:
           type: string
           x-js-format: bigint
           example: "597968399"
-          description: "Total accumulated commission (estimated, admin gets) "
-        accumulated_royalty:
-          type: string
-          x-js-format: bigint
-          example: "597968399"
-          description: "Total accumulated royalty (royalty receiver gets)"
+          description: "Accumulated commission (estimated, admin gets)"
         jetton_balance:
           type: string
           x-js-format: bigint
           example: "597968399"
           description: "Jetton balance"
+    RoyaltyData:
+      type: object
+      required:
+        - account
+        - shard
+        - accumulated_royalty
+        - total_accumulated_royalty
+      properties:
+        account:
+          type: string
+          example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
+          description: "Distributor contract address"
+        shard:
+          type: integer
+          format: int32
+          example: 3
+          description: "Shard number of distributor contract"
+        royalty_withdrawal_message:
+          $ref: '#/components/schemas/InternalMessage'
+        accumulated_royalty:
+          type: string
+          x-js-format: bigint
+          example: "597968399"
+          default: "0"
+          description: "Accumulated royalty (royalty receiver gets)"
+        total_accumulated_royalty:
+          type: string
+          x-js-format: bigint
+          example: "597968399"
+          default: "0"
+          description: "Total accumulated royalty (royalty receiver gets)"
     InternalMessage:
       type: object
       required:
         - mode
-        - message
+        - address
+        - amount
+        - payload
       properties:
         mode:
           type: integer
           format: int32
           example: 3
           description: "Message sending mode"
-        message:
+        address:
           type: string
-          description: "Internal message (base64 format)"
+          example: "kQABcHP_oXkYNCx3HHKd4rxL371RRl-O6IwgwqYZ7IT6Ha-u"
+          description: "Destination address in user-friendly form with bounce flag"
+        state_init:
+          type: string
+          description: "Message state init (base64 format)"
+        payload:
+          type: string
+          description: "Message payload (base64 format)"
+        amount:
+          type: string
+          x-js-format: bigint
+          example: "597968399"
+          description: "TON attached amount"
     JettonInfo:
       type: object
       required:
@@ -399,6 +455,16 @@ components:
           description: "List of distributor contracts"
           items:
             $ref: '#/components/schemas/DistributorData'
+    RoyaltiesData:
+      type: object
+      required:
+        - royalties
+      properties:
+        royalties:
+          type: array
+          description: "List of distributor`s royalty info"
+          items:
+            $ref: '#/components/schemas/RoyaltyData'
     UserClaim:
       type: object
       required:
@@ -406,8 +472,7 @@ components:
         - amount
       properties:
         claim_message:
-          type: string
-          description: "Claim internal message (base64 format)"
+          $ref: '#/components/schemas/InternalMessage'
         amount:
           type: string
           x-js-format: bigint
