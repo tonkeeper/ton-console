@@ -5,7 +5,7 @@ import {
     Loadable
     // Network
 } from 'src/shared';
-import { ADAirdropData, ADDistributorData, airdropApiClient } from 'src/shared/api/airdrop-api';
+import { ADAirdropData, airdropApiClient } from 'src/shared/api/airdrop-api';
 import { makeAutoObservable } from 'mobx';
 import { projectsStore } from 'src/entities';
 import { toNano } from '@ton/ton';
@@ -19,8 +19,6 @@ export class AirdropStore {
     airdrop$ = new Loadable<AirdropFullT | null>(null);
 
     airdrops$ = new Loadable<DTOJettonAirdrop[]>([]);
-
-    distributors$ = new Loadable<ADDistributorData[]>([]);
 
     constructor() {
         makeAutoObservable(this);
@@ -85,13 +83,10 @@ export class AirdropStore {
 
         console.log(data);
 
-        return {
-            ...airdrop,
-            name: current.name
-        };
+        return data;
     });
 
-    loadDistributors = this.distributors$.createAsyncAction(async (id: string) => {
+    loadDistributors = async (id: string) => {
         const res = await airdropApiClient.v1
             .getDistributorsData({
                 id,
@@ -100,7 +95,11 @@ export class AirdropStore {
             .then(data => data.data.distributors);
 
         return res;
-    });
+    };
+
+    clearAirdrop() {
+        this.airdrop$.clear();
+    }
 
     clearStore() {
         this.airdrops$.clear();

@@ -6,6 +6,7 @@ import { airdropsStore } from 'src/features';
 import { TonConnectButton } from '@tonconnect/ui-react';
 import { InfoComponent } from 'src/pages/jetton/airdrop/InfoComponent';
 import { UploadComponent } from 'src/pages/jetton/airdrop/UploadComponent';
+import { DeployComponent } from 'src/pages/jetton/airdrop/DeployComponent';
 
 const NewAirdropPage: FC<BoxProps> = () => {
     const { searchParams } = useSearchParams();
@@ -17,7 +18,10 @@ const NewAirdropPage: FC<BoxProps> = () => {
         if (queryId) {
             airdropsStore.loadAirdrop(queryId!);
         }
-    }, [queryId]);
+        return () => {
+            airdropsStore.clearAirdrop();
+        };
+    }, []);
 
     if (!airdropsStore.airdrop$.isResolved || !airdrop || !queryId) {
         return (
@@ -33,15 +37,18 @@ const NewAirdropPage: FC<BoxProps> = () => {
                 <Box>
                     <H4 mb="1">{airdrop.name}</H4>
                     <Text textStyle="body2" color="text.secondary">
-                        Upload the file with recipients
+                        {!airdrop.processed
+                            ? 'Upload the file with recipients'
+                            : 'Create and top up distribution smart contracts by clicking the Deploy button'}
                     </Text>
                 </Box>
                 <TonConnectButton />
             </Flex>
             <Divider mb="3" />
-            <Flex align="flex-start" direction="column" gap="24px" px="6">
+            <Flex direction="column" gap="24px" maxW="568px" px="6">
                 <InfoComponent airdrop={airdrop} />
                 {!airdrop.processed && <UploadComponent queryId={queryId} />}
+                {airdrop.processed && <DeployComponent queryId={queryId} />}
             </Flex>
         </Overlay>
     );

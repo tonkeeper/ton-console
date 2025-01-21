@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { observer } from 'mobx-react-lite';
 import { Button, Flex, Text } from '@chakra-ui/react';
 import {
     FileInfoComponent,
@@ -8,7 +9,7 @@ import { airdropsStore } from 'src/features';
 import { airdropApiClient } from 'src/shared/api/airdrop-api';
 import { projectsStore } from 'src/entities';
 
-export const UploadComponent = (props: { queryId: string }) => {
+const UploadComponentInner = (props: { queryId: string }) => {
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [progress, setProgress] = useState<number | null>(null);
@@ -141,3 +142,5 @@ export const UploadComponent = (props: { queryId: string }) => {
         </Flex>
     );
 };
+
+export const UploadComponent = observer(UploadComponentInner);

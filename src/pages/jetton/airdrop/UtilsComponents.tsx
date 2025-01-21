@@ -21,7 +21,7 @@ export const FileInfoComponent = () => {
     };
 
     return (
-        <Card w="550px" bg="background.contentTint">
+        <Card bg="background.contentTint">
             <Flex direction="column" gap="6px" p="16px">
                 <Flex align="center" justify="space-between" direction="row">
                     <Text textStyle="label1">File requirements</Text>
@@ -54,7 +54,7 @@ export const FileInfoComponent = () => {
 
 export const FileProcessedComponent = () => {
     return (
-        <Card w="550px" bg="background.contentTint">
+        <Card bg="background.contentTint">
             <Flex direction="column" gap="6px" p="16px">
                 <Flex align="center" justify="space-between" direction="row">
                     <Text textStyle="label1">Preparing data for distribution</Text>
