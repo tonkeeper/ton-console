@@ -14,7 +14,7 @@ export const EmptyAirdrops: FunctionComponent = () => {
                     color="accent.red"
                     bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
                 >
-                    The service is in the testing phase. Do not use for production airdrops!
+                    MAINNET The service is in the testing phase. Do not use for production airdrops!
                 </Badge>
                 <H4 mb="2">Your Airdrops will be shown here</H4>
                 <Text textStyle="body2" mb="6" color="text.secondary">
