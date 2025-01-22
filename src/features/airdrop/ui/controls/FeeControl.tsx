@@ -43,7 +43,10 @@ const Control = <T extends { [controlId]: string }>({
             />
 
             <FormHelperText color="text.secondary">
-                The amount of TON the recipient must send to receive the Jettons.
+                The amount of TON the recipient must send to receive the Jettons. Min: 0.15 TON.
+                After the user pays this amount, the blockchain network fee is deducted from it, and
+                the remaining part is divided between the project administrator and the royalty
+                recipient (TonApps).
             </FormHelperText>
             <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
         </FormControl>

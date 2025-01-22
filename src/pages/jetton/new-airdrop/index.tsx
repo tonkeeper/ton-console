@@ -90,7 +90,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
             <Flex align="flex-start" justify="space-between" mb="5" px="6">
                 <Box>
                     <Flex align="center" direction="row" gap="8px">
-                        <H4 mb="1">New Sending</H4>
+                        <H4 mb="1">New Airdrop</H4>
                         <Badge
                             textStyle="label3"
                             color="accent.red"

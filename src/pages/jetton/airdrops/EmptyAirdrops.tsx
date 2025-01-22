@@ -21,7 +21,7 @@ export const EmptyAirdrops: FunctionComponent = () => {
                     A service for mass distribution of jettons
                 </Text>
                 <Button as={Link} to={'/jetton/new-airdrop'}>
-                    New Sending
+                    New Airdrop
                 </Button>
             </Flex>
         </Overlay>

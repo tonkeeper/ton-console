@@ -38,7 +38,7 @@ const AirdropsPage: FC<BoxProps> = () => {
                     </Text>
                 </Box>
                 <Button as={Link} ml="auto" to={'/jetton/new-airdrop'}>
-                    New Sending
+                    New Airdrop
                 </Button>
             </Flex>
             <AirdropsHistoryTable />
