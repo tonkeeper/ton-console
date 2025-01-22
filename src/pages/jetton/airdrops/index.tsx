@@ -37,9 +37,22 @@ const AirdropsPage: FC<BoxProps> = () => {
                         A service for mass distribution of jettons
                     </Text>
                 </Box>
-                <Button as={Link} ml="auto" to={'/jetton/new-airdrop'}>
-                    New Airdrop
-                </Button>
+                <Flex direction="row" gap="16px">
+                    <Button
+                        onClick={() => {
+                            window.open(
+                                'https://docs.tonconsole.com/tonconsole/jettons/airdrop',
+                                '_blank'
+                            );
+                        }}
+                        variant="secondary"
+                    >
+                        Documentation
+                    </Button>
+                    <Button as={Link} ml="auto" to={'/jetton/new-airdrop'}>
+                        New Airdrop
+                    </Button>
+                </Flex>
             </Flex>
             <AirdropsHistoryTable />
         </Overlay>
