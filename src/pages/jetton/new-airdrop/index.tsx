@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { H4, Overlay, tonapiClient } from 'src/shared';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Box, BoxProps, Button, Divider, Flex, Text, useToast } from '@chakra-ui/react';
+import { Badge, Box, BoxProps, Button, Divider, Flex, Text, useToast } from '@chakra-ui/react';
 import {
     TonConnectButton,
     useIsConnectionRestored,
@@ -89,7 +89,16 @@ const NewAirdropPage: FC<BoxProps> = () => {
         <Overlay display="flex" flexDirection="column" px="0">
             <Flex align="flex-start" justify="space-between" mb="5" px="6">
                 <Box>
-                    <H4 mb="1">New Sending</H4>
+                    <Flex align="center" direction="row" gap="8px">
+                        <H4 mb="1">New Sending</H4>
+                        <Badge
+                            textStyle="label3"
+                            color="accent.red"
+                            bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
+                        >
+                            MAINNET
+                        </Badge>
+                    </Flex>
                     <Text textStyle="body2" color="text.secondary">
                         Connect the wallet via TON Connect version W5 only. This address will serve
                         as the admin for the mailing list.
