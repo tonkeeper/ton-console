@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
+import { Address } from '@ton/core';
 import { H4, Overlay, useSearchParams } from 'src/shared';
 import {
     Badge,
@@ -133,6 +134,31 @@ const NewAirdropPage: FC<BoxProps> = () => {
                     <Flex direction="column" gap="16px">
                         <StatisticComponent />
                         {airdrop.status === 'blocked' && <DeployComponent queryId={queryId} />}
+                        <Flex wrap="wrap" direction="row" gap="16px">
+                            <Button
+                                onClick={() => {
+                                    window.open(
+                                        `https://tonkeeper.github.io/airdrop-reference-dapp/?claimId=${queryId}&claimJetton=${Address.parse(
+                                            airdrop?.jetton.address
+                                        ).toString()}`,
+                                        '_blank'
+                                    );
+                                }}
+                                variant="secondary"
+                            >
+                                Test claim
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    window.open(
+                                        'https://docs.tonconsole.com/tonconsole/jettons/airdrop',
+                                        '_blank'
+                                    );
+                                }}
+                            >
+                                Documentation
+                            </Button>
+                        </Flex>
                     </Flex>
                 )}
             </Flex>

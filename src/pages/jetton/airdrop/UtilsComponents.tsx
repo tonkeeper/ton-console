@@ -1,4 +1,4 @@
-import { Card, Flex, Spinner, Text } from '@chakra-ui/react';
+import { Card, Flex, Spinner, Text, Link } from '@chakra-ui/react';
 import { IconButton, DownloadIcon16 } from 'src/shared';
 
 export const FileInfoComponent = () => {
@@ -43,7 +43,15 @@ export const FileInfoComponent = () => {
                     decimal points are not allowed;
                     <br />
                     4. Recipient wallet addresses in user-friendly or raw format, with no duplicate
-                    addresses allowed. More information in documentation;
+                    addresses allowed. More information in{' '}
+                    <Link
+                        color="accent.blue"
+                        href="https://docs.tonconsole.com/tonconsole/jettons/airdrop"
+                        isExternal
+                    >
+                        documentation
+                    </Link>
+                    ;
                     <br />
                     5. File size no more than 800 MB.
                 </Text>

@@ -20,9 +20,22 @@ export const EmptyAirdrops: FunctionComponent = () => {
                 <Text textStyle="body2" mb="6" color="text.secondary">
                     A service for mass distribution of jettons
                 </Text>
-                <Button as={Link} to={'/jetton/new-airdrop'}>
-                    New Airdrop
-                </Button>
+                <Flex direction="row" gap="16px">
+                    <Button as={Link} to={'/jetton/new-airdrop'}>
+                        New Airdrop
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            window.open(
+                                'https://docs.tonconsole.com/tonconsole/jettons/airdrop',
+                                '_blank'
+                            );
+                        }}
+                        variant="secondary"
+                    >
+                        Documentation
+                    </Button>
+                </Flex>
             </Flex>
         </Overlay>
     );

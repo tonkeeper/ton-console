@@ -206,7 +206,7 @@ const DeployComponentInner = (props: {
     }
 
     return (
-        <Flex align="center" direction="row" gap="12px">
+        <Flex align="center" direction="row" gap="16px">
             <Button isLoading={loading} onClick={sendTransaction}>
                 {buttonText}
             </Button>
