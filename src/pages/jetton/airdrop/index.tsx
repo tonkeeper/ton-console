@@ -96,7 +96,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
             </Flex>
             <Divider mb="3" />
             <Flex align="flex-start" direction="row" gap="16px" px="6">
-                <Flex direction="column" gap="24px" maxW="520px">
+                <Flex direction="column" gap="24px" minW="520px" maxW="520px">
                     <InfoComponent airdrop={airdrop} />
                     {airdrop.status === 'need_file' && <UploadComponent queryId={queryId} />}
                     {airdrop.status === 'need_deploy' && (

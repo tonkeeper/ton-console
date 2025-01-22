@@ -21,13 +21,19 @@ const Control = <T extends { [controlId]: string }>({
     const { ref: maskFeeRef } = useIMask({
         mask: Number,
         scale: 2,
-        min: 0.15,
-        max: 100,
         radix: '.'
     });
 
     const { ref: hookDecimalsRef, ...registerFeeRest } = register(fieldName, {
-        required: 'This is required'
+        required: 'This is required',
+        validate: value => {
+            if (parseFloat(value) < 0.15) {
+                return 'Minimum 0.15 TON';
+            }
+            if (parseFloat(value) > 100) {
+                return 'Maximum 100 TON';
+            }
+        }
     });
 
     return (
@@ -41,14 +47,13 @@ const Control = <T extends { [controlId]: string }>({
                 placeholder="0.15 TON"
                 {...registerFeeRest}
             />
-
+            <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
             <FormHelperText color="text.secondary">
                 The amount of TON the recipient must send to receive the Jettons. Min: 0.15 TON.
                 After the user pays this amount, the blockchain network fee is deducted from it, and
                 the remaining part is divided between the project administrator and the royalty
                 recipient (TonApps).
             </FormHelperText>
-            <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
         </FormControl>
     );
 };
