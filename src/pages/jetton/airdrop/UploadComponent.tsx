@@ -78,12 +78,19 @@ const UploadComponentInner = (props: { queryId: string }) => {
     };
 
     const handleFileChange = async (file: File) => {
+        const minSize = 1024 * 1.5;
         const maxSize = 1024 * 1024 * 500;
 
         if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+            setError('Invalid file type');
+            return;
+        }
+        if (file.size < minSize) {
+            setError('Minimum 20 wallets');
             return;
         }
         if (file.size > maxSize) {
+            setError('Maximum 500 MB');
             return;
         }
 
@@ -100,6 +107,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
                             isLoading={isUploading}
                             onClick={() => {
                                 if (inputRef.current) {
+                                    setError(null);
                                     inputRef.current.value = '';
                                     inputRef.current.click();
                                 }
@@ -107,7 +115,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
                         >
                             Upload File
                         </Button>
-                        {!!progress && !error && (
+                        {!!progress && (
                             <Flex
                                 flex={1}
                                 overflow="hidden"
@@ -118,7 +126,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
                                 <Flex w={`${progress}%`} h="100%" bgColor="#000" />
                             </Flex>
                         )}
-                        {!!error && (
+                        {!progress && !!error && (
                             <Text textStyle="body2" color="#F53C36">
                                 {error}
                             </Text>

@@ -14,14 +14,16 @@ import {
 } from '@chakra-ui/react';
 import { airdropsStore } from 'src/features';
 import { TonConnectButton } from '@tonconnect/ui-react';
-import { InfoComponent } from 'src/pages/jetton/airdrop/InfoComponent';
-import { UploadComponent } from 'src/pages/jetton/airdrop/UploadComponent';
-import { DeployComponent } from 'src/pages/jetton/airdrop/DeployComponent';
+import { InfoComponent } from './InfoComponent';
+import { UploadComponent } from './UploadComponent';
+import { DeployComponent } from './DeployComponent';
+import { StatisticComponent } from './StatisticComponent';
 
 const NewAirdropPage: FC<BoxProps> = () => {
     const { searchParams } = useSearchParams();
     const queryId = searchParams.get('id');
     const [loading, setLoading] = useState(false);
+    const [showSwitch, setShowSwitch] = useState(true);
 
     const airdrop = airdropsStore.airdrop$.value;
 
@@ -53,17 +55,23 @@ const NewAirdropPage: FC<BoxProps> = () => {
 
     if (airdrop.status === 'need_deploy') {
         description =
-            'Create and top up distribution smart contracts by clicking the Deploy button';
+            'Create and top up distribution smart contracts by clicking the Deploy button.';
     }
 
     if (airdrop.status === 'claim_active') {
-        description = 'Airdrop is ready, you can pause claims or complete the distribution';
+        description = 'Airdrop is ready, you can pause claims or complete the distribution.';
         badgeText = 'CLAIM ENABLED';
     }
 
     if (airdrop.status === 'claim_stopped') {
-        description = 'Enable users to claim by clicking the Enable Сlaim button';
+        description = 'Enable users to claim by clicking the Enable Сlaim button.';
         badgeText = 'CLAIM DISABLED';
+    }
+
+    if (airdrop.status === 'blocked') {
+        description =
+            'Distribution completed. You can withdraw the accumulated profit and remaining tokens using the Withdraw button.';
+        badgeText = 'FINISHED';
     }
 
     return (
@@ -87,23 +95,44 @@ const NewAirdropPage: FC<BoxProps> = () => {
                 <TonConnectButton />
             </Flex>
             <Divider mb="3" />
-            <Flex direction="column" gap="24px" maxW="568px" px="6">
-                <InfoComponent airdrop={airdrop} />
-                {airdrop.status === 'need_file' && <UploadComponent queryId={queryId} />}
-                {airdrop.status === 'need_deploy' && <DeployComponent queryId={queryId} />}
-                {(airdrop.status === 'claim_active' || airdrop.status === 'claim_stopped') && (
-                    <Flex direction="row">
-                        <Button
-                            isLoading={loading}
-                            onClick={() =>
-                                switchClaim(
-                                    airdrop.status === 'claim_active' ? 'disable' : 'enable'
-                                )
-                            }
-                            variant={airdrop.status === 'claim_active' ? 'secondary' : undefined}
-                        >
-                            {airdrop.status === 'claim_active' ? 'Disable Claim' : 'Enable Сlaim'}
-                        </Button>
+            <Flex align="flex-start" direction="row" gap="16px" px="6">
+                <Flex direction="column" gap="24px" maxW="520px">
+                    <InfoComponent airdrop={airdrop} />
+                    {airdrop.status === 'need_file' && <UploadComponent queryId={queryId} />}
+                    {airdrop.status === 'need_deploy' && (
+                        <DeployComponent queryId={queryId} updateType="ready" />
+                    )}
+                    {(airdrop.status === 'claim_active' || airdrop.status === 'claim_stopped') && (
+                        <Flex direction="row" gap="16px">
+                            {showSwitch && (
+                                <Button
+                                    isLoading={loading}
+                                    onClick={() =>
+                                        switchClaim(
+                                            airdrop.status === 'claim_active' ? 'disable' : 'enable'
+                                        )
+                                    }
+                                    variant={
+                                        airdrop.status === 'claim_active' ? 'secondary' : undefined
+                                    }
+                                >
+                                    {airdrop.status === 'claim_active'
+                                        ? 'Disable Claim'
+                                        : 'Enable Сlaim'}
+                                </Button>
+                            )}
+                            <DeployComponent
+                                queryId={queryId}
+                                updateType="block"
+                                hideEnableButton={() => setShowSwitch(false)}
+                            />
+                        </Flex>
+                    )}
+                </Flex>
+                {airdrop.status !== 'need_file' && airdrop.status !== 'need_deploy' && (
+                    <Flex direction="column" gap="16px">
+                        <StatisticComponent />
+                        {airdrop.status === 'blocked' && <DeployComponent queryId={queryId} />}
                     </Flex>
                 )}
             </Flex>

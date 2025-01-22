@@ -5,7 +5,7 @@ import {
     Loadable
     // Network
 } from 'src/shared';
-import { ADAirdropData, airdropApiClient } from 'src/shared/api/airdrop-api';
+import { ADAirdropData, ADDistributorData, airdropApiClient } from 'src/shared/api/airdrop-api';
 import { makeAutoObservable } from 'mobx';
 import { projectsStore } from 'src/entities';
 import { toNano } from '@ton/ton';
@@ -21,6 +21,8 @@ export class AirdropStore {
     airdrop$ = new Loadable<AirdropFullT | null>(null);
 
     airdrops$ = new Loadable<DTOJettonAirdrop[]>([]);
+
+    distributors$ = new Loadable<ADDistributorData[]>([]);
 
     constructor() {
         makeAutoObservable(this);
@@ -82,6 +84,8 @@ export class AirdropStore {
             })
             .then(v => v.data.distributors);
 
+        this.distributors$.value = distributors;
+
         const current = this.airdrops$.value.find(i => i.api_id === id)!;
         const status = getAirdropStatus(airdrop, distributors);
 
@@ -91,21 +95,19 @@ export class AirdropStore {
             status: status
         };
 
-        console.log(data);
-
         return data;
     });
 
-    loadDistributors = async (id: string) => {
-        const res = await airdropApiClient.v1
+    loadDistributors = this.distributors$.createAsyncAction(async (id: string) => {
+        const distributors = await airdropApiClient.v1
             .getDistributorsData({
                 id,
                 project_id: `${projectsStore.selectedProject!.id}`
             })
             .then(data => data.data.distributors);
 
-        return res;
-    };
+        return distributors;
+    });
 
     switchClaim = async (id: string, type: 'enable' | 'disable') => {
         if (type === 'enable') {
@@ -137,10 +139,13 @@ export class AirdropStore {
 
     clearAirdrop() {
         this.airdrop$.clear();
+        this.distributors$.clear();
     }
 
     clearStore() {
         this.airdrops$.clear();
+        this.airdrop$.clear();
+        this.distributors$.clear();
     }
 }
 

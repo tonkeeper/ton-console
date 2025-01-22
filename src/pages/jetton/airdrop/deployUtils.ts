@@ -2,7 +2,15 @@ import { ADAirdropData, ADDistributorData } from 'src/shared/api/airdrop-api';
 import { tonapiClient } from 'src/shared';
 import { Address } from '@ton/core';
 
-export type StatusT = 'waiting' | 'deploy' | 'topup' | 'ready' | 'block';
+export type StatusT =
+    | 'waiting'
+    | 'deploy'
+    | 'topup'
+    | 'ready'
+    | 'block'
+    | 'withdraw_jetton'
+    | 'withdraw_ton'
+    | 'withdraw_complete';
 
 type AccountCheckT = {
     admin: string;
@@ -37,28 +45,42 @@ export const checkAccount = async (v: AccountCheckT) => {
     return true;
 };
 
-export const getStatus = (distributors: ADDistributorData[]) => {
+export const getStatus = (distributors: ADDistributorData[]): StatusT => {
+    const s: StatusT = 'waiting';
+
     if (distributors.length === 0) {
-        return 'waiting';
+        return s;
     }
-    const needDeploy = distributors.findIndex(i => i.airdrop_status === 'not_deployed') !== -1;
-    const needTopUp = distributors.findIndex(i => i.airdrop_status === 'lack_of_jettons') !== -1;
-    const ready = distributors.findIndex(i => i.airdrop_status === 'ready') !== -1;
-    const isBlock = distributors.findIndex(i => i.airdrop_status === 'blocked') !== -1;
+    const needDeploy = distributors.some(i => i.airdrop_status === 'not_deployed');
+    const needTopUp = distributors.some(i => i.airdrop_status === 'lack_of_jettons');
+    const ready = distributors.some(i => i.airdrop_status === 'ready');
+    const isBlock = distributors.some(i => i.airdrop_status === 'blocked');
+    const canWithdrawTons = distributors.some(i => !!i.ton_withdrawal_message);
+    const canWithdrawJettons = distributors.some(i => !!i.jetton_withdrawal_message);
+    const isWithdrawComplete = distributors.some(
+        i => !i.jetton_withdrawal_message && !i.ton_withdrawal_message
+    );
 
-    let s: StatusT = 'waiting';
-
-    if (isBlock) {
-        s = 'block';
-    }
-    if (ready) {
-        s = 'ready';
+    if (needDeploy) {
+        return 'deploy';
     }
     if (needTopUp) {
-        s = 'topup';
+        return 'topup';
     }
-    if (needDeploy) {
-        s = 'deploy';
+    if (ready) {
+        return 'ready';
+    }
+    if (isBlock && canWithdrawJettons) {
+        return 'withdraw_jetton';
+    }
+    if (isBlock && canWithdrawTons) {
+        return 'withdraw_ton';
+    }
+    if (isBlock && isWithdrawComplete) {
+        return 'withdraw_complete';
+    }
+    if (isBlock) {
+        return 'block';
     }
 
     return s;
@@ -132,9 +154,29 @@ export const getMessages = (distributors: ADDistributorData[], status: StatusT) 
         messages = distributors
             .filter(i => i.airdrop_status === 'ready')
             .map(i => ({
-                address: i.top_up_message!.address,
-                amount: i.top_up_message!.amount,
-                payload: i.top_up_message!.payload
+                address: i.block_message!.address,
+                amount: i.block_message!.amount,
+                payload: i.block_message!.payload
+            }));
+    }
+
+    if (status === 'withdraw_jetton') {
+        messages = distributors
+            .filter(i => i.airdrop_status === 'blocked' && !!i.jetton_withdrawal_message)
+            .map(i => ({
+                address: i.jetton_withdrawal_message!.address,
+                amount: i.jetton_withdrawal_message!.amount,
+                payload: i.jetton_withdrawal_message!.payload
+            }));
+    }
+
+    if (status === 'withdraw_ton') {
+        messages = distributors
+            .filter(i => i.airdrop_status === 'blocked' && !!i.ton_withdrawal_message)
+            .map(i => ({
+                address: i.ton_withdrawal_message!.address,
+                amount: i.ton_withdrawal_message!.amount,
+                payload: i.ton_withdrawal_message!.payload
             }));
     }
 
@@ -169,7 +211,12 @@ export const getAirdropStatus = (airdrop: ADAirdropData, distributors: ADDistrib
         status = 'claim_stopped';
     }
 
-    if (distStatus === 'block') {
+    if (
+        distStatus === 'block' ||
+        distStatus === 'withdraw_ton' ||
+        distStatus === 'withdraw_jetton' ||
+        distStatus === 'withdraw_complete'
+    ) {
         status = 'blocked';
     }
 
