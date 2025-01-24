@@ -24,7 +24,6 @@ const AirdropForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) =>
         <chakra.form
             id={id}
             w="100%"
-            maxW={600}
             onSubmit={handleSubmit(submitHandler)}
             noValidate
             gap={4}

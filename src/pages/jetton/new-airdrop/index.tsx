@@ -15,6 +15,7 @@ import AirdropForm from 'src/features/airdrop/ui/AirdropForm';
 import { AirdropMetadata } from 'src/features/airdrop/model/interfaces/AirdropMetadata';
 import { useNavigate } from 'react-router-dom';
 import { airdropsStore } from 'src/features';
+import { InfoComponent } from './InfoComponent';
 
 const WALLET_W5_CODE_HASH = 'IINLe3KxEhR+Gy+0V7hOdNGjDwT3N9T2KmaOlVLSty8=';
 
@@ -100,34 +101,36 @@ const NewAirdropPage: FC<BoxProps> = () => {
                         </Badge>
                     </Flex>
                     <Text textStyle="body2" color="text.secondary">
-                        Connect the wallet via TON Connect version W5 only. This address will serve
-                        as the admin for the mailing list.
+                        Fill in the details and connect your wallet
                     </Text>
                 </Box>
                 <TonConnectButton />
             </Flex>
             <Divider mb="3" />
-            <Flex align="flex-start" direction="column" px="6">
-                <FormProvider {...methods}>
-                    <AirdropForm onSubmit={handleSubmit} id={formId} />
-                </FormProvider>
-                {userAddress ? (
-                    <Button
-                        flex={1}
-                        maxW={600}
-                        mt={4}
-                        form={formId}
-                        isLoading={isLoading}
-                        type="submit"
-                        variant="primary"
-                    >
-                        Continue
-                    </Button>
-                ) : (
-                    <Button flex={1} maxW={600} mt={4} onClick={openConnect} variant="primary">
-                        Connect W5 Wallet
-                    </Button>
-                )}
+            <Flex align="flex-start" direction="column" gap="24px" maxW="550px" px="6">
+                <Flex align="flex-start" direction="column" gap="16px">
+                    <FormProvider {...methods}>
+                        <AirdropForm onSubmit={handleSubmit} id={formId} />
+                    </FormProvider>
+                    {userAddress ? (
+                        <Button
+                            flex={1}
+                            maxW={600}
+                            mt={4}
+                            form={formId}
+                            isLoading={isLoading}
+                            type="submit"
+                            variant="primary"
+                        >
+                            Continue
+                        </Button>
+                    ) : (
+                        <Button flex={1} maxW={600} mt={4} onClick={openConnect} variant="primary">
+                            Connect W5 Wallet
+                        </Button>
+                    )}
+                </Flex>
+                <InfoComponent />
             </Flex>
         </Overlay>
     );

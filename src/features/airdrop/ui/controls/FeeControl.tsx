@@ -48,7 +48,7 @@ const Control = <T extends { [controlId]: string }>({
                 {...registerFeeRest}
             />
             <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
-            <FormHelperText color="text.secondary">
+            <FormHelperText textStyle="body2" color="text.secondary">
                 The amount of TON the recipient must send to receive the Jettons. Min: 0.15 TON.
                 After the user pays this amount, the blockchain network fee is deducted from it, and
                 the remaining part is divided between the project administrator and the royalty

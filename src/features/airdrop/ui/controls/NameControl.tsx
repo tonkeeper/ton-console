@@ -28,7 +28,7 @@ const Control = <T extends { [controlId]: string }>({
                     required: 'This is required'
                 })}
             />
-            <FormHelperText color="text.secondary">
+            <FormHelperText textStyle="body2" color="text.secondary">
                 Only the administrator can see this name.
             </FormHelperText>
             <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
