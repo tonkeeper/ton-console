@@ -101,8 +101,8 @@ const DeployComponentInner = (props: {
         const checkAmount = await checkAccount({
             admin: airdrop.admin,
             jetton: airdrop.jetton.address,
-            needTon: needAmount.ton,
-            needJetton: needAmount.jetton,
+            needTon: needAmount?.ton || 0,
+            needJetton: needAmount?.jetton || 0,
             errCb: v => {
                 toast({
                     title: v.title,

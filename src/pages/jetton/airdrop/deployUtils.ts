@@ -31,13 +31,17 @@ export const checkAccount = async (v: AccountCheckT) => {
     }
 
     if (v.needJetton) {
-        const wallet = await tonapiClient.accounts.getAccountJettonBalance(
-            Address.parse(v.admin),
-            Address.parse(v.jetton)
-        );
-
-        if (wallet.balance < BigInt(v.needJetton)) {
-            v.errCb({ title: 'Not enough tokens', text: 'Top up balance and try again' });
+        try {
+            const res = await tonapiClient.accounts.getAccountJettonBalance(
+                Address.parse(v.admin),
+                Address.parse(v.jetton)
+            );
+            if (res?.balance < BigInt(v?.needJetton || 0)) {
+                v.errCb({ title: 'Not enough tokens', text: 'Top up balance and try again' });
+                return true;
+            }
+        } catch (err) {
+            v.errCb({ title: 'Error', text: (err as { message?: string })?.message || '' });
             return false;
         }
     }
@@ -86,12 +90,12 @@ export const getStatus = (distributors: ADDistributorData[]): StatusT => {
     return s;
 };
 
-export const getAmount = (distributors: ADDistributorData[], status: StatusT) => {
-    let amount: { ton: number; jetton?: number } = {
-        ton: 0
-    };
+export const getAmount = (
+    distributors: ADDistributorData[],
+    status: StatusT
+): { ton: number; jetton?: number } | null => {
     if (status === 'deploy') {
-        amount = {
+        return {
             ton: distributors
                 .filter(i => i.airdrop_status === 'not_deployed')
                 .reduce((a, c) => a + parseFloat(c.deploy_message!.amount), 0)
@@ -99,24 +103,23 @@ export const getAmount = (distributors: ADDistributorData[], status: StatusT) =>
     }
 
     if (status === 'topup') {
-        amount = {
+        return {
             ton: distributors
-                .filter(i => i.airdrop_status === 'lack_of_jettons')
-                .reduce((a, c) => a + parseFloat(c.top_up_message!.amount), 0),
+                .filter(i => i.airdrop_status === 'lack_of_jettons' && !!i?.top_up_message)
+                .reduce((a, c) => a + parseFloat(c?.top_up_message?.amount || '0'), 0),
             jetton: distributors
                 .filter(i => i.airdrop_status === 'lack_of_jettons')
-                .reduce((a, c) => a + parseFloat(c.need_jettons!), 0)
+                .reduce((a, c) => a + parseFloat(c?.need_jettons || '0'), 0)
         };
     }
     if (status === 'ready') {
-        amount = {
+        return {
             ton: distributors
                 .filter(i => i.airdrop_status === 'ready')
                 .reduce((a, c) => a + parseFloat(c.block_message!.amount), 0)
         };
     }
-
-    return amount;
+    return null;
 };
 
 type MessageT = {
@@ -127,10 +130,10 @@ type MessageT = {
 };
 
 export const getMessages = (distributors: ADDistributorData[], status: StatusT) => {
-    let messages: MessageT[] = [];
+    const messages: MessageT[] = [];
 
     if (status === 'deploy') {
-        messages = distributors
+        return distributors
             .filter(i => i.airdrop_status === 'not_deployed')
             .map(i => ({
                 address: i.deploy_message!.address,
@@ -141,8 +144,8 @@ export const getMessages = (distributors: ADDistributorData[], status: StatusT) 
     }
 
     if (status === 'topup') {
-        messages = distributors
-            .filter(i => i.airdrop_status === 'lack_of_jettons')
+        return distributors
+            .filter(i => i.airdrop_status === 'lack_of_jettons' && !!i?.top_up_message)
             .map(i => ({
                 address: i.top_up_message!.address,
                 amount: i.top_up_message!.amount,
@@ -151,7 +154,7 @@ export const getMessages = (distributors: ADDistributorData[], status: StatusT) 
     }
 
     if (status === 'ready') {
-        messages = distributors
+        return distributors
             .filter(i => i.airdrop_status === 'ready')
             .map(i => ({
                 address: i.block_message!.address,
@@ -161,7 +164,7 @@ export const getMessages = (distributors: ADDistributorData[], status: StatusT) 
     }
 
     if (status === 'withdraw_jetton') {
-        messages = distributors
+        return distributors
             .filter(i => i.airdrop_status === 'blocked' && !!i.jetton_withdrawal_message)
             .map(i => ({
                 address: i.jetton_withdrawal_message!.address,
@@ -171,7 +174,7 @@ export const getMessages = (distributors: ADDistributorData[], status: StatusT) 
     }
 
     if (status === 'withdraw_ton') {
-        messages = distributors
+        return distributors
             .filter(i => i.airdrop_status === 'blocked' && !!i.ton_withdrawal_message)
             .map(i => ({
                 address: i.ton_withdrawal_message!.address,
