@@ -85,10 +85,6 @@ const UploadComponentInner = (props: { queryId: string }) => {
             setError('Invalid file type');
             return;
         }
-        if (file.size < minSize) {
-            setError('Minimum 20 wallets');
-            return;
-        }
         if (file.size > maxSize) {
             setError('Maximum 500 MB');
             return;
