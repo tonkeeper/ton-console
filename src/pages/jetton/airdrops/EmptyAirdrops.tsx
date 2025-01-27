@@ -40,7 +40,7 @@ export const EmptyAirdrops: FunctionComponent = () => {
                         color="accent.red"
                         bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
                     >
-                        MAINNET The service is in the testing phase. Do not use for production
+                        TESTNET The service is in the testing phase. Do not use for production
                         airdrops!
                     </Badge>
                 </Flex>

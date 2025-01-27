@@ -97,7 +97,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
                             color="accent.red"
                             bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
                         >
-                            MAINNET
+                            TESTNET
                         </Badge>
                     </Flex>
                     <Text textStyle="body2" color="text.secondary">
