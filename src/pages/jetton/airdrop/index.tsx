@@ -140,7 +140,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
                                     window.open(
                                         `https://tonkeeper.github.io/airdrop-reference-dapp/?claimId=${queryId}&claimJetton=${Address.parse(
                                             airdrop?.jetton.address
-                                        ).toString()}`,
+                                        ).toString()}&testnet=true`,
                                         '_blank'
                                     );
                                 }}
