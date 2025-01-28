@@ -1,15 +1,34 @@
+import { useState } from 'react';
+import { Address, fromNano } from '@ton/core';
 import { Card, Image, Flex, Text, Divider } from '@chakra-ui/react';
 import { ADAirdropData } from 'src/shared/api/airdrop-api';
-import { Address, fromNano } from '@ton/core';
 import { prettifyAmount, sliceString } from './deployUtils';
+import { CopyIcon16, copyToClipboard, IconButton, TickIcon } from 'src/shared';
 
-const TextItem = (props: { title: string; text: string }) => {
+const TextItem = (props: { title: string; text: string; copyContent?: string }) => {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = () => {
+        setCopied(true);
+        copyToClipboard(props.copyContent!);
+        setTimeout(() => setCopied(false), 1500);
+    };
+
     return (
         <Flex direction="row" overflow="hidden" whiteSpace="nowrap">
             <Text textStyle="body2" minW="100px" color="text.secondary">
                 {props.title}
             </Text>
-            <Text textStyle="body2">{props.text}</Text>
+            <Flex align="center" direction="row" gap="6px">
+                <Text textStyle="body2">{props.text}</Text>
+                {!!props.copyContent && (
+                    <IconButton
+                        aria-label="copy"
+                        icon={copied ? <TickIcon /> : <CopyIcon16 />}
+                        onClick={handleCopy}
+                    />
+                )}
+            </Flex>
         </Flex>
     );
 };
@@ -48,13 +67,16 @@ export const InfoComponent = (props: { airdrop: ADAirdropData }) => {
                 <Flex direction="column" gap="4px" py="8px">
                     <TextItem
                         title="Admin"
-                        text={sliceString(Address.parse(admin).toString({ bounceable: false }))}
+                        text={sliceString(Address.parse(admin).toString({ bounceable: false }), 16)}
+                        copyContent={Address.parse(admin).toString({ bounceable: false })}
                     />
                     <TextItem
                         title="Jetton"
                         text={sliceString(
-                            Address.parse(jetton.address).toString({ bounceable: true })
+                            Address.parse(jetton.address).toString({ bounceable: true }),
+                            16
                         )}
+                        copyContent={Address.parse(jetton.address).toString({ bounceable: true })}
                     />
                     <TextItem
                         title="Claim Fee"

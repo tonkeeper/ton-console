@@ -17,8 +17,6 @@ import { useNavigate } from 'react-router-dom';
 import { airdropsStore } from 'src/features';
 import { InfoComponent } from './InfoComponent';
 
-const WALLET_W5_CODE_HASH = 'IINLe3KxEhR+Gy+0V7hOdNGjDwT3N9T2KmaOlVLSty8=';
-
 async function checkJetton(address: string) {
     try {
         await tonapiClient.jettons.getJettonInfo(Address.parse(address));
@@ -29,6 +27,7 @@ async function checkJetton(address: string) {
 }
 
 const checkIsWalletW5 = (stateInit: string) => {
+    const WALLET_W5_CODE_HASH = 'IINLe3KxEhR+Gy+0V7hOdNGjDwT3N9T2KmaOlVLSty8=';
     const boc = Cell.fromBase64(stateInit);
     const code = boc.refs[0];
     const hash = code.hash().toString('base64');
@@ -49,24 +48,32 @@ const NewAirdropPage: FC<BoxProps> = () => {
 
     const formId = 'airdrops-form-id';
 
+    const showWalletError = () => {
+        toast({
+            title: 'Connect wallet W5',
+            description: 'Please reconnect with wallet W5',
+            position: 'bottom-left',
+            duration: 5000,
+            status: 'error',
+            isClosable: true
+        });
+    };
+
     useEffect(() => {
         if (connectionRestored && !!wallet?.account.walletStateInit) {
             const isW5 = checkIsWalletW5(wallet?.account.walletStateInit);
 
             if (!isW5) {
-                toast({
-                    title: 'Connect wallet W5',
-                    description: 'Please reconnect with wallet W5',
-                    position: 'bottom-left',
-                    duration: 5000,
-                    status: 'error',
-                    isClosable: true
-                });
+                showWalletError();
             }
         }
     }, [wallet, connectionRestored]);
 
     const handleSubmit = async ({ name, address, fee }: AirdropMetadata) => {
+        if (!checkIsWalletW5(wallet?.account.walletStateInit || '')) {
+            showWalletError();
+            return;
+        }
         setIsLoading(true);
         const isValidJetton = await checkJetton(address);
 

@@ -54,9 +54,9 @@ const AirdropsHistoryTable: FunctionComponent<ComponentProps<typeof TableContain
                                     <Td overflow="hidden">
                                         <Flex align="center" gap="1">
                                             <chakra.span flexShrink="1" layerStyle="textEllipse">
-                                                {i.id}
+                                                {i.api_id}
                                             </chakra.span>
-                                            {copiedKey !== undefined && copiedKey === i.id ? (
+                                            {copiedKey !== undefined && copiedKey === i.api_id ? (
                                                 <TickIcon />
                                             ) : (
                                                 <IconButton
@@ -65,8 +65,8 @@ const AirdropsHistoryTable: FunctionComponent<ComponentProps<typeof TableContain
                                                     onClick={e => {
                                                         e.stopPropagation();
                                                         e.preventDefault();
-                                                        setCopiedKey(i.id);
-                                                        copyToClipboard(i.id);
+                                                        setCopiedKey(i.api_id);
+                                                        copyToClipboard(i.api_id);
                                                     }}
                                                 />
                                             )}

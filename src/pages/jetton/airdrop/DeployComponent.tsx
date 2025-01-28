@@ -3,7 +3,12 @@ import { observer } from 'mobx-react-lite';
 import { fromNano } from '@ton/core';
 import { Button, Center, Flex, Spinner, Text, useToast } from '@chakra-ui/react';
 import { airdropsStore } from 'src/features';
-import { useTonConnectUI } from '@tonconnect/ui-react';
+import {
+    useIsConnectionRestored,
+    useTonConnectModal,
+    useTonConnectUI,
+    useTonWallet
+} from '@tonconnect/ui-react';
 import {
     StatusT,
     getStatus,
@@ -15,11 +20,13 @@ import {
 import { ADDistributorData } from 'src/shared/api/airdrop-api';
 import { ConfirmationDialog } from 'src/entities';
 
-const DeployComponentInner = (props: {
+interface DeployComponentProps {
     queryId: string;
     updateType?: 'ready' | 'block';
     hideEnableButton?: () => void;
-}) => {
+}
+
+const DeployComponentInner = (props: DeployComponentProps) => {
     const airdrop = airdropsStore.airdrop$.value!;
     const initDistrubutors = airdropsStore.distributors$.value!;
     const initialStatus = getStatus(initDistrubutors);
@@ -217,4 +224,39 @@ const DeployComponentInner = (props: {
     );
 };
 
-export const DeployComponent = observer(DeployComponentInner);
+const DeployComponentConnector = (props: DeployComponentProps) => {
+    const airdrop = airdropsStore.airdrop$.value!;
+    const toast = useToast();
+    const connectionRestored = useIsConnectionRestored();
+    const wallet = useTonWallet();
+    const { open: openConnect } = useTonConnectModal();
+
+    const showWalletError = () => {
+        toast({
+            title: 'Connect Admin Wallet',
+            description: 'Please reconnect with admin wallet',
+            position: 'bottom-left',
+            duration: 5000,
+            status: 'error',
+            isClosable: true
+        });
+    };
+
+    useEffect(() => {
+        if (connectionRestored && !!wallet && wallet.account.address !== airdrop.admin) {
+            showWalletError();
+        }
+    }, [wallet, connectionRestored]);
+
+    if (!wallet?.account.address || wallet.account.address !== airdrop.admin) {
+        return (
+            <Button flex={1} alignSelf="flex-start" onClick={openConnect} variant="primary">
+                Connect Admin Wallet
+            </Button>
+        );
+    }
+
+    return <DeployComponentInner {...props} />;
+};
+
+export const DeployComponent = observer(DeployComponentConnector);

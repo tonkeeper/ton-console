@@ -230,7 +230,7 @@ export const prettifyAmount = (v: number | string) => {
     const value = parseFloat(`${v}`);
     return new Intl.NumberFormat('en', {
         minimumFractionDigits: 0,
-        maximumFractionDigits: 2
+        maximumFractionDigits: 10
     }).format(value);
 };
 

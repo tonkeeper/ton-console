@@ -69,16 +69,21 @@ const UploadComponentInner = (props: { queryId: string }) => {
                     }
                 }
             )
+            .catch(err => {
+                setError(err?.message);
+            })
             .finally(async () => {
                 await airdropsStore.loadAirdrop(props.queryId);
                 setIsUploading(false);
                 setProgress(null);
-                setError(null);
+                if (inputRef.current) {
+                    inputRef.current.value = '';
+                }
             });
     };
 
     const handleFileChange = async (file: File) => {
-        const minSize = 1024 * 1.5;
+        const minSize = 1000;
         const maxSize = 1024 * 1024 * 500;
 
         if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
@@ -106,24 +111,27 @@ const UploadComponentInner = (props: { queryId: string }) => {
                         <Button
                             isLoading={isUploading}
                             onClick={() => {
-                                if (inputRef.current) {
-                                    setError(null);
-                                    inputRef.current.value = '';
-                                    inputRef.current.click();
-                                }
+                                setError(null);
+                                inputRef.current!.click();
                             }}
                         >
                             Upload File
                         </Button>
                         {!!progress && (
-                            <Flex
-                                flex={1}
-                                overflow="hidden"
-                                h="8px"
-                                borderRadius="8px"
-                                bgColor="#f1f3f5"
-                            >
-                                <Flex w={`${progress}%`} h="100%" bgColor="#000" />
+                            <Flex direction="column" flex={1} gap="4px">
+                                <Flex
+                                    flex={1}
+                                    overflow="hidden"
+                                    h="8px"
+                                    minH="8px"
+                                    borderRadius="8px"
+                                    bgColor="background.contentTint"
+                                >
+                                    <Flex w={`${progress}%`} h="8px" bgColor="#000" />
+                                </Flex>
+                                <Text textStyle="body3" color="text.secondary">
+                                    {progress}% of the file uploaded
+                                </Text>
                             </Flex>
                         )}
                         {!progress && !!error && (
