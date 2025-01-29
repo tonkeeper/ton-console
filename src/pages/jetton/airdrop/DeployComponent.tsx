@@ -140,6 +140,10 @@ const DeployComponentInner = (props: DeployComponentProps) => {
         }
     };
 
+    if (airdrop.status === 'claim_active' || status === 'withdraw_complete') {
+        return null;
+    }
+
     if (
         globalLoading ||
         !distributors.length ||
@@ -152,10 +156,6 @@ const DeployComponentInner = (props: DeployComponentProps) => {
                 <Spinner />
             </Center>
         );
-    }
-
-    if (airdrop.status === 'claim_active' || status === 'withdraw_complete') {
-        return null;
     }
 
     if (airdrop.status === 'claim_stopped') {
