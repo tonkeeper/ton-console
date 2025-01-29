@@ -14,6 +14,7 @@ export default ({ mode }) => {
 
     const tgScript = makeTgAuthScript(VITE_TG_OAUTH_BOT_NAME);
     const gtmScrip = mode === 'production' ? makeGtmScript(VITE_GTM_ID) : '';
+    const yMetrikaScript = mode === 'production' ? makeYMetrikaScript() : '';
 
     return defineConfig({
         plugins: [
@@ -24,7 +25,7 @@ export default ({ mode }) => {
                 entry: '/src/main.tsx',
                 inject: {
                     data: {
-                        injectScript: tgScript + gtmScrip
+                        injectScript: tgScript + gtmScrip + yMetrikaScript
                     },
                     tags: [
                         {
@@ -123,4 +124,22 @@ function makeTgAuthScript(botName) {
 
 function makeGtmScript(gtmId) {
     return `<script async src="https://www.googletagmanager.com/gtag/js?id=${gtmId}"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","${gtmId}");</script>`;
+}
+
+function makeYMetrikaScript() {
+    return `
+<script type="text/javascript" >
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();
+   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(99709953, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+   });
+</script>`;
 }

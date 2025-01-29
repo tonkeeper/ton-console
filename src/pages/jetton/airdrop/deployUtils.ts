@@ -119,6 +119,20 @@ export const getAmount = (
                 .reduce((a, c) => a + parseFloat(c.block_message!.amount), 0)
         };
     }
+    if (status === 'withdraw_jetton') {
+        return {
+            ton: distributors
+                .filter(i => i.airdrop_status === 'blocked' && !!i.jetton_withdrawal_message)
+                .reduce((a, c) => a + parseFloat(c.jetton_withdrawal_message!.amount), 0)
+        };
+    }
+    if (status === 'withdraw_ton') {
+        return {
+            ton: distributors
+                .filter(i => i.airdrop_status === 'blocked' && !!i.ton_withdrawal_message)
+                .reduce((a, c) => a + parseFloat(c.ton_withdrawal_message!.amount), 0)
+        };
+    }
     return null;
 };
 

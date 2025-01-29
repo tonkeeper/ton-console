@@ -29,6 +29,12 @@ const Routing: FunctionComponent = () => {
     const params = new URLSearchParams(location.search);
     const queryBackUrl = params.get('backUrl');
 
+    useEffect(() => {
+        if (typeof ym !== 'undefined') {
+            ym(99709953, 'hit', location.pathname);
+        }
+    }, [location]);
+
     // Scale layout for mobile devices until adaptive layout is not ready
     useEffect(() => {
         const metatag = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');

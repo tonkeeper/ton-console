@@ -73,6 +73,7 @@
     "@types/react-dom": "^18.0.9",
     "@types/react-window": "^1.8.5",
     "@types/react-window-infinite-loader": "^1.0.6",
+    "@types/yandex-metrika-tag": "^2.0.7",
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "@typescript-eslint/parser": "^5.50.0",
     "@vitejs/plugin-react": "^4.3.1",
