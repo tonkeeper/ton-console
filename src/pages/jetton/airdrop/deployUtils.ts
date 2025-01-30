@@ -38,7 +38,7 @@ export const checkAccount = async (v: AccountCheckT) => {
             );
             if (res?.balance < BigInt(v?.needJetton || 0)) {
                 v.errCb({ title: 'Not enough tokens', text: 'Top up balance and try again' });
-                return true;
+                return false;
             }
         } catch (err) {
             v.errCb({ title: 'Error', text: (err as { message?: string })?.message || '' });
