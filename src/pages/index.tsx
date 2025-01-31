@@ -30,7 +30,11 @@ const Routing: FunctionComponent = () => {
     const queryBackUrl = params.get('backUrl');
 
     useEffect(() => {
+        /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+        // @ts-ignore
         if (typeof ym !== 'undefined') {
+            /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+            // @ts-ignore
             ym(99709953, 'hit', location.pathname);
         }
     }, [location]);

@@ -138,7 +138,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
                             <Button
                                 onClick={() => {
                                     window.open(
-                                        `https://tonkeeper.github.io/airdrop-reference-dapp/?claimId=${queryId}&claimJetton=${Address.parse(
+                                        `https://tonkeeper.github.io/airdrop-reference-dapp/?airdropId=${queryId}&claimJetton=${Address.parse(
                                             airdrop?.jetton.address
                                         ).toString()}&testnet=true`,
                                         '_blank'
