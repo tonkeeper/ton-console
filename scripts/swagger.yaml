@@ -42,6 +42,8 @@ tags:
     description: 'Endpoints for managing Mintless Jetton operations and interactions.'
   - name: utils
     description: 'Utility endpoints for common service operations and tools.'
+  - name: airdrops
+    description: 'Endpoints for working with airdrops.'
 
 paths:
   /ready:
@@ -82,7 +84,7 @@ paths:
           description: "Ok"
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/feedback:
     post:
       summary: "Send user feedback"
@@ -98,7 +100,7 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/test/user:
     delete:
       summary: "Delete test user"
@@ -116,7 +118,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/admin/project/{id}/balance:
     get:
       summary: "Private method: Get project balance"
@@ -196,7 +198,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/auth/tg:
     post:
       summary: "Auth via telegram"
@@ -258,7 +260,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/me:
     get:
       summary: "Get user info"
@@ -293,7 +295,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/account/logout:
     post:
       summary: "Logout from the system"
@@ -312,7 +314,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/project:
     post:
       summary: "Create project"
@@ -1076,7 +1078,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/stats/ddl:
     get:
       summary: "Get stats db ddl"
@@ -1347,7 +1349,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/invoices/app:
     post:
       summary: "Create invoices app"
@@ -1663,7 +1665,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/pro/auth/proof/payload:
     post:
       summary: "Generating payload for TonConnect"
@@ -1941,7 +1943,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/cnft/config:
     get:
       summary: "Get cNFT config"
@@ -2018,7 +2020,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/mintless/config:
     get:
       summary: "Get mintless jetton config"
@@ -2074,7 +2076,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/minter/owner/jettons:
     get:
       summary: "Get jettons by owner"
@@ -2113,7 +2115,66 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+  /api/v1/services/minter/jetton/meta:
+    post:
+      summary: "Upload jetton meta"
+      operationId: uploadMinterJettonMeta
+      tags:
+        - minter_jetton_media
+      requestBody:
+        $ref: "#/components/requestBodies/JettonMeta"
+      responses:
+        '201':
+          $ref: '#/components/responses/URL'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v1/services/airdrops/jettons:
+    get:
+      summary: "Get all jetton airdrops for a specific project id"
+      operationId: getJettonAirdrops
+      tags:
+        - airdrops
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/JettonAirdrops'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: "Create new jetton airdrops"
+      operationId: createJettonAirdrop
+      tags:
+        - airdrops
+      parameters:
+        - $ref: '#/components/parameters/queryProjectID'
+      requestBody:
+        $ref: "#/components/requestBodies/NewJettonAirdrop"
+      responses:
+        '201':
+          $ref: '#/components/responses/JettonAirdropCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
   /api/v1/services/sites:
     post:
       summary: "Create a Ton Site"
@@ -2515,8 +2576,23 @@ components:
       required: false
       schema:
         type: boolean
-  
+
   requestBodies:
+    NewJettonAirdrop:
+      required: true
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - api_id
+              - name
+            properties:
+              api_id:
+                type: string
+              name:
+                type: string
     TgAuthExpected:
       description: "Data that is expected from Telegram"
       content:
@@ -2772,8 +2848,11 @@ components:
         application/json:
           schema:
             type: object
-            additionalProperties: true
-            example: { }
+            additionalProperties:
+              type: string
+            example:
+              key1: "name"
+              key2: "test"
     ProjectCharge:
       description: "Data that is expected"
       content:
@@ -2987,6 +3066,18 @@ components:
               media:
                 type: string
                 format: binary
+    JettonMeta:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - meta
+            properties:
+              meta:
+                additionalProperties: true
+                example: { }
     ProServiceNewDashboardData:
       description: "Data that is expected"
       content:
@@ -3008,7 +3099,7 @@ components:
                 items:
                   type: string
                   example: "id"
-  
+
   headers:
     setCookie:
       required: true
@@ -3865,6 +3956,27 @@ components:
             example: "https://lucky.io"
         adnl_address:
           type: string
+        date_create:
+          type: integer
+          format: int64
+          example: 1690889913000
+    JettonAirdrop:
+      type: object
+      required:
+        - id
+        - api_id
+        - name
+        - date_create
+      properties:
+        id:
+          type: string
+          example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+        api_id:
+          type: string
+          example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+        name:
+          type: string
+          example: "My airdrops"
         date_create:
           type: integer
           format: int64
@@ -5213,6 +5325,17 @@ components:
             properties:
               site:
                 $ref: '#/components/schemas/TonSite'
+    JettonAirdropCreated:
+      description: "Created jetton airdrops"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - airdrop
+            properties:
+              airdrop:
+                $ref: '#/components/schemas/JettonAirdrop'
     ProServiceInvoice:
       description: "Invoice"
       headers:
@@ -5265,6 +5388,19 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Account'
+    JettonAirdrops:
+      description: "Jetton airdrops"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - airdrops
+            properties:
+              airdrops:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JettonAirdrop'
     UserReferrals:
       description: 'User referrals'
       content:
@@ -5284,4 +5420,3 @@ components:
                 format: int64
                 example: 1000000000
 
-                

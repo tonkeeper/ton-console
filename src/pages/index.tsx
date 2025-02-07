@@ -29,6 +29,16 @@ const Routing: FunctionComponent = () => {
     const params = new URLSearchParams(location.search);
     const queryBackUrl = params.get('backUrl');
 
+    useEffect(() => {
+        /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+        // @ts-ignore
+        if (typeof ym !== 'undefined') {
+            /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+            // @ts-ignore
+            ym(99709953, 'hit', location.pathname);
+        }
+    }, [location]);
+
     // Scale layout for mobile devices until adaptive layout is not ready
     useEffect(() => {
         const metatag = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
