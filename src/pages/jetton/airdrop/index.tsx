@@ -64,7 +64,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
     }
 
     if (airdrop.status === 'claim_stopped') {
-        description = 'Enable users to claim by clicking the Enable Сlaim button.';
+        description = 'Enable users to claim by clicking the Enable Claim button.';
         badgeText = 'CLAIM DISABLED';
     }
 
@@ -118,7 +118,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
                                 >
                                     {airdrop.status === 'claim_active'
                                         ? 'Disable Claim'
-                                        : 'Enable Сlaim'}
+                                        : 'Enable Claim'}
                                 </Button>
                             )}
                             <DeployComponent
