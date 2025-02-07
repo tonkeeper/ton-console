@@ -70,7 +70,7 @@ const Aside: FC = () => {
                 linkTo="jetton"
             >
                 <DropDownMenuItem linkTo="new-jetton">Minter</DropDownMenuItem>
-                <DropDownMenuItem linkTo="airdrops">Airdrops</DropDownMenuItem>
+                {/* <DropDownMenuItem linkTo="airdrops">Airdrops</DropDownMenuItem> */}
             </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>
                 Testnet Assets

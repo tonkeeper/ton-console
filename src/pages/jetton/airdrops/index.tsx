@@ -23,7 +23,7 @@ const AirdropsPage: FC<BoxProps> = () => {
             <Flex align="flex-start" justify="space-between" gap="3" mb="5">
                 <Box>
                     <Flex align="center" direction="row" gap="8px">
-                        <H4>Airdrop</H4>
+                        <H4>Airdrops</H4>
                     </Flex>
                     <Text textStyle="body2" color="text.secondary">
                         A service for mass distribution of jettons
