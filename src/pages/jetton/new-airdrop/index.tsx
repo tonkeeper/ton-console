@@ -158,7 +158,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
                             <Link
                                 textStyle="label2"
                                 color="accent.blue"
-                                href="https://tonkeeper.com/terms"
+                                href="https://docs.tonconsole.com/tonconsole/jettons/airdrop/terms"
                                 isExternal
                             >
                                 Airdrop Terms of Use
@@ -174,7 +174,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
                             <Link
                                 textStyle="label2"
                                 color="accent.blue"
-                                href="https://tonkeeper.com/terms"
+                                href="https://docs.tonconsole.com/tonconsole/jettons/airdrop"
                                 isExternal
                             >
                                 Airdop T&C Terms
