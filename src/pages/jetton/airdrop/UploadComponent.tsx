@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, Flex, Text } from '@chakra-ui/react';
+import { Button, Checkbox, Flex, Input, Text } from '@chakra-ui/react';
 import {
     FileInfoComponent,
     FileProcessedComponent
@@ -14,6 +14,8 @@ const UploadComponentInner = (props: { queryId: string }) => {
     const [error, setError] = useState<string | null>(null);
     const [progress, setProgress] = useState<number | null>(null);
     const [processed, setProcessed] = useState(false);
+    const [isExternal, setIsExternal] = useState<boolean>(false);
+    const [url, setUrl] = useState<string | null>(null);
 
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -82,9 +84,37 @@ const UploadComponentInner = (props: { queryId: string }) => {
             });
     };
 
+    const handleUploadFromUrl = async () => {
+        setIsUploading(true);
+        setError(null);
+        try {
+            new URL(url!);
+        } catch (e) {
+            setError('Incorrect file URL');
+        }
+
+        await airdropApiClient.v1
+            .fileUpload(
+                {
+                    id: props.queryId,
+                    project_id: `${projectsStore.selectedProject!.id}`
+                },
+                {
+                    url: url!
+                }
+            )
+            .catch(err => {
+                setError(err?.message);
+            })
+            .finally(async () => {
+                await airdropsStore.loadAirdrop(props.queryId);
+                setIsUploading(false);
+            });
+    };
+
     const handleFileChange = async (file: File) => {
         const minSize = 1000;
-        const maxSize = 1024 * 1024 * 500;
+        const maxSize = 1024 * 1024 * 100;
 
         if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
             setError('Invalid file type');
@@ -95,7 +125,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
             return;
         }
         if (file.size > maxSize) {
-            setError('Maximum 500 MB');
+            setError('Maximum 100 MB');
             return;
         }
 
@@ -103,55 +133,86 @@ const UploadComponentInner = (props: { queryId: string }) => {
     };
 
     return (
-        <Flex direction="column">
+        <Flex direction="column" gap="16px">
             {processed && <FileProcessedComponent />}
             {!processed && (
                 <Flex direction="column" gap="24px">
-                    <Flex align="center" direction="row" gap="12px">
-                        <Button
-                            isLoading={isUploading}
-                            onClick={() => {
-                                setError(null);
-                                inputRef.current!.click();
-                            }}
-                        >
-                            Upload File
-                        </Button>
-                        {!!progress && (
-                            <Flex direction="column" flex={1} gap="4px">
-                                <Flex
-                                    flex={1}
-                                    overflow="hidden"
-                                    h="8px"
-                                    minH="8px"
-                                    borderRadius="8px"
-                                    bgColor="background.contentTint"
-                                >
-                                    <Flex w={`${progress}%`} h="8px" bgColor="#000" />
+                    <Flex direction="column" gap="16px">
+                        <Checkbox checked={isExternal} onChange={() => setIsExternal(!isExternal)}>
+                            <Text textStyle="label2">File size more than 100 MB</Text>
+                        </Checkbox>
+                        {isExternal ? (
+                            <Flex direction="column" gap="12px">
+                                <Flex align="center" direction="row" gap="12px">
+                                    <Input
+                                        autoComplete="off"
+                                        onChange={e => setUrl(e.target.value)}
+                                        placeholder="File URL"
+                                        value={url || ''}
+                                    />
+                                    <Button
+                                        isDisabled={!url}
+                                        isLoading={isUploading}
+                                        onClick={handleUploadFromUrl}
+                                    >
+                                        Upload File
+                                    </Button>
                                 </Flex>
-                                <Text textStyle="body3" color="text.secondary">
-                                    {progress}% of the file uploaded
-                                </Text>
+                                {!!error && (
+                                    <Text textStyle="body2" color="#F53C36">
+                                        {error}
+                                    </Text>
+                                )}
                             </Flex>
-                        )}
-                        {!progress && !!error && (
-                            <Text textStyle="body2" color="#F53C36">
-                                {error}
-                            </Text>
+                        ) : (
+                            <>
+                                <Flex align="center" direction="row" gap="12px">
+                                    <Button
+                                        isLoading={isUploading}
+                                        onClick={() => {
+                                            setError(null);
+                                            inputRef.current!.click();
+                                        }}
+                                    >
+                                        Upload File
+                                    </Button>
+                                    {!!progress && (
+                                        <Flex direction="column" flex={1} gap="4px">
+                                            <Flex
+                                                flex={1}
+                                                overflow="hidden"
+                                                h="8px"
+                                                minH="8px"
+                                                borderRadius="8px"
+                                                bgColor="background.contentTint"
+                                            >
+                                                <Flex w={`${progress}%`} h="8px" bgColor="#000" />
+                                            </Flex>
+                                            <Text textStyle="body3" color="text.secondary">
+                                                {progress}% of the file uploaded
+                                            </Text>
+                                        </Flex>
+                                    )}
+                                    {!progress && !!error && (
+                                        <Text textStyle="body2" color="#F53C36">
+                                            {error}
+                                        </Text>
+                                    )}
+                                </Flex>
+                                <input
+                                    ref={inputRef}
+                                    type="file"
+                                    accept=".csv"
+                                    style={{ display: 'none' }}
+                                    onChange={e => {
+                                        if (!!e.target.files?.length) {
+                                            handleFileChange(e.target.files[0]);
+                                        }
+                                    }}
+                                />
+                            </>
                         )}
                     </Flex>
-
-                    <input
-                        ref={inputRef}
-                        type="file"
-                        accept=".csv"
-                        style={{ display: 'none' }}
-                        onChange={e => {
-                            if (!!e.target.files?.length) {
-                                handleFileChange(e.target.files[0]);
-                            }
-                        }}
-                    />
                     <FileInfoComponent />
                 </Flex>
             )}

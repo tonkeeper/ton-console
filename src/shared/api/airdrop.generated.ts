@@ -208,10 +208,28 @@ export interface ADRoyaltiesData {
     royalties: ADRoyaltyData[];
 }
 
+export interface ADConfig {
+    /**
+     * @format int32
+     * @example 1
+     */
+    royalty_numerator: number;
+    /**
+     * @format int32
+     * @example 2
+     */
+    royalty_denominator: number;
+}
+
 export interface ADUserClaim {
     claim_message: ADInternalMessage;
     /** @example "597968399" */
-    amount: string;
+    jetton_amount: string;
+    /**
+     * Jetton master contract in user-friendly form
+     * @example "kQABcHP_oXkYNCx3HHKd4rxL371RRl-O6IwgwqYZ7IT6Ha-u"
+     */
+    jetton: string;
 }
 
 export enum ADAirdropDataClamStatusEnum {
@@ -472,11 +490,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 project_id: string;
             },
             data: {
+                url?: string;
                 /**
                  * The CSV file to upload
                  * @format binary
                  */
-                file: File;
+                file?: File;
             },
             params: RequestParams = {}
         ) =>
@@ -537,6 +556,28 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<ADRoyaltiesData, ADError>({
                 path: `/v1/airdrop/royalty`,
+                method: 'GET',
+                query: query,
+                format: 'json',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags admin
+         * @name GetConfig
+         * @summary Get config params
+         * @request GET:/v1/config
+         */
+        getConfig: (
+          query: {
+            project_id: string;
+            },
+          params: RequestParams = {}
+        ) =>
+            this.request<ADConfig, ADError>({
+                path: `/v1/config`,
                 method: 'GET',
                 query: query,
                 format: 'json',

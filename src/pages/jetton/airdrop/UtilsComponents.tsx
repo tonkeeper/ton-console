@@ -53,7 +53,7 @@ export const FileInfoComponent = () => {
                     </Link>
                     ;
                     <br />
-                    5. File size no more than 800 MB.
+                    5. File size no more than 100 MB.
                 </Text>
             </Flex>
         </Card>
@@ -70,7 +70,8 @@ export const FileProcessedComponent = () => {
                 </Flex>
                 <Text textStyle="body2" color="text.secondary">
                     Preparing data for distribution. This is a lengthy process and will take
-                    approximately X minutes. You can close the page and check later.
+                    approximately 7 minutes per 1 million addresses. You can close the page and
+                    check later.
                 </Text>
             </Flex>
         </Card>

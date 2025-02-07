@@ -30,8 +30,8 @@ const Control = <T extends { [controlId]: string }>({
             if (parseFloat(value) < 0.15) {
                 return 'Minimum 0.15 TON';
             }
-            if (parseFloat(value) > 100) {
-                return 'Maximum 100 TON';
+            if (parseFloat(value) > 5) {
+                return 'Maximum 5 TON';
             }
         }
     });
@@ -49,10 +49,10 @@ const Control = <T extends { [controlId]: string }>({
             />
             <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
             <FormHelperText textStyle="body2" color="text.secondary">
-                The amount of TON the recipient must send to receive the Jettons. Min: 0.15 TON.
-                After the user pays this amount, the blockchain network fee is deducted from it, and
-                the remaining part is divided between the project administrator and the royalty
-                recipient (TonApps).
+                The amount of TON the recipient must send to receive the Jettons. Min: 0.15 TON and
+                Max: 5 TON. After the user pays this amount, the blockchain network fee is deducted
+                from it, and the remaining part is divided between the project administrator and the
+                royalty recipient (TonApps).
             </FormHelperText>
         </FormControl>
     );

@@ -106,6 +106,22 @@ paths:
         'default':
           $ref: '#/components/responses/Error'
 
+  /v1/config:
+    get:
+      summary: "Get config params"
+      operationId: getConfig
+      tags:
+        - admin
+      responses:
+        '200':
+          description: config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        'default':
+          $ref: '#/components/responses/Error'
+
   /v1/airdrop/start:
     post:
       summary: "Open claim method for users"
@@ -204,9 +220,9 @@ components:
         multipart/form-data:
           schema:
             type: object
-            required:
-              - file
             properties:
+              url:
+                type: string
               file:
                 type: string
                 format: binary
@@ -465,18 +481,37 @@ components:
           description: "List of distributor`s royalty info"
           items:
             $ref: '#/components/schemas/RoyaltyData'
+    Config:
+      type: object
+      required:
+        - royalty_numerator
+        - royalty_denominator
+      properties:
+        royalty_numerator:
+          type: integer
+          format: int32
+          example: 1
+        royalty_denominator:
+          type: integer
+          format: int32
+          example: 2
     UserClaim:
       type: object
       required:
         - claim_message
-        - amount
+        - jetton
+        - jetton_amount
       properties:
         claim_message:
           $ref: '#/components/schemas/InternalMessage'
-        amount:
+        jetton_amount:
           type: string
           x-js-format: bigint
           example: "597968399"
+        jetton:
+          type: string
+          example: "kQABcHP_oXkYNCx3HHKd4rxL371RRl-O6IwgwqYZ7IT6Ha-u"
+          description: "Jetton master contract in user-friendly form"
 
   responses:
     Error:

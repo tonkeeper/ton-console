@@ -3,7 +3,20 @@ import { FC, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { H4, Overlay, tonapiClient } from 'src/shared';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Badge, Box, BoxProps, Button, Divider, Flex, Text, useToast } from '@chakra-ui/react';
+import {
+    Badge,
+    Box,
+    BoxProps,
+    Button,
+    Checkbox,
+    Divider,
+    Flex,
+    Text,
+    Link,
+    useToast,
+    Center,
+    Spinner
+} from '@chakra-ui/react';
 import {
     TonConnectButton,
     useIsConnectionRestored,
@@ -43,6 +56,10 @@ const NewAirdropPage: FC<BoxProps> = () => {
     const userAddress = useTonAddress();
     const { open: openConnect } = useTonConnectModal();
     const [isLoading, setIsLoading] = useState(false);
+    const [termsChecked, setTermsChecked] = useState(false);
+    const [royaltyChecked, setRoyaltyChecked] = useState(false);
+
+    const config = airdropsStore.config$.value;
 
     const methods = useForm<AirdropMetadata>({});
 
@@ -93,6 +110,14 @@ const NewAirdropPage: FC<BoxProps> = () => {
         navigate(`/jetton/airdrop?id=${id}`);
     };
 
+    if (!airdropsStore.config$.isResolved || !config) {
+        return (
+            <Center h="300px">
+                <Spinner />
+            </Center>
+        );
+    }
+
     return (
         <Overlay display="flex" flexDirection="column" px="0">
             <Flex align="flex-start" justify="space-between" mb="5" px="6">
@@ -119,12 +144,38 @@ const NewAirdropPage: FC<BoxProps> = () => {
                     <FormProvider {...methods}>
                         <AirdropForm onSubmit={handleSubmit} id={formId} />
                     </FormProvider>
+                    <Checkbox
+                        checked={termsChecked}
+                        onChange={() => setTermsChecked(!termsChecked)}
+                    >
+                        <Text textStyle="label2">
+                            I have read and agree with the{' '}
+                            <Link
+                                textStyle="label2"
+                                color="accent.blue"
+                                href="https://tonkeeper.com/terms"
+                                isExternal
+                            >
+                                terms
+                            </Link>
+                        </Text>
+                    </Checkbox>
+                    <Checkbox
+                        checked={royaltyChecked}
+                        onChange={() => setRoyaltyChecked(!royaltyChecked)}
+                    >
+                        <Text textStyle="label2">
+                            I agree that the commission is {config.royalty_numerator}/
+                            {config.royalty_denominator}
+                        </Text>
+                    </Checkbox>
                     {userAddress ? (
                         <Button
                             flex={1}
                             maxW={600}
                             mt={4}
                             form={formId}
+                            isDisabled={!termsChecked || !royaltyChecked}
                             isLoading={isLoading}
                             type="submit"
                             variant="primary"
