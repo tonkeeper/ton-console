@@ -1,6 +1,5 @@
 import { FC, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Address } from '@ton/core';
 import { H4, Overlay, useSearchParams } from 'src/shared';
 import {
     Badge,
@@ -138,9 +137,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
                             <Button
                                 onClick={() => {
                                     window.open(
-                                        `https://tonkeeper.github.io/airdrop-reference-dapp/?airdropId=${queryId}&claimJetton=${Address.parse(
-                                            airdrop?.jetton.address
-                                        ).toString()}&testnet=true`,
+                                        `https://tonkeeper.github.io/airdrop-reference-dapp/?airdropId=${queryId}&testnet=true`,
                                         '_blank'
                                     );
                                 }}
