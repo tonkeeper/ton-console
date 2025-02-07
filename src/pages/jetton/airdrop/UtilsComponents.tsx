@@ -53,7 +53,7 @@ export const FileInfoComponent = () => {
                     </Link>
                     ;
                     <br />
-                    5. File size no more than 100 MB.
+                    5. File size up to 10,000,000 records
                 </Text>
             </Flex>
         </Card>
