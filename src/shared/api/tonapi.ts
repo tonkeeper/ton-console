@@ -2,7 +2,7 @@ import { TonApiClient } from '@ton-api/client';
 
 const authToken = import.meta.env.VITE_TONAPI_TOKEN;
 
-const isTestnet = true;
+const isTestnet = false;
 
 export const tonapiClient = new TonApiClient({
     baseUrl: isTestnet ? 'https://testnet.tonapi.io' : 'https://tonapi.io',

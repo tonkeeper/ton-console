@@ -1,4 +1,4 @@
-import { Flex, BoxProps, Button, Center, Spinner, Text, Box, Badge } from '@chakra-ui/react';
+import { Flex, BoxProps, Button, Center, Spinner, Text, Box } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
@@ -24,14 +24,6 @@ const AirdropsPage: FC<BoxProps> = () => {
                 <Box>
                     <Flex align="center" direction="row" gap="8px">
                         <H4>Airdrop</H4>
-                        <Badge
-                            textStyle="label3"
-                            color="accent.red"
-                            bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
-                        >
-                            TESTNET The service is in the testing phase. Do not use for production
-                            airdrops!
-                        </Badge>
                     </Flex>
                     <Text textStyle="body2" color="text.secondary">
                         A service for mass distribution of jettons

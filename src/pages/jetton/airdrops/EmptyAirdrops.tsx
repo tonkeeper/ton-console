@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import { Link } from 'react-router-dom';
 import { AirdropSchemeIcon, H3, Overlay } from 'src/shared';
-import { Card, Badge, Button, Flex, Text } from '@chakra-ui/react';
+import { Card, Button, Flex, Text } from '@chakra-ui/react';
 
 export const EmptyAirdrops: FunctionComponent = () => {
     return (
@@ -39,14 +39,6 @@ export const EmptyAirdrops: FunctionComponent = () => {
                             Recipient to connect their wallet and receive jettons by paying a fee
                         </Text>
                     </Flex>
-                    <Badge
-                        textStyle="label3"
-                        color="accent.red"
-                        bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
-                    >
-                        TESTNET The service is in the testing phase. Do not use for production
-                        airdrops!
-                    </Badge>
                 </Flex>
                 <Flex direction="row" gap="16px">
                     <Button as={Link} to={'/jetton/new-airdrop'}>

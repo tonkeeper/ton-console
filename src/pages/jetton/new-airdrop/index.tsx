@@ -4,7 +4,6 @@ import { observer } from 'mobx-react-lite';
 import { H4, Overlay, tonapiClient } from 'src/shared';
 import { FormProvider, useForm } from 'react-hook-form';
 import {
-    Badge,
     Box,
     BoxProps,
     Button,
@@ -124,13 +123,6 @@ const NewAirdropPage: FC<BoxProps> = () => {
                 <Box>
                     <Flex align="center" direction="row" gap="8px">
                         <H4 mb="1">New Airdrop</H4>
-                        <Badge
-                            textStyle="label3"
-                            color="accent.red"
-                            bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
-                        >
-                            TESTNET
-                        </Badge>
                     </Flex>
                     <Text textStyle="body2" color="text.secondary">
                         Fill in the details and connect your wallet
