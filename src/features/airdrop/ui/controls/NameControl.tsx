@@ -1,4 +1,4 @@
-import { FormControl, FormLabel, Input, FormHelperText, FormErrorMessage } from '@chakra-ui/react';
+import { FormControl, FormLabel, Input, FormErrorMessage } from '@chakra-ui/react';
 import { FieldError, Path, UseFormReturn } from 'react-hook-form';
 
 const controlId = 'name';
@@ -23,14 +23,11 @@ const Control = <T extends { [controlId]: string }>({
                 autoComplete="off"
                 autoFocus
                 id={fieldName}
-                placeholder="Sending Name"
+                placeholder="Airdrop Name"
                 {...register(fieldName, {
                     required: 'This is required'
                 })}
             />
-            <FormHelperText textStyle="body2" color="text.secondary">
-                Only the administrator can see this name.
-            </FormHelperText>
             <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
         </FormControl>
     );

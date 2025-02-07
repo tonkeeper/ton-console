@@ -151,6 +151,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
                                         value={url || ''}
                                     />
                                     <Button
+                                        flexShrink={0}
                                         isDisabled={!url}
                                         isLoading={isUploading}
                                         onClick={handleUploadFromUrl}
@@ -168,6 +169,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
                             <>
                                 <Flex align="center" direction="row" gap="12px">
                                     <Button
+                                        flexShrink={0}
                                         isLoading={isUploading}
                                         onClick={() => {
                                             setError(null);

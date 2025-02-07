@@ -56,8 +56,8 @@ const NewAirdropPage: FC<BoxProps> = () => {
     const userAddress = useTonAddress();
     const { open: openConnect } = useTonConnectModal();
     const [isLoading, setIsLoading] = useState(false);
-    const [termsChecked, setTermsChecked] = useState(false);
-    const [royaltyChecked, setRoyaltyChecked] = useState(false);
+    const [terms1Checked, setTerms1Checked] = useState(false);
+    const [terms2Checked, setTerms2Checked] = useState(false);
 
     const config = airdropsStore.config$.value;
 
@@ -143,10 +143,15 @@ const NewAirdropPage: FC<BoxProps> = () => {
                 <Flex align="flex-start" direction="column" gap="16px">
                     <FormProvider {...methods}>
                         <AirdropForm onSubmit={handleSubmit} id={formId} />
+                        <Text textStyle="label2">
+                            Royalty coefficient:{' '}
+                            {config.royalty_numerator / config.royalty_denominator} (see it in
+                            Airdop T&C Terms)
+                        </Text>
                     </FormProvider>
                     <Checkbox
-                        checked={termsChecked}
-                        onChange={() => setTermsChecked(!termsChecked)}
+                        checked={terms1Checked}
+                        onChange={() => setTerms1Checked(!terms1Checked)}
                     >
                         <Text textStyle="label2">
                             I have read and agree with the{' '}
@@ -156,17 +161,24 @@ const NewAirdropPage: FC<BoxProps> = () => {
                                 href="https://tonkeeper.com/terms"
                                 isExternal
                             >
-                                terms
+                                Airdrop Terms of Use
                             </Link>
                         </Text>
                     </Checkbox>
                     <Checkbox
-                        checked={royaltyChecked}
-                        onChange={() => setRoyaltyChecked(!royaltyChecked)}
+                        checked={terms2Checked}
+                        onChange={() => setTerms2Checked(!terms2Checked)}
                     >
                         <Text textStyle="label2">
-                            I agree that the commission is {config.royalty_numerator}/
-                            {config.royalty_denominator}
+                            I have read and agree with the{' '}
+                            <Link
+                                textStyle="label2"
+                                color="accent.blue"
+                                href="https://tonkeeper.com/terms"
+                                isExternal
+                            >
+                                Airdop T&C Terms
+                            </Link>
                         </Text>
                     </Checkbox>
                     {userAddress ? (
@@ -175,7 +187,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
                             maxW={600}
                             mt={4}
                             form={formId}
-                            isDisabled={!termsChecked || !royaltyChecked}
+                            isDisabled={!terms1Checked || !terms2Checked}
                             isLoading={isLoading}
                             type="submit"
                             variant="primary"

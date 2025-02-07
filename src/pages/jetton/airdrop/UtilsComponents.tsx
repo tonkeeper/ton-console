@@ -36,7 +36,7 @@ export const FileInfoComponent = () => {
                 <Text textStyle="body2" color="text.secondary">
                     1. CSV format with a comma delimiter;
                     <br />
-                    2. Contain a header in the format: recipients, amount;
+                    2. Contain a header in the format: recipient, amount;
                     <br />
                     3. Token amount in minimal indivisible units without considering decimals
                     (example: 1000000 for 1 USDT, decimals=6). The value must be positive, and

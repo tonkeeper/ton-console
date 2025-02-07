@@ -6,13 +6,14 @@ import { Card, Badge, Button, Flex, Text } from '@chakra-ui/react';
 export const EmptyAirdrops: FunctionComponent = () => {
     return (
         <Overlay display="flex" alignItems="center" justifyContent="center">
-            <Flex align="flex-start" direction="column" gap="32px" maxW="600px">
+            <Flex align="flex-start" direction="column" gap="32px" maxW="800px">
                 <Flex align="flex-start" direction="column" gap="12px">
                     <H3>Airdrop</H3>
                     <Text textStyle="Body2" color="text.secondary">
-                        Our service enables a mass token distribution model where the recipient pays
-                        a fixed fee in TONs and receives Jettons. In the following, we will refer to
-                        the Jetton distribution process as an Airdrop.
+                        Service enables a mass jetton distribution model where the recipient pays a
+                        fixed fee in TONs and receives jettons. The distribution is carried out to a
+                        fixed list of Recipients. In the following, we will refer to the jetton
+                        distribution process as an Airdrop.
                     </Text>
                     <Card px="32px" py="22px" bg="background.contentTint">
                         <AirdropSchemeIcon />
@@ -22,17 +23,20 @@ export const EmptyAirdrops: FunctionComponent = () => {
                             How it works
                         </Text>
                         <Text textStyle="Body2" color="text.secondary">
-                            1. The Airdrop admin starts a new project in tonconsole and fills in the
-                            airdrop data.
+                            1. The Airdrop organizer (Airdrop admin) prepares an Airdrop file with a
+                            fixed list of Recipients
                         </Text>
                         <Text textStyle="Body2" color="text.secondary">
-                            2. The Airdrop admin connects his wallet via TON Connect and deploys the
-                            smart contracts necessary for the work.
+                            2. The Airdrop admin creates a new project in Ton Console and fills in
+                            the Airdrop data
                         </Text>
                         <Text textStyle="Body2" color="text.secondary">
-                            3. The Airdrop admin on his hosting raises a dapp that allows the
-                            recipient to connect his wallet and receive tokens by paying a
-                            commission.
+                            3. The Airdrop admin connects their wallet via TON Connect (in Ton
+                            Console) and deploys the Airdrop smart contracts
+                        </Text>
+                        <Text textStyle="Body2" color="text.secondary">
+                            4. The Airdrop admin on their hosting raises a dApp that allows the
+                            Recipient to connect their wallet and receive jettons by paying a fee
                         </Text>
                     </Flex>
                     <Badge
