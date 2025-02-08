@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Button, ButtonProps } from '@chakra-ui/react';
 import { DownloadIcon16, DTOLiteproxyKey } from 'src/shared';
-import { globalConfig } from './global.config';
+import { globalConfigTemplate } from './global.config';
 
 const DownloadConfigButton: FC<
     ButtonProps & {
@@ -25,20 +25,21 @@ const DownloadConfigButton: FC<
         return Number(signedInt32);
     };
 
-    const getGlobalConfig = (): typeof globalConfig => ({
-        ...globalConfig,
-        liteservers: liteproxyList.map(({ server, public_key }) => ({
+    const getGlobalConfig = (): string => {
+        const liteservers = liteproxyList.map(({ server, public_key }) => ({
             ip: ipToSignedInt32(server.split(':')[0]),
             port: parseInt(server.split(':')[1]),
             id: {
                 '@type': 'pub.ed25519',
                 key: public_key
             }
-        }))
-    });
+        }));
+
+        return globalConfigTemplate(JSON.stringify(liteservers, null, 2));
+    };
 
     const handleDownload = () => {
-        const json = JSON.stringify(getGlobalConfig(), null, 2);
+        const json = getGlobalConfig();
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
 
