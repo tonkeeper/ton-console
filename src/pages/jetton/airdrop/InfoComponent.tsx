@@ -20,7 +20,9 @@ const TextItem = (props: { title: string; text: string; copyContent?: string }) 
                 {props.title}
             </Text>
             <Flex align="center" direction="row" gap="6px">
-                <Text textStyle="body2">{props.text}</Text>
+                <Text textStyle="body2" fontFamily={props.copyContent && 'mono'}>
+                    {props.text}
+                </Text>
                 {!!props.copyContent && (
                     <IconButton
                         aria-label="copy"
@@ -33,7 +35,7 @@ const TextItem = (props: { title: string; text: string; copyContent?: string }) 
     );
 };
 
-export const InfoComponent = (props: { airdrop: ADAirdropData }) => {
+export const InfoComponent = (props: { airdrop: ADAirdropData; id: string }) => {
     const {
         admin,
         jetton,
@@ -65,6 +67,9 @@ export const InfoComponent = (props: { airdrop: ADAirdropData }) => {
             <Divider />
             <Flex direction="column" gap="8px" px="16px">
                 <Flex direction="column" gap="4px" py="8px">
+                    <TextItem title="ID" text={props.id} copyContent={props.id} />
+                </Flex>
+                <Flex direction="column" gap="4px" py="8px">
                     <TextItem
                         title="Admin"
                         text={sliceString(Address.parse(admin).toString({ bounceable: false }), 16)}
@@ -86,7 +91,11 @@ export const InfoComponent = (props: { airdrop: ADAirdropData }) => {
                 {!!file_name && !!file_hash && (
                     <Flex direction="column" gap="4px" py="8px">
                         <TextItem title="File name" text={file_name} />
-                        <TextItem title="File hash" text={sliceString(file_hash)} />
+                        <TextItem
+                            title="File hash"
+                            text={sliceString(file_hash)}
+                            copyContent={file_hash}
+                        />
                     </Flex>
                 )}
                 {!!total_amount && !!recipients && (
