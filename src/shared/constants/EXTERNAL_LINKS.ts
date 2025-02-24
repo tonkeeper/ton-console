@@ -1,5 +1,5 @@
 export enum EXTERNAL_LINKS {
-    SUPPORT = 'https://t.me/tonrostislav',
+    SUPPORT = 'https://t.me/ton_console_bot',
     TG_CHANNEL = 'https://t.me/tonconsole_com',
     TONCONNECT_MANIFEST = 'https://tonconsole.com/tonconnect-manifest.json',
 
