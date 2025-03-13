@@ -4,7 +4,6 @@ import { SubscriptionsTable, webhooksStore } from 'src/features/tonapi/webhooks'
 import { EmptySubscriptions } from './EmptySubscriptions';
 import { EXTERNAL_LINKS, H4, Overlay, useSearchParams } from 'src/shared';
 import {
-    Badge,
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
@@ -81,14 +80,6 @@ const SubscriptionsViewPage: FC = () => {
                     <Flex direction="column" gap={2}>
                         <Flex align="center" gap={4}>
                             <H4>Webhook Subscriptions</H4>
-                            <Badge
-                                textStyle="label3"
-                                color="accent.orange"
-                                fontFamily="body"
-                                bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
-                            >
-                                BETA
-                            </Badge>
                         </Flex>
                         <Flex>
                             <Text textStyle="text.body2" color="text.secondary" fontSize={14}>

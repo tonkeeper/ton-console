@@ -13,7 +13,6 @@ import {
     TickIcon
 } from 'src/shared';
 import {
-    Badge,
     Button,
     Center,
     Flex,
@@ -50,14 +49,6 @@ const WebhooksPage: FC = () => {
                     <Flex direction="column" gap={2}>
                         <Flex align="center" gap={4}>
                             <H4>Webhooks</H4>
-                            <Badge
-                                textStyle="label3"
-                                color="accent.orange"
-                                fontFamily="body"
-                                bgColor={'color-mix(in srgb, currentColor 12%, transparent)'}
-                            >
-                                BETA
-                            </Badge>
 
                             <Menu placement="bottom">
                                 <MenuButtonDefault
