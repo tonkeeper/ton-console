@@ -823,6 +823,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InsufficientFunds'
         '500':
           $ref: '#/components/responses/InternalError'
 
@@ -1138,6 +1140,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InsufficientFunds'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/stats/query/{id}:
@@ -1225,6 +1229,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InsufficientFunds'
         '500':
           $ref: '#/components/responses/InternalError'
   /api/v1/services/stats/gpt:
@@ -2155,7 +2161,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
     post:
-      summary: "Create new jetton airdrops"
+      summary: "Create new jetton airdrop"
       operationId: createJettonAirdrop
       tags:
         - airdrops
@@ -3967,6 +3973,7 @@ components:
         - api_id
         - name
         - date_create
+        - version
       properties:
         id:
           type: string
@@ -3976,11 +3983,15 @@ components:
           example: "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
         name:
           type: string
-          example: "My airdrops"
+          example: "My airdrop"
         date_create:
           type: integer
           format: int64
           example: 1690889913000
+        version:
+          type: integer
+          format: int32
+          example: 2
     ProServiceInvoiceWebhook:
       type: object
       required:
@@ -4356,6 +4367,18 @@ components:
           example: 1690889913000
 
   responses:
+    InsufficientFunds:
+      description: "Insufficient funds"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error
+            properties:
+              error:
+                type: string
+                description: "Error message"
     NotFound:
       description: "The specified resource was not found"
       content:
@@ -5326,7 +5349,7 @@ components:
               site:
                 $ref: '#/components/schemas/TonSite'
     JettonAirdropCreated:
-      description: "Created jetton airdrops"
+      description: "Created jetton airdrop"
       content:
         application/json:
           schema:

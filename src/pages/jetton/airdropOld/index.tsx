@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { airdropsStore } from 'src/features';
 import { TonConnectButton } from '@tonconnect/ui-react';
-import { InfoComponent } from './InfoComponent';
+import { InfoComponent } from 'src/pages/jetton/airdrop/InfoComponent';
 import { UploadComponent } from './UploadComponent';
 import { DeployComponent } from './DeployComponent';
 import { StatisticComponent } from './StatisticComponent';
@@ -29,7 +29,7 @@ const AirdropPage: FC<BoxProps> = () => {
 
     useEffect(() => {
         if (queryId) {
-            airdropsStore.loadAirdrop(queryId!);
+            airdropsStore.loadAirdrop(queryId!, true);
         }
         return () => {
             airdropsStore.clearAirdrop();
@@ -38,7 +38,7 @@ const AirdropPage: FC<BoxProps> = () => {
 
     const switchClaim = async (type: 'enable' | 'disable') => {
         setLoading(true);
-        await airdropsStore.switchClaim(queryId!, type);
+        await airdropsStore.switchClaim(queryId!, type, true);
         setLoading(false);
     };
 
@@ -137,7 +137,8 @@ const AirdropPage: FC<BoxProps> = () => {
                             <Button
                                 onClick={() => {
                                     window.open(
-                                        `https://mois-ilya.github.io/airdrop-reference-dapp/?airdropId=${queryId}&testnet=true`
+                                        `https://tonkeeper.github.io/airdrop-reference-dapp/?airdropId=${queryId}`,
+                                        '_blank'
                                     );
                                 }}
                                 variant="secondary"

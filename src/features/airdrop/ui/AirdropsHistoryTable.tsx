@@ -48,7 +48,11 @@ const AirdropsHistoryTable: FunctionComponent<ComponentProps<typeof TableContain
                                 key={i.id}
                                 as={ReactRouterLink}
                                 display="contents"
-                                to={`/jetton/airdrop?id=${i.api_id}`}
+                                to={
+                                    i.version === 1
+                                        ? `/jetton/airdropOld?id=${i.api_id}`
+                                        : `/jetton/airdrop?id=${i.api_id}`
+                                }
                             >
                                 <Tr key={i.id}>
                                     <Td overflow="hidden">
