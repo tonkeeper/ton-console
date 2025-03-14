@@ -85,7 +85,8 @@ const NewAirdropPage: FC<BoxProps> = () => {
         }
     }, [wallet, connectionRestored]);
 
-    const handleSubmit = async ({ name, address, fee }: AirdropMetadata) => {
+    const handleSubmit = async (v: AirdropMetadata) => {
+        const { name, address, fee, vesting } = v;
         if (!checkIsWalletW5(wallet?.account.walletStateInit || '')) {
             showWalletError();
             return;
@@ -103,6 +104,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
             name,
             address,
             fee,
+            vesting,
             adminAddress: userAddress
         });
         setIsLoading(false);

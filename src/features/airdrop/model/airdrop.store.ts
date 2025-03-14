@@ -1,10 +1,4 @@
-import {
-    apiClient,
-    createImmediateReaction,
-    DTOJettonAirdrop,
-    Loadable
-    // Network
-} from 'src/shared';
+import { apiClient, createImmediateReaction, DTOJettonAirdrop, Loadable } from 'src/shared';
 import {
     ADAirdropData,
     ADConfig,
@@ -58,7 +52,7 @@ export class AirdropStore {
     });
 
     fetchConfig = this.config$.createAsyncAction(async () => {
-        const res = await airdropApiClient.v1
+        const res = await airdropApiClient.v2
             .getConfig({
                 project_id: `${projectsStore.selectedProject!.id}`
             })
@@ -68,13 +62,21 @@ export class AirdropStore {
     });
 
     createAirdrop = async (v: AirdropMetadata & { adminAddress: string }) => {
-        const airdropRes = await airdropApiClient.v1
+        const airdropRes = await airdropApiClient.v2
             .newAirdrop(
                 { project_id: `${projectsStore.selectedProject!.id}` },
                 {
                     admin: v.adminAddress,
                     jetton: v.address,
-                    royalty_parameters: { min_commission: toNano(v.fee).toString() }
+                    royalty_parameters: { min_commission: toNano(v.fee).toString() },
+                    vesting_parameters: !!v.vesting?.length
+                        ? {
+                              unlocks_list: v.vesting.map(i => ({
+                                  unlock_time: Math.floor(new Date(i.unlockTime).getTime() / 1000),
+                                  fraction: i.fraction * 100
+                              }))
+                          }
+                        : undefined
                 }
             )
             .then(data => data.data);
@@ -91,11 +93,36 @@ export class AirdropStore {
         return consoleRes.airdrop.api_id;
     };
 
-    loadAirdrop = this.airdrop$.createAsyncAction(async (id: string) => {
-        const airdrop = await airdropApiClient.v1
+    loadAirdrop = this.airdrop$.createAsyncAction(async (id: string, old?: boolean) => {
+        if (old) {
+            const airdrop = await airdropApiClient.v1
+                .getAirdropData({ id, project_id: `${projectsStore.selectedProject!.id}` })
+                .then(v => v.data);
+            const distributors = await airdropApiClient.v1
+                .getDistributorsData({
+                    id,
+                    project_id: `${projectsStore.selectedProject!.id}`
+                })
+                .then(v => v.data.distributors);
+
+            this.distributors$.value = distributors;
+
+            const current = this.airdrops$.value.find(i => i.api_id === id)!;
+            const status = getAirdropStatus(airdrop, distributors);
+
+            const data: AirdropFullT = {
+                ...airdrop,
+                name: current.name,
+                status: status
+            };
+
+            return data;
+        }
+
+        const airdrop = await airdropApiClient.v2
             .getAirdropData({ id, project_id: `${projectsStore.selectedProject!.id}` })
             .then(v => v.data);
-        const distributors = await airdropApiClient.v1
+        const distributors = await airdropApiClient.v2
             .getDistributorsData({
                 id,
                 project_id: `${projectsStore.selectedProject!.id}`
@@ -116,8 +143,18 @@ export class AirdropStore {
         return data;
     });
 
-    loadDistributors = this.distributors$.createAsyncAction(async (id: string) => {
-        const distributors = await airdropApiClient.v1
+    loadDistributors = this.distributors$.createAsyncAction(async (id: string, old?: boolean) => {
+        if (old) {
+            const distributors = await airdropApiClient.v1
+                .getDistributorsData({
+                    id,
+                    project_id: `${projectsStore.selectedProject!.id}`
+                })
+                .then(data => data.data.distributors);
+
+            return distributors;
+        }
+        const distributors = await airdropApiClient.v2
             .getDistributorsData({
                 id,
                 project_id: `${projectsStore.selectedProject!.id}`
@@ -127,9 +164,36 @@ export class AirdropStore {
         return distributors;
     });
 
-    switchClaim = async (id: string, type: 'enable' | 'disable') => {
+    switchClaim = async (id: string, type: 'enable' | 'disable', old?: boolean) => {
+        if (old) {
+            if (type === 'enable') {
+                await airdropApiClient.v1
+                    .openClaim({
+                        id,
+                        project_id: `${projectsStore.selectedProject!.id}`
+                    })
+                    .then(d => {
+                        console.log(d);
+                    })
+                    .finally(async () => {
+                        await this.loadAirdrop(id);
+                    });
+            } else {
+                await airdropApiClient.v1
+                    .closeClaim({
+                        id,
+                        project_id: `${projectsStore.selectedProject!.id}`
+                    })
+                    .then(d => {
+                        console.log(d);
+                    })
+                    .finally(async () => {
+                        await this.loadAirdrop(id);
+                    });
+            }
+        }
         if (type === 'enable') {
-            await airdropApiClient.v1
+            await airdropApiClient.v2
                 .openClaim({
                     id,
                     project_id: `${projectsStore.selectedProject!.id}`
@@ -141,7 +205,7 @@ export class AirdropStore {
                     await this.loadAirdrop(id);
                 });
         } else {
-            await airdropApiClient.v1
+            await airdropApiClient.v2
                 .closeClaim({
                     id,
                     project_id: `${projectsStore.selectedProject!.id}`

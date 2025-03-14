@@ -2,10 +2,10 @@ import { GenerateApiParams, generateApi } from 'swagger-typescript-api';
 import path from 'path';
 
 const generateApiParams: GenerateApiParams = {
-    name: 'airdrop.generated.ts',
+    name: 'airdrop2.generated.ts',
     output: path.resolve(process.cwd(), './src/shared/api'),
-    input: path.resolve(process.cwd(), './scripts/airdrops.yaml'),
-    apiClassName: 'ApiV1',
+    input: path.resolve(process.cwd(), './scripts/airdrop2.yaml'),
+    apiClassName: 'Api',
     typePrefix: 'AD',
     enumKeyPrefix: 'AD',
     extractEnums: true,

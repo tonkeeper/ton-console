@@ -610,13 +610,18 @@ export interface DTOJettonAirdrop {
     id: string;
     /** @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b" */
     api_id: string;
-    /** @example "My airdrops" */
+    /** @example "My airdrop" */
     name: string;
     /**
      * @format int64
      * @example 1690889913000
      */
     date_create: number;
+    /**
+     * @format int32
+     * @example 2
+     */
+    version: number;
 }
 
 export interface DTOProServiceInvoiceWebhook {
@@ -2388,12 +2393,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 DTOOk,
-                {
-                    /** Error message */
-                    error: string;
-                    /** backend error code */
-                    code: number;
-                }
+                | {
+                      /** Error message */
+                      error: string;
+                      /** backend error code */
+                      code: number;
+                  }
+                | {
+                      /** Error message */
+                      error: string;
+                  }
             >({
                 path: `/api/v1/services/tonapi/liteproxy/tier`,
                 method: 'PATCH',
@@ -3033,12 +3042,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 DTOStatsQueryResult,
-                {
-                    /** Error message */
-                    error: string;
-                    /** backend error code */
-                    code: number;
-                }
+                | {
+                      /** Error message */
+                      error: string;
+                      /** backend error code */
+                      code: number;
+                  }
+                | {
+                      /** Error message */
+                      error: string;
+                  }
             >({
                 path: `/api/v1/services/stats/query`,
                 method: 'POST',
@@ -3205,12 +3218,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 DTOStatsQueryResult,
-                {
-                    /** Error message */
-                    error: string;
-                    /** backend error code */
-                    code: number;
-                }
+                | {
+                      /** Error message */
+                      error: string;
+                      /** backend error code */
+                      code: number;
+                  }
+                | {
+                      /** Error message */
+                      error: string;
+                  }
             >({
                 path: `/api/v1/services/stats/cosmos/graph`,
                 method: 'POST',
@@ -4932,7 +4949,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          *
          * @tags airdrops
          * @name CreateJettonAirdrop
-         * @summary Create new jetton airdrops
+         * @summary Create new jetton airdrop
          * @request POST:/api/v1/services/airdrops/jettons
          */
         createJettonAirdrop: (
