@@ -249,7 +249,7 @@ const Control = ({
                                 }
                                 variant="secondary"
                             >
-                                Add vesting date
+                                Add unlock date
                             </Button>
                         </VStack>
                     </VStack>
