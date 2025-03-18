@@ -49,9 +49,8 @@ const Control = <T extends { [controlId]: string }>({
             />
             <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
             <FormHelperText textStyle="body2" color="text.secondary">
-                The amount of TON the recipient must send to receive the Jettons.
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Min: 0.15 TON and Max:
-                5 TON.
+                The amount of TON the recipient must send to receive the Jettons. Min: 0.15 TON and
+                Max: 5 TON.
             </FormHelperText>
         </FormControl>
     );
