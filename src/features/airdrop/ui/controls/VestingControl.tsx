@@ -1,17 +1,17 @@
 import { RefCallback, useState } from 'react';
 import {
-    FormControl,
-    FormLabel,
-    Input,
-    FormErrorMessage,
     Button,
-    VStack,
+    FormControl,
+    FormErrorMessage,
     HStack,
     IconButton,
-    Checkbox
+    Input,
+    Switch,
+    Text,
+    VStack
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon, InputProps } from '@chakra-ui/icons';
-import { UseFormReturn, useFieldArray } from 'react-hook-form';
+import { useFieldArray, UseFormReturn } from 'react-hook-form';
 import { AirdropMetadata } from 'src/features/airdrop/model/interfaces/AirdropMetadata';
 import { useIMask } from 'react-imask';
 import { mergeRefs } from 'src/shared';
@@ -93,152 +93,165 @@ const Control = ({
         return totalFraction === 100 && !invalid;
     };
 
+    const getErrorState = () => {
+        const dateError = vestingFields.some((f, i) => !validateUnlockTime(i, f?.unlockTime));
+        const fractionError = vestingFields.some(
+            (f, i) => !validateFraction(i, Number(f?.fraction))
+        );
+        const hasZeroFraction = vestingFields.some(i => Number(i.fraction || 0) <= 0);
+        return dateError && fractionError
+            ? 'date-fraction'
+            : dateError
+            ? 'date'
+            : hasZeroFraction
+            ? 'zero'
+            : fractionError
+            ? 'fraction'
+            : 'valid';
+    };
+
     return (
         <>
-            <Checkbox
+            <Switch
+                textStyle="label2"
+                alignItems="center"
                 alignSelf="flex-start"
+                display="flex"
                 isChecked={isVestingEnabled}
                 onChange={e => {
                     setIsVestingEnabled(e.target.checked);
                     if (!e.target.checked) {
                         remove();
                     } else {
-                        append({
-                            unlockTime: formatDateTime(new Date(Date.now() + 1000 * 60 * 60)),
-                            fraction: 55
-                        });
+                        append([
+                            {
+                                unlockTime: formatDateTime(
+                                    new Date(Date.now() + 1000 * 60 * 60 * 24)
+                                ),
+                                fraction: 55
+                            },
+                            {
+                                unlockTime: formatDateTime(
+                                    new Date(Date.now() + 1000 * 60 * 60 * 24 * 2)
+                                ),
+                                fraction: 45
+                            }
+                        ]);
                     }
                 }}
             >
                 Enable Vesting
-            </Checkbox>
+            </Switch>
             {isVestingEnabled && (
                 <FormControl mb={0} isInvalid={!!fieldErrors} isRequired>
-                    <FormLabel>Vesting Schedule</FormLabel>
-                    <VStack align="stretch" spacing={4}>
-                        {fields.map((field, index) => (
-                            <VStack key={field.id} align="stretch">
-                                <HStack spacing={4}>
-                                    <FormControl
-                                        mb={0}
-                                        isInvalid={
-                                            !!errors[
-                                                `${controlId}.${index}.unlockTime` as keyof typeof errors
-                                            ] ||
-                                            !validateUnlockTime(
-                                                index,
-                                                vestingFields[index]?.unlockTime
-                                            )
-                                        }
-                                    >
-                                        <Input
-                                            max={formatDateTime(
-                                                new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 5)
-                                            )}
-                                            min={formatDateTime()}
-                                            type="datetime-local"
-                                            {...register(`${controlId}.${index}.unlockTime`, {
-                                                required: 'Time is required',
-                                                validate: value =>
-                                                    validateUnlockTime(index, value) ||
-                                                    'Date must be after the previous date'
-                                            })}
+                    <VStack alignItems="stretch" spacing={2}>
+                        <HStack spacing={4}>
+                            <Text textStyle="label2" w={213}>
+                                Unlock Date
+                            </Text>
+                            <Text textStyle="label2" w={213}>
+                                Percent
+                            </Text>
+                        </HStack>
+                        <VStack align="stretch" spacing={4}>
+                            {fields.map((field, index) => (
+                                <VStack key={field.id} align="stretch">
+                                    <HStack spacing={4}>
+                                        <FormControl
+                                            mb={0}
+                                            isInvalid={
+                                                !validateUnlockTime(
+                                                    index,
+                                                    vestingFields[index]?.unlockTime
+                                                )
+                                            }
+                                        >
+                                            <Input
+                                                max={formatDateTime(
+                                                    new Date(
+                                                        Date.now() + 1000 * 60 * 60 * 24 * 365 * 5
+                                                    )
+                                                )}
+                                                min={formatDateTime()}
+                                                type="datetime-local"
+                                                {...register(`${controlId}.${index}.unlockTime`, {
+                                                    required: 'Time is required',
+                                                    validate: value =>
+                                                        validateUnlockTime(index, value)
+                                                })}
+                                            />
+                                        </FormControl>
+                                        <FormControl
+                                            mb={0}
+                                            isInvalid={
+                                                !validateFraction(
+                                                    index,
+                                                    Number(vestingFields[index]?.fraction)
+                                                )
+                                            }
+                                        >
+                                            {(() => {
+                                                const {
+                                                    ref: hookFractionRef,
+                                                    ...registerFractionRest
+                                                } = register(`${controlId}.${index}.fraction`, {
+                                                    required: 'Fraction is required',
+                                                    validate: value =>
+                                                        validateFraction(index, Number(value))
+                                                });
+
+                                                return (
+                                                    <FractionInput
+                                                        hookFractionRef={hookFractionRef}
+                                                        registerFractionRest={registerFractionRest}
+                                                    />
+                                                );
+                                            })()}
+                                        </FormControl>
+
+                                        <IconButton
+                                            w="44px"
+                                            minW="44px"
+                                            maxW="44px"
+                                            aria-label="Remove vesting period"
+                                            icon={<DeleteIcon />}
+                                            isDisabled={fields.length === 1}
+                                            onClick={() => remove(index)}
+                                            variant="secondary"
                                         />
-                                    </FormControl>
-                                    <FormControl
-                                        mb={0}
-                                        isInvalid={
-                                            !!errors[
-                                                `${controlId}.${index}.fraction` as keyof typeof errors
-                                            ] ||
-                                            !validateFraction(
-                                                index,
-                                                Number(vestingFields[index]?.fraction)
-                                            )
-                                        }
-                                    >
-                                        {(() => {
-                                            const {
-                                                ref: hookFractionRef,
-                                                ...registerFractionRest
-                                            } = register(`${controlId}.${index}.fraction`, {
-                                                required: 'Fraction is required',
-                                                validate: value => {
-                                                    return (
-                                                        validateFraction(index, Number(value)) ||
-                                                        'Total fractions cannot exceed 100%'
-                                                    );
-                                                }
-                                            });
-
-                                            return (
-                                                <FractionInput
-                                                    hookFractionRef={hookFractionRef}
-                                                    registerFractionRest={registerFractionRest}
-                                                />
-                                            );
-                                        })()}
-                                    </FormControl>
-
-                                    <IconButton
-                                        w={44}
-                                        aria-label="Remove vesting period"
-                                        icon={<DeleteIcon />}
-                                        isDisabled={fields.length === 1}
-                                        onClick={() => remove(index)}
-                                    />
-                                </HStack>
-                                <FormControl
-                                    mb={0}
-                                    isInvalid={
-                                        !!errors[
-                                            `${controlId}.${index}.unlockTime` as keyof typeof errors
-                                        ] ||
-                                        !validateUnlockTime(
-                                            index,
-                                            vestingFields[index]?.unlockTime
-                                        ) ||
-                                        !!errors[
-                                            `${controlId}.${index}.fraction` as keyof typeof errors
-                                        ] ||
-                                        !validateFraction(
-                                            index,
-                                            Number(vestingFields[index]?.fraction)
-                                        )
-                                    }
-                                >
-                                    {!validateUnlockTime(
-                                        index,
-                                        vestingFields[index]?.unlockTime
-                                    ) && (
-                                        <FormErrorMessage pos="static">
-                                            Date must be after the previous date
-                                        </FormErrorMessage>
-                                    )}
-                                    {!validateFraction(
-                                        index,
-                                        Number(vestingFields[index]?.fraction)
-                                    ) && (
-                                        <FormErrorMessage pos="static">
-                                            Total fractions cannot exceed 100%
-                                        </FormErrorMessage>
-                                    )}
+                                    </HStack>
+                                </VStack>
+                            ))}
+                            {getErrorState() !== 'valid' && (
+                                <FormControl mb={0} isInvalid={getErrorState() !== 'valid'}>
+                                    <FormErrorMessage pos="static">
+                                        {getErrorState() === 'date-fraction' &&
+                                            'New date must be later than the previous one and date must be no earlier than tomorrow and percentages must sum up to 100'}
+                                        {getErrorState() === 'zero' &&
+                                            'Percentage value must be greater than zero.'}
+                                        {getErrorState() === 'date' &&
+                                            'New date must be later than the previous one and date must be no earlier than tomorrow'}
+                                        {getErrorState() === 'fraction' &&
+                                            'Percentages must sum up to 100'}
+                                    </FormErrorMessage>
                                 </FormControl>
-                            </VStack>
-                        ))}
-                        <Button
-                            leftIcon={<AddIcon />}
-                            onClick={() =>
-                                append({
-                                    unlockTime: formatDateTime(
-                                        new Date(Date.now() + 1000 * 60 * 60)
-                                    ),
-                                    fraction: 45
-                                })
-                            }
-                        >
-                            Add Vesting Period
-                        </Button>
+                            )}
+                            <Button
+                                alignSelf="flex-start"
+                                leftIcon={<AddIcon />}
+                                onClick={() =>
+                                    append({
+                                        unlockTime: formatDateTime(
+                                            new Date(Date.now() + 1000 * 60 * 60 * 24 * 3)
+                                        ),
+                                        fraction: 45
+                                    })
+                                }
+                                variant="secondary"
+                            >
+                                Add vesting date
+                            </Button>
+                        </VStack>
                     </VStack>
                 </FormControl>
             )}
