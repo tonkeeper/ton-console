@@ -14,11 +14,11 @@ import {
 } from 'src/shared';
 import { FC } from 'react';
 import { Flex, Text } from '@chakra-ui/react';
-import { balanceStore } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { invoicesAppStore } from 'src/features';
 import { NftIcon24 } from 'src/shared';
 import { JettonIcon24 } from 'src/shared/ui/icons/JettonIcon24';
+import { balancesStore } from 'src/shared/stores';
 
 const Aside: FC = () => {
     return (
@@ -69,7 +69,7 @@ const Aside: FC = () => {
                 content="Jetton"
                 linkTo="jetton"
             >
-                <DropDownMenuItem linkTo="new-jetton">Minter</DropDownMenuItem>
+                <DropDownMenuItem linkTo="minter">Minter</DropDownMenuItem>
                 <DropDownMenuItem linkTo="airdrops">Airdrops</DropDownMenuItem>
             </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>
@@ -81,12 +81,12 @@ const Aside: FC = () => {
                         Balance
                     </Text>
                     <TextWithSkeleton
-                        isLoading={!balanceStore.portfolio$.isResolved}
+                        isLoading={!balancesStore.portfolio$.isResolved}
                         textStyle="body3"
                         color="text.secondary"
                         skeletonWidth="45px"
                     >
-                        {balanceStore.balances[0]?.stringCurrencyAmount}
+                        {balancesStore.balances[0]?.stringCurrencyAmount}
                     </TextWithSkeleton>
                 </Flex>
             </DropDownMenuItem>

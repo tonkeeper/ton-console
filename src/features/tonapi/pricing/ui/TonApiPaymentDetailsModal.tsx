@@ -13,9 +13,10 @@ import {
     Box
 } from '@chakra-ui/react';
 import { CURRENCY, H4, InfoTooltip, Pad, UsdCurrencyAmount } from 'src/shared';
-import { TonApiTier, tonApiTiersStore } from '../model';
+import { TonApiTier } from '../model';
 import { observer } from 'mobx-react-lite';
-import { balanceStore, CurrencyRate } from 'src/entities';
+import { CurrencyRate } from 'src/entities';
+import { tonApiTiersStore, balancesStore } from 'src/shared/stores';
 
 const TonApiPaymentDetailsModal: FunctionComponent<{
     isOpen: boolean;
@@ -24,7 +25,7 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
 }> = ({ tier, ...rest }) => {
     const onConfirm = useCallback(async () => {
         await tonApiTiersStore.selectTier(tier!.id);
-        await balanceStore.fetchPortfolio();
+        await balancesStore.fetchPortfolio();
         rest.onClose();
     }, [tier]);
 

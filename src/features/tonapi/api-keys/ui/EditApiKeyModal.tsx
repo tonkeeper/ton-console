@@ -11,9 +11,10 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FormProvider, useForm } from 'react-hook-form';
-import { ApiKey, CreateApiKeyForm, apiKeysStore } from '../model';
+import { ApiKey, CreateApiKeyForm } from '../model';
 import { ApiKeyForm, ApiKeyFormInternal, toApiKeyFormDefaultValues } from './ApiKeyForm';
-import { tonApiTiersStore } from '../../pricing';
+import { tonApiTiersStore } from 'src/shared/stores';
+import { apiKeysStore } from 'src/shared/stores';
 
 const EditApiKeyModal: FunctionComponent<{
     isOpen: boolean;

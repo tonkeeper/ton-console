@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import { RegisterApp } from './RegisterApp';
 import { observer } from 'mobx-react-lite';
-import { dappStore } from 'src/entities';
+import { dappStore } from 'src/shared/stores';
 import { Center, Spinner } from '@chakra-ui/react';
 import { AppMessagesDashboard } from './dashboard/AppMessagesDashboard';
 

@@ -2,10 +2,10 @@ import { makeAutoObservable } from 'mobx';
 import { loginViaTG } from './telegram-oauth';
 import { User } from './interfaces/user';
 import { apiClient, DTOUser, Loadable } from 'src/shared';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import { AxiosError } from 'axios';
 
-class UserStore {
+export class UserStore {
     user$ = new Loadable<User | null>(null, {
         makePersistable: { storeKey: 'User', notModifyStatusAfter: true }
     });
@@ -112,5 +112,3 @@ function mapDTOUserToUser(user: DTOUser): User {
         referralCount: user.referrals_count
     };
 }
-
-export const userStore = new UserStore();

@@ -9,7 +9,7 @@ import {
     CRYPTO_CURRENCY,
     TokenCurrencyAmount
 } from 'src/shared';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import {
     InvoicesAllStatistics,
     InvoicesApp,
@@ -18,7 +18,7 @@ import {
 } from './interfaces';
 import { CRYPTO_CURRENCY_DECIMALS } from 'src/shared/lib/currency/CRYPTO_CURRENCY';
 
-class InvoicesAppStore {
+export class InvoicesAppStore {
     invoicesApp$ = new Loadable<InvoicesApp | null>(null);
 
     appToken$ = new Loadable<string | null>(null);
@@ -248,5 +248,3 @@ function mapInvoicesStatsDTOToInvoicesStats(
         })
     };
 }
-
-export const invoicesAppStore = new InvoicesAppStore();

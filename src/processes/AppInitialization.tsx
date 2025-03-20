@@ -1,17 +1,10 @@
-import {
-    ComponentProps,
-    FunctionComponent,
-    PropsWithChildren,
-    useEffect,
-    useRef,
-    useState
-} from 'react';
-import { Box, Center, Fade, useConst } from '@chakra-ui/react';
+import { FC, PropsWithChildren, useEffect, useRef } from 'react';
+import { Box, Center, Fade, FadeProps } from '@chakra-ui/react';
 import { TonConsoleIcon } from 'src/shared';
-import { userStore } from 'src/entities';
+import { appStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 
-const FadeAnimation: FunctionComponent<ComponentProps<typeof Fade>> = props => (
+const FadeAnimation: FC<FadeProps> = props => (
     <Fade
         transition={{ enter: { duration: 0 }, exit: { duration: 0.3 } }}
         initial={{ opacity: 1 }}
@@ -20,22 +13,14 @@ const FadeAnimation: FunctionComponent<ComponentProps<typeof Fade>> = props => (
     />
 );
 
-const AppInitialization: FunctionComponent<PropsWithChildren> = props => {
-    const [userResolved, setUserResolved] = useState(false);
-    const startResolvingTimeout = useConst(Date.now());
+const AppInitialization: FC<PropsWithChildren> = props => {
     const ref = useRef<SVGElement | null>(null);
-    useEffect(() => {
-        if (userStore.user$.isResolved) {
-            const timeout = 500 - (Date.now() - startResolvingTimeout);
-            setTimeout(() => setUserResolved(true), timeout < 0 ? 0 : timeout);
-        }
-    }, [userStore.user$.isResolved]);
 
     useEffect(() => {
-        if (userResolved && ref.current) {
+        if (appStore.isInitialized && ref.current) {
             ref.current.style.opacity = '0';
         }
-    }, [userResolved]);
+    }, [appStore.isInitialized]);
 
     return (
         <>
@@ -48,14 +33,14 @@ const AppInitialization: FunctionComponent<PropsWithChildren> = props => {
                 bottom={0}
                 left={0}
                 bgColor="background.content"
-                in={!userResolved}
+                in={!appStore.isInitialized}
             >
                 <TonConsoleIcon ref={ref} transition="opacity 0.1s linear" h="64px" w="64px" />
             </Center>
             <Box
-                overflow={userResolved ? 'auto' : 'hidden'}
+                overflow={appStore.isInitialized ? 'auto' : 'hidden'}
                 h="100%"
-                maxH={userResolved ? 'unset' : '100%'}
+                maxH={appStore.isInitialized ? 'unset' : '100%'}
             >
                 {props.children}
             </Box>

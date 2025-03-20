@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 import { createReaction, Loadable } from 'src/shared';
 import { AnalyticsDashboardWidget, AnalyticsQuerySuccessful } from './interfaces';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 
 class AnalyticsDashboardStore {
     widgets$ = new Loadable<AnalyticsDashboardWidget[]>([]);

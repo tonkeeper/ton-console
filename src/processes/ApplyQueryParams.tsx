@@ -1,6 +1,6 @@
 import { FunctionComponent, PropsWithChildren, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 
 const ApplyQueryParams: FunctionComponent<PropsWithChildren> = ({ children }) => {

@@ -6,13 +6,11 @@ import { FC, useEffect, useMemo } from 'react';
 import { JettonCard, jettonStore } from 'src/features';
 import { isValidAddress } from 'src/features/jetton/lib/utils';
 import JettonWallet from 'src/features/jetton/ui/minter/JettonWallet';
-
-import { H4, Overlay, useSearchParams } from 'src/shared';
+import { H4, Overlay } from 'src/shared';
+import { useParams } from 'react-router-dom';
 
 const JettonViewPage: FC<BoxProps> = () => {
-    const { searchParams } = useSearchParams();
-    const jettonAddressStr = searchParams.get('address');
-
+    const { address } = useParams<{ address: string }>();
     const connectedWalletAddressStr = useTonAddress();
     const connectedWalletAddress = useMemo(
         () => (connectedWalletAddressStr ? Address.parse(connectedWalletAddressStr) : null),
@@ -20,13 +18,9 @@ const JettonViewPage: FC<BoxProps> = () => {
     );
 
     useEffect(() => {
-        const jettonAddress =
-            jettonAddressStr && isValidAddress(jettonAddressStr)
-                ? Address.parse(jettonAddressStr)
-                : null;
-
+        const jettonAddress = address && isValidAddress(address) ? Address.parse(address) : null;
         jettonStore.setJettonAddress(jettonAddress);
-    }, [jettonAddressStr, jettonStore]);
+    }, [address, jettonStore]);
 
     useEffect(() => {
         jettonStore.setConnectedWalletAddress(connectedWalletAddress);

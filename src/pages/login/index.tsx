@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import { Footer } from 'src/widgets';
 import { useLocation } from 'react-router-dom';
 import { SERVICE_NAMES, SERVICE } from 'src/entities/service/SERVICES';
-import { userStore } from 'src/entities';
+import { userStore } from 'src/shared/stores';
 
 const LoginPage: FC = () => {
     const location = useLocation();

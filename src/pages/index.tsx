@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import TonapiRouting from 'src/pages/tonapi';
 import { lazy } from '@loadable/component';
 import { Layout } from './layouts';
-import { projectsStore, userStore } from 'src/entities';
+import { projectsStore, userStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 import SettingsRouting from 'src/pages/settings';
 import InvoicesRouting from './invoices';
@@ -159,7 +159,14 @@ const Routing: FunctionComponent = () => {
                 />
                 <Route path="analytics">{AnalyticsRouting}</Route>
                 <Route path="nft">{NftRouting}</Route>
-                <Route path="jetton">{JettonRouting}</Route>
+                <Route
+                    path="jetton/*"
+                    element={
+                        <Suspense>
+                            <JettonRouting />
+                        </Suspense>
+                    }
+                />
                 <Route path="settings">{SettingsRouting}</Route>
                 <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="*" element={<Navigate to="dashboard" replace />} />

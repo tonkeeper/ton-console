@@ -2,7 +2,7 @@ import { FC, useEffect } from 'react';
 import { Box, Divider, Flex, Text, Image } from '@chakra-ui/react';
 import { CopyPad, H4, Overlay } from 'src/shared';
 import { observer } from 'mobx-react-lite';
-import { userStore } from 'src/entities';
+import { userStore } from 'src/shared/stores';
 import { StatsCard } from 'src/entities/stats/Card';
 
 const UserProfilePage: FC = () => {

@@ -12,15 +12,17 @@ import {
     TonCurrencyAmount,
     UsdCurrencyAmount
 } from 'src/shared';
-import { projectsStore } from '../../project';
+import { ProjectsStore } from '../../project/model/projects.store';
 import { Portfolio, Refill } from './interfaces';
 import { ratesStore } from 'src/entities';
 import { createStandaloneToast } from '@chakra-ui/react';
 
-class BalancesStore {
+export class BalancesStore {
     portfolio$ = new Loadable<Portfolio | null>(null);
 
     depositAddress$ = new Loadable<string | undefined>(undefined);
+
+    private readonly projectsStore: ProjectsStore;
 
     get balances(): CurrencyAmount[] {
         return this.portfolio$.value?.balances || [];
@@ -44,11 +46,12 @@ class BalancesStore {
         return null;
     }
 
-    constructor() {
+    constructor(projectsStore: ProjectsStore) {
         makeAutoObservable(this);
+        this.projectsStore = projectsStore;
 
         createImmediateReaction(
-            () => projectsStore.selectedProject,
+            () => this.projectsStore.selectedProject,
             project => {
                 this.clearState();
 
@@ -60,7 +63,7 @@ class BalancesStore {
         );
 
         setIntervalWhenPageOnFocus(() => {
-            if (projectsStore.selectedProject) {
+            if (this.projectsStore.selectedProject) {
                 this.fetchPortfolio({ silently: true });
             }
         }, 3000);
@@ -68,7 +71,7 @@ class BalancesStore {
 
     fetchPortfolio = this.portfolio$.createAsyncAction(async () => {
         const response = await apiClient.api.getProjectDepositsHistory(
-            projectsStore.selectedProject!.id
+            this.projectsStore.selectedProject!.id
         );
 
         return {
@@ -78,7 +81,9 @@ class BalancesStore {
     });
 
     fetchDepositAddress = this.depositAddress$.createAsyncAction(async () => {
-        const response = await apiClient.api.getDepositAddress(projectsStore.selectedProject!.id);
+        const response = await apiClient.api.getDepositAddress(
+            this.projectsStore.selectedProject!.id
+        );
 
         return response.data.ton_deposit_wallet;
     });
@@ -88,7 +93,7 @@ class BalancesStore {
 
         try {
             await apiClient.api.promoCodeDepositProject(
-                projectsStore.selectedProject!.id,
+                this.projectsStore.selectedProject!.id,
                 promoCode
             );
             await this.fetchPortfolio();
@@ -137,5 +142,3 @@ function mapDTODepositToRefill(dtoDeposit: DTODeposit): Refill {
         type: 'promoCode'
     };
 }
-
-export const balanceStore = new BalancesStore();

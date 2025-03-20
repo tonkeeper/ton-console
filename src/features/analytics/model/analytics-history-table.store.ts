@@ -14,11 +14,11 @@ import {
     AnalyticsRepeatingQueryAggregated,
     AnalyticsTablePagination
 } from './interfaces';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import { mapDTOStatsSqlResultToAnalyticsQuery } from './analytics-query.store';
 import { mapDTOStatsGraphResultToAnalyticsGraphQuery } from './analytics-graph-query.store';
 
-class AnalyticsHistoryTableStore {
+export class AnalyticsHistoryTableStore {
     queries$ = new Loadable<
         (AnalyticsQuery | AnalyticsRepeatingQueryAggregated | AnalyticsGraphQuery)[]
     >([]);
@@ -168,5 +168,3 @@ function mapTypeToTypeDTO(type: AnalyticsQueryType[] | undefined): DTOStatsQuery
 
     return type?.length ? type.map(v => mappingTypeToTypeDTO[v]) : undefined;
 }
-
-export const analyticsHistoryTableStore = new AnalyticsHistoryTableStore();

@@ -39,7 +39,6 @@ function calculateAmounts(input: number, tiers: WebhooksTier[]): number {
         (acc, { limit, price }) => {
             const value = Math.min(acc.count, limit);
             const current = (value * price) / 1_000_000;
-            console.log('value', value, current);
 
             return {
                 count: acc.count - value,

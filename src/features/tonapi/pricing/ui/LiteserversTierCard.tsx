@@ -1,4 +1,4 @@
-import { ComponentProps, FC, ReactNode } from 'react';
+import { ComponentProps, FC } from 'react';
 import {
     Box,
     Button,
@@ -26,11 +26,10 @@ export const LiteserversTierCard: FC<
     CardProps & {
         tier: DTOLiteproxyTier | DTOProjectLiteproxyTierDetail;
         tonPriceStyles?: ComponentProps<typeof Text>;
-        zeroTonPricePlaceholder?: ReactNode;
         onChoseTier?: (tier: DTOLiteproxyTier) => void;
         isChosen?: boolean;
     }
-> = ({ tier, tonPriceStyles, zeroTonPricePlaceholder, isChosen = false, onChoseTier, ...rest }) => {
+> = ({ tier, tonPriceStyles, isChosen = false, onChoseTier, ...rest }) => {
     const price = new UsdCurrencyAmount(tier.usd_price);
     return (
         <Card

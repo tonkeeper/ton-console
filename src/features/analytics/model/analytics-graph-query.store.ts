@@ -9,9 +9,9 @@ import {
     TonCurrencyAmount
 } from 'src/shared';
 import { AnalyticsGraphQuery, AnalyticsGraphQueryBasic } from './interfaces';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 
-class AnalyticsGraphQueryStore {
+export class AnalyticsGraphQueryStore {
     query$ = new Loadable<AnalyticsGraphQuery | null>(null);
 
     constructor() {
@@ -104,5 +104,3 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
         cost: new TonCurrencyAmount(value.cost!)
     };
 }
-
-export const analyticsGraphQueryStore = new AnalyticsGraphQueryStore();

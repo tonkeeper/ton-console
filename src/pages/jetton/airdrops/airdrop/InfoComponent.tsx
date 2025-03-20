@@ -1,40 +1,37 @@
 import { useState } from 'react';
 import { Address, fromNano } from '@ton/core';
 import { Card, Image, Flex, Text, Divider } from '@chakra-ui/react';
-import { ADAirdropData } from 'src/shared/api/airdrop-api';
+import { ADAirdropData, ADDistributorData } from 'src/shared/api/airdrop-api';
 import { prettifyAmount, sliceString } from './deployUtils';
 import { CopyIcon16, copyToClipboard, IconButton, TickIcon } from 'src/shared';
 
-function getFormattedDate(date = new Date()): string {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-
-    return `${day}.${month}.${year} ${hours}:${minutes}`;
-}
-
-const TextItem = (props: { title: string; text: string; copyContent?: string }) => {
+const TextItem = ({
+    title,
+    text,
+    copyContent
+}: {
+    title: string;
+    text: string;
+    copyContent?: string;
+}) => {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = () => {
         setCopied(true);
-        copyToClipboard(props.copyContent!);
+        copyToClipboard(copyContent!);
         setTimeout(() => setCopied(false), 1500);
     };
 
     return (
         <Flex direction="row" overflow="hidden" whiteSpace="nowrap">
             <Text textStyle="body2" minW="100px" color="text.secondary">
-                {props.title}
+                {title}
             </Text>
             <Flex align="center" direction="row" gap="6px">
-                <Text textStyle="body2" fontFamily={props.copyContent && 'mono'}>
-                    {props.text}
+                <Text textStyle="body2" fontFamily={copyContent && 'mono'}>
+                    {text}
                 </Text>
-                {!!props.copyContent && (
+                {!!copyContent && (
                     <IconButton
                         aria-label="copy"
                         icon={copied ? <TickIcon /> : <CopyIcon16 />}
@@ -46,8 +43,9 @@ const TextItem = (props: { title: string; text: string; copyContent?: string }) 
     );
 };
 
-export const InfoComponent = (props: { airdrop: ADAirdropData; id: string }) => {
-    const {
+export const InfoComponent = ({
+    id,
+    airdrop: {
         admin,
         jetton,
         royalty_parameters,
@@ -55,9 +53,14 @@ export const InfoComponent = (props: { airdrop: ADAirdropData; id: string }) => 
         file_hash,
         total_amount,
         recipients,
-        shards,
         vesting_parameters
-    } = props.airdrop;
+    },
+    distributors
+}: {
+    airdrop: ADAirdropData;
+    id: string;
+    distributors: ADDistributorData[];
+}) => {
     return (
         <Card bg="background.contentTint">
             <Flex align="center" direction="row" gap="12px" overflow="hidden" p="16px">
@@ -79,7 +82,7 @@ export const InfoComponent = (props: { airdrop: ADAirdropData; id: string }) => 
             <Divider />
             <Flex direction="column" gap="8px" px="16px">
                 <Flex direction="column" gap="4px" py="8px">
-                    <TextItem title="ID" text={props.id} copyContent={props.id} />
+                    <TextItem title="ID" text={id} copyContent={id} />
                 </Flex>
                 <Flex direction="column" gap="4px" py="8px">
                     <TextItem
@@ -119,7 +122,7 @@ export const InfoComponent = (props: { airdrop: ADAirdropData; id: string }) => 
                             )} ${jetton.symbol}`}
                         />
                         <TextItem title="Recepients" text={prettifyAmount(recipients)} />
-                        {!!shards && <TextItem title="Contracts" text={prettifyAmount(shards)} />}
+                        <TextItem title="Contracts" text={prettifyAmount(distributors.length)} />
                     </Flex>
                 )}
                 {!!vesting_parameters?.unlocks_list.length && (
@@ -128,7 +131,9 @@ export const InfoComponent = (props: { airdrop: ADAirdropData; id: string }) => 
                             <Flex key={j} direction="column" gap="4px" py="8px">
                                 <TextItem
                                     title="Vesting Date"
-                                    text={getFormattedDate(new Date(i.unlock_time * 1000))}
+                                    text={new Date(i.unlock_time * 1000)
+                                        .toISOString()
+                                        .replace('T', ' ')}
                                 />
                                 <TextItem title="Fraction" text={`${i.fraction / 100}%`} />
                             </Flex>

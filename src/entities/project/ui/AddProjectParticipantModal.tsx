@@ -20,11 +20,12 @@ import {
     Portal,
     chakra
 } from '@chakra-ui/react';
-import { AddProjectParticipantFormValues, projectsStore } from 'src/entities';
+import { AddProjectParticipantFormValues } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
 import { useIMask } from 'react-imask';
 import { InfoIcon16, mergeRefs } from 'src/shared';
+import { projectsStore } from 'src/shared/stores';
 
 const AddProjectParticipantModal: FC<{
     isOpen: boolean;

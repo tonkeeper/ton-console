@@ -9,7 +9,7 @@ import {
 } from 'src/features';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-// import { projectsStore } from 'src/entities';
+// import { projectsStore } from 'src/shared/stores';
 
 const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
     useEffect(() => {

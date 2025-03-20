@@ -1,4 +1,4 @@
 export * from './interfaces';
-export { invoicesAppStore } from './invoices-app.store';
-export { invoicesTableStore } from './invoices-table.store';
+export { invoicesAppStore } from 'src/shared/stores';
+export { invoicesTableStore } from 'src/shared/stores';
 export { INVOICES_LINKS } from './INVOICES_LINKS';

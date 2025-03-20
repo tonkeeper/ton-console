@@ -19,7 +19,8 @@ import {
 } from 'src/shared';
 import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
-import { TonApiTier, tonApiTiersStore } from '../model';
+import { TonApiTier } from '../model';
+import { tonApiTiersStore } from 'src/shared/stores';
 
 const SelectTonApiTierItem = observer<{
     name: string;

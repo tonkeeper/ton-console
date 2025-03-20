@@ -12,5 +12,5 @@ export const tonapiTestnet = new TonApiClient({
     apiKey: authToken
 });
 
-const isTestnet = true;
+export const isTestnet = import.meta.env.VITE_TESTNET === 'true';
 export const tonapiClient = isTestnet ? tonapiTestnet : tonapiMainnet;

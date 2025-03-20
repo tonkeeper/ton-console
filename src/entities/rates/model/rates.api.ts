@@ -1,4 +1,4 @@
-import { CRYPTO_CURRENCY } from 'src/shared';
+import { CRYPTO_CURRENCY, tonapiMainnet } from 'src/shared';
 import BigNumber from 'bignumber.js';
 
 const backendCurrenciesMapping = {
@@ -13,13 +13,13 @@ const backendCurrenciesMapping = {
 };
 
 export async function fetchRate(currency: CRYPTO_CURRENCY): Promise<BigNumber> {
-    const response = await fetch(
-        `${import.meta.env.VITE_TONAPI_BASE_URL}rates?tokens=${
-            backendCurrenciesMapping[currency].request
-        }&currencies=usd`
-    );
+    const token = backendCurrenciesMapping[currency];
 
-    const data = await response.json();
+    const data = await tonapiMainnet.rates.getRates({
+        tokens: [token.request],
+        currencies: ['usd']
+    });
 
-    return new BigNumber(data.rates[backendCurrenciesMapping[currency].response].prices.USD);
+    const tokenRate = data.rates[token.response].prices?.USD;
+    return tokenRate ? new BigNumber(tokenRate) : new BigNumber(0);
 }

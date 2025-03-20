@@ -1,9 +1,9 @@
 import { makeAutoObservable } from 'mobx';
 import { apiClient, createImmediateReaction, Loadable, TonCurrencyAmount } from 'src/shared';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import { GptGenerationPricing } from 'src/features';
 
-class AnalyticsGPTGenerationStore {
+export class AnalyticsGPTGenerationStore {
     generatedSQL$ = new Loadable<string | null>(null);
 
     gptPricing$ = new Loadable<GptGenerationPricing | null>(null);
@@ -65,5 +65,3 @@ function mapStatsChatGptPriceToGptGenerationPricing(
         requestPrice: new TonCurrencyAmount(value.price)
     };
 }
-
-export const analyticsGPTGenerationStore = new AnalyticsGPTGenerationStore();

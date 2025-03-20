@@ -14,8 +14,8 @@ import {
 } from '@chakra-ui/react';
 import { CURRENCY, DTOLiteproxyTier, H4, Pad, UsdCurrencyAmount } from 'src/shared';
 import { observer } from 'mobx-react-lite';
-import { balanceStore, CurrencyRate } from 'src/entities';
-import { liteproxysStore } from '../../liteproxy';
+import { CurrencyRate } from 'src/entities';
+import { liteproxysStore, balancesStore } from 'src/shared/stores';
 
 const LiteserversPaymentDetailsModal: FunctionComponent<{
     isOpen: boolean;
@@ -24,7 +24,7 @@ const LiteserversPaymentDetailsModal: FunctionComponent<{
 }> = ({ tier, ...rest }) => {
     const onConfirm = useCallback(async () => {
         await liteproxysStore.selectTier(tier!.id);
-        await balanceStore.fetchPortfolio();
+        await balancesStore.fetchPortfolio();
         rest.onClose();
     }, [tier]);
 

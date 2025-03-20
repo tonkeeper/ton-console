@@ -13,13 +13,12 @@ import {
 } from '@chakra-ui/react';
 import { CopyPad, createTransferLink, H4, Pad } from 'src/shared';
 import { QRCodeSVG } from 'qrcode.react';
-import { balanceStore } from '../model';
 import { observer } from 'mobx-react-lite';
-
+import { balancesStore } from 'src/shared/stores';
 const RefillModalContent: FunctionComponent<{
     onClose: () => void;
 }> = props => {
-    const depositAddress = balanceStore.depositAddress$.value;
+    const depositAddress = balancesStore.depositAddress$.value;
     return (
         <ModalContent>
             <ModalHeader>
@@ -32,11 +31,11 @@ const RefillModalContent: FunctionComponent<{
             <ModalCloseButton />
             <ModalBody pt="0" pb="4">
                 <>
-                    {balanceStore.depositAddress$.isLoading ? (
+                    {balancesStore.depositAddress$.isLoading ? (
                         <Center h="80px">
                             <Spinner />
                         </Center>
-                    ) : balanceStore.depositAddress$.error ? (
+                    ) : balancesStore.depositAddress$.error ? (
                         <Box color="accent.orange">
                             <Box>Balance refill is not available right now.</Box>
                             <Box>Please try again later.</Box>
