@@ -22,7 +22,7 @@ const LiteproxyView: FC = () => {
                     </Flex>
                     <Flex align="baseline" gap={2}>
                         <Text textStyle="text.label2">Public key:</Text>
-                        <CopyPad text={liteproxy.public_key} variant="flat" width="400px" />
+                        <CopyPad text={liteproxy.public_key} variant="flat" width="407px" />
                     </Flex>
                 </Flex>
             ))}
