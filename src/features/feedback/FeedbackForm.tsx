@@ -61,7 +61,7 @@ export const FeedbackFrom: FC<{
             </FormControl>
 
             <FormControl>
-                <FormLabel htmlFor="information">Additiona information</FormLabel>
+                <FormLabel htmlFor="information">Additional information</FormLabel>
                 <Textarea
                     placeholder="Ton Console services you are looking for"
                     {...register('information')}

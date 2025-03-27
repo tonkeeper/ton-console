@@ -61,7 +61,7 @@ const FeaturesList: FunctionComponent<
                 </Button>
             </FeatureCard>
 
-            <FeatureCard
+            {/* <FeatureCard
                 h="100%"
                 background="linear-gradient(104deg, #5C92FF 0%, #3D7EFF 100%)"
                 src="/assets/images/tonkeeper-NFT.webp"
@@ -74,7 +74,7 @@ const FeaturesList: FunctionComponent<
                 <Button onClick={openFeedbackModal('nft-themes')} variant={buttonVariant}>
                     Become Partner
                 </Button>
-            </FeatureCard>
+            </FeatureCard> */}
 
             <FeatureCard
                 h="100%"
