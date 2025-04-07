@@ -1,4 +1,11 @@
-import { ComponentProps, FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
+import {
+    ComponentProps,
+    FunctionComponent,
+    useCallback,
+    useEffect,
+    useRef
+    // useState
+} from 'react';
 import {
     Box,
     Button,
@@ -6,15 +13,21 @@ import {
     Flex,
     FormControl,
     FormErrorMessage,
-    Input,
+    // Input,
     Link,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuList,
+    // Menu,
+    // MenuButton,
+    // MenuItem,
+    // MenuList,
     Text
 } from '@chakra-ui/react';
-import { ArrowIcon, AsyncInput, Span, TickIcon, useAsyncValidator } from 'src/shared';
+import {
+    // ArrowIcon,
+    AsyncInput,
+    Span,
+    // TickIcon,
+    useAsyncValidator
+} from 'src/shared';
 import { ErrorOption, useForm } from 'react-hook-form';
 import { CreateDappForm, DAPPS_LINKS } from '../model';
 
@@ -24,8 +37,8 @@ type AppUrlFormStruct = {
 };
 
 const inputsLabels = {
-    manifest: 'TonConnect Manifest URL',
-    url: 'App URL'
+    manifest: 'TonConnect Manifest URL'
+    // url: 'App URL'
 };
 
 export const DAppUrlInputForm: FunctionComponent<
@@ -37,7 +50,7 @@ export const DAppUrlInputForm: FunctionComponent<
         ) => Promise<ErrorOption | undefined | { success: true; result: CreateDappForm }>;
     }
 > = ({ onSubmit, validator, submitButtonLoading, ...rest }) => {
-    const [selectedInput, setSelectedInput] = useState<'manifest' | 'url'>('manifest');
+    // const [selectedInput, setSelectedInput] = useState<'manifest' | 'url'>('manifest');
     const methods = useForm<AppUrlFormStruct>({
         mode: 'onChange'
     });
@@ -45,13 +58,13 @@ export const DAppUrlInputForm: FunctionComponent<
     const {
         handleSubmit,
         register,
-        unregister,
-        trigger,
+        // unregister,
+        // trigger,
         getFieldState,
         formState: { errors, isDirty, isValid }
     } = methods;
     const [validationState, validationProduct] = useAsyncValidator(methods, 'manifest', validator);
-    const isValidating = selectedInput === 'manifest' && validationState !== 'succeed';
+    const isValidating = validationState !== 'succeed';
     const { isTouched: isManifestTouched } = getFieldState('manifest');
     const { isTouched: isUrlTouched } = getFieldState('url');
 
@@ -70,16 +83,16 @@ export const DAppUrlInputForm: FunctionComponent<
         }
     }, [isUrlTouched]);
 
-    useEffect(() => {
-        const notSelectedInput = selectedInput === 'manifest' ? 'url' : 'manifest';
-        unregister(notSelectedInput);
+    // useEffect(() => {
+    //     const notSelectedInput = selectedInput === 'manifest' ? 'url' : 'manifest';
+    //     unregister(notSelectedInput);
 
-        const selectedInputTouched =
-            selectedInput === 'manifest' ? isManifestTouchedRef : isUrlTouchedRef;
-        if (selectedInputTouched.current) {
-            trigger(selectedInput);
-        }
-    }, [register, unregister, selectedInput]);
+    //     const selectedInputTouched =
+    //         selectedInput === 'manifest' ? isManifestTouchedRef : isUrlTouchedRef;
+    //     if (selectedInputTouched.current) {
+    //         trigger(selectedInput);
+    //     }
+    // }, [register, unregister, selectedInput]);
 
     const submitMiddleware = useCallback(
         (form: AppUrlFormStruct) => {
@@ -102,8 +115,14 @@ export const DAppUrlInputForm: FunctionComponent<
                 Registration
             </Text>
             <Flex align="center" justify="space-between">
-                <Menu gutter={2} placement="bottom-start">
-                    <MenuButton
+                <Text textStyle="label2" mr="2" color="text.primary">
+                    {inputsLabels.manifest}
+                </Text>
+                {/* <Menu gutter={2} placement="bottom-start">
+                    <Text textStyle="label2" mr="2" color="text.primary">
+                        {inputsLabels.manifest}
+                    </Text> */}
+                {/* <MenuButton
                         as={Button}
                         mb="1"
                         pl="0"
@@ -112,9 +131,9 @@ export const DAppUrlInputForm: FunctionComponent<
                         rightIcon={<ArrowIcon />}
                         variant="flat"
                     >
-                        {inputsLabels[selectedInput]}
-                    </MenuButton>
-                    <MenuList zIndex={100} minW="100px">
+                        {inputsLabels.manifest}
+                    </MenuButton> */}
+                {/* <MenuList zIndex={100} minW="100px">
                         {(Object.keys(inputsLabels) as ('manifest' | 'url')[]).map(key => (
                             <MenuItem key={key} onClick={() => setSelectedInput(key)}>
                                 <Text textStyle="label2" mr="2" color="text.primary" noOfLines={1}>
@@ -123,8 +142,8 @@ export const DAppUrlInputForm: FunctionComponent<
                                 {selectedInput === key && <TickIcon ml="auto" />}
                             </MenuItem>
                         ))}
-                    </MenuList>
-                </Menu>
+                    </MenuList> */}
+                {/* </Menu> */}
                 <Link
                     textStyle="label2"
                     color="text.accent"
@@ -136,7 +155,7 @@ export const DAppUrlInputForm: FunctionComponent<
             </Flex>
             <chakra.form noValidate onSubmit={handleSubmit(submitMiddleware)}>
                 <FormControl
-                    display={selectedInput === 'manifest' ? 'block' : 'none'}
+                    // display={selectedInput === 'manifest' ? 'block' : 'none'}
                     mb="5"
                     isInvalid={!!errors.manifest}
                 >
@@ -144,20 +163,19 @@ export const DAppUrlInputForm: FunctionComponent<
                         autoComplete="off"
                         placeholder="https://yourapp.com/tonconnect-manifest.json"
                         validationState={validationState}
-                        {...(selectedInput === 'manifest' &&
-                            register('manifest', {
-                                required: 'Required',
-                                pattern: {
-                                    value: /^https?:\/\/.+/,
-                                    message: 'Wrong URL format'
-                                }
-                            }))}
+                        {...register('manifest', {
+                            required: 'Required',
+                            pattern: {
+                                value: /^https?:\/\/.+/,
+                                message: 'Wrong URL format'
+                            }
+                        })}
                     />
                     <FormErrorMessage>
                         {errors.manifest && errors.manifest.message}
                     </FormErrorMessage>
                 </FormControl>
-                <FormControl
+                {/* <FormControl
                     display={selectedInput === 'url' ? 'block' : 'none'}
                     mb="5"
                     isInvalid={!!errors.url}
@@ -175,8 +193,8 @@ export const DAppUrlInputForm: FunctionComponent<
                             }))}
                     />
                     <FormErrorMessage>{errors.url && errors.url.message}</FormErrorMessage>
-                </FormControl>
-                {selectedInput === 'manifest' && !!validationProduct?.url && (
+                </FormControl> */}
+                {!!validationProduct?.url && (
                     <Text textStyle="body2" mb="4" color="text.secondary">
                         App url
                         <Span textStyle="body2" fontFamily="mono" color="text.primary" ml="4">

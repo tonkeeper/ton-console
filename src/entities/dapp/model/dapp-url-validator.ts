@@ -3,7 +3,11 @@ import axios from 'axios';
 import { CreateDappForm } from './interfaces';
 
 export const fetchDappFormByManifestUrl = async (manifestUrl: string): Promise<CreateDappForm> => {
-    const response = await axios.get(manifestUrl);
+    const uint8Array = new TextEncoder().encode(manifestUrl);
+    const base64ManifestUrl = btoa(String.fromCharCode(...uint8Array));
+    const requestUrl = `https://c.tonapi.io/json?url=${base64ManifestUrl}`;
+
+    const response = await axios.get(requestUrl);
 
     const url = response.data.url;
 
