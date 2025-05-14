@@ -17,6 +17,7 @@
     "generate-api": "npx tsx ./scripts/swagger.ts",
     "generate-webhooks": "npx tsx ./scripts/webhooks.ts",
     "generate-airdrop": "npx tsx ./scripts/airdrop.ts",
+    "generate-airdrop2": "npx tsx ./scripts/airdrop2.ts",
     "postinstall": "patch-package"
   },
   "dependencies": {

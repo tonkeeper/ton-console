@@ -65,12 +65,35 @@ export interface ADAirdropData {
      * @example "Address duplication error. Two identical recipient addresses in the file."
      */
     upload_error?: string;
+    vesting_parameters?: ADVestingParameters;
 }
 
 /** royalty parameters for airdrop */
 export interface ADRoyaltyParameters {
     /** @example "100000000" */
     min_commission: string;
+}
+
+export interface ADVestingParameters {
+    /** List of unlocks */
+    unlocks_list: ADUnlockData[];
+}
+
+export interface ADUnlockData {
+    /**
+     * Unlock utime
+     * @format int64
+     * @example 1740141611
+     */
+    unlock_time: number;
+    /**
+     * The percentage rounded to the second decimal place multiplied by 100. 25.15% -> 2515
+     * @format int16
+     * @min 0
+     * @max 10000
+     * @example 2500
+     */
+    fraction: number;
 }
 
 export interface ADDistributorData {
@@ -221,17 +244,6 @@ export interface ADConfig {
     royalty_denominator: number;
 }
 
-export interface ADUserClaim {
-    claim_message: ADInternalMessage;
-    /** @example "597968399" */
-    jetton_amount: string;
-    /**
-     * Jetton master contract in user-friendly form
-     * @example "kQABcHP_oXkYNCx3HHKd4rxL371RRl-O6IwgwqYZ7IT6Ha-u"
-     */
-    jetton: string;
-}
-
 export enum ADAirdropDataClamStatusEnum {
     ADOpened = 'opened',
     ADClosed = 'closed'
@@ -253,9 +265,9 @@ import type {
 } from 'axios';
 import axios from 'axios';
 
-export type QueryParamsType = Record<string | number, any>;
+type QueryParamsType = Record<string | number, any>;
 
-export interface FullRequestParams
+interface FullRequestParams
     extends Omit<AxiosRequestConfig, 'data' | 'params' | 'url' | 'responseType'> {
     /** set parameter to `true` for call `securityWorker` for this request */
     secure?: boolean;
@@ -271,9 +283,9 @@ export interface FullRequestParams
     body?: unknown;
 }
 
-export type RequestParams = Omit<FullRequestParams, 'body' | 'method' | 'query' | 'path'>;
+type RequestParams = Omit<FullRequestParams, 'body' | 'method' | 'query' | 'path'>;
 
-export interface ApiConfig<SecurityDataType = unknown>
+interface ApiConfig<SecurityDataType = unknown>
     extends Omit<AxiosRequestConfig, 'data' | 'cancelToken'> {
     securityWorker?: (
         securityData: SecurityDataType | null
@@ -282,14 +294,14 @@ export interface ApiConfig<SecurityDataType = unknown>
     format?: ResponseType;
 }
 
-export enum ContentType {
+enum ContentType {
     Json = 'application/json',
     FormData = 'multipart/form-data',
     UrlEncoded = 'application/x-www-form-urlencoded',
     Text = 'text/plain'
 }
 
-export class HttpClient<SecurityDataType = unknown> {
+class HttpClient<SecurityDataType = unknown> {
     public instance: AxiosInstance;
     private securityData: SecurityDataType | null = null;
     private securityWorker?: ApiConfig<SecurityDataType>['securityWorker'];
@@ -571,10 +583,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @request GET:/v1/config
          */
         getConfig: (
-          query: {
-            project_id: string;
+            query: {
+                project_id: string;
             },
-          params: RequestParams = {}
+            params: RequestParams = {}
         ) =>
             this.request<ADConfig, ADError>({
                 path: `/v1/config`,
@@ -634,18 +646,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 method: 'POST',
                 query: query,
                 ...params
-            }),
-
+            })
+    };
+    v2 = {
         /**
          * No description
          *
-         * @tags claim
-         * @name GetUserClaim
-         * @summary Get user claim data
-         * @request GET:/v1/airdrop/claim/{account}
+         * @tags admin
+         * @name GetAirdropData
+         * @summary Get airdrop info
+         * @request GET:/v2/airdrop
          */
-        getUserClaim: (
-            account: string,
+        getAirdropData: (
             query: {
                 /**
                  * Airdrop ID
@@ -656,11 +668,213 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             },
             params: RequestParams = {}
         ) =>
-            this.request<ADUserClaim, ADError>({
-                path: `/v1/airdrop/claim/${account}`,
+            this.request<ADAirdropData, ADError>({
+                path: `/v2/airdrop`,
                 method: 'GET',
                 query: query,
                 format: 'json',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags admin
+         * @name NewAirdrop
+         * @summary Generate new airdrop
+         * @request POST:/v2/airdrop
+         */
+        newAirdrop: (
+            query: {
+                project_id: string;
+            },
+            data: {
+                /** claim admin wallet address */
+                admin: string;
+                /** jetton master contract address */
+                jetton: string;
+                /** royalty parameters for airdrop */
+                royalty_parameters: ADRoyaltyParameters;
+                vesting_parameters?: ADVestingParameters;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    /** @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b" */
+                    id: string;
+                },
+                ADError
+            >({
+                path: `/v2/airdrop`,
+                method: 'POST',
+                query: query,
+                body: data,
+                format: 'json',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags admin
+         * @name FileUpload
+         * @summary Upload withdrawals file
+         * @request POST:/v2/airdrop/upload
+         */
+        fileUpload: (
+            query: {
+                /**
+                 * Airdrop ID
+                 * @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+                 */
+                id: string;
+                project_id: string;
+            },
+            data: {
+                url?: string;
+                /**
+                 * The CSV file to upload
+                 * @format binary
+                 */
+                file?: File;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<void, ADError>({
+                path: `/v2/airdrop/upload`,
+                method: 'POST',
+                query: query,
+                body: data,
+                type: ContentType.FormData,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags admin
+         * @name GetDistributorsData
+         * @summary Get distributors info
+         * @request GET:/v2/airdrop/distributors
+         */
+        getDistributorsData: (
+            query: {
+                /**
+                 * Airdrop ID
+                 * @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+                 */
+                id: string;
+                project_id: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<ADDistributorsData, ADError>({
+                path: `/v2/airdrop/distributors`,
+                method: 'GET',
+                query: query,
+                format: 'json',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags admin
+         * @name GetRoyaltyData
+         * @summary Get royalty info
+         * @request GET:/v2/airdrop/royalty
+         */
+        getRoyaltyData: (
+            query: {
+                /**
+                 * Airdrop ID
+                 * @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+                 */
+                id: string;
+                project_id: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<ADRoyaltiesData, ADError>({
+                path: `/v2/airdrop/royalty`,
+                method: 'GET',
+                query: query,
+                format: 'json',
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags admin
+         * @name GetConfig
+         * @summary Get config params
+         * @request GET:/v2/config
+         */
+        getConfig: (
+            query: {
+                project_id: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<ADConfig, ADError>({
+                path: `/v2/config`,
+                method: 'GET',
+                format: 'json',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags admin
+         * @name OpenClaim
+         * @summary Open claim method for users
+         * @request POST:/v2/airdrop/start
+         */
+        openClaim: (
+            query: {
+                /**
+                 * Airdrop ID
+                 * @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+                 */
+                id: string;
+                project_id: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<void, ADError>({
+                path: `/v2/airdrop/start`,
+                method: 'POST',
+                query: query,
+                ...params
+            }),
+
+        /**
+         * No description
+         *
+         * @tags admin
+         * @name CloseClaim
+         * @summary Close claim method for users
+         * @request POST:/v2/airdrop/stop
+         */
+        closeClaim: (
+            query: {
+                /**
+                 * Airdrop ID
+                 * @example "03cfc582-b1c3-410a-a9a7-1f3afe326b3b"
+                 */
+                id: string;
+                project_id: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<void, ADError>({
+                path: `/v2/airdrop/stop`,
+                method: 'POST',
+                query: query,
                 ...params
             })
     };

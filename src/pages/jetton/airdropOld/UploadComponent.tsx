@@ -34,7 +34,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
             resetInterval();
         } else {
             intervalRef.current = setInterval(async () => {
-                await airdropsStore.loadAirdrop(props.queryId);
+                await airdropsStore.loadAirdrop(props.queryId, true);
             }, 2000);
         }
         return () => resetInterval();
@@ -53,7 +53,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
     const handleFileUpload = async (file: File) => {
         setIsUploading(true);
         setError(null);
-        await airdropApiClient.v2
+        await airdropApiClient.v1
             .fileUpload(
                 {
                     id: props.queryId,
@@ -75,7 +75,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
                 setError(err?.message);
             })
             .finally(async () => {
-                await airdropsStore.loadAirdrop(props.queryId);
+                await airdropsStore.loadAirdrop(props.queryId, true);
                 setIsUploading(false);
                 setProgress(null);
                 if (inputRef.current) {
@@ -93,7 +93,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
             setError('Incorrect file URL');
         }
 
-        await airdropApiClient.v2
+        await airdropApiClient.v1
             .fileUpload(
                 {
                     id: props.queryId,
@@ -107,7 +107,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
                 setError(err?.message);
             })
             .finally(async () => {
-                await airdropsStore.loadAirdrop(props.queryId);
+                await airdropsStore.loadAirdrop(props.queryId, true);
                 setIsUploading(false);
             });
     };

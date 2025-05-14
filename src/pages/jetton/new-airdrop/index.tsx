@@ -85,7 +85,8 @@ const NewAirdropPage: FC<BoxProps> = () => {
         }
     }, [wallet, connectionRestored]);
 
-    const handleSubmit = async ({ name, address, fee }: AirdropMetadata) => {
+    const handleSubmit = async (v: AirdropMetadata) => {
+        const { name, address, fee, vesting } = v;
         if (!checkIsWalletW5(wallet?.account.walletStateInit || '')) {
             showWalletError();
             return;
@@ -103,6 +104,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
             name,
             address,
             fee,
+            vesting,
             adminAddress: userAddress
         });
         setIsLoading(false);
@@ -132,10 +134,10 @@ const NewAirdropPage: FC<BoxProps> = () => {
             </Flex>
             <Divider mb="3" />
             <Flex align="flex-start" direction="column" gap="24px" maxW="550px" px="6">
-                <Flex align="flex-start" direction="column" gap="16px">
+                <Flex align="flex-start" direction="column" gap="12px">
                     <FormProvider {...methods}>
                         <AirdropForm onSubmit={handleSubmit} id={formId} />
-                        <Text textStyle="label2">
+                        <Text textStyle="label2" color="text.secondary">
                             Royalty coefficient:{' '}
                             {config.royalty_numerator / config.royalty_denominator} (see it in
                             Airdop T&C Terms)
@@ -145,7 +147,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
                         checked={terms1Checked}
                         onChange={() => setTerms1Checked(!terms1Checked)}
                     >
-                        <Text textStyle="label2">
+                        <Text textStyle="label2" color="text.secondary">
                             I have read and agree with the{' '}
                             <Link
                                 textStyle="label2"
@@ -161,7 +163,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
                         checked={terms2Checked}
                         onChange={() => setTerms2Checked(!terms2Checked)}
                     >
-                        <Text textStyle="label2">
+                        <Text textStyle="label2" color="text.secondary">
                             I have read and agree with the{' '}
                             <Link
                                 textStyle="label2"

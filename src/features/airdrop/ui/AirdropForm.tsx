@@ -5,6 +5,7 @@ import { SubmitHandler, useFormContext } from 'react-hook-form';
 import NameControl from './controls/NameControl';
 import AddressControl from './controls/AddressControl';
 import FeeControl from './controls/FeeControl';
+import VestingControl from './controls/VestingControl';
 import { AirdropMetadata } from 'src/features/airdrop/model/interfaces/AirdropMetadata';
 
 type JettonFormProps = StyleProps & {
@@ -34,6 +35,7 @@ const AirdropForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) =>
             <NameControl context={context} />
             <AddressControl context={context} />
             <FeeControl context={context} />
+            <VestingControl context={context} />
         </chakra.form>
     );
 });

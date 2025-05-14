@@ -6,6 +6,7 @@ const JettonNewPage = lazy(() => import('./new-jetton'));
 const JettonMinerPage = lazy(() => import('./minter'));
 const JettonViewPage = lazy(() => import('./view'));
 const AirdropPage = lazy(() => import('./airdrop'));
+const AirdropOldPage = lazy(() => import('./airdropOld'));
 const AirdropsPage = lazy(() => import('./airdrops'));
 const NewAirdropPage = lazy(() => import('./new-airdrop'));
 
@@ -32,6 +33,14 @@ const JettonRouting = (
             element={
                 <Suspense>
                     <JettonViewPage />
+                </Suspense>
+            }
+        />
+        <Route
+            path="airdropOld"
+            element={
+                <Suspense>
+                    <AirdropOldPage />
                 </Suspense>
             }
         />

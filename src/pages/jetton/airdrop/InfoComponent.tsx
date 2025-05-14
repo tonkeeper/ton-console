@@ -5,6 +5,17 @@ import { ADAirdropData } from 'src/shared/api/airdrop-api';
 import { prettifyAmount, sliceString } from './deployUtils';
 import { CopyIcon16, copyToClipboard, IconButton, TickIcon } from 'src/shared';
 
+function getFormattedDate(date = new Date()): string {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${day}.${month}.${year} ${hours}:${minutes}`;
+}
+
 const TextItem = (props: { title: string; text: string; copyContent?: string }) => {
     const [copied, setCopied] = useState(false);
 
@@ -44,7 +55,8 @@ export const InfoComponent = (props: { airdrop: ADAirdropData; id: string }) => 
         file_hash,
         total_amount,
         recipients,
-        shards
+        shards,
+        vesting_parameters
     } = props.airdrop;
     return (
         <Card bg="background.contentTint">
@@ -109,6 +121,19 @@ export const InfoComponent = (props: { airdrop: ADAirdropData; id: string }) => 
                         <TextItem title="Recepients" text={prettifyAmount(recipients)} />
                         {!!shards && <TextItem title="Contracts" text={prettifyAmount(shards)} />}
                     </Flex>
+                )}
+                {!!vesting_parameters?.unlocks_list.length && (
+                    <>
+                        {vesting_parameters.unlocks_list.map((i, j) => (
+                            <Flex key={j} direction="column" gap="4px" py="8px">
+                                <TextItem
+                                    title="Vesting Date"
+                                    text={getFormattedDate(new Date(i.unlock_time * 1000))}
+                                />
+                                <TextItem title="Fraction" text={`${i.fraction / 100}%`} />
+                            </Flex>
+                        ))}
+                    </>
                 )}
             </Flex>
         </Card>
