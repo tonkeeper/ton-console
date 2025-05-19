@@ -254,9 +254,7 @@ const JettonWallet: FC<
 
     return (
         <>
-            <Text textStyle="label1" py={5}>
-                Connected Jetton wallet
-            </Text>
+            <Text textStyle="label1">Connected Jetton wallet</Text>
             <List maxW={516} {...rest}>
                 <FormControl>
                     <FormLabel justifyContent="space-between" display="flex" htmlFor="name">

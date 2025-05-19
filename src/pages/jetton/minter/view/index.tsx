@@ -59,16 +59,14 @@ const JettonViewPage: FC<BoxProps> = () => {
                 <TonConnectButton />
             </Flex>
             <Divider mb="3" />
-            <Flex align="flex-start" direction="row" gap="16px" px="6">
+            <Flex align="flex-start" direction="column" gap="16px" px="6">
                 <Flex direction="column" gap="24px" minW="520px" maxW="520px">
                     <JettonCard data={jettonInfo} />
                 </Flex>
-                <Flex direction="column" gap="16px">
-                    <JettonWallet
-                        connectedWalletAddress={connectedWalletAddress}
-                        jettonInfo={jettonInfo}
-                    />
-                </Flex>
+                <JettonWallet
+                    connectedWalletAddress={connectedWalletAddress}
+                    jettonInfo={jettonInfo}
+                />
             </Flex>
         </Overlay>
     );
