@@ -13,16 +13,15 @@ import {
     AnalyticsChart,
     AnalyticsChartOptions,
     AnalyticsQuery,
-    AnalyticsQuerySuccessful,
     AnalyticsTableSource,
     AnalyticsTablesSchema,
     isAnalyticsQuerySuccessful
 } from './interfaces';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import { analyticsGPTGenerationStore } from 'src/features';
 import { parse } from 'csv-parse/sync';
 
-class AnalyticsQueryStore {
+export class AnalyticsQueryStore {
     query$ = new Loadable<AnalyticsQuery | null>(null);
 
     chartsDatasource$ = new Loadable<Record<string, number>[] | null>(null);
@@ -205,25 +204,28 @@ class AnalyticsQueryStore {
 
     refetchQuery = this.query$.createAsyncAction(async () => {
         const result = await apiClient.api.getSqlResultFromStats(this.query$.value!.id);
-
         return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
     });
 
     loadQuery = this.query$.createAsyncAction(
-        async (id: string) => {
-            const result = await apiClient.api.getSqlResultFromStats(id);
+        async (queryId: string) => {
+            const result = await apiClient.api.getSqlResultFromStats(queryId);
             return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
         },
         { resetBeforeExecution: true }
     );
 
-    updateChartDatasource = this.chartsDatasource$.createAsyncAction(() => {
-        const query = this.query$.value! as AnalyticsQuerySuccessful;
-        return downloadAndParseCSV(query.csvUrl);
+    updateChartDatasource = this.chartsDatasource$.createAsyncAction(async () => {
+        if (!isAnalyticsQuerySuccessful(this.query$.value!)) {
+            return;
+        }
+
+        return downloadAndParseCSV(this.query$.value.csvUrl);
     });
 
     clear(): void {
         this.query$.clear();
+        this.chartsDatasource$.clear();
     }
 }
 
@@ -336,5 +338,3 @@ function parseDDL(ddl: string): AnalyticsTablesSchema {
         return acc;
     }, {} as AnalyticsTablesSchema);
 }
-
-export const analyticsQueryStore = new AnalyticsQueryStore();

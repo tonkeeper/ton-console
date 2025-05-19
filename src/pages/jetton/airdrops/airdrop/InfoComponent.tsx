@@ -5,17 +5,6 @@ import { ADAirdropData } from 'src/shared/api/airdrop-api';
 import { prettifyAmount, sliceString } from './deployUtils';
 import { CopyIcon16, copyToClipboard, IconButton, TickIcon } from 'src/shared';
 
-function getFormattedDate(date = new Date()): string {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-
-    return `${day}.${month}.${year} ${hours}:${minutes}`;
-}
-
 const TextItem = (props: { title: string; text: string; copyContent?: string }) => {
     const [copied, setCopied] = useState(false);
 
@@ -128,7 +117,9 @@ export const InfoComponent = (props: { airdrop: ADAirdropData; id: string }) => 
                             <Flex key={j} direction="column" gap="4px" py="8px">
                                 <TextItem
                                     title="Vesting Date"
-                                    text={getFormattedDate(new Date(i.unlock_time * 1000))}
+                                    text={new Date(i.unlock_time * 1000)
+                                        .toISOString()
+                                        .replace('T', ' ')}
                                 />
                                 <TextItem title="Fraction" text={`${i.fraction / 100}%`} />
                             </Flex>

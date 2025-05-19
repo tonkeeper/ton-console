@@ -12,5 +12,6 @@ export const tonapiTestnet = new TonApiClient({
     apiKey: authToken
 });
 
+// TODO: remove testnet attribute
 const isTestnet = true;
 export const tonapiClient = isTestnet ? tonapiTestnet : tonapiMainnet;

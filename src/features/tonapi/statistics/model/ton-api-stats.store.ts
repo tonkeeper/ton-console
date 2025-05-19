@@ -1,9 +1,9 @@
 import { apiClient, createImmediateReaction, DTOStats, Loadable } from 'src/shared';
 import { TonApiStats } from './interfaces';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import { makeAutoObservable } from 'mobx';
 
-class TonApiStatsStore {
+export class TonApiStatsStore {
     stats$ = new Loadable<TonApiStats | null>(null);
 
     constructor() {
@@ -54,5 +54,3 @@ function mapStatsDTOToTonApiStats(stats: DTOStats): TonApiStats | null {
         }))
     };
 }
-
-export const tonApiStatsStore = new TonApiStatsStore();

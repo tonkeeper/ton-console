@@ -1,7 +1,7 @@
 import { Text, Flex } from '@chakra-ui/react';
 import { FC } from 'react';
 import { CopyPad } from 'src/shared';
-import { liteproxysStore } from '../model';
+import { liteproxysStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 import DownloadConfigButton from './DownloadConfigButton';
 

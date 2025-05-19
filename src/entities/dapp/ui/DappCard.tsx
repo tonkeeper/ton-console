@@ -11,9 +11,10 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 import { DeleteIcon24, IconButton, Image, VerticalDotsIcon16 } from 'src/shared';
-import { Dapp, dappStore } from 'src/entities';
+import { Dapp } from 'src/entities';
 import { ConfirmDappDeleteModal } from './ConfirmDappDeleteModal';
 import { observer } from 'mobx-react-lite';
+import { dappStore } from 'src/shared/stores';
 
 const DappCard: FunctionComponent<
     ComponentProps<typeof Card> & {

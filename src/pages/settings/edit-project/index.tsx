@@ -1,15 +1,11 @@
 import { FunctionComponent, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Center, Flex, Text } from '@chakra-ui/react';
-import {
-    DeleteProjectConfirmation,
-    ProjectForm,
-    ProjectFormValues,
-    projectsStore
-} from 'src/entities';
+import { DeleteProjectConfirmation, ProjectForm, ProjectFormValues } from 'src/entities';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toJS } from 'mobx';
 import { CopyPad, H4, Overlay } from 'src/shared';
 import { observer } from 'mobx-react-lite';
+import { projectsStore } from 'src/shared/stores';
 
 const availableDeleteProject = import.meta.env.VITE_AVAILABLE_DELETE_PROJECT === 'true';
 

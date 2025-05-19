@@ -7,20 +7,23 @@ import {
     DTOMessagesApp,
     Loadable
 } from 'src/shared';
-import { projectsStore } from '../../project';
+import { ProjectsStore } from '../../project/model/projects.store';
 import { CreateDappForm, Dapp, PendingDapp } from './interfaces';
 import { fetchDappFormByManifestUrl } from './dapp-url-validator';
 
-class DappStore {
+export class DappStore {
     dapps$ = new Loadable<Dapp[]>([]);
 
     pendingDapp: PendingDapp | null = null;
 
-    constructor() {
+    private readonly projectsStore: ProjectsStore;
+
+    constructor(projectsStore: ProjectsStore) {
         makeAutoObservable(this);
+        this.projectsStore = projectsStore;
 
         createImmediateReaction(
-            () => projectsStore.selectedProject,
+            () => this.projectsStore.selectedProject,
             project => {
                 this.clearState();
 
@@ -32,7 +35,7 @@ class DappStore {
     }
 
     fetchDapps = this.dapps$.createAsyncAction(() => {
-        return dappsApiRequest(projectsStore.selectedProject!.id);
+        return dappsApiRequest(this.projectsStore.selectedProject!.id);
     });
 
     createDapp = createAsyncAction(async (form: CreateDappForm) => {
@@ -49,7 +52,7 @@ class DappStore {
 
         const response = await apiClient.api.createProjectMessagesApp(
             {
-                project_id: projectsStore.selectedProject!.id
+                project_id: this.projectsStore.selectedProject!.id
             },
             form as Required<CreateDappForm>
         );
@@ -67,7 +70,7 @@ class DappStore {
                 app_id: id
             });
 
-            return dappsApiRequest(projectsStore.selectedProject!.id);
+            return dappsApiRequest(this.projectsStore.selectedProject!.id);
         },
         {
             successToast: {
@@ -88,14 +91,14 @@ class DappStore {
 
             await apiClient.api.verifyProjectMessagesApp(
                 {
-                    project_id: projectsStore.selectedProject!.id
+                    project_id: this.projectsStore.selectedProject!.id
                 },
                 {
                     payload: token
                 }
             );
 
-            const dappsList = await dappsApiRequest(projectsStore.selectedProject!.id);
+            const dappsList = await dappsApiRequest(this.projectsStore.selectedProject!.id);
             this.pendingDapp = null;
             return dappsList;
         },
@@ -149,5 +152,3 @@ function mapDTODappToDapp(dtoDapp: DTOMessagesApp): Dapp {
 
     return dapp;
 }
-
-export const dappStore = new DappStore();

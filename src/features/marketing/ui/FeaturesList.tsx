@@ -1,7 +1,7 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Box, Button, SimpleGrid } from '@chakra-ui/react';
 import { FeatureCard } from './FeatureCard';
-import { userStore } from 'src/entities';
+import { userStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 import { useNavigate } from 'react-router-dom';
 import { openFeedbackModal } from 'src/features/feedback/model/feedback';

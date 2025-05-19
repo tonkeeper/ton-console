@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 import { apiClient, createAsyncAction } from 'src/shared';
 import { createStandaloneToast } from '@chakra-ui/react';
-import { projectsStore, userStore } from 'src/entities';
+import { projectsStore, userStore } from 'src/shared/stores';
 import type { AxiosError } from 'axios';
 import { FeedbackFromI } from '../interfaces/form';
 
@@ -9,7 +9,7 @@ interface FeetbackMeta {
     source?: string;
 }
 
-class FeetbackStore {
+export class FeetbackStore {
     params: FeetbackMeta | null = null;
 
     // isOpen = true;

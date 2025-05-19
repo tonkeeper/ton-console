@@ -89,7 +89,8 @@ module.exports = {
                         scss: 'always',
                         css: 'always',
                         json: 'always',
-                        svg: 'always'
+                        svg: 'always',
+                        store: 'always'
                     }
                 ],
                 'import/prefer-default-export': 'off',

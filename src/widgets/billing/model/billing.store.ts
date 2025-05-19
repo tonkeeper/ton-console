@@ -1,16 +1,16 @@
 import { makeAutoObservable } from 'mobx';
 import { createAsyncAction } from 'src/shared';
 import { BillingHistory, BillingHistoryPaymentItem, BillingHistoryRefillItem } from './interfaces';
-import { balanceStore } from 'src/entities';
+import { balancesStore } from 'src/shared/stores';
 import { paymentsTableStore } from './payments-table.store';
 
 class BillingStore {
     get isResolved() {
-        return balanceStore.portfolio$.isResolved && paymentsTableStore.charges$.isResolved;
+        return balancesStore.portfolio$.isResolved && paymentsTableStore.charges$.isResolved;
     }
 
     get totalItems() {
-        return balanceStore.refills.length + paymentsTableStore.totalPayments;
+        return balancesStore.refills.length + paymentsTableStore.totalPayments;
     }
 
     get tableContentLength(): number {
@@ -20,7 +20,7 @@ class BillingStore {
     }
 
     get billingHistory(): BillingHistory {
-        const refills: BillingHistoryRefillItem[] = balanceStore.refills.map(item => ({
+        const refills: BillingHistoryRefillItem[] = balancesStore.refills.map(item => ({
             ...item,
             action: 'refill'
         }));
@@ -44,7 +44,7 @@ class BillingStore {
     }
 
     get billingHistoryLoading(): boolean {
-        return paymentsTableStore.charges$.isLoading || balanceStore.portfolio$.isLoading;
+        return paymentsTableStore.charges$.isLoading || balancesStore.portfolio$.isLoading;
     }
 
     get isPageLoading() {
@@ -58,7 +58,7 @@ class BillingStore {
     loadFirstPage = createAsyncAction(async () => {
         paymentsTableStore.loadFirstPage.cancelAllPendingCalls();
 
-        await Promise.all([balanceStore.fetchPortfolio(), paymentsTableStore.loadFirstPage()]);
+        await Promise.all([balancesStore.fetchPortfolio(), paymentsTableStore.loadFirstPage()]);
     });
 
     loadNextPage = createAsyncAction(async () => {
@@ -69,7 +69,7 @@ class BillingStore {
     updateCurrentListSilently = createAsyncAction(async () => {
         paymentsTableStore.updateCurrentListSilently.cancelAllPendingCalls();
         await Promise.all([
-            balanceStore.fetchPortfolio(),
+            balancesStore.fetchPortfolio(),
             paymentsTableStore.updateCurrentListSilently()
         ]);
     });

@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { fromNano } from '@ton/core';
 import { Button, Center, Flex, Spinner, Text, useToast } from '@chakra-ui/react';
-import { airdropsStore } from 'src/features';
 import {
     useIsConnectionRestored,
     useTonConnectModal,
@@ -19,16 +18,22 @@ import {
 } from './deployUtils';
 import { ADDistributorData } from 'src/shared/api/airdrop-api';
 import { ConfirmationDialog } from 'src/entities';
-
+import { AirdropStore } from 'src/features/airdrop/model/airdrop.store';
 interface DeployComponentProps {
-    queryId: string;
+    id: string;
+    airdropStore: AirdropStore;
     updateType?: 'ready' | 'block';
     hideEnableButton?: () => void;
 }
 
-const DeployComponentInner = (props: DeployComponentProps) => {
-    const airdrop = airdropsStore.airdrop$.value!;
-    const initDistrubutors = airdropsStore.distributors$.value!;
+const DeployComponentInner = ({
+    id,
+    airdropStore,
+    updateType,
+    hideEnableButton
+}: DeployComponentProps) => {
+    const airdrop = airdropStore.airdrop$.value!;
+    const initDistrubutors = airdropStore.distributors$.value!;
     const initialStatus = getStatus(initDistrubutors);
 
     const [confirmOpen, setConfirmOpen] = useState(false);
@@ -45,7 +50,7 @@ const DeployComponentInner = (props: DeployComponentProps) => {
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const fetchDistributors = async () => {
-        await airdropsStore.loadDistributors(props.queryId).then(res => {
+        await airdropStore.loadDistributors(id).then(res => {
             setDistributors(res);
             checkStatus();
         });
@@ -57,16 +62,16 @@ const DeployComponentInner = (props: DeployComponentProps) => {
             status === 'block' || status === 'withdraw_jetton' || status === 'withdraw_ton';
 
         const needUpdate =
-            (props.updateType === 'ready' && updateReadyStatus) ||
-            (props.updateType === 'block' && updateWithdrawStatus);
+            (updateType === 'ready' && updateReadyStatus) ||
+            (updateType === 'block' && updateWithdrawStatus);
 
         if (needUpdate) {
             setGlobalLoading(true);
             (async () => {
-                await airdropsStore.loadAirdrop(props.queryId);
+                await airdropStore.loadAirdrop(id);
             })();
         }
-    }, [status, props.updateType]);
+    }, [status, updateType]);
 
     useEffect(() => {
         (async () => {
@@ -131,8 +136,8 @@ const DeployComponentInner = (props: DeployComponentProps) => {
                 validUntil: Math.floor(new Date().getTime() / 1000 + 120),
                 messages: messages
             });
-            if (!!props.hideEnableButton) {
-                props.hideEnableButton();
+            if (!!hideEnableButton) {
+                hideEnableButton();
             }
             setLoading(true);
         } catch (error) {
@@ -225,7 +230,7 @@ const DeployComponentInner = (props: DeployComponentProps) => {
 };
 
 const DeployComponentConnector = (props: DeployComponentProps) => {
-    const airdrop = airdropsStore.airdrop$.value!;
+    const airdrop = props.airdropStore.airdrop$.value!;
     const toast = useToast();
     const connectionRestored = useIsConnectionRestored();
     const wallet = useTonWallet();

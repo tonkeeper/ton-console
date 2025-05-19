@@ -13,7 +13,7 @@ import {
     Divider
 } from '@chakra-ui/react';
 import TonApiPaymentDetailsModal from './TonApiPaymentDetailsModal';
-import { TonApiTier, tonApiTiersStore } from '../model';
+import { TonApiTier } from '../model';
 import { TonApiTierCard } from './TonApiTierCard';
 import { RefillModal } from 'src/entities';
 import { DTOLiteproxyTier, UsdCurrencyAmount } from 'src/shared';
@@ -24,11 +24,11 @@ import { ChevronRightIcon16 } from 'src/shared/ui/icons/ChevronRightIcon16';
 import TonApiPricingModal from './TonApiPricingModal';
 import WebhooksPricingModal from './WebhooksPricingModal';
 import { Link as RouterLink } from 'react-router-dom';
-import { liteproxysStore } from '../../liteproxy';
 import { LiteserversTierCard } from './LiteserversTierCard';
 import LiteserversPaymentDetailsModal from './LiteserversPaymentDetailsModal';
 import LiteserversPricingModal from './LiteserversPricingModal';
 import { webhooksStore } from '../../webhooks';
+import { liteproxysStore, tonApiTiersStore } from 'src/shared/stores';
 
 const TonApiTiers: FC = () => {
     const storeSelectedTonApiTier = tonApiTiersStore.selectedTier$.value;

@@ -1,9 +1,9 @@
 import { FunctionComponent } from 'react';
 import { Button, Center, Flex, Text, useBoolean } from '@chakra-ui/react';
 import { CreateIcon96, H4, Overlay } from 'src/shared';
-import { ProjectForm, projectsStore } from 'src/entities';
+import { ProjectForm } from 'src/entities';
 import { observer } from 'mobx-react-lite';
-
+import { projectsStore } from 'src/shared/stores';
 const CreateFirstProjectPage: FunctionComponent = () => {
     const [clicked, setClicked] = useBoolean();
     const formId = 'create-first-project-form';

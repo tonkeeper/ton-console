@@ -12,9 +12,9 @@ import {
 import { FC } from 'react';
 import { PlusIcon16, IconButton, DTOParticipant, Span } from 'src/shared';
 import { TrashIcon16 } from 'src/shared';
-import { projectsStore } from '../model';
 import { observer } from 'mobx-react-lite';
 import { ConfirmationDialog } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 
 const getParticipantName = (participant: DTOParticipant) => {
     return [participant.first_name, participant.last_name].join(' ');

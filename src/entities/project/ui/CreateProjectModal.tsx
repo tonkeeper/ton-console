@@ -10,8 +10,9 @@ import {
     ModalOverlay
 } from '@chakra-ui/react';
 import { ProjectForm } from './ProjectForm';
-import { ProjectFormValues, projectsStore } from 'src/entities';
+import { ProjectFormValues } from 'src/entities';
 import { observer } from 'mobx-react-lite';
+import { projectsStore } from 'src/shared/stores';
 
 const CreateProjectModal_: FunctionComponent<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'create-project-form';

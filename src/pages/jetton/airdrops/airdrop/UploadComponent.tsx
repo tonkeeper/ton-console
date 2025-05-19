@@ -5,11 +5,11 @@ import {
     FileInfoComponent,
     FileProcessedComponent
 } from 'src/pages/jetton/airdrops/airdrop/UtilsComponents';
-import { airdropsStore } from 'src/features';
+import { projectsStore } from 'src/shared/stores';
 import { airdropApiClient } from 'src/shared/api/airdrop-api';
-import { projectsStore } from 'src/entities';
+import { AirdropStore } from 'src/features/airdrop/model/airdrop.store';
 
-const UploadComponentInner = (props: { queryId: string }) => {
+const UploadComponentInner = (props: { id: string; airdropStore: AirdropStore }) => {
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [progress, setProgress] = useState<number | null>(null);
@@ -21,7 +21,8 @@ const UploadComponentInner = (props: { queryId: string }) => {
 
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const airdrop = airdropsStore.airdrop$.value!;
+    const airdropStore = props.airdropStore;
+    const airdrop = airdropStore.airdrop$.value!;
 
     const resetInterval = () => {
         if (intervalRef.current) {
@@ -34,7 +35,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
             resetInterval();
         } else {
             intervalRef.current = setInterval(async () => {
-                await airdropsStore.loadAirdrop(props.queryId);
+                await airdropStore.loadAirdrop(props.id);
             }, 2000);
         }
         return () => resetInterval();
@@ -56,7 +57,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
         await airdropApiClient.v2
             .fileUpload(
                 {
-                    id: props.queryId,
+                    id: props.id,
                     project_id: `${projectsStore.selectedProject!.id}`
                 },
                 {
@@ -75,7 +76,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
                 setError(err?.message);
             })
             .finally(async () => {
-                await airdropsStore.loadAirdrop(props.queryId);
+                await airdropStore.loadAirdrop(props.id);
                 setIsUploading(false);
                 setProgress(null);
                 if (inputRef.current) {
@@ -96,7 +97,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
         await airdropApiClient.v2
             .fileUpload(
                 {
-                    id: props.queryId,
+                    id: props.id,
                     project_id: `${projectsStore.selectedProject!.id}`
                 },
                 {
@@ -107,7 +108,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
                 setError(err?.message);
             })
             .finally(async () => {
-                await airdropsStore.loadAirdrop(props.queryId);
+                await airdropStore.loadAirdrop(props.id);
                 setIsUploading(false);
             });
     };

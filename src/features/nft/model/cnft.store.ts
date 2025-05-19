@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import { makeAutoObservable } from 'mobx';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import {
     DTOCnftCollection,
     Loadable,

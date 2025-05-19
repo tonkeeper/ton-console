@@ -1,10 +1,12 @@
 export * from './ANALYTICS_LINKS';
-export { analyticsQueryStore } from './analytics-query.store';
+
 export {
+    analyticsQueryStore,
     analyticsQuerySQLRequestStore,
-    analyticsQueryGPTRequestStore
-} from './analytics-query-request.store';
-export { analyticsHistoryTableStore } from './analytics-history-table.store';
-export { analyticsGPTGenerationStore } from './analytics-gpt-generation.store';
-export { analyticsGraphQueryStore } from './analytics-graph-query.store';
+    analyticsQueryGPTRequestStore,
+    analyticsHistoryTableStore,
+    analyticsGPTGenerationStore,
+    analyticsGraphQueryStore
+} from 'src/shared/stores';
+
 export * from './interfaces';

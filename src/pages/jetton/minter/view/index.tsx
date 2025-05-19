@@ -44,30 +44,27 @@ const JettonViewPage: FC<BoxProps> = () => {
         );
     }
 
-    if (!jettonInfo) {
-        return (
-            <Overlay display="flex" justifyContent="center" alignItems="center">
-                <H4>Jetton not found</H4>
-            </Overlay>
-        );
-    }
-
     return (
-        <Overlay display="flex" flexDirection="column" px="0">
-            <Flex align="flex-start" justify="space-between" mb="5" px="6">
+        <Overlay display="flex" flexDirection="column">
+            <Flex align="flex-start" justify="space-between" mb="5">
                 <H4>Jetton</H4>
                 <TonConnectButton />
             </Flex>
-            <Divider mb="3" />
-            <Flex align="flex-start" direction="column" gap="16px" px="6">
-                <Flex direction="column" gap="24px" minW="520px" maxW="520px">
+            {jettonInfo === null ? (
+                <Overlay display="flex" justifyContent="center" alignItems="center">
+                    <H4>Jetton not found</H4>
+                </Overlay>
+            ) : (
+                <>
                     <JettonCard data={jettonInfo} />
-                </Flex>
-                <JettonWallet
-                    connectedWalletAddress={connectedWalletAddress}
-                    jettonInfo={jettonInfo}
-                />
-            </Flex>
+                    <Divider mt={6} />
+
+                    <JettonWallet
+                        connectedWalletAddress={connectedWalletAddress}
+                        jettonInfo={jettonInfo}
+                    />
+                </>
+            )}
         </Overlay>
     );
 };

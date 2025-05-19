@@ -5,10 +5,10 @@ import {
     DTOLiteproxyTier,
     Loadable
 } from 'src/shared';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import { makeAutoObservable } from 'mobx';
 
-class LiteproxysStore {
+export class LiteproxysStore {
     liteproxyList$ = new Loadable<DTOLiteproxyKey[]>([]);
 
     liteproxyTiers$ = new Loadable<DTOLiteproxyTier[] | null>(null);
@@ -96,5 +96,3 @@ class LiteproxysStore {
         this.liteproxyTiers$.clear();
     }
 }
-
-export const liteproxysStore = new LiteproxysStore();

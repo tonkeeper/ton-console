@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
 import { H4, Overlay } from 'src/shared';
-import { airdropsStore } from 'src/features';
 import { EmptyAirdrops } from './EmptyAirdrops.tsx';
 import AirdropsHistoryTable from 'src/features/airdrop/ui/AirdropsHistoryTable';
+import { airdropsStore } from 'src/shared/stores/root.store';
 
 const AirdropsMainPage: FC<BoxProps> = () => {
     if (!airdropsStore.airdrops$.isResolved) {

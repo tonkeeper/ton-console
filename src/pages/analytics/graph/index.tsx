@@ -7,7 +7,7 @@ import { GraphSuccess } from './GraphSuccess';
 import { GraphError } from './GraphError';
 import { GraphHome } from './GraphHome';
 import { observer } from 'mobx-react-lite';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 
 const GraphPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
     const navigate = useNavigate();

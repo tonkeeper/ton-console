@@ -26,10 +26,11 @@ import {
     IconButton,
     MenuButtonIcon
 } from 'src/shared';
-import { ApiKey, apiKeysStore } from '../model';
+import { ApiKey } from '../model';
 import { observer } from 'mobx-react-lite';
 import EditApiKeyModal from './EditApiKeyModal';
 import DeleteApiKeyModal from './DeleteApiKeyModal';
+import { apiKeysStore } from 'src/shared/stores';
 
 const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
     const [modal, setModal] = useState<{ key: ApiKey; action: 'edit' | 'delete' } | null>();

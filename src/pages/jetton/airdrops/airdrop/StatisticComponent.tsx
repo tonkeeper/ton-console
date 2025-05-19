@@ -1,9 +1,10 @@
 import { observer } from 'mobx-react-lite';
 import { Card, Center, Flex, Spinner, Text } from '@chakra-ui/react';
-import { airdropsStore } from 'src/features';
 import { H4 } from 'src/shared';
 import { prettifyAmount } from './deployUtils';
 import { fromNano } from '@ton/core';
+import { AirdropFullT } from 'src/features/airdrop/model/airdrop.store';
+import { ADDistributorData } from 'src/shared/api/airdrop-api';
 
 const InfoCard = (props: { title: string; text: string }) => {
     return (
@@ -18,10 +19,13 @@ const InfoCard = (props: { title: string; text: string }) => {
     );
 };
 
-const StatisticComponentInner = () => {
-    const airdrop = airdropsStore.airdrop$.value!;
-    const distributors = airdropsStore.distributors$.value!;
-
+const StatisticComponentInner = ({
+    airdrop,
+    distributors
+}: {
+    airdrop: AirdropFullT;
+    distributors: ADDistributorData[];
+}) => {
     if (!distributors.length) {
         return (
             <Center>

@@ -20,9 +20,10 @@ import {
 import { CURRENCY, FilledWarnIcon16, formatWithSuffix, H4 } from 'src/shared';
 import { RadioCard } from 'src/shared/ui/checkbox';
 import { AppMessagesPackage, appMessagesStore } from '../model';
-import { balanceStore, CurrencyRate, RefillModalContent } from 'src/entities';
+import { CurrencyRate, RefillModalContent } from 'src/entities';
 import MessagesPaymentConfirmationModalContent from './MessagesPaymentConfirmationModalContent';
 import { observer } from 'mobx-react-lite';
+import { balancesStore } from 'src/shared/stores';
 
 const MessagesRefillModal: FunctionComponent<{
     isOpen: boolean;
@@ -38,7 +39,7 @@ const MessagesRefillModal: FunctionComponent<{
     });
     const group = getRootProps();
 
-    const balance = balanceStore.tonBalanceUSDEquivalent;
+    const balance = balancesStore.tonBalanceUSDEquivalent;
     const notEnoughUsd =
         balance && selectedPlan && balance.isLT(selectedPlan?.price)
             ? selectedPlan.price.amount.minus(balance.amount).decimalPlaces(1).toNumber()

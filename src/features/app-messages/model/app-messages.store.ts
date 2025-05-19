@@ -6,10 +6,10 @@ import {
     Loadable,
     UsdCurrencyAmount
 } from 'src/shared';
-import { dappStore, projectsStore } from 'src/entities';
+import { dappStore, projectsStore } from 'src/shared/stores';
 import { AppMessagesPackage, AppMessagesStats } from './interfaces';
 
-class AppMessagesStore {
+export class AppMessagesStore {
     packages$ = new Loadable<AppMessagesPackage[]>([]);
 
     balance$ = new Loadable<number>(0);
@@ -135,5 +135,3 @@ function mapDTOPackageToAppmessagesPackage(dtoPackage: DTOMessagesPackage): AppM
         id: dtoPackage.id
     };
 }
-
-export const appMessagesStore = new AppMessagesStore();

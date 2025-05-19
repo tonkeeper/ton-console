@@ -26,8 +26,9 @@ import {
 import AirdropForm from 'src/features/airdrop/ui/AirdropForm';
 import { AirdropMetadata } from 'src/features/airdrop/model/interfaces/AirdropMetadata';
 import { useNavigate } from 'react-router-dom';
-import { airdropsStore } from 'src/features';
 import { InfoComponent } from './InfoComponent';
+import { airdropsStore, projectsStore } from 'src/shared/stores';
+import { AirdropStore } from 'src/features/airdrop/model/airdrop.store';
 
 async function checkJetton(address: string) {
     try {
@@ -85,8 +86,7 @@ const CreateAirdropPage: FC<BoxProps> = () => {
         }
     }, [wallet, connectionRestored]);
 
-    const handleSubmit = async (v: AirdropMetadata) => {
-        const { name, address, fee, vesting } = v;
+    const handleSubmit = async ({ name, address, fee, vesting }: AirdropMetadata) => {
         if (!checkIsWalletW5(wallet?.account.walletStateInit || '')) {
             showWalletError();
             return;
@@ -100,7 +100,12 @@ const CreateAirdropPage: FC<BoxProps> = () => {
             return;
         }
 
-        const id = await airdropsStore.createAirdrop({
+        const airdropStore = new AirdropStore({
+            projectId: projectsStore.selectedProject!.id,
+            airdrops: airdropsStore.airdrops$.value
+        });
+
+        const id = await airdropStore.createAirdrop({
             name,
             address,
             fee,

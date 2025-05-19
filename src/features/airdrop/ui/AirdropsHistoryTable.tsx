@@ -13,9 +13,8 @@ import {
 import { ComponentProps, FunctionComponent, useEffect, useState } from 'react';
 import { CopyIcon16, copyToClipboard, TickIcon, IconButton } from 'src/shared';
 import { Link as ReactRouterLink } from 'react-router-dom';
-import { airdropsStore } from '../model';
 import { observer } from 'mobx-react-lite';
-
+import { airdropsStore } from 'src/shared/stores';
 const AirdropsHistoryTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
     const [copiedKey, setCopiedKey] = useState<string | undefined>();
 

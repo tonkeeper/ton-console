@@ -9,10 +9,10 @@ import {
     createAsyncAction
 } from 'src/shared';
 import { TonApiTier } from './interfaces';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import { TonApiSelectedTier } from './interfaces';
 
-class TonApiTiersStore {
+export class TonApiTiersStore {
     tiers$ = new Loadable<TonApiTier[]>([]);
 
     selectedTier$ = new Loadable<TonApiSelectedTier | null>(null);
@@ -124,5 +124,3 @@ function mapAppTierDTOToSelectedTier(tierDTO: DTOAppTier | null): TonApiSelected
         active: true
     };
 }
-
-export const tonApiTiersStore = new TonApiTiersStore();

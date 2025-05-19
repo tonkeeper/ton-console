@@ -19,9 +19,9 @@ import {
     UpdateProjectFormValues,
     AddProjectParticipantFormValues
 } from './interfaces';
-import { userStore } from '../../user';
+import { userStore } from 'src/shared/stores';
 
-class ProjectsStore {
+export class ProjectsStore {
     projects$ = new Loadable<Project[]>([]);
 
     projectParticipants$ = new Loadable<DTOParticipant[]>([]);
@@ -260,5 +260,3 @@ function mapProjectDtoToProject(projectDTO: DTOProject): Project {
 function gradient(color: string): string {
     return `linear-gradient(27.61deg, ${color} -4.58%, ${color}60 107.4%)`;
 }
-
-export const projectsStore = new ProjectsStore();

@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { Box, Center, Fade, useConst } from '@chakra-ui/react';
 import { TonConsoleIcon } from 'src/shared';
-import { userStore } from 'src/entities';
+import { userStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 
 const FadeAnimation: FunctionComponent<ComponentProps<typeof Fade>> = props => (

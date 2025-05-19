@@ -16,7 +16,7 @@ import {
     Td
 } from '@chakra-ui/react';
 import { DoneIconCircle24, H4 } from 'src/shared';
-import { tonApiTiersStore } from '../model';
+import { tonApiTiersStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 
 const TonApiPricingModal: FC<{

@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { H4 } from 'src/shared';
 import { useForm } from 'react-hook-form';
-import { balanceStore } from 'src/entities';
+import { balancesStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 
 const PromoCodeModal: FunctionComponent<{
@@ -34,7 +34,7 @@ const PromoCodeModal: FunctionComponent<{
     const formId = useId();
 
     const onSubmit = async (form: { promoCode: string }): Promise<void> => {
-        const result = await balanceStore.applyPromoCode(form.promoCode);
+        const result = await balancesStore.applyPromoCode(form.promoCode);
         if (result) {
             onClose();
         } else {
@@ -65,7 +65,7 @@ const PromoCodeModal: FunctionComponent<{
                     <chakra.form id={formId} noValidate onSubmit={handleSubmit(onSubmit)}>
                         <FormControl mb="0" isInvalid={!!errors.promoCode}>
                             <Input
-                                isDisabled={balanceStore.applyPromoCode.isLoading}
+                                isDisabled={balancesStore.applyPromoCode.isLoading}
                                 placeholder="Promo Code"
                                 {...register('promoCode', {
                                     required: 'This is required',
@@ -89,7 +89,7 @@ const PromoCodeModal: FunctionComponent<{
                         flex={1}
                         form={formId}
                         isDisabled={!isDirty}
-                        isLoading={balanceStore.applyPromoCode.isLoading}
+                        isLoading={balancesStore.applyPromoCode.isLoading}
                         type="submit"
                         variant="primary"
                     >

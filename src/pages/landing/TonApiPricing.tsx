@@ -1,8 +1,9 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Box, forwardRef, Grid } from '@chakra-ui/react';
-import { TonApiTierCard, tonApiTiersStore, TonApiUnlimitedTierCard } from 'src/features';
+import { TonApiTierCard, TonApiUnlimitedTierCard } from 'src/features';
 import { observer } from 'mobx-react-lite';
 import { H3 } from 'src/shared';
+import { tonApiTiersStore } from 'src/shared/stores';
 
 const TonApiPricing: FunctionComponent<ComponentProps<typeof Box>> = forwardRef((props, ref) => {
     if (!tonApiTiersStore.tiers$.isResolved) {

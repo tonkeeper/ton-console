@@ -1,0 +1,42 @@
+import { ProjectsStore } from 'src/entities/project/model/projects.store';
+
+import { AnalyticsGraphQueryStore } from 'src/features/analytics/model/analytics-graph-query.store';
+import { AnalyticsHistoryTableStore } from 'src/features/analytics/model/analytics-history-table.store';
+import { AnalyticsQueryStore } from 'src/features/analytics/model/analytics-query.store';
+import { AirdropsStore } from 'src/features/airdrop/model/airdrops.store';
+import { feetbackModalStore } from 'src/features/feedback/model/feedback';
+import { AnalyticsQueryRequestStore } from 'src/features/analytics/model/analytics-query-request.store';
+import { ApiKeysStore } from 'src/features/tonapi/api-keys/model/api-keys.store';
+import { AppMessagesStore } from 'src/features/app-messages/model/app-messages.store';
+import { InvoicesAppStore } from 'src/features/invoices/models/invoices-app.store';
+import { InvoicesTableStore } from 'src/features/invoices/models/invoices-table.store';
+import { JettonStore } from 'src/features/jetton/model/jetton.store';
+import { LiteproxysStore } from 'src/features/tonapi/liteproxy/model/liteproxy.store';
+import { TonApiStatsStore } from 'src/features/tonapi/statistics/model/ton-api-stats.store';
+import { TonApiTiersStore } from 'src/features/tonapi/pricing/model/ton-api-tiers.store';
+import { BalancesStore } from 'src/entities/balance/model/balances.store';
+import { DappStore } from 'src/entities/dapp/model/dapp.store';
+import { AnalyticsGPTGenerationStore } from 'src/features/analytics/model/analytics-gpt-generation.store';
+import { UserStore } from 'src/entities/user/model/user.store';
+
+export const projectsStore = new ProjectsStore();
+export const userStore = new UserStore();
+export const balancesStore = new BalancesStore(projectsStore);
+export const dappStore = new DappStore(projectsStore);
+
+export const analyticsGraphQueryStore = new AnalyticsGraphQueryStore();
+export const analyticsHistoryTableStore = new AnalyticsHistoryTableStore();
+export const analyticsQueryStore = new AnalyticsQueryStore();
+export const feedbackStore = feetbackModalStore;
+export const analyticsQuerySQLRequestStore = new AnalyticsQueryRequestStore();
+export const analyticsQueryGPTRequestStore = new AnalyticsQueryRequestStore();
+export const analyticsGPTGenerationStore = new AnalyticsGPTGenerationStore();
+export const apiKeysStore = new ApiKeysStore();
+export const appMessagesStore = new AppMessagesStore();
+export const invoicesAppStore = new InvoicesAppStore();
+export const invoicesTableStore = new InvoicesTableStore();
+export const jettonStore = new JettonStore();
+export const liteproxysStore = new LiteproxysStore();
+export const tonApiStatsStore = new TonApiStatsStore();
+export const tonApiTiersStore = new TonApiTiersStore();
+export const airdropsStore = new AirdropsStore();
