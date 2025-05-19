@@ -4,9 +4,9 @@ import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
 
 import { H4, Overlay } from 'src/shared';
-import { SearchInput } from 'src/pages/jetton/ui/SearchInput';
+import { SearchInput } from 'src/pages/jetton/minter/main/ui/SearchInput';
 
-const NewJettonPage: FC<BoxProps> = () => {
+const MainPage: FC<BoxProps> = () => {
     return (
         <Overlay display="flex" flexDirection="column">
             <Flex align="center" gap={4} mb="5">
@@ -30,4 +30,4 @@ const NewJettonPage: FC<BoxProps> = () => {
     );
 };
 
-export default observer(NewJettonPage);
+export default observer(MainPage);

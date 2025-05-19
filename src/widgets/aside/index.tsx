@@ -69,7 +69,7 @@ const Aside: FC = () => {
                 content="Jetton"
                 linkTo="jetton"
             >
-                <DropDownMenuItem linkTo="new-jetton">Minter</DropDownMenuItem>
+                <DropDownMenuItem linkTo="minter">Minter</DropDownMenuItem>
                 <DropDownMenuItem linkTo="airdrops">Airdrops</DropDownMenuItem>
             </DropDownMenuItemExpandable>
             <DropDownMenuItem linkTo="faucet" leftIcon={<CoinsIcon24 />}>

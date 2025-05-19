@@ -4,7 +4,7 @@ import { Button, Checkbox, Flex, Input, Text } from '@chakra-ui/react';
 import {
     FileInfoComponent,
     FileProcessedComponent
-} from 'src/pages/jetton/airdrop/UtilsComponents';
+} from 'src/pages/jetton/airdrops/airdrop/UtilsComponents';
 import { airdropsStore } from 'src/features';
 import { airdropApiClient } from 'src/shared/api/airdrop-api';
 import { projectsStore } from 'src/entities';

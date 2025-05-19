@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { airdropsStore } from 'src/features';
 import { TonConnectButton } from '@tonconnect/ui-react';
-import { InfoComponent } from 'src/pages/jetton/airdrop/InfoComponent';
+import { InfoComponent } from 'src/pages/jetton/airdrops/airdrop/InfoComponent';
 import { UploadComponent } from './UploadComponent';
 import { DeployComponent } from './DeployComponent';
 import { StatisticComponent } from './StatisticComponent';

@@ -9,7 +9,7 @@ import { makeAutoObservable } from 'mobx';
 import { projectsStore } from 'src/entities';
 import { toNano } from '@ton/ton';
 import { AirdropMetadata } from 'src/features/airdrop/model/interfaces/AirdropMetadata';
-import { getAirdropStatus, AirdropStatusT } from 'src/pages/jetton/airdrop/deployUtils';
+import { getAirdropStatus, AirdropStatusT } from 'src/pages/jetton/airdrops/airdrop/deployUtils';
 
 type AirdropFullT = ADAirdropData & {
     name: string;
