@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { H4, Overlay, useSearchParams } from 'src/shared';
+import { H4, Overlay } from 'src/shared';
 import {
     Badge,
     Box,
@@ -18,31 +18,31 @@ import { InfoComponent } from './InfoComponent';
 import { UploadComponent } from './UploadComponent';
 import { DeployComponent } from './DeployComponent';
 import { StatisticComponent } from './StatisticComponent';
+import { useParams } from 'react-router-dom';
 
 const AirdropPage: FC<BoxProps> = () => {
-    const { searchParams } = useSearchParams();
-    const queryId = searchParams.get('id');
+    const { id } = useParams<{ id: string }>();
     const [loading, setLoading] = useState(false);
     const [showSwitch, setShowSwitch] = useState(true);
 
     const airdrop = airdropsStore.airdrop$.value;
 
     useEffect(() => {
-        if (queryId) {
-            airdropsStore.loadAirdrop(queryId!);
+        if (id) {
+            airdropsStore.loadAirdrop(id);
         }
         return () => {
             airdropsStore.clearAirdrop();
         };
-    }, []);
+    }, [id]);
 
     const switchClaim = async (type: 'enable' | 'disable') => {
         setLoading(true);
-        await airdropsStore.switchClaim(queryId!, type);
+        await airdropsStore.switchClaim(id!, type);
         setLoading(false);
     };
 
-    if (!airdropsStore.airdrop$.isResolved || !airdrop || !queryId) {
+    if (!airdropsStore.airdrop$.isResolved || !airdrop || !id) {
         return (
             <Center h="300px">
                 <Spinner />
@@ -97,10 +97,10 @@ const AirdropPage: FC<BoxProps> = () => {
             <Divider mb="3" />
             <Flex align="flex-start" direction="row" gap="16px" px="6">
                 <Flex direction="column" gap="24px" minW="520px" maxW="520px">
-                    <InfoComponent airdrop={airdrop} id={queryId} />
-                    {airdrop.status === 'need_file' && <UploadComponent queryId={queryId} />}
+                    <InfoComponent airdrop={airdrop} id={id} />
+                    {airdrop.status === 'need_file' && <UploadComponent queryId={id} />}
                     {airdrop.status === 'need_deploy' && (
-                        <DeployComponent queryId={queryId} updateType="ready" />
+                        <DeployComponent queryId={id} updateType="ready" />
                     )}
                     {(airdrop.status === 'claim_active' || airdrop.status === 'claim_stopped') && (
                         <Flex direction="row" gap="16px">
@@ -122,7 +122,7 @@ const AirdropPage: FC<BoxProps> = () => {
                                 </Button>
                             )}
                             <DeployComponent
-                                queryId={queryId}
+                                queryId={id}
                                 updateType="block"
                                 hideEnableButton={() => setShowSwitch(false)}
                             />
@@ -132,12 +132,12 @@ const AirdropPage: FC<BoxProps> = () => {
                 {airdrop.status !== 'need_file' && airdrop.status !== 'need_deploy' && (
                     <Flex direction="column" gap="16px">
                         <StatisticComponent />
-                        {airdrop.status === 'blocked' && <DeployComponent queryId={queryId} />}
+                        {airdrop.status === 'blocked' && <DeployComponent queryId={id} />}
                         <Flex wrap="wrap" direction="row" gap="16px">
                             <Button
                                 onClick={() => {
                                     window.open(
-                                        `https://tonkeeper.github.io/airdrop-reference-dapp/v2/?airdropId=${queryId}&testnet=true`
+                                        `https://tonkeeper.github.io/airdrop-reference-dapp/v2/?airdropId=${id}&testnet=true`
                                     );
                                 }}
                                 variant="secondary"

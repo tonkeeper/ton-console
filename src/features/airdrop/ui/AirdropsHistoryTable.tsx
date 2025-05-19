@@ -50,8 +50,8 @@ const AirdropsHistoryTable: FunctionComponent<ComponentProps<typeof TableContain
                                 display="contents"
                                 to={
                                     i.version === 1
-                                        ? `/jetton/airdropOld?id=${i.api_id}`
-                                        : `/jetton/airdrop?id=${i.api_id}`
+                                        ? `/jetton/airdrops/old/${i.api_id}`
+                                        : `/jetton/airdrops/${i.api_id}`
                                 }
                             >
                                 <Tr key={i.id}>

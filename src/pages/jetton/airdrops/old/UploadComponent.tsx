@@ -8,8 +8,10 @@ import {
 import { airdropsStore } from 'src/features';
 import { airdropApiClient } from 'src/shared/api/airdrop-api';
 import { projectsStore } from 'src/entities';
+import { useParams } from 'react-router-dom';
 
-const UploadComponentInner = (props: { queryId: string }) => {
+const UploadComponentInner = () => {
+    const { id } = useParams<{ id: string }>();
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [progress, setProgress] = useState<number | null>(null);
@@ -33,12 +35,16 @@ const UploadComponentInner = (props: { queryId: string }) => {
         if (isUploading) {
             resetInterval();
         } else {
+            if (!id) {
+                throw new Error('Airdrop ID is not defined');
+            }
+
             intervalRef.current = setInterval(async () => {
-                await airdropsStore.loadAirdrop(props.queryId, true);
+                await airdropsStore.loadAirdrop(id, true);
             }, 2000);
         }
         return () => resetInterval();
-    }, [isUploading]);
+    }, [isUploading, id]);
 
     useEffect(() => {
         if (airdrop.upload_error) {
@@ -53,10 +59,15 @@ const UploadComponentInner = (props: { queryId: string }) => {
     const handleFileUpload = async (file: File) => {
         setIsUploading(true);
         setError(null);
+
+        if (!id) {
+            throw new Error('Airdrop ID is not defined');
+        }
+
         await airdropApiClient.v1
             .fileUpload(
                 {
-                    id: props.queryId,
+                    id,
                     project_id: `${projectsStore.selectedProject!.id}`
                 },
                 {
@@ -75,7 +86,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
                 setError(err?.message);
             })
             .finally(async () => {
-                await airdropsStore.loadAirdrop(props.queryId, true);
+                await airdropsStore.loadAirdrop(id, true);
                 setIsUploading(false);
                 setProgress(null);
                 if (inputRef.current) {
@@ -93,10 +104,14 @@ const UploadComponentInner = (props: { queryId: string }) => {
             setError('Incorrect file URL');
         }
 
+        if (!id) {
+            throw new Error('Airdrop ID is not defined');
+        }
+
         await airdropApiClient.v1
             .fileUpload(
                 {
-                    id: props.queryId,
+                    id: id,
                     project_id: `${projectsStore.selectedProject!.id}`
                 },
                 {
@@ -107,7 +122,7 @@ const UploadComponentInner = (props: { queryId: string }) => {
                 setError(err?.message);
             })
             .finally(async () => {
-                await airdropsStore.loadAirdrop(props.queryId, true);
+                await airdropsStore.loadAirdrop(id, true);
                 setIsUploading(false);
             });
     };

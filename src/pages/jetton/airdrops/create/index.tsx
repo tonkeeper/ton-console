@@ -108,7 +108,7 @@ const CreateAirdropPage: FC<BoxProps> = () => {
             adminAddress: userAddress
         });
         setIsLoading(false);
-        navigate(`/jetton/airdrop?id=${id}`);
+        navigate(`/jetton/airdrops/${id}`);
     };
 
     if (!airdropsStore.config$.isResolved || !config) {

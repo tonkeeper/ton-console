@@ -19,14 +19,15 @@ import {
 } from './deployUtils';
 import { ADDistributorData } from 'src/shared/api/airdrop-api';
 import { ConfirmationDialog } from 'src/entities';
+import { useParams } from 'react-router-dom';
 
 interface DeployComponentProps {
-    queryId: string;
     updateType?: 'ready' | 'block';
     hideEnableButton?: () => void;
 }
 
 const DeployComponentInner = (props: DeployComponentProps) => {
+    const { id } = useParams<{ id: string }>();
     const airdrop = airdropsStore.airdrop$.value!;
     const initDistrubutors = airdropsStore.distributors$.value!;
     const initialStatus = getStatus(initDistrubutors);
@@ -45,7 +46,7 @@ const DeployComponentInner = (props: DeployComponentProps) => {
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const fetchDistributors = async () => {
-        await airdropsStore.loadDistributors(props.queryId, true).then(res => {
+        await airdropsStore.loadDistributors(id!, true).then(res => {
             setDistributors(res);
             checkStatus();
         });
@@ -63,23 +64,23 @@ const DeployComponentInner = (props: DeployComponentProps) => {
         if (needUpdate) {
             setGlobalLoading(true);
             (async () => {
-                await airdropsStore.loadAirdrop(props.queryId, true);
+                await airdropsStore.loadAirdrop(id!, true);
             })();
         }
-    }, [status, props.updateType]);
+    }, [status, props.updateType, id]);
 
     useEffect(() => {
         (async () => {
             await fetchDistributors();
         })();
-    }, []);
+    }, [id]);
 
     useEffect(() => {
         intervalRef.current = setInterval(async () => {
             await fetchDistributors();
         }, 2000);
         return () => resetInterval();
-    }, [distributors, amount, loading]);
+    }, [distributors, amount, loading, id]);
 
     const resetInterval = () => {
         if (intervalRef.current) {
@@ -225,6 +226,7 @@ const DeployComponentInner = (props: DeployComponentProps) => {
 };
 
 const DeployComponentConnector = (props: DeployComponentProps) => {
+    const { id } = useParams<{ id: string }>();
     const airdrop = airdropsStore.airdrop$.value!;
     const toast = useToast();
     const connectionRestored = useIsConnectionRestored();
