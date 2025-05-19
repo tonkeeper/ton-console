@@ -56,7 +56,7 @@ const JettonNewPage: FC<BoxProps> = () => {
             .getAccount(contractAddress)
             .then(v => v.status === 'active');
 
-        const jettonViewUrl = `/jetton/view?address=${contractAddress.toString()}`;
+        const jettonViewUrl = `/jetton/minter/view/${contractAddress.toString()}`;
 
         if (isDeployed) {
             setIsDeploying(false);

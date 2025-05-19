@@ -159,7 +159,14 @@ const Routing: FunctionComponent = () => {
                 />
                 <Route path="analytics">{AnalyticsRouting}</Route>
                 <Route path="nft">{NftRouting}</Route>
-                <Route path="jetton/*" element={<Suspense><JettonRouting /></Suspense>} />
+                <Route
+                    path="jetton/*"
+                    element={
+                        <Suspense>
+                            <JettonRouting />
+                        </Suspense>
+                    }
+                />
                 <Route path="settings">{SettingsRouting}</Route>
                 <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="*" element={<Navigate to="dashboard" replace />} />

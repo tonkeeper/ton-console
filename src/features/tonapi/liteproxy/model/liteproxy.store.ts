@@ -37,8 +37,6 @@ class LiteproxysStore {
             .getLiteproxyKeys({ project_id: projectsStore.selectedProject!.id })
             .then(({ data }) => data.keys)
             .catch(({ response }) => {
-                console.log(response);
-
                 if (response.data.error === 'keys not found') {
                     return [];
                 }

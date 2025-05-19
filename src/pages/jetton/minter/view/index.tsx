@@ -6,13 +6,11 @@ import { FC, useEffect, useMemo } from 'react';
 import { JettonCard, jettonStore } from 'src/features';
 import { isValidAddress } from 'src/features/jetton/lib/utils';
 import JettonWallet from 'src/features/jetton/ui/minter/JettonWallet';
-
-import { H4, Overlay, useSearchParams } from 'src/shared';
+import { H4, Overlay } from 'src/shared';
+import { useParams } from 'react-router-dom';
 
 const JettonViewPage: FC<BoxProps> = () => {
-    const { searchParams } = useSearchParams();
-    const jettonAddressStr = searchParams.get('address');
-
+    const { address } = useParams<{ address: string }>();
     const connectedWalletAddressStr = useTonAddress();
     const connectedWalletAddress = useMemo(
         () => (connectedWalletAddressStr ? Address.parse(connectedWalletAddressStr) : null),
@@ -20,13 +18,9 @@ const JettonViewPage: FC<BoxProps> = () => {
     );
 
     useEffect(() => {
-        const jettonAddress =
-            jettonAddressStr && isValidAddress(jettonAddressStr)
-                ? Address.parse(jettonAddressStr)
-                : null;
-
+        const jettonAddress = address && isValidAddress(address) ? Address.parse(address) : null;
         jettonStore.setJettonAddress(jettonAddress);
-    }, [jettonAddressStr, jettonStore]);
+    }, [address, jettonStore]);
 
     useEffect(() => {
         jettonStore.setConnectedWalletAddress(connectedWalletAddress);
@@ -50,27 +44,32 @@ const JettonViewPage: FC<BoxProps> = () => {
         );
     }
 
+    if (!jettonInfo) {
+        return (
+            <Overlay display="flex" justifyContent="center" alignItems="center">
+                <H4>Jetton not found</H4>
+            </Overlay>
+        );
+    }
+
     return (
-        <Overlay display="flex" flexDirection="column">
-            <Flex align="flex-start" justify="space-between" mb="5">
+        <Overlay display="flex" flexDirection="column" px="0">
+            <Flex align="flex-start" justify="space-between" mb="5" px="6">
                 <H4>Jetton</H4>
                 <TonConnectButton />
             </Flex>
-            {jettonInfo === null ? (
-                <Overlay display="flex" justifyContent="center" alignItems="center">
-                    <H4>Jetton not found</H4>
-                </Overlay>
-            ) : (
-                <>
+            <Divider mb="3" />
+            <Flex align="flex-start" direction="row" gap="16px" px="6">
+                <Flex direction="column" gap="24px" minW="520px" maxW="520px">
                     <JettonCard data={jettonInfo} />
-                    <Divider mt={6} />
-
+                </Flex>
+                <Flex direction="column" gap="16px">
                     <JettonWallet
                         connectedWalletAddress={connectedWalletAddress}
                         jettonInfo={jettonInfo}
                     />
-                </>
-            )}
+                </Flex>
+            </Flex>
         </Overlay>
     );
 };

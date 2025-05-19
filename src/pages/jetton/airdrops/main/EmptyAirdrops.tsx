@@ -40,7 +40,7 @@ export const EmptyAirdrops: FunctionComponent = () => {
                         </Text>
                     </Flex>
                 </Flex>
-                <Flex margin='auto' direction="row" gap="16px">
+                <Flex direction="row" gap="16px" m="auto">
                     <Button as={Link} to={'/jetton/airdrops/create'}>
                         New Airdrop
                     </Button>

@@ -24,49 +24,15 @@ const MinterRouting = () => (
                 </Suspense>
             }
         />
-        <Route path="*" element={<Navigate to="./" replace />} />
-        {/* <Route
-            path="view"
+        <Route
+            path="view/:address"
             element={
                 <Suspense>
                     <JettonViewPage />
                 </Suspense>
             }
-        /> */}
-        {/* <Route
-            path="airdropOld"
-            element={
-                <Suspense>
-                    <AirdropOldPage />
-                </Suspense>
-            }
         />
-        <Route
-            path="airdrop"
-            element={
-                <Suspense>
-                    <AirdropPage />
-                </Suspense>
-            }
-        /> */}
-        {/* <Route
-            path="airdrops"
-            element={
-                <Suspense>
-                    <AirdropsPage />
-                </Suspense>
-            }
-        /> */}
-        {/* <Route
-            path="new-airdrop"
-            element={
-                <Suspense>
-                    <NewAirdropPage />
-                </Suspense>
-            }
-        /> */}
-        {/* <Route index element={<Navigate to="new-jetton" replace />} />
-        <Route path="*" element={<Navigate to="new-jetton" replace />} /> */}
+        <Route path="*" element={<Navigate to="./" replace />} />
     </Routes>
 );
 

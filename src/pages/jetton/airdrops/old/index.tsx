@@ -99,9 +99,7 @@ const AirdropPage: FC<BoxProps> = () => {
                 <Flex direction="column" gap="24px" minW="520px" maxW="520px">
                     <InfoComponent airdrop={airdrop} id={id} />
                     {airdrop.status === 'need_file' && <UploadComponent />}
-                    {airdrop.status === 'need_deploy' && (
-                        <DeployComponent updateType="ready" />
-                    )}
+                    {airdrop.status === 'need_deploy' && <DeployComponent updateType="ready" />}
                     {(airdrop.status === 'claim_active' || airdrop.status === 'claim_stopped') && (
                         <Flex direction="row" gap="16px">
                             {showSwitch && (

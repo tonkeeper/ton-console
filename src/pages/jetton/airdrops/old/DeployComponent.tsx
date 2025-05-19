@@ -137,7 +137,14 @@ const DeployComponentInner = (props: DeployComponentProps) => {
             }
             setLoading(true);
         } catch (error) {
-            console.log(error);
+            toast({
+                title: 'Transaction Error',
+                description: 'Failed to send transaction',
+                position: 'bottom-left',
+                duration: 5000,
+                status: 'error',
+                isClosable: true
+            });
         }
     };
 
@@ -226,7 +233,6 @@ const DeployComponentInner = (props: DeployComponentProps) => {
 };
 
 const DeployComponentConnector = (props: DeployComponentProps) => {
-    const { id } = useParams<{ id: string }>();
     const airdrop = airdropsStore.airdrop$.value!;
     const toast = useToast();
     const connectionRestored = useIsConnectionRestored();
