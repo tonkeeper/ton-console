@@ -15,6 +15,7 @@ import { CopyIcon16, copyToClipboard, TickIcon, IconButton } from 'src/shared';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { airdropsStore } from 'src/shared/stores';
+
 const AirdropsHistoryTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
     const [copiedKey, setCopiedKey] = useState<string | undefined>();
 
@@ -42,20 +43,24 @@ const AirdropsHistoryTable: FunctionComponent<ComponentProps<typeof TableContain
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {airdropsStore.airdrops$.value.map(i => (
-                            <ChakraLink
+                        {airdropsStore.airdrops$.value.toReversed().map(i => (
+                            <Tr
                                 key={i.id}
-                                as={ReactRouterLink}
-                                display="contents"
-                                to={
-                                    i.version === 1
-                                        ? `/jetton/airdrops/old/${i.api_id}`
-                                        : `/jetton/airdrops/${i.api_id}`
-                                }
+                                _hover={{ bg: 'background.contentTint' }}
+                                cursor="pointer"
                             >
-                                <Tr key={i.id}>
-                                    <Td overflow="hidden">
-                                        <Flex align="center" gap="1">
+                                <Td overflow="hidden">
+                                    <ChakraLink
+                                        as={ReactRouterLink}
+                                        display="block"
+                                        _hover={{ textDecoration: 'none' }}
+                                        to={
+                                            i.version === 1
+                                                ? `/jetton/airdrops/old/${i.api_id}`
+                                                : `/jetton/airdrops/${i.api_id}`
+                                        }
+                                    >
+                                        <Flex align="center" gap="1" color="black">
                                             <chakra.span flexShrink="1" layerStyle="textEllipse">
                                                 {i.api_id}
                                             </chakra.span>
@@ -74,27 +79,45 @@ const AirdropsHistoryTable: FunctionComponent<ComponentProps<typeof TableContain
                                                 />
                                             )}
                                         </Flex>
-                                    </Td>
-                                    <Td overflow="hidden">
-                                        <Flex align="center" gap="1">
+                                    </ChakraLink>
+                                </Td>
+                                <Td overflow="hidden">
+                                    <ChakraLink
+                                        as={ReactRouterLink}
+                                        display="block"
+                                        _hover={{ textDecoration: 'none' }}
+                                        to={
+                                            i.version === 1
+                                                ? `/jetton/airdrops/old/${i.api_id}`
+                                                : `/jetton/airdrops/${i.api_id}`
+                                        }
+                                    >
+                                        <Flex align="center" gap="1" color="black">
                                             <chakra.span flexShrink="1" layerStyle="textEllipse">
                                                 {i.name}
                                             </chakra.span>
                                         </Flex>
-                                    </Td>
-                                    <Td overflow="hidden">
+                                    </ChakraLink>
+                                </Td>
+                                <Td overflow="hidden">
+                                    <ChakraLink
+                                        as={ReactRouterLink}
+                                        display="block"
+                                        _hover={{ textDecoration: 'none' }}
+                                        to={
+                                            i.version === 1
+                                                ? `/jetton/airdrops/old/${i.api_id}`
+                                                : `/jetton/airdrops/${i.api_id}`
+                                        }
+                                    >
                                         <Flex align="center" gap="1">
-                                            <chakra.span
-                                                color="text.secondary"
-                                                flexShrink="1"
-                                                layerStyle="textEllipse"
-                                            >
+                                            <chakra.span flexShrink="1" layerStyle="textEllipse">
                                                 {new Date(i.date_create * 1000).toDateString()}
                                             </chakra.span>
                                         </Flex>
-                                    </Td>
-                                </Tr>
-                            </ChakraLink>
+                                    </ChakraLink>
+                                </Td>
+                            </Tr>
                         ))}
                     </Tbody>
                 </Table>

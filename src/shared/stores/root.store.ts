@@ -1,5 +1,4 @@
 import { ProjectsStore } from 'src/entities/project/model/projects.store';
-
 import { AnalyticsGraphQueryStore } from 'src/features/analytics/model/analytics-graph-query.store';
 import { AnalyticsHistoryTableStore } from 'src/features/analytics/model/analytics-history-table.store';
 import { AnalyticsQueryStore } from 'src/features/analytics/model/analytics-query.store';
@@ -18,25 +17,72 @@ import { BalancesStore } from 'src/entities/balance/model/balances.store';
 import { DappStore } from 'src/entities/dapp/model/dapp.store';
 import { AnalyticsGPTGenerationStore } from 'src/features/analytics/model/analytics-gpt-generation.store';
 import { UserStore } from 'src/entities/user/model/user.store';
+import { awaitValueResolved } from 'src/shared';
 
 export const projectsStore = new ProjectsStore();
 export const userStore = new UserStore();
-export const balancesStore = new BalancesStore(projectsStore);
-export const dappStore = new DappStore(projectsStore);
 
-export const analyticsGraphQueryStore = new AnalyticsGraphQueryStore();
-export const analyticsHistoryTableStore = new AnalyticsHistoryTableStore();
-export const analyticsQueryStore = new AnalyticsQueryStore();
-export const feedbackStore = feetbackModalStore;
-export const analyticsQuerySQLRequestStore = new AnalyticsQueryRequestStore();
-export const analyticsQueryGPTRequestStore = new AnalyticsQueryRequestStore();
-export const analyticsGPTGenerationStore = new AnalyticsGPTGenerationStore();
-export const apiKeysStore = new ApiKeysStore();
-export const appMessagesStore = new AppMessagesStore();
-export const invoicesAppStore = new InvoicesAppStore();
-export const invoicesTableStore = new InvoicesTableStore();
-export const jettonStore = new JettonStore();
-export const liteproxysStore = new LiteproxysStore();
-export const tonApiStatsStore = new TonApiStatsStore();
-export const tonApiTiersStore = new TonApiTiersStore();
-export const airdropsStore = new AirdropsStore();
+let balancesStore: BalancesStore;
+let dappStore: DappStore;
+let analyticsGraphQueryStore: AnalyticsGraphQueryStore;
+let analyticsHistoryTableStore: AnalyticsHistoryTableStore;
+let analyticsQueryStore: AnalyticsQueryStore;
+let feedbackStore: typeof feetbackModalStore;
+let analyticsQuerySQLRequestStore: AnalyticsQueryRequestStore;
+let analyticsQueryGPTRequestStore: AnalyticsQueryRequestStore;
+let analyticsGPTGenerationStore: AnalyticsGPTGenerationStore;
+let apiKeysStore: ApiKeysStore;
+let appMessagesStore: AppMessagesStore;
+let invoicesAppStore: InvoicesAppStore;
+let invoicesTableStore: InvoicesTableStore;
+let jettonStore: JettonStore;
+let liteproxysStore: LiteproxysStore;
+let tonApiStatsStore: TonApiStatsStore;
+let tonApiTiersStore: TonApiTiersStore;
+let airdropsStore: AirdropsStore;
+
+const initializeDependentStores = () => {
+    balancesStore = new BalancesStore(projectsStore);
+    dappStore = new DappStore(projectsStore);
+    analyticsGraphQueryStore = new AnalyticsGraphQueryStore();
+    analyticsHistoryTableStore = new AnalyticsHistoryTableStore();
+    analyticsQueryStore = new AnalyticsQueryStore();
+    feedbackStore = feetbackModalStore;
+    analyticsQuerySQLRequestStore = new AnalyticsQueryRequestStore();
+    analyticsQueryGPTRequestStore = new AnalyticsQueryRequestStore();
+    analyticsGPTGenerationStore = new AnalyticsGPTGenerationStore();
+    apiKeysStore = new ApiKeysStore();
+    appMessagesStore = new AppMessagesStore();
+    invoicesAppStore = new InvoicesAppStore();
+    invoicesTableStore = new InvoicesTableStore();
+    jettonStore = new JettonStore();
+    liteproxysStore = new LiteproxysStore();
+    tonApiStatsStore = new TonApiStatsStore();
+    tonApiTiersStore = new TonApiTiersStore();
+    airdropsStore = new AirdropsStore();
+};
+
+awaitValueResolved(projectsStore.projects$).then(() => {
+    initializeDependentStores();
+});
+
+export {
+    balancesStore,
+    dappStore,
+    analyticsGraphQueryStore,
+    analyticsHistoryTableStore,
+    analyticsQueryStore,
+    feedbackStore,
+    analyticsQuerySQLRequestStore,
+    analyticsQueryGPTRequestStore,
+    analyticsGPTGenerationStore,
+    apiKeysStore,
+    appMessagesStore,
+    invoicesAppStore,
+    invoicesTableStore,
+    jettonStore,
+    liteproxysStore,
+    tonApiStatsStore,
+    tonApiTiersStore,
+    airdropsStore
+};
