@@ -22,7 +22,7 @@ const MainPage: FC<BoxProps> = () => {
             </Flex>
             <Flex align="center" justify="center" gap="4" h="100%" mb="6">
                 <SearchInput />
-                <Button as={Link} to={'/jetton/minter'}>
+                <Button as={Link} to={'/jetton/minter/create'}>
                     New Jetton
                 </Button>
             </Flex>

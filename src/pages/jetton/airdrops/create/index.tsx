@@ -47,7 +47,7 @@ const checkIsWalletW5 = (stateInit: string) => {
     return hash === WALLET_W5_CODE_HASH;
 };
 
-const NewAirdropPage: FC<BoxProps> = () => {
+const CreateAirdropPage: FC<BoxProps> = () => {
     const navigate = useNavigate();
     const connectionRestored = useIsConnectionRestored();
     const wallet = useTonWallet();
@@ -200,4 +200,4 @@ const NewAirdropPage: FC<BoxProps> = () => {
     );
 };
 
-export default observer(NewAirdropPage);
+export default observer(CreateAirdropPage);

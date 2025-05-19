@@ -1,13 +1,13 @@
 import { lazy } from '@loadable/component';
 import { Suspense } from 'react';
-import { Navigate, Route } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 const JettonMainPage = lazy(() => import('./main'));
-const JettonMinerPage = lazy(() => import('./mint'));
+const JettonCreatePage = lazy(() => import('./create'));
 const JettonViewPage = lazy(() => import('./view'));
 
-const JettonRouting = (
-    <>
+const MinterRouting = () => (
+    <Routes>
         <Route
             index
             element={
@@ -16,15 +16,15 @@ const JettonRouting = (
                 </Suspense>
             }
         />
-        <Route path="*" element={<Navigate to="./" replace />} />
-        {/* <Route
-            path="minter"
+        <Route
+            path="create"
             element={
                 <Suspense>
-                    <JettonMinerPage />
+                    <JettonCreatePage />
                 </Suspense>
             }
-        /> */}
+        />
+        <Route path="*" element={<Navigate to="./" replace />} />
         {/* <Route
             path="view"
             element={
@@ -67,7 +67,7 @@ const JettonRouting = (
         /> */}
         {/* <Route index element={<Navigate to="new-jetton" replace />} />
         <Route path="*" element={<Navigate to="new-jetton" replace />} /> */}
-    </>
+    </Routes>
 );
 
-export default JettonRouting;
+export default MinterRouting;

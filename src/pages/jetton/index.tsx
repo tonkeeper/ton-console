@@ -1,31 +1,31 @@
 import { lazy } from '@loadable/component';
 import { Suspense } from 'react';
-import { Navigate, Route } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
-const MinterPage = lazy(() => import('./minter/main'));
-const AirdropsPage = lazy(() => import('./airdrops/main'));
+const MinterRouting = lazy(() => import('./minter'));
+const AirdropsRouting = lazy(() => import('./airdrops'));
 
-const JettonRouting = (
-    <>
+const JettonRouting = () => (
+    <Routes>
         <Route
-            path="minter"
+            path="minter/*"
             element={
                 <Suspense>
-                    <MinterPage />
+                    <MinterRouting />
                 </Suspense>
             }
         />
         <Route
-            path="airdrops"
+            path="airdrops/*"
             element={
                 <Suspense>
-                    <AirdropsPage />
+                    <AirdropsRouting />
                 </Suspense>
             }
         />
         <Route index element={<Navigate to="minter" replace />} />
         <Route path="*" element={<Navigate to="minter" replace />} />
-    </>
+    </Routes>
 );
 
 export default JettonRouting;

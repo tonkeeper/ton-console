@@ -41,7 +41,7 @@ const AirdropsMainPage: FC<BoxProps> = () => {
                     >
                         Documentation
                     </Button>
-                    <Button as={Link} ml="auto" to={'/jetton/new-airdrop'}>
+                    <Button as={Link} ml="auto" to={'/jetton/airdrops/create'}>
                         New Airdrop
                     </Button>
                 </Flex>

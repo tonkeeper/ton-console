@@ -1,13 +1,14 @@
 import { lazy } from '@loadable/component';
 import { Suspense } from 'react';
-import { Navigate, Route } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 const MainPage = lazy(() => import('./main'));
 const AirdropPage = lazy(() => import('./airdrop'));
 const AirdropOldPage = lazy(() => import('./airdropOld'));
+const CreatePage = lazy(() => import('./create'));
 
-const JettonRouting = (
-    <>
+const AirdropsRouting = () => (
+    <Routes>
         <Route
             index
             element={
@@ -32,8 +33,16 @@ const JettonRouting = (
                 </Suspense>
             }
         />
+        <Route
+            path="create"
+            element={
+                <Suspense>
+                    <CreatePage />
+                </Suspense>
+            }
+        />
         <Route path="*" element={<Navigate to="./" replace />} />
-    </>
+    </Routes>
 );
 
-export default JettonRouting;
+export default AirdropsRouting;
