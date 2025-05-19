@@ -133,16 +133,13 @@ class PaymentsTableStore {
 }
 
 function mapChargeToTonapiPayment(charge: DTOCharge, tiers: TonApiTier[]): Payment | null {
-    const tier = tiers.find(item => item.id === Number(charge.tier_id));
-    if (!tier) {
-        return null;
-    }
+    const tierName = tiers.find(item => item.id === Number(charge.tier_id))?.name ?? 'Custom';
 
     const tonAmount = new TonCurrencyAmount(charge.amount);
 
     return {
         id: `tonapi-${charge.id}`,
-        name: `TonAPI ${tier.name}`,
+        name: `TonAPI ${tierName}`,
         date: new Date(charge.date_create),
         amount: tonAmount,
         amountUsdEquivalent: new UsdCurrencyAmount(

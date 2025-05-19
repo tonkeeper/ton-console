@@ -33,7 +33,7 @@ export const TonApiTierCard: FC<
         size="xl"
         {...rest}
     >
-        <Flex direction="column" w="109px">
+        <Flex direction="column" minW="109px">
             <Text textStyle="label2" color="text.primary">
                 {tier.name}
             </Text>
