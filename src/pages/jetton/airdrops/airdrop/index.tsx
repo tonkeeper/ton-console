@@ -35,6 +35,7 @@ const AirdropPage: FC<BoxProps> = () => {
         [id]
     );
     const airdrop = airdropStore.airdrop$.value;
+    const distributors = airdropStore.distributors$.value;
 
     useEffect(() => {
         if (id) {
@@ -114,7 +115,7 @@ const AirdropPage: FC<BoxProps> = () => {
             <Divider mb="3" />
             <Flex align="flex-start" direction="row" gap="16px" px="6">
                 <Flex direction="column" gap="24px" minW="520px" maxW="520px">
-                    <InfoComponent airdrop={airdrop} id={id} />
+                    <InfoComponent airdrop={airdrop} id={id} distributors={distributors} />
                     {airdrop.status === 'need_file' && (
                         <UploadComponent id={id} airdropStore={airdropStore} />
                     )}

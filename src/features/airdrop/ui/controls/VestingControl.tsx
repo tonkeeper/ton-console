@@ -84,7 +84,7 @@ const Control = ({
 
         const unlockTime = vestingFields[index - 1].unlockTime;
         const previousDate = unlockTime ? new Date(unlockTime) : undefined;
-        return previousDate ? currentDate >= previousDate : true; // TODO: check if this is correct
+        return previousDate ? currentDate > previousDate : true; // TODO: check if this is correct
     };
 
     const validateFraction = (index: number, value: number) => {
