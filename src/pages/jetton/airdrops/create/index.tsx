@@ -58,7 +58,9 @@ const CreateAirdropPage: FC<BoxProps> = () => {
 
     const config = airdropsStore.config$.value;
 
-    const methods = useForm<AirdropMetadata>({});
+    const methods = useForm<AirdropMetadata>({
+        mode: 'onSubmit'
+    });
 
     const formId = 'airdrops-form-id';
 

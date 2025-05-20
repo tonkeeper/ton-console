@@ -38,6 +38,10 @@ export class AirdropStore {
         vesting,
         name
     }: AirdropMetadata & { adminAddress: string }) => {
+        if (vesting?.length && vesting.some(i => !i.unlockTime || !i.fraction)) {
+            throw new Error('Vesting parameters are invalid');
+        } // TODO: add guard function
+
         const airdropRes = await airdropApiClient.v2
             .newAirdrop(
                 { project_id: `${this.projectId}` },
@@ -48,8 +52,8 @@ export class AirdropStore {
                     vesting_parameters: !!vesting?.length
                         ? {
                               unlocks_list: vesting.map(i => ({
-                                  unlock_time: Math.floor(new Date(i.unlockTime).getTime() / 1000),
-                                  fraction: i.fraction * 100
+                                  unlock_time: Math.floor(new Date(i.unlockTime!).getTime() / 1000), // TODO:remove not null
+                                  fraction: i.fraction! * 100 // TODO:remove not null
                               }))
                           }
                         : undefined

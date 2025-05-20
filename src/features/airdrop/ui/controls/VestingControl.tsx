@@ -56,7 +56,7 @@ const FractionInput = ({ hookFractionRef, registerFractionRest }: FractionInputP
 const Control = ({
     context: {
         register,
-        formState: { errors },
+        formState: { errors, isSubmitted },
         control,
         watch
     }
@@ -65,12 +65,14 @@ const Control = ({
     const fieldErrors = errors[controlId];
     const vestingFields = watch(controlId) || [];
 
+    const showErrors = isSubmitted;
+
     const { fields, append, remove } = useFieldArray({
         control,
         name: controlId
     });
 
-    const validateUnlockTime = (index: number, value: string) => {
+    const validateUnlockTime = (index: number, value?: string) => {
         if (!value) return false;
 
         const currentDate = new Date(value);
@@ -80,8 +82,9 @@ const Control = ({
 
         if (index === 0) return true;
 
-        const previousDate = new Date(vestingFields[index - 1].unlockTime);
-        return currentDate >= previousDate;
+        const unlockTime = vestingFields[index - 1].unlockTime;
+        const previousDate = unlockTime ? new Date(unlockTime) : undefined;
+        return previousDate ? currentDate >= previousDate : true; // TODO: check if this is correct
     };
 
     const validateFraction = (index: number, value: number) => {
@@ -123,27 +126,14 @@ const Control = ({
                     if (!e.target.checked) {
                         remove();
                     } else {
-                        append([
-                            {
-                                unlockTime: formatDateTime(
-                                    new Date(Date.now() + 1000 * 60 * 60 * 24)
-                                ),
-                                fraction: 55
-                            },
-                            {
-                                unlockTime: formatDateTime(
-                                    new Date(Date.now() + 1000 * 60 * 60 * 24 * 2)
-                                ),
-                                fraction: 45
-                            }
-                        ]);
+                        append([{}, {}]);
                     }
                 }}
             >
                 Enable Vesting
             </Switch>
             {isVestingEnabled && (
-                <FormControl mb={0} isInvalid={!!fieldErrors} isRequired>
+                <FormControl mb={0} isInvalid={showErrors && !!fieldErrors} isRequired>
                     <VStack alignItems="stretch" spacing={2}>
                         <HStack spacing={4}>
                             <Text textStyle="label2" w={213}>
@@ -160,6 +150,7 @@ const Control = ({
                                         <FormControl
                                             mb={0}
                                             isInvalid={
+                                                showErrors &&
                                                 !validateUnlockTime(
                                                     index,
                                                     vestingFields[index]?.unlockTime
@@ -184,6 +175,7 @@ const Control = ({
                                         <FormControl
                                             mb={0}
                                             isInvalid={
+                                                showErrors &&
                                                 !validateFraction(
                                                     index,
                                                     Number(vestingFields[index]?.fraction)
@@ -222,7 +214,7 @@ const Control = ({
                                     </HStack>
                                 </VStack>
                             ))}
-                            {getErrorState() !== 'valid' && (
+                            {showErrors && getErrorState() !== 'valid' && (
                                 <FormControl mb={0} isInvalid={getErrorState() !== 'valid'}>
                                     <FormErrorMessage pos="static">
                                         {getErrorState() === 'date-fraction' &&
@@ -239,14 +231,7 @@ const Control = ({
                             <Button
                                 alignSelf="flex-start"
                                 leftIcon={<AddIcon />}
-                                onClick={() =>
-                                    append({
-                                        unlockTime: formatDateTime(
-                                            new Date(Date.now() + 1000 * 60 * 60 * 24 * 3)
-                                        ),
-                                        fraction: 45
-                                    })
-                                }
+                                onClick={() => append({})}
                                 variant="secondary"
                             >
                                 Add unlock date

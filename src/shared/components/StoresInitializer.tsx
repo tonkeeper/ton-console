@@ -15,7 +15,7 @@ export const StoresInitializer: FunctionComponent<PropsWithChildren> = ({ childr
     }, []);
 
     if (!isInitialized) {
-        return null; // или можно вернуть компонент загрузки
+        return null;
     }
 
     return <>{children}</>;

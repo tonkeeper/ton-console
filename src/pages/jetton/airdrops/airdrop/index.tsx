@@ -35,7 +35,6 @@ const AirdropPage: FC<BoxProps> = () => {
         [id]
     );
     const airdrop = airdropStore.airdrop$.value;
-    const isAirdropLoading = airdropStore.airdrop$.isLoading;
 
     useEffect(() => {
         if (id) {
@@ -52,7 +51,7 @@ const AirdropPage: FC<BoxProps> = () => {
         setLoading(false);
     };
 
-    if (!airdropsStore.airdrops$.isResolved || isAirdropLoading || !id) {
+    if (!airdropsStore.airdrops$.isResolved || !airdropStore.airdrop$.isResolved || !id) {
         return (
             <Center h="300px">
                 <Spinner />
