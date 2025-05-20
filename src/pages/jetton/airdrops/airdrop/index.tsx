@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { H4, Overlay } from 'src/shared';
+import { H4, isTestnet, Overlay } from 'src/shared';
 import {
     Badge,
     Box,
@@ -163,8 +163,7 @@ const AirdropPage: FC<BoxProps> = () => {
                             <Button
                                 onClick={() => {
                                     window.open(
-                                        // TODO: remove testnet attribute
-                                        `https://tonkeeper.github.io/airdrop-reference-dapp/v2/?airdropId=${id}&testnet=true`
+                                        `https://tonkeeper.github.io/airdrop-reference-dapp/v2/?airdropId=${id}&testnet=${isTestnet}`
                                     );
                                 }}
                                 variant="secondary"

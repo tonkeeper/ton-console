@@ -12,6 +12,13 @@ export type AirdropFullT = ADAirdropData & {
     status: AirdropStatusT;
 };
 
+function isValidVesting(
+    vesting: Array<{ unlockTime?: string; fraction?: number }> | null
+): boolean {
+    if (!vesting?.length) return true;
+    return !vesting.some(i => !i.unlockTime || typeof i.fraction !== 'number');
+}
+
 export class AirdropStore {
     airdrop$ = new Loadable<AirdropFullT | null>(null);
 
@@ -40,9 +47,9 @@ export class AirdropStore {
         vesting,
         name
     }: AirdropMetadata & { adminAddress: string }) => {
-        if (vesting?.length && vesting.some(i => !i.unlockTime || !i.fraction)) {
+        if (!isValidVesting(vesting)) {
             throw new Error('Vesting parameters are invalid');
-        } // TODO: add guard function
+        }
 
         const airdropRes = await airdropApiClient.v2
             .newAirdrop(
@@ -54,8 +61,10 @@ export class AirdropStore {
                     vesting_parameters: !!vesting?.length
                         ? {
                               unlocks_list: vesting.map(i => ({
-                                  unlock_time: Math.floor(new Date(i.unlockTime!).getTime() / 1000), // TODO:remove not null
-                                  fraction: i.fraction! * 100 // TODO:remove not null
+                                  unlock_time: Math.floor(
+                                      new Date(i.unlockTime || '').getTime() / 1000
+                                  ),
+                                  fraction: (i.fraction || 0) * 100
                               }))
                           }
                         : undefined
