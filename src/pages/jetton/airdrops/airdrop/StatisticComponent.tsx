@@ -49,11 +49,15 @@ const StatisticComponentInner = ({
         0
     );
 
+    const unlocksCount = airdrop.vesting_parameters?.unlocks_list.length ?? 1;
+
     return (
         <Flex align="center" wrap="wrap" direction="row" gap="16px">
             <InfoCard
                 title="Number of claims"
-                text={`${prettifyAmount(numberOfClaims)} / ${prettifyAmount(recipients)}`}
+                text={`${prettifyAmount(numberOfClaims)} / ${prettifyAmount(
+                    recipients * unlocksCount
+                )}`}
             />
             <InfoCard
                 title="Claimed Jettons"
