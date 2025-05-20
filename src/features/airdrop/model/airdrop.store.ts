@@ -83,7 +83,11 @@ export class AirdropStore {
 
         this.distributors$.value = distributors;
 
-        const current = this.airdrops.find(i => i.api_id === id)!;
+        const current = this.airdrops.find(i => i.api_id === id);
+        if (!current) {
+            throw new Error('Airdrop not found in local store');
+        }
+
         const status = getAirdropStatus(airdrop, distributors);
 
         const data: AirdropFullT = {

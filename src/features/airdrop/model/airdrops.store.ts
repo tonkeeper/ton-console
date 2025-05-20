@@ -28,6 +28,9 @@ export class AirdropsStore {
                 this.fetchAirdrops();
             }
         );
+
+        this.fetchConfig();
+        this.fetchAirdrops();
     }
 
     fetchAirdrops = this.airdrops$.createAsyncAction(() =>

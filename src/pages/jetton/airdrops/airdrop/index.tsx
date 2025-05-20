@@ -35,6 +35,7 @@ const AirdropPage: FC<BoxProps> = () => {
         [id]
     );
     const airdrop = airdropStore.airdrop$.value;
+    const isAirdropLoading = airdropStore.airdrop$.isLoading;
 
     useEffect(() => {
         if (id) {
@@ -43,7 +44,7 @@ const AirdropPage: FC<BoxProps> = () => {
         return () => {
             airdropStore.clearAirdrop();
         };
-    }, [id]);
+    }, [id, airdropStore]);
 
     const switchClaim = async (type: 'enable' | 'disable') => {
         setLoading(true);
@@ -51,10 +52,18 @@ const AirdropPage: FC<BoxProps> = () => {
         setLoading(false);
     };
 
-    if (!airdropsStore.airdrops$.isResolved || !airdrop || !id) {
+    if (!airdropsStore.airdrops$.isResolved || isAirdropLoading || !id) {
         return (
             <Center h="300px">
                 <Spinner />
+            </Center>
+        );
+    }
+
+    if (!airdrop) {
+        return (
+            <Center h="300px">
+                <Text>Airdrop not found</Text>
             </Center>
         );
     }
