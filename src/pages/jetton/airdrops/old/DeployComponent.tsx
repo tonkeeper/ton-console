@@ -18,7 +18,7 @@ import {
 } from './deployUtils';
 import { ADDistributorData } from 'src/shared/api/airdrop-api';
 import { ConfirmationDialog } from 'src/entities';
-import { AirdropOldStore } from 'src/features/airdrop/model/airdrop-old.store';
+import { AirdropOldStore } from 'src/features/airdrop/model/airdrop.store';
 interface DeployComponentProps {
     id: string;
     airdropStore: AirdropOldStore;

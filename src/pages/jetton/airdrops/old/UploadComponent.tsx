@@ -7,7 +7,7 @@ import {
 } from 'src/pages/jetton/airdrops/airdrop/UtilsComponents';
 import { projectsStore } from 'src/shared/stores';
 import { airdropApiClient } from 'src/shared/api/airdrop-api';
-import { AirdropOldStore } from 'src/features/airdrop/model/airdrop-old.store';
+import { AirdropOldStore } from 'src/features/airdrop/model/airdrop.store';
 
 const UploadComponentInner = (props: { id: string; airdropStore: AirdropOldStore }) => {
     const [isUploading, setIsUploading] = useState(false);
