@@ -30,14 +30,11 @@ import { InfoComponent } from './InfoComponent';
 import { airdropsStore, projectsStore } from 'src/shared/stores';
 import { AirdropStore } from 'src/features/airdrop/model/airdrop.store';
 
-async function checkJetton(address: string) {
-    try {
-        await tonapiClient.jettons.getJettonInfo(Address.parse(address));
-        return true;
-    } catch (error) {
-        return false;
-    }
-}
+const checkJetton = (address: string): Promise<boolean> =>
+    tonapiClient.jettons.getJettonInfo(Address.parse(address)).then(
+        () => true, // onFulfilled
+        () => false // onRejected
+    );
 
 const checkIsWalletW5 = (stateInit: string) => {
     const WALLET_W5_CODE_HASH = 'IINLe3KxEhR+Gy+0V7hOdNGjDwT3N9T2KmaOlVLSty8=';
@@ -92,7 +89,9 @@ const CreateAirdropPage: FC<BoxProps> = () => {
             return;
         }
         setIsLoading(true);
+        console.log('userAddress', address);
         const isValidJetton = await checkJetton(address);
+        console.log('isValidJetton', isValidJetton);
 
         if (!isValidJetton) {
             methods.setError('address', { message: 'Jetton not found' });

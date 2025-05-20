@@ -86,7 +86,7 @@ export class JettonDeployController {
             .execGetMethodForBlockchainAccount(contractAddr, 'get_wallet_address', {
                 args: [ownerAddress]
             })
-            .then(v => Address.parse(v.decoded.jettonWalletAddress));
+            .then(v => Address.parse(v.decoded.jetton_wallet_address));
 
         await waitForContractDeploy(ownerJWalletAddr, tonapiMainnet);
 

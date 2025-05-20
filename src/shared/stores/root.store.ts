@@ -3,7 +3,6 @@ import { AnalyticsGraphQueryStore } from 'src/features/analytics/model/analytics
 import { AnalyticsHistoryTableStore } from 'src/features/analytics/model/analytics-history-table.store';
 import { AnalyticsQueryStore } from 'src/features/analytics/model/analytics-query.store';
 import { AirdropsStore } from 'src/features/airdrop/model/airdrops.store';
-import { feetbackModalStore } from 'src/features/feedback/model/feedback';
 import { AnalyticsQueryRequestStore } from 'src/features/analytics/model/analytics-query-request.store';
 import { ApiKeysStore } from 'src/features/tonapi/api-keys/model/api-keys.store';
 import { AppMessagesStore } from 'src/features/app-messages/model/app-messages.store';
@@ -27,7 +26,6 @@ let dappStore: DappStore;
 let analyticsGraphQueryStore: AnalyticsGraphQueryStore;
 let analyticsHistoryTableStore: AnalyticsHistoryTableStore;
 let analyticsQueryStore: AnalyticsQueryStore;
-let feedbackStore: typeof feetbackModalStore;
 let analyticsQuerySQLRequestStore: AnalyticsQueryRequestStore;
 let analyticsQueryGPTRequestStore: AnalyticsQueryRequestStore;
 let analyticsGPTGenerationStore: AnalyticsGPTGenerationStore;
@@ -47,7 +45,6 @@ const initializeDependentStores = () => {
     analyticsGraphQueryStore = new AnalyticsGraphQueryStore();
     analyticsHistoryTableStore = new AnalyticsHistoryTableStore();
     analyticsQueryStore = new AnalyticsQueryStore();
-    feedbackStore = feetbackModalStore;
     analyticsQuerySQLRequestStore = new AnalyticsQueryRequestStore();
     analyticsQueryGPTRequestStore = new AnalyticsQueryRequestStore();
     analyticsGPTGenerationStore = new AnalyticsGPTGenerationStore();
@@ -72,7 +69,6 @@ export {
     analyticsGraphQueryStore,
     analyticsHistoryTableStore,
     analyticsQueryStore,
-    feedbackStore,
     analyticsQuerySQLRequestStore,
     analyticsQueryGPTRequestStore,
     analyticsGPTGenerationStore,

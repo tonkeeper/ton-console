@@ -235,6 +235,7 @@ const DeployComponentConnector = (props: DeployComponentProps) => {
     const connectionRestored = useIsConnectionRestored();
     const wallet = useTonWallet();
     const { open: openConnect } = useTonConnectModal();
+    const [tonConnectUI] = useTonConnectUI();
 
     const showWalletError = () => {
         toast({
@@ -247,6 +248,13 @@ const DeployComponentConnector = (props: DeployComponentProps) => {
         });
     };
 
+    const handleConnect = async () => {
+        if (wallet && wallet.account.address !== airdrop.admin) {
+            await tonConnectUI.disconnect();
+        }
+        openConnect();
+    };
+
     useEffect(() => {
         if (connectionRestored && !!wallet && wallet.account.address !== airdrop.admin) {
             showWalletError();
@@ -255,7 +263,7 @@ const DeployComponentConnector = (props: DeployComponentProps) => {
 
     if (!wallet?.account.address || wallet.account.address !== airdrop.admin) {
         return (
-            <Button flex={1} alignSelf="flex-start" onClick={openConnect} variant="primary">
+            <Button flex={1} alignSelf="flex-start" onClick={handleConnect} variant="primary">
                 Connect Admin Wallet
             </Button>
         );

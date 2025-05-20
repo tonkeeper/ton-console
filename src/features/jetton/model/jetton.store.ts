@@ -79,7 +79,7 @@ export class JettonStore {
 
         const jettonMetadataFromBlockchainContent = await tonapiMainnet.blockchain
             .execGetMethodForBlockchainAccount(jettonAddress, 'get_jetton_data')
-            .then(v => v.decoded.jettonContent)
+            .then(v => v.decoded.jetton_content)
             .then(v => Cell.fromBoc(Buffer.from(v, 'hex')))
             .then(async v => {
                 const pop = v.pop();
