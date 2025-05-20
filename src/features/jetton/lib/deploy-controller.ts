@@ -17,7 +17,7 @@ import { JettonInfo } from '@ton-api/client';
 import { Address, beginCell, toNano } from '@ton/core';
 import { TonConnectUI } from '@tonconnect/ui-react';
 
-import { tonapiMainnet } from 'src/shared';
+import { tonapiClient } from 'src/shared';
 
 export const JETTON_DEPLOY_GAS = toNano(0.25);
 
@@ -60,20 +60,20 @@ export interface JettonData {
 export class JettonDeployController {
     async createJetton(params: JettonDeployParams, tonConnection: TonConnectUI): Promise<Address> {
         const contractDeployer = new ContractDeployer();
-        const balance = await tonapiMainnet.accounts.getAccount(params.owner).then(v => v.balance);
+        const balance = await tonapiClient.accounts.getAccount(params.owner).then(v => v.balance);
 
         if (balance < JETTON_DEPLOY_GAS) throw new Error('Not enough balance in deployer wallet');
 
         const deployParams = await createDeployParams(params, params.offchainUri);
         const contractAddr = contractDeployer.addressForContract(deployParams);
 
-        const isDeployed = await tonapiMainnet.accounts
+        const isDeployed = await tonapiClient.accounts
             .getAccount(contractAddr)
             .then(v => v.status === 'active');
 
         if (!isDeployed) {
             await contractDeployer.deployContract(deployParams, tonConnection);
-            await waitForContractDeploy(contractAddr, tonapiMainnet);
+            await waitForContractDeploy(contractAddr, tonapiClient);
         }
 
         const ownerAddress = beginCell()
@@ -82,13 +82,13 @@ export class JettonDeployController {
             .toBoc()
             .toString('hex');
 
-        const ownerJWalletAddr = await tonapiMainnet.blockchain
+        const ownerJWalletAddr = await tonapiClient.blockchain
             .execGetMethodForBlockchainAccount(contractAddr, 'get_wallet_address', {
                 args: [ownerAddress]
             })
             .then(v => Address.parse(v.decoded.jetton_wallet_address));
 
-        await waitForContractDeploy(ownerJWalletAddr, tonapiMainnet);
+        await waitForContractDeploy(ownerJWalletAddr, tonapiClient);
 
         return contractAddr;
     }

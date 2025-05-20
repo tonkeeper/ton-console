@@ -17,7 +17,7 @@ import {
 } from 'src/features/jetton/lib/deploy-controller';
 import { createDeployParams } from 'src/features/jetton/lib/utils';
 import JettonForm, { RawJettonMetadata } from 'src/features/jetton/ui/minter/JettonForm';
-import { H4, Overlay, fromDecimals, tonapiMainnet } from 'src/shared';
+import { H4, Overlay, fromDecimals, tonapiClient } from 'src/shared';
 
 const DEFAULT_DECIMALS = 9;
 
@@ -52,7 +52,7 @@ const JettonNewPage: FC<BoxProps> = () => {
         const deployParams = await createDeployParams(dataForMint, dataForMint.offchainUri);
         const contractAddress = new ContractDeployer().addressForContract(deployParams);
 
-        const isDeployed = await tonapiMainnet.accounts
+        const isDeployed = await tonapiClient.accounts
             .getAccount(contractAddress)
             .then(v => v.status === 'active');
 

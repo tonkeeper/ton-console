@@ -91,9 +91,7 @@ const CreateAirdropPage: FC<BoxProps> = () => {
             return;
         }
         setIsLoading(true);
-        console.log('userAddress', address);
         const isValidJetton = await checkJetton(address);
-        console.log('isValidJetton', isValidJetton);
 
         if (!isValidJetton) {
             methods.setError('address', { message: 'Jetton not found' });
