@@ -35,7 +35,6 @@ const StatisticComponentInner = ({
     }
 
     const numberOfClaims = distributors.reduce((a, c) => a + (c?.completed_claims || 0), 0);
-    const recipients = distributors.reduce((a, c) => a + c.recipients, 0);
     const claimedJettons = distributors.reduce(
         (a, c) => a + parseFloat(c?.claimed_amount || '0'),
         0
@@ -49,16 +48,9 @@ const StatisticComponentInner = ({
         0
     );
 
-    const unlocksCount = airdrop.vesting_parameters?.unlocks_list.length ?? 1;
-
     return (
         <Flex align="center" wrap="wrap" direction="row" gap="16px">
-            <InfoCard
-                title="Number of claims"
-                text={`${prettifyAmount(numberOfClaims)} / ${prettifyAmount(
-                    recipients * unlocksCount
-                )}`}
-            />
+            <InfoCard title="Number of claims" text={`${prettifyAmount(numberOfClaims)}`} />
             <InfoCard
                 title="Claimed Jettons"
                 text={`${prettifyAmount(
