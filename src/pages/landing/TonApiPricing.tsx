@@ -6,7 +6,7 @@ import { H3 } from 'src/shared';
 import { tonApiTiersStore } from 'src/shared/stores';
 
 const TonApiPricing: FunctionComponent<ComponentProps<typeof Box>> = forwardRef((props, ref) => {
-    if (!tonApiTiersStore.tiers$.isResolved) {
+    if (!tonApiTiersStore?.tiers$.isResolved) {
         return null;
     }
 
