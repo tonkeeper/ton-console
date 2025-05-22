@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
-import { User, userStore } from 'src/entities';
+import { User } from 'src/entities';
 import {
     Button,
     Flex,
@@ -15,6 +15,7 @@ import {
 import { ArrowIcon, CopyPad, DisconnectIcon, MenuButtonDefault, TgIcon } from 'src/shared';
 import { ProfileIcon24 } from 'src/shared/ui/icons/ProfileIcon24';
 import { useNavigate } from 'react-router-dom';
+import { userStore } from 'src/shared/stores';
 
 const ExistUserMenu: FC<{ user: User }> = observer(({ user }) => {
     const navigate = useNavigate();

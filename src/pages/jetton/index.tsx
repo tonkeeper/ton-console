@@ -1,67 +1,31 @@
 import { lazy } from '@loadable/component';
 import { Suspense } from 'react';
-import { Navigate, Route } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
-const JettonNewPage = lazy(() => import('./new-jetton'));
-const JettonMinerPage = lazy(() => import('./minter'));
-const JettonViewPage = lazy(() => import('./view'));
-const AirdropPage = lazy(() => import('./airdrop'));
-const AirdropsPage = lazy(() => import('./airdrops'));
-const NewAirdropPage = lazy(() => import('./new-airdrop'));
+const MinterRouting = lazy(() => import('./minter'));
+const AirdropsRouting = lazy(() => import('./airdrops'));
 
-const JettonRouting = (
-    <>
+const JettonRouting = () => (
+    <Routes>
         <Route
-            path="new-jetton"
+            path="minter/*"
             element={
                 <Suspense>
-                    <JettonNewPage />
+                    <MinterRouting />
                 </Suspense>
             }
         />
         <Route
-            path="minter"
+            path="airdrops/*"
             element={
                 <Suspense>
-                    <JettonMinerPage />
+                    <AirdropsRouting />
                 </Suspense>
             }
         />
-        <Route
-            path="view"
-            element={
-                <Suspense>
-                    <JettonViewPage />
-                </Suspense>
-            }
-        />
-        <Route
-            path="airdrop"
-            element={
-                <Suspense>
-                    <AirdropPage />
-                </Suspense>
-            }
-        />
-        <Route
-            path="airdrops"
-            element={
-                <Suspense>
-                    <AirdropsPage />
-                </Suspense>
-            }
-        />
-        <Route
-            path="new-airdrop"
-            element={
-                <Suspense>
-                    <NewAirdropPage />
-                </Suspense>
-            }
-        />
-        <Route index element={<Navigate to="new-jetton" replace />} />
-        <Route path="*" element={<Navigate to="new-jetton" replace />} />
-    </>
+        <Route index element={<Navigate to="minter" replace />} />
+        <Route path="*" element={<Navigate to="minter" replace />} />
+    </Routes>
 );
 
 export default JettonRouting;

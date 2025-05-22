@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
-import { userStore } from 'src/entities';
+import { userStore } from 'src/shared/stores';
 import { useBreakpointValue } from '@chakra-ui/react';
 import { ButtonLink, DocsLogo32, EXTERNAL_LINKS } from 'src/shared';
 

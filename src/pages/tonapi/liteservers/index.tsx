@@ -3,9 +3,10 @@ import { observer } from 'mobx-react-lite';
 import { ButtonLink, ConsoleDocsIcon32, EXTERNAL_LINKS, H4, Overlay } from 'src/shared';
 import { Badge, Center, Flex, Spinner, useDisclosure, Text, Link } from '@chakra-ui/react';
 import LiteproxyView from 'src/features/tonapi/liteproxy/ui/LiteproxyView';
-import { CreateLiteproxyModal, liteproxysStore } from 'src/features/tonapi/liteproxy';
+import { CreateLiteproxyModal } from 'src/features/tonapi/liteproxy';
 import { EmptyLiteservers } from './EmptyLiteservers';
 import { Link as RouterLink } from 'react-router-dom';
+import { liteproxysStore } from 'src/shared/stores';
 
 const LiteserversPage: FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();

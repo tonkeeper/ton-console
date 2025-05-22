@@ -39,7 +39,7 @@ import {
     analyticsQueryStore
 } from 'src/features';
 import { useNavigate } from 'react-router-dom';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 
 const QueryPage: FC<BoxProps> = () => {

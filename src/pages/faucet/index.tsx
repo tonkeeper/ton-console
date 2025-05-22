@@ -11,7 +11,8 @@ import {
 } from 'src/features';
 import { FormProvider, useForm } from 'react-hook-form';
 import BigNumber from 'bignumber.js';
-import { balanceStore, RefillModal } from 'src/entities';
+import { RefillModal } from 'src/entities';
+import { balancesStore } from 'src/shared/stores';
 
 const FaucetPage: FunctionComponent = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
@@ -45,7 +46,7 @@ const FaucetPage: FunctionComponent = () => {
         setReceiverAddress(form.receiverAddress);
         setAmount(form.amount);
 
-        if (price && balanceStore.tonBalance?.isGTE(price)) {
+        if (price && balancesStore.tonBalance?.isGTE(price)) {
             return onOpen();
         }
 

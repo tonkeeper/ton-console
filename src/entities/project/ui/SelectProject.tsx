@@ -20,7 +20,8 @@ import {
 } from 'src/shared';
 import { ComponentProps, FunctionComponent } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Project, projectsStore } from 'src/entities/project';
+import { Project } from 'src/entities/project';
+import { projectsStore } from 'src/shared/stores';
 import { CreateProjectModal } from './CreateProjectModal';
 
 const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {

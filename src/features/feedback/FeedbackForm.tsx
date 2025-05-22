@@ -3,8 +3,8 @@ import { chakra, FormControl, FormLabel, Input, Textarea } from '@chakra-ui/reac
 import { useForm } from 'react-hook-form';
 import { FeedbackFromI } from './interfaces/form';
 import { feetbackModalStore } from './model/feedback';
-import { userStore } from 'src/entities/user';
-import { projectsStore } from 'src/entities';
+import { userStore } from 'src/shared/stores';
+import { projectsStore } from 'src/shared/stores';
 
 export const FeedbackFrom: FC<{
     formId: string;

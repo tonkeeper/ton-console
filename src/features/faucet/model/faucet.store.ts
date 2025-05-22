@@ -9,7 +9,7 @@ import {
     TonCurrencyAmount
 } from 'src/shared';
 import { createStandaloneToast } from '@chakra-ui/react';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import type { AxiosError } from 'axios';
 import { RequestFaucetForm } from './interfaces';
 import { tonapiTestnet } from 'src/shared/api/tonapi';

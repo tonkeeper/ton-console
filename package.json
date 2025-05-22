@@ -17,6 +17,7 @@
     "generate-api": "npx tsx ./scripts/swagger.ts",
     "generate-webhooks": "npx tsx ./scripts/webhooks.ts",
     "generate-airdrop": "npx tsx ./scripts/airdrop.ts",
+    "generate-airdrop2": "npx tsx ./scripts/airdrop2.ts",
     "postinstall": "patch-package"
   },
   "dependencies": {
@@ -29,10 +30,10 @@
     "@lezer/highlight": "^1.1.6",
     "@loadable/component": "^5.15.3",
     "@react-hook/resize-observer": "^1.2.6",
-    "@ton-api/client": "^0.3.0-beta.0",
+    "@ton-api/client": "^0.4.0",
     "@ton/core": "^0.59.0",
     "@ton/ton": "^15.1.0",
-    "@tonconnect/ui-react": "^2.0.9",
+    "@tonconnect/ui-react": "^2.2.0-beta.0",
     "@uiw/codemirror-theme-dracula": "^4.21.18",
     "@uiw/react-codemirror": "^4.21.18",
     "axios": "^1.7.7",

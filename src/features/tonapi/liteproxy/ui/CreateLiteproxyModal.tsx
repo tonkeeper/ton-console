@@ -10,7 +10,7 @@ import {
     Text
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { liteproxysStore } from '../model';
+import { liteproxysStore } from 'src/shared/stores';
 
 const CreateLiteproxyModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
     const onSubmit = () => liteproxysStore.createLiteproxy().then(props.onClose);

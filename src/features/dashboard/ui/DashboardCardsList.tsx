@@ -1,7 +1,7 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Box, Center, Grid, GridItem, Spinner } from '@chakra-ui/react';
 import { DashboardTierCard } from '../../tonapi';
-import { tonApiTiersStore } from 'src/features';
+import { tonApiTiersStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 
 const DashboardCardsList: FunctionComponent<ComponentProps<typeof Box>> = props => {

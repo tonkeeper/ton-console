@@ -26,14 +26,14 @@ import {
     InvoiceTableSortColumn,
     isCustomFiltrationPeriod
 } from './interfaces';
-import { invoicesAppStore } from './invoices-app.store';
+import { invoicesAppStore } from 'src/shared/stores';
 import {
     convertCryptoCurrencyToDTOCryptoCurrency,
     convertDTOCryptoCurrencyToCryptoCurrency,
     getTokenCurrencyAmountFromDTO
 } from './utils';
 
-class InvoicesTableStore {
+export class InvoicesTableStore {
     invoices$ = new Loadable<Invoice[]>([]);
 
     private totalInvoices = 0;
@@ -424,5 +424,3 @@ const preriodToDTO = (
         };
     }
 };
-
-export const invoicesTableStore = new InvoicesTableStore();

@@ -11,16 +11,9 @@ import {
     UsdCurrencyAmount
 } from 'src/shared';
 import { Payment } from './interfaces';
-import { projectsStore } from 'src/entities';
-import {
-    AppMessagesPackage,
-    appMessagesStore,
-    faucetStore,
-    TonApiTier,
-    tonApiTiersStore
-} from 'src/features';
+import { projectsStore, tonApiTiersStore, liteproxysStore } from 'src/shared/stores';
+import { AppMessagesPackage, appMessagesStore, faucetStore, TonApiTier } from 'src/features';
 import BigNumber from 'bignumber.js';
-import { liteproxysStore } from 'src/features/tonapi/liteproxy';
 
 class PaymentsTableStore {
     charges$ = new Loadable<DTOCharge[]>([]);

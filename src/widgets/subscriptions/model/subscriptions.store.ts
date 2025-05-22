@@ -1,8 +1,8 @@
 import { makeAutoObservable } from 'mobx';
 import { createAsyncAction } from 'src/shared';
-import { TonApiSelectedTier, tonApiTiersStore } from 'src/features';
+import { TonApiSelectedTier } from 'src/features';
 import { Subscription } from 'src/widgets/subscriptions/model/interfaces/subscription';
-
+import { tonApiTiersStore } from 'src/shared/stores';
 class SubscriptionsStore {
     get subscriptions(): Subscription[] {
         const tier = tonApiTiersStore.selectedTier$.value;

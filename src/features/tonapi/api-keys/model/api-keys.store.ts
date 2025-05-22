@@ -1,9 +1,9 @@
 import { apiClient, createImmediateReaction, DTOProjectTonApiToken, Loadable } from 'src/shared';
 import { EditApiKeyForm, ApiKey, CreateApiKeyForm } from './interfaces';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import { makeAutoObservable } from 'mobx';
 
-class ApiKeysStore {
+export class ApiKeysStore {
     apiKeys$ = new Loadable<ApiKey[]>([]);
 
     constructor() {
@@ -111,5 +111,3 @@ function mapApiTokenDTOToApiKey(apiTokenDTO: DTOProjectTonApiToken): ApiKey {
         capabilities: apiTokenDTO.capabilities ?? []
     };
 }
-
-export const apiKeysStore = new ApiKeysStore();

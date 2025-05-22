@@ -6,7 +6,7 @@ import {
     Network
 } from 'src/shared';
 import { Webhook, CreateWebhookForm } from './interfaces';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import { makeAutoObservable } from 'mobx';
 import {
     rtTonApiClient,

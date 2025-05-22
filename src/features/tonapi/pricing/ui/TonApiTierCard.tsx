@@ -1,4 +1,4 @@
-import { ComponentProps, FC, ReactNode } from 'react';
+import { ComponentProps, FC } from 'react';
 import {
     Box,
     Button,
@@ -19,11 +19,10 @@ export const TonApiTierCard: FC<
     CardProps & {
         tier: TonApiTier | TonApiSelectedTier;
         tonPriceStyles?: ComponentProps<typeof Text>;
-        zeroTonPricePlaceholder?: ReactNode;
         onChoseTier?: (tier: TonApiTier) => void;
         isChosen?: boolean;
     }
-> = ({ tier, tonPriceStyles, zeroTonPricePlaceholder, isChosen = false, onChoseTier, ...rest }) => (
+> = ({ tier, tonPriceStyles, isChosen = false, onChoseTier, ...rest }) => (
     <Card
         direction={{ base: 'column', md: 'row' }}
         gap="6"

@@ -6,6 +6,11 @@ export const withTonConnectUI = (component: () => ReactNode) => {
     const WithTonConnectUI = () => (
         <TonConnectUIProvider
             manifestUrl={EXTERNAL_LINKS.TONCONNECT_MANIFEST}
+            walletsPreferredFeatures={{
+                sendTransaction: {
+                    minMessages: 16
+                }
+            }}
             uiPreferences={{
                 theme: THEME.LIGHT,
                 borderRadius: 's'

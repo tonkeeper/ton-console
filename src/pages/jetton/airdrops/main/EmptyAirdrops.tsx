@@ -7,8 +7,8 @@ export const EmptyAirdrops: FunctionComponent = () => {
     return (
         <Overlay display="flex" alignItems="center" justifyContent="center">
             <Flex align="flex-start" direction="column" gap="32px" maxW="800px">
-                <Flex align="flex-start" direction="column" gap="12px">
-                    <H3>Airdrop</H3>
+                <Flex align="center" direction="column" gap="12px">
+                    <H3>Airdrops</H3>
                     <Text textStyle="Body2" color="text.secondary">
                         Service enables a mass jetton distribution model where the recipient pays a
                         fixed fee in TONs and receives jettons. The distribution is carried out to a
@@ -40,8 +40,8 @@ export const EmptyAirdrops: FunctionComponent = () => {
                         </Text>
                     </Flex>
                 </Flex>
-                <Flex direction="row" gap="16px">
-                    <Button as={Link} to={'/jetton/new-airdrop'}>
+                <Flex direction="row" gap="16px" m="auto">
+                    <Button as={Link} to={'/jetton/airdrops/create'}>
                         New Airdrop
                     </Button>
                     <Button

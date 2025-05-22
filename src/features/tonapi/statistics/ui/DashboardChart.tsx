@@ -12,8 +12,7 @@ import {
     ReferenceLine
 } from 'recharts';
 import { observer } from 'mobx-react-lite';
-import { tonApiTiersStore } from '../../pricing';
-import { tonApiStatsStore } from '../model';
+import { tonApiStatsStore, tonApiTiersStore } from 'src/shared/stores';
 import { toDate, toDateTime } from 'src/shared';
 import { toJS } from 'mobx';
 

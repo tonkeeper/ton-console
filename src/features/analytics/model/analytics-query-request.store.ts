@@ -9,10 +9,10 @@ import {
     TonCurrencyAmount
 } from 'src/shared';
 import { AnalyticsQueryTemplate } from './interfaces';
-import { projectsStore } from 'src/entities';
+import { projectsStore } from 'src/shared/stores';
 import { DTOChainNetworkMap } from 'src/shared/lib/blockchain/network';
 
-class AnalyticsQueryRequestStore {
+export class AnalyticsQueryRequestStore {
     request$ = new Loadable<AnalyticsQueryTemplate | null>(null);
 
     private _network = Network.MAINNET;
@@ -119,6 +119,3 @@ function mapDTOStatsEstimateSQLToAnalyticsQuery(
         explanation: value.explain!
     };
 }
-
-export const analyticsQuerySQLRequestStore = new AnalyticsQueryRequestStore();
-export const analyticsQueryGPTRequestStore = new AnalyticsQueryRequestStore();

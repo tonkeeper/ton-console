@@ -12,11 +12,13 @@ interface ControlProps<T extends { [controlId]: string }> {
 const Control = <T extends { [controlId]: string }>({
     context: {
         register,
-        formState: { errors }
+        formState: { errors, isSubmitted }
     }
 }: ControlProps<T>) => {
     const fieldName = controlId as Path<T>;
     const fieldErrors = errors[controlId] as FieldError | undefined;
+
+    const showError = isSubmitted && !!fieldErrors;
 
     const { ref: maskFeeRef } = useIMask({
         mask: Number,
@@ -37,7 +39,7 @@ const Control = <T extends { [controlId]: string }>({
     });
 
     return (
-        <FormControl mb={0} isInvalid={!!fieldErrors} isRequired>
+        <FormControl mb={0} isInvalid={showError} isRequired>
             <FormLabel htmlFor={fieldName}>Claim Fee</FormLabel>
             <Input
                 ref={mergeRefs(maskFeeRef, hookDecimalsRef)}
@@ -49,8 +51,7 @@ const Control = <T extends { [controlId]: string }>({
             />
             <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
             <FormHelperText textStyle="body2" color="text.secondary">
-                The amount of TON the recipient must send to receive the Jettons. Min: 0.15 TON and
-                Max: 5 TON.
+                Amount of TON required to receive Jettons. Min: 0.15 TON and Max: 5 TON.
             </FormHelperText>
         </FormControl>
     );

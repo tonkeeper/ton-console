@@ -26,17 +26,15 @@ import {
 import AirdropForm from 'src/features/airdrop/ui/AirdropForm';
 import { AirdropMetadata } from 'src/features/airdrop/model/interfaces/AirdropMetadata';
 import { useNavigate } from 'react-router-dom';
-import { airdropsStore } from 'src/features';
 import { InfoComponent } from './InfoComponent';
+import { airdropsStore, projectsStore } from 'src/shared/stores';
+import { AirdropStore } from 'src/features/airdrop/model/airdrop.store';
 
-async function checkJetton(address: string) {
-    try {
-        await tonapiClient.jettons.getJettonInfo(Address.parse(address));
-        return true;
-    } catch (error) {
-        return false;
-    }
-}
+const checkJetton = (address: string): Promise<boolean> =>
+    tonapiClient.jettons.getJettonInfo(Address.parse(address)).then(
+        () => true, // onFulfilled
+        () => false // onRejected
+    );
 
 const checkIsWalletW5 = (stateInit: string) => {
     const WALLET_W5_CODE_HASH = 'IINLe3KxEhR+Gy+0V7hOdNGjDwT3N9T2KmaOlVLSty8=';
@@ -47,7 +45,7 @@ const checkIsWalletW5 = (stateInit: string) => {
     return hash === WALLET_W5_CODE_HASH;
 };
 
-const NewAirdropPage: FC<BoxProps> = () => {
+const CreateAirdropPage: FC<BoxProps> = () => {
     const navigate = useNavigate();
     const connectionRestored = useIsConnectionRestored();
     const wallet = useTonWallet();
@@ -60,7 +58,9 @@ const NewAirdropPage: FC<BoxProps> = () => {
 
     const config = airdropsStore.config$.value;
 
-    const methods = useForm<AirdropMetadata>({});
+    const methods = useForm<AirdropMetadata>({
+        mode: 'onSubmit'
+    });
 
     const formId = 'airdrops-form-id';
 
@@ -85,7 +85,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
         }
     }, [wallet, connectionRestored]);
 
-    const handleSubmit = async ({ name, address, fee }: AirdropMetadata) => {
+    const handleSubmit = async ({ name, address, fee, vesting }: AirdropMetadata) => {
         if (!checkIsWalletW5(wallet?.account.walletStateInit || '')) {
             showWalletError();
             return;
@@ -99,14 +99,20 @@ const NewAirdropPage: FC<BoxProps> = () => {
             return;
         }
 
-        const id = await airdropsStore.createAirdrop({
+        const airdropStore = new AirdropStore({
+            projectId: projectsStore.selectedProject!.id,
+            airdrops: airdropsStore.airdrops$.value
+        });
+
+        const id = await airdropStore.createAirdrop({
             name,
             address,
             fee,
+            vesting,
             adminAddress: userAddress
         });
         setIsLoading(false);
-        navigate(`/jetton/airdrop?id=${id}`);
+        navigate(`/jetton/airdrops/${id}`);
     };
 
     if (!airdropsStore.config$.isResolved || !config) {
@@ -132,10 +138,10 @@ const NewAirdropPage: FC<BoxProps> = () => {
             </Flex>
             <Divider mb="3" />
             <Flex align="flex-start" direction="column" gap="24px" maxW="550px" px="6">
-                <Flex align="flex-start" direction="column" gap="16px">
+                <Flex align="flex-start" direction="column" gap="12px">
                     <FormProvider {...methods}>
                         <AirdropForm onSubmit={handleSubmit} id={formId} />
-                        <Text textStyle="label2">
+                        <Text textStyle="label2" color="text.secondary">
                             Royalty coefficient:{' '}
                             {config.royalty_numerator / config.royalty_denominator} (see it in
                             Airdop T&C Terms)
@@ -145,7 +151,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
                         checked={terms1Checked}
                         onChange={() => setTerms1Checked(!terms1Checked)}
                     >
-                        <Text textStyle="label2">
+                        <Text textStyle="label2" color="text.secondary">
                             I have read and agree with the{' '}
                             <Link
                                 textStyle="label2"
@@ -161,7 +167,7 @@ const NewAirdropPage: FC<BoxProps> = () => {
                         checked={terms2Checked}
                         onChange={() => setTerms2Checked(!terms2Checked)}
                     >
-                        <Text textStyle="label2">
+                        <Text textStyle="label2" color="text.secondary">
                             I have read and agree with the{' '}
                             <Link
                                 textStyle="label2"
@@ -198,4 +204,4 @@ const NewAirdropPage: FC<BoxProps> = () => {
     );
 };
 
-export default observer(NewAirdropPage);
+export default observer(CreateAirdropPage);
