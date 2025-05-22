@@ -16,10 +16,12 @@ import { BalancesStore } from 'src/entities/balance/model/balances.store';
 import { DappStore } from 'src/entities/dapp/model/dapp.store';
 import { AnalyticsGPTGenerationStore } from 'src/features/analytics/model/analytics-gpt-generation.store';
 import { UserStore } from 'src/entities/user/model/user.store';
+import { AppStore } from './app.store';
 import { awaitValueResolved } from 'src/shared';
 
 export const projectsStore = new ProjectsStore();
 export const userStore = new UserStore();
+export const appStore = new AppStore();
 
 let balancesStore: BalancesStore;
 let dappStore: DappStore;
