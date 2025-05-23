@@ -18,10 +18,15 @@ import { UploadComponent } from './UploadComponent';
 import { DeployComponent } from './DeployComponent';
 import { StatisticComponent } from './StatisticComponent';
 import { useParams } from 'react-router-dom';
-import { airdropsStore, projectsStore } from 'src/shared/stores';
+import { projectsStore } from 'src/shared/stores';
 import { AirdropStore } from 'src/features/airdrop/model/airdrop.store';
+import { AirdropsStore } from 'src/features/airdrop/model/airdrops.store';
 
-const AirdropPage: FC<BoxProps> = () => {
+interface AirdropPageProps extends BoxProps {
+    airdropsStore: AirdropsStore;
+}
+
+const AirdropPage: FC<AirdropPageProps> = ({ airdropsStore, ...props }) => {
     const { id } = useParams<{ id: string }>();
     const [loading, setLoading] = useState(false);
     const [showSwitch, setShowSwitch] = useState(true);
@@ -93,7 +98,7 @@ const AirdropPage: FC<BoxProps> = () => {
     }
 
     return (
-        <Overlay display="flex" flexDirection="column" px="0">
+        <Overlay display="flex" flexDirection="column" px="0" {...props}>
             <Flex align="flex-start" justify="space-between" mb="5" px="6">
                 <Box>
                     <Flex align="center" direction="row" gap="8px">

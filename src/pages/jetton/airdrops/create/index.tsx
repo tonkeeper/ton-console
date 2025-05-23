@@ -27,8 +27,13 @@ import AirdropForm from 'src/features/airdrop/ui/AirdropForm';
 import { AirdropMetadata } from 'src/features/airdrop/model/interfaces/AirdropMetadata';
 import { useNavigate } from 'react-router-dom';
 import { InfoComponent } from './InfoComponent';
-import { airdropsStore, projectsStore } from 'src/shared/stores';
+import { projectsStore } from 'src/shared/stores';
 import { AirdropStore } from 'src/features/airdrop/model/airdrop.store';
+import { AirdropsStore } from 'src/features/airdrop/model/airdrops.store';
+
+interface CreatePageProps extends BoxProps {
+    airdropsStore: AirdropsStore;
+}
 
 const checkJetton = (address: string): Promise<boolean> =>
     tonapiClient.jettons.getJettonInfo(Address.parse(address)).then(
@@ -45,7 +50,7 @@ const checkIsWalletW5 = (stateInit: string) => {
     return hash === WALLET_W5_CODE_HASH;
 };
 
-const CreateAirdropPage: FC<BoxProps> = () => {
+const CreateAirdropPage: FC<CreatePageProps> = ({ airdropsStore, ...props }) => {
     const navigate = useNavigate();
     const connectionRestored = useIsConnectionRestored();
     const wallet = useTonWallet();
@@ -124,7 +129,7 @@ const CreateAirdropPage: FC<BoxProps> = () => {
     }
 
     return (
-        <Overlay display="flex" flexDirection="column" px="0">
+        <Overlay display="flex" flexDirection="column" px="0" {...props}>
             <Flex align="flex-start" justify="space-between" mb="5" px="6">
                 <Box>
                     <Flex align="center" direction="row" gap="8px">

@@ -5,9 +5,13 @@ import { FC } from 'react';
 import { H4, Overlay } from 'src/shared';
 import { EmptyAirdrops } from './EmptyAirdrops.tsx';
 import AirdropsHistoryTable from 'src/features/airdrop/ui/AirdropsHistoryTable';
-import { airdropsStore } from 'src/shared/stores/root.store';
+import { AirdropsStore } from 'src/features/airdrop/model/airdrops.store';
 
-const AirdropsMainPage: FC<BoxProps> = () => {
+interface MainPageProps extends BoxProps {
+    airdropsStore: AirdropsStore;
+}
+
+const AirdropsMainPage: FC<MainPageProps> = ({ airdropsStore, ...props }) => {
     if (!airdropsStore.airdrops$.isResolved) {
         return (
             <Center h="300px">
@@ -19,7 +23,7 @@ const AirdropsMainPage: FC<BoxProps> = () => {
         return <EmptyAirdrops />;
     }
     return (
-        <Overlay display="flex" flexDirection="column">
+        <Overlay display="flex" flexDirection="column" {...props}>
             <Flex align="flex-start" justify="space-between" gap="3" mb="5">
                 <Box>
                     <Flex align="center" direction="row" gap="8px">
@@ -46,7 +50,7 @@ const AirdropsMainPage: FC<BoxProps> = () => {
                     </Button>
                 </Flex>
             </Flex>
-            <AirdropsHistoryTable />
+            <AirdropsHistoryTable airdropsStore={airdropsStore} />
         </Overlay>
     );
 };

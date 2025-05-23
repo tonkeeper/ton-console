@@ -2,7 +2,6 @@ import { ProjectsStore } from 'src/entities/project/model/projects.store';
 import { AnalyticsGraphQueryStore } from 'src/features/analytics/model/analytics-graph-query.store';
 import { AnalyticsHistoryTableStore } from 'src/features/analytics/model/analytics-history-table.store';
 import { AnalyticsQueryStore } from 'src/features/analytics/model/analytics-query.store';
-import { AirdropsStore } from 'src/features/airdrop/model/airdrops.store';
 import { AnalyticsQueryRequestStore } from 'src/features/analytics/model/analytics-query-request.store';
 import { ApiKeysStore } from 'src/features/tonapi/api-keys/model/api-keys.store';
 import { AppMessagesStore } from 'src/features/app-messages/model/app-messages.store';
@@ -39,7 +38,6 @@ let jettonStore: JettonStore;
 let liteproxysStore: LiteproxysStore;
 let tonApiStatsStore: TonApiStatsStore;
 let tonApiTiersStore: TonApiTiersStore;
-let airdropsStore: AirdropsStore;
 
 const initializeDependentStores = () => {
     balancesStore = new BalancesStore(projectsStore);
@@ -58,7 +56,6 @@ const initializeDependentStores = () => {
     liteproxysStore = new LiteproxysStore();
     tonApiStatsStore = new TonApiStatsStore();
     tonApiTiersStore = new TonApiTiersStore();
-    airdropsStore = new AirdropsStore();
 };
 
 awaitValueResolved(projectsStore.projects$).then(() => {
@@ -81,6 +78,5 @@ export {
     jettonStore,
     liteproxysStore,
     tonApiStatsStore,
-    tonApiTiersStore,
-    airdropsStore
+    tonApiTiersStore
 };

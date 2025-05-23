@@ -8,15 +8,20 @@ import {
     Tr,
     chakra,
     Flex,
-    Link as ChakraLink
+    Link as ChakraLink,
+    TableContainerProps
 } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { CopyIcon16, copyToClipboard, TickIcon, IconButton } from 'src/shared';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-import { airdropsStore } from 'src/shared/stores';
+import { AirdropsStore } from 'src/features/airdrop/model/airdrops.store';
 
-const AirdropsHistoryTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
+type AirdropsHistoryTableProps = {
+    airdropsStore: AirdropsStore;
+} & TableContainerProps;
+
+const AirdropsHistoryTable: FC<AirdropsHistoryTableProps> = ({ airdropsStore, ...props }) => {
     const [copiedKey, setCopiedKey] = useState<string | undefined>();
 
     useEffect(() => {
