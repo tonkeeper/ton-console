@@ -211,16 +211,18 @@ export const ApiKeyForm: FunctionComponent<
                                     <Span textStyle="label2">Origins</Span>
                                 </FormLabel>
                                 <Box textStyle="body2" mr="4" color="text.secondary">
-                                    Enter up to 20 values,
+                                    Allow requests from
                                     <br />
-                                    each on a new line
+                                    these sites only
                                 </Box>
                             </Box>
                             <Textarea
                                 minH={65}
                                 autoComplete="off"
                                 id="originsValue"
-                                placeholder={'http://example.com\nhttps://dev.example.net'}
+                                placeholder={
+                                    'http://example.com\nEnter up to 20 values (each on a new line)'
+                                }
                                 rows={2}
                                 {...register('originsValue', {
                                     validate(value) {
