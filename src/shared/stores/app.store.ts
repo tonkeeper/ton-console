@@ -1,16 +1,22 @@
 import { makeAutoObservable } from 'mobx';
-import { userStore, projectsStore } from './root.store';
 import { awaitValueResolved } from 'src/shared';
+import { ProjectsStore } from 'src/entities/project/model/projects.store';
+import { UserStore } from 'src/entities/user/model/user.store';
+
+interface AppStoreDependencies {
+    userStore: UserStore;
+    projectsStore: ProjectsStore;
+}
 
 export class AppStore {
     isInitialized = false;
 
-    constructor() {
+    constructor(dependencies: AppStoreDependencies) {
         makeAutoObservable(this);
-        this.initialize();
+        this.waitForInitialization(dependencies);
     }
 
-    private async initialize() {
+    private async waitForInitialization({ userStore, projectsStore }: AppStoreDependencies) {
         await awaitValueResolved(userStore.user$);
 
         if (userStore.user$.value) {
@@ -20,5 +26,3 @@ export class AppStore {
         this.isInitialized = true;
     }
 }
-
-export const appStore = new AppStore();

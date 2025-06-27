@@ -20,7 +20,7 @@ import { awaitValueResolved } from 'src/shared';
 
 export const projectsStore = new ProjectsStore();
 export const userStore = new UserStore();
-export const appStore = new AppStore();
+export const appStore = new AppStore({ userStore, projectsStore });
 
 let balancesStore: BalancesStore;
 let dappStore: DappStore;
