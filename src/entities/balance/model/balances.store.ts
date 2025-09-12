@@ -133,7 +133,9 @@ function mapDTODepositToRefill(dtoDeposit: DTODeposit): Refill {
         return {
             ...commonFields,
             type: 'deposit',
-            fromAddress: TonAddress.parse(dtoDeposit.source_address!)
+            fromAddress: dtoDeposit.source_address
+                ? TonAddress.parse(dtoDeposit.source_address)
+                : undefined
         };
     }
 

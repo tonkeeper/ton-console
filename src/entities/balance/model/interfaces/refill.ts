@@ -8,7 +8,7 @@ export interface RefillBasic {
 
 export interface RefillDeposit extends RefillBasic {
     type: 'deposit';
-    fromAddress: TonAddress;
+    fromAddress?: TonAddress;
 }
 
 export interface RefillPromoCode extends RefillBasic {
