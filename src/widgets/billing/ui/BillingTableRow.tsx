@@ -58,15 +58,19 @@ const ItemRow: FunctionComponent<{ historyItem: BillingHistoryItem; style: React
                         <>
                             {historyItem.type === 'deposit' ? (
                                 <>
-                                    Refill from{' '}
+                                    Refill
                                     {historyItem.fromAddress && (
-                                        <Link
-                                            color="text.accent"
-                                            href={explorer.accountLink(historyItem.fromAddress)}
-                                            isExternal
-                                        >
-                                            {shortAddress(historyItem.fromAddress)}
-                                        </Link>
+                                        <>
+                                            {' '}
+                                            from{' '}
+                                            <Link
+                                                color="text.accent"
+                                                href={explorer.accountLink(historyItem.fromAddress)}
+                                                isExternal
+                                            >
+                                                {shortAddress(historyItem.fromAddress)}
+                                            </Link>
+                                        </>
                                     )}
                                 </>
                             ) : (
