@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 import { CreateWebhookModal, WebhooksTable, webhooksStore } from 'src/features/tonapi/webhooks';
+import { WebhooksStatsModal } from 'src/features/tonapi/statistics';
 import { EmptyWebhooks } from './EmptyWebhooks';
 import {
     ArrowIcon,
@@ -25,7 +26,6 @@ import {
     MenuList,
     Box
 } from '@chakra-ui/react';
-import WebhookChartModal from './ChatrWebhooks';
 
 const WebhooksPage: FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -40,7 +40,6 @@ const WebhooksPage: FC = () => {
     }
 
     const isEmptyWebhooks = webhooksStore.webhooks$.value.length === 0;
-    const WebhooksStats = webhooksStore.stats$.value;
 
     return (
         <>
@@ -106,24 +105,13 @@ const WebhooksPage: FC = () => {
                             <Button onClick={onChartOpen} variant="secondary">
                                 Statistics
                             </Button>
-
-                            {/* <H4>Statistics</H4>
-                            <Flex gap="6" mt={2} mb={4}>
-                                <Button onClick={onChartOpen}>Statistics</Button>
-                                <StatsCard
-                                    onClick={onChartOpen}
-                                    header="Delivered events"
-                                    value={'101'}
-                                />
-                                <StatsCard onClick={onChartOpen} header="Failed sent" value={'0'} />
-                            </Flex> */}
                         </Box>
                         <WebhooksTable />
                     </>
                 )}
             </Overlay>
             <CreateWebhookModal isOpen={isOpen} onClose={onClose} />
-            <WebhookChartModal data={WebhooksStats} isOpen={isChartOpen} onClose={onChartClose} />
+            <WebhooksStatsModal isOpen={isChartOpen} onClose={onChartClose} />
         </>
     );
 };
