@@ -62,6 +62,9 @@ function mapStatsChatGptPriceToGptGenerationPricing(
     return {
         freeRequestsNumber: value.free_requests,
         usedFreeRequest: value.used,
-        requestPrice: new TonCurrencyAmount(value.price)
+        // TODO: PRICES remove this after backend will be updated
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        requestPrice: value.price ? new TonCurrencyAmount(value.price) : value.usd_price
     };
 }

@@ -115,6 +115,9 @@ function mapDTOStatsEstimateSQLToAnalyticsQuery(
         request,
         network: DTOChainNetworkMap[network],
         estimatedTimeMS: value.approximate_time,
+        // TODO: PRICES remove this after backend will be updated
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         estimatedCost: new TonCurrencyAmount(value.approximate_cost),
         explanation: value.explain!
     };
