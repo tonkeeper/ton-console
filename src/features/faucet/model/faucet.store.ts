@@ -38,6 +38,9 @@ class FaucetStore {
         async () => {
             this.tonRate$.setStartLoading();
             const response = await apiClient.api.getTestnetAvailable();
+            // TODO: PRICES remove this after backend will be updated
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             this.tonRate$.value = 1 / response.data.price_multiplicator;
             this.tonRate$.setEndLoading();
             return new TonCurrencyAmount(response.data.balance);

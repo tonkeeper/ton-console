@@ -154,6 +154,9 @@ function mapDTOStatsQueryResultToAnalyticsQueryAggregated(
         lastQuery: mapDTOStatsSqlResultToAnalyticsQuery(value),
         lastQueryDate: new Date(value.last_repeat_date!),
         repeatFrequencyMs: value.query!.repeat_interval! * 1000,
+        // TODO: PRICES remove this after backend will be updated
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         totalCost: new TonCurrencyAmount(value.total_cost!),
         totalRepetitions: value.total_repetitions!
     };
