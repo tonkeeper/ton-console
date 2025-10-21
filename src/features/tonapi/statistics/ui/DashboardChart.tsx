@@ -42,8 +42,10 @@ const DashboardChart: FunctionComponent<ComponentProps<typeof Box>> = props => {
             return false;
         }
 
-        const requests = data.map(item => item.requests || 0);
-        return Math.max(...requests) >= selectedTier.description.requestsPerSecondLimit * 0.67;
+        return (
+            Math.max(...data.map(item => item.requests)) >=
+            selectedTier.description.requestsPerSecondLimit * 0.67
+        );
     }, [data, selectedTier]);
 
     if (!tonApiStatsStore.stats$.isResolved || !tonApiTiersStore.selectedTier$.isResolved) {

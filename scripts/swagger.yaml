@@ -84,7 +84,7 @@ paths:
           description: "Ok"
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/feedback:
     post:
       summary: "Send user feedback"
@@ -100,7 +100,7 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/test/user:
     delete:
       summary: "Delete test user"
@@ -118,7 +118,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/admin/project/{id}/balance:
     get:
       summary: "Private method: Get project balance"
@@ -198,7 +198,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/auth/tg:
     post:
       summary: "Auth via telegram"
@@ -248,11 +248,7 @@ paths:
       tags:
         - auth
       requestBody:
-        description: "Data that is expected"
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TonConnectProof'
+        $ref: "#/components/requestBodies/TonConnectProofExpected"
       responses:
         '200':
           $ref: '#/components/responses/AuthOk'
@@ -264,7 +260,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/me:
     get:
       summary: "Get user info"
@@ -299,7 +295,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/account/logout:
     post:
       summary: "Logout from the system"
@@ -318,7 +314,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/project:
     post:
       summary: "Create project"
@@ -414,19 +410,17 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /api/v1/project/{id}/billing/history:
+  /api/v1/project/{id}/deposits/history:
     get:
-      summary: "Get project billing history"
-      operationId: getProjectBillingHistory
+      summary: "Get project deposits history"
+      operationId: getProjectDepositsHistory
       tags:
         - project
       parameters:
         - $ref: '#/components/parameters/projectID'
-        - $ref: '#/components/parameters/beforeBillingTx'
-        - $ref: '#/components/parameters/queryLimit'
       responses:
         '200':
-          $ref: '#/components/responses/BillingHistory'
+          $ref: '#/components/responses/DepositsHistory'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -459,7 +453,6 @@ paths:
     get:
       summary: "Get project payments history"
       operationId: projectPaymentsHistory
-      deprecated: true
       tags:
         - project
       parameters:
@@ -1087,7 +1080,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/stats/ddl:
     get:
       summary: "Get stats db ddl"
@@ -1362,7 +1355,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/invoices/app:
     post:
       summary: "Create invoices app"
@@ -1678,7 +1671,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/pro/auth/proof/payload:
     post:
       summary: "Generating payload for TonConnect"
@@ -1703,11 +1696,7 @@ paths:
       tags:
         - pro_service
       requestBody:
-        description: "Data that is expected"
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TonConnectProof'
+        $ref: "#/components/requestBodies/TonConnectProofExpected"
       responses:
         '200':
           $ref: '#/components/responses/ProServiceOk'
@@ -1960,30 +1949,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/mobile:
-    post:
-      summary: "Activate Pro tier for mobile"
-      operationId: proServiceMobile
-      tags:
-        - pro_service
-      requestBody:
-        description: "Data that is expected"
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TonConnectProof'
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceOk'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/cnft/config:
     get:
       summary: "Get cNFT config"
@@ -2060,7 +2026,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/mintless/config:
     get:
       summary: "Get mintless jetton config"
@@ -2116,7 +2082,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
+
   /api/v1/services/minter/owner/jettons:
     get:
       summary: "Get jettons by owner"
@@ -2463,15 +2429,6 @@ components:
       schema:
         type: integer
         example: 100
-    beforeBillingTx:
-      description: Before Billing TX
-      in: query
-      name: before_tx
-      required: false
-      schema:
-        type: string
-        format: uuid
-        example: "03cfc582-b1c3-410a-a9a7-1f0afe116b3b"
     queryFieldOrder:
       description: Field
       in: query
@@ -2518,7 +2475,7 @@ components:
       name: currency
       required: false
       schema:
-        $ref: '#/components/schemas/Currencies'
+        $ref: '#/components/schemas/FiatCurrencies'
     queryPromoCode:
       description: Promo code
       in: query
@@ -2579,8 +2536,6 @@ components:
         enum:
           - tonapi_token
           - tonapi_webhook
-          - liteproxy_requests
-          - liteproxy_connections
         default: tonapi_token
     queryOnlyBetween:
       in: query
@@ -2627,7 +2582,7 @@ components:
       required: false
       schema:
         type: boolean
-  
+
   requestBodies:
     NewJettonAirdrop:
       required: true
@@ -2691,8 +2646,6 @@ components:
                 type: number
                 example: 5
                 nullable: true
-                maximum: 100000
-                minimum: 0
               origins:
                 type: array
                 items:
@@ -2701,6 +2654,12 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/TokenCapability'
+    TonConnectProofExpected:
+      description: "Data that is expected"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TonConnectProof'
     ProjectCreate:
       description: "Data that is expected"
       content:
@@ -3146,7 +3105,7 @@ components:
                 items:
                   type: string
                   example: "id"
-  
+
   headers:
     setCookie:
       required: true
@@ -3288,8 +3247,6 @@ components:
         - address
         - proof
       properties:
-        promo_code:
-          type: string
         address:
           type: string
           example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
@@ -3319,8 +3276,6 @@ components:
         - long_polling_sub
         - entity_per_conn
         - capabilities
-        - payment_currency
-        - instant_payment
       properties:
         id:
           type: integer
@@ -3346,11 +3301,6 @@ components:
         usd_price:
           type: number
           example: 100
-        payment_currency:
-          $ref: '#/components/schemas/CryptoCurrency'
-        instant_payment:
-          type: boolean
-          example: false
     ProServiceTier:
       type: object
       required:
@@ -3390,8 +3340,6 @@ components:
         - capabilities
         - usd_price
         - date_create
-        - payment_currency
-        - instant_payment
       properties:
         id:
           type: integer
@@ -3425,11 +3373,6 @@ components:
           type: integer
           format: int64
           example: 1690889913000
-        payment_currency:
-          $ref: '#/components/schemas/CryptoCurrency'
-        instant_payment:
-          type: boolean
-          example: false
     ProServiceAppTier:
       type: object
       required:
@@ -3459,59 +3402,32 @@ components:
           type: integer
           format: int64
           example: 1690889913000
-    BillingTransaction:
+    Deposit:
       type: object
       required:
-        - id
         - type
+        - income_date
         - amount
-        - currency
-        - reason
-        - additional_info
-        - created_at
       properties:
-        id:
-          type: string
-          format: uuid
-          example: "03cfc582-b1c3-410a-a9a7-1f0afe116b3b"
         type:
           type: string
           enum:
+            - promo_code
             - deposit
-            - charge
-        amount:
-          description: "deposited amount"
+        deposit_address:
           type: string
-          x-js-format: bigint
-          example: "123000000000"
-        currency:
-          $ref: '#/components/schemas/CryptoCurrency'
-        reason:
+          example: "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR"
+        source_address:
           type: string
-        additional_info:
-          type: string
-        created_at:
+          example: "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR"
+        income_date:
           type: integer
           format: int64
           example: 1690889913000
-    Balance:
-      type: object
-      required:
-        - currency
-        - amount
-        - promo_amount
-      properties:
-        currency:
-          $ref: '#/components/schemas/CryptoCurrency'
         amount:
-          description: "deposited amount"
-          type: string
-          x-js-format: bigint
-          example: "123000000000"
-        promo_amount:
-          type: string
-          x-js-format: bigint
-          example: "12300000000"
+          type: integer
+          format: int64
+          example: 1000000000
     Charge:
       type: object
       required:
@@ -3570,6 +3486,19 @@ components:
           type: integer
           format: int64
           example: 1690889913000
+    Balance:
+      type: object
+      required:
+        - balance
+        - currency
+      properties:
+        currency:
+          type: string
+          example: "TON"
+        balance:
+          type: integer
+          format: int64
+          example: 1000000000
     Participant:
       type: object
       required:
@@ -3873,13 +3802,13 @@ components:
           type: integer
           format: int32
           example: 5
-        total_usd_cost:
-          type: number
-          format: float64
+        total_cost:
+          type: integer
+          format: int64
           example: 1000000000
-        usd_cost:
-          type: number
-          format: float64
+        cost:
+          type: integer
+          format: int64
           example: 1000000000
         error:
           type: string
@@ -3906,14 +3835,14 @@ components:
       type: object
       required:
         - approximate_time
-        - approximate_usd_cost
+        - approximate_cost
       properties:
         approximate_time:
           type: integer
           format: int64
-        approximate_usd_cost:
-          type: number
-          format: float64
+        approximate_cost:
+          type: integer
+          format: int64
         explain:
           type: string
     StatsQueryType:
@@ -4284,7 +4213,7 @@ components:
         value:
           type: string
         fiat:
-          $ref: '#/components/schemas/Currencies'
+          $ref: '#/components/schemas/FiatCurrencies'
     ProServiceDashboardCellString:
       type: object
       required:
@@ -4298,7 +4227,7 @@ components:
           $ref: '#/components/schemas/ProServiceDashboardColumnType'
         value:
           type: string
-    Currencies:
+    FiatCurrencies:
       type: string
       default: USD
       enum:
@@ -4315,7 +4244,6 @@ components:
         - IDR
         - INR
         - JPY
-        - TON
     Account:
       type: object
       required:
@@ -4393,7 +4321,6 @@ components:
         - name
         - usd_price
         - rps
-        - payment_currency
       properties:
         id:
           type: integer
@@ -4408,8 +4335,6 @@ components:
         rps:
           type: number
           example: 10.0
-        payment_currency:
-          $ref: '#/components/schemas/CryptoCurrency'
     ProjectLiteproxyTierDetail:
       type: object
       required:
@@ -4418,7 +4343,6 @@ components:
         - rps
         - usd_price
         - date_create
-        - payment_currency
       properties:
         id:
           type: integer
@@ -4441,8 +4365,6 @@ components:
           type: integer
           format: int64
           example: 1690889913000
-        payment_currency:
-          $ref: '#/components/schemas/CryptoCurrency'
 
   responses:
     InsufficientFunds:
@@ -4550,12 +4472,8 @@ components:
             type: object
             required:
               - ton_deposit_wallet
-              - usdt_deposit_wallet
             properties:
               ton_deposit_wallet:
-                type: string
-                example: "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR"
-              usdt_deposit_wallet:
                 type: string
                 example: "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR"
     PaymentsHistory:
@@ -4598,7 +4516,7 @@ components:
             required:
               - free_requests
               - used
-              - usd_price
+              - price
             properties:
               free_requests:
                 type: integer
@@ -4608,10 +4526,10 @@ components:
                 type: integer
                 format: int32
                 example: 100
-              usd_price:
-                type: number
-                format: float64
-                example: 0.1
+              price:
+                type: integer
+                format: int64
+                example: 1000000
     ProjectTonApiStats:
       description: "Project TonApi stats"
       content:
@@ -4693,24 +4611,22 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/StatsDashboard'
-    BillingHistory:
-      description: "Billing history"
+    DepositsHistory:
+      description: "Deposits history"
       content:
         application/json:
           schema:
             type: object
             required:
-              - balances
+              - balance
               - history
             properties:
-              balances:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Balance'
+              balance:
+                $ref: '#/components/schemas/Balance'
               history:
                 type: array
                 items:
-                  $ref: '#/components/schemas/BillingTransaction'
+                  $ref: '#/components/schemas/Deposit'
     ProjectTonApiTokenRes:
       description: "Project TonAPI token"
       content:
@@ -5157,17 +5073,17 @@ components:
           schema:
             required:
               - balance
-              - usd_per_testnet_ton
+              - price_multiplicator
             type: object
             properties:
               balance:
                 type: integer
                 format: uint64
                 example: 1000000000
-              usd_per_testnet_ton:
-                type: number
-                format: float64
-                example: 0.06
+              price_multiplicator:
+                type: integer
+                format: int32
+                example: 20
     MessageHash:
       description: "Message hash"
       content:
@@ -5392,9 +5308,9 @@ components:
               - price_per_nft
             properties:
               price_per_nft:
-                type: number
-                format: float64
-                example: 0.01
+                type: integer
+                format: uint64
+                example: 100000000
     CnftCollections:
       description: "cNFT collections"
       content:

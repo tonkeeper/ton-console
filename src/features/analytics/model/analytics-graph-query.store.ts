@@ -85,9 +85,6 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
                 value.url!
             )}&meta=${encodeURIComponent(value.meta_url!)}`,
             spentTimeMS: value.spent_time!,
-            // TODO: PRICES remove this after backend will be updated
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
             cost: new TonCurrencyAmount(value.cost!)
         };
     }
@@ -104,9 +101,6 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
         status: 'error',
         errorReason: value.error!,
         spentTimeMS: value.spent_time!,
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         cost: new TonCurrencyAmount(value.cost!)
     };
 }

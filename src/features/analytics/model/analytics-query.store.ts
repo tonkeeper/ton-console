@@ -237,9 +237,6 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         gptPrompt: value.query?.gpt_message,
         request: value.query!.sql!,
         estimatedTimeMS: value.estimate!.approximate_time,
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         estimatedCost: new TonCurrencyAmount(value.estimate!.approximate_cost),
         explanation: value.estimate!.explain!,
         name: value.name,
@@ -260,9 +257,6 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         return {
             ...basicQuery,
             status: 'success',
-            // TODO: PRICES remove this after backend will be updated
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
             cost: new TonCurrencyAmount(value.cost!),
             spentTimeMS: value.spent_time!,
             csvUrl: value.url!,
@@ -274,9 +268,6 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
     return {
         ...basicQuery,
         status: 'error',
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         cost: new TonCurrencyAmount(value.cost!),
         spentTimeMS: value.spent_time!,
         errorReason: value.error!

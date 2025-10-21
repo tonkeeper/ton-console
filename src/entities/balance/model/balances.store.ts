@@ -4,10 +4,11 @@ import {
     createAsyncAction,
     createImmediateReaction,
     CurrencyAmount,
-    // DTODeposit,
-    // DTODepositTypeEnum,
+    DTODeposit,
+    DTODepositTypeEnum,
     Loadable,
     setIntervalWhenPageOnFocus,
+    TonAddress,
     TonCurrencyAmount,
     UsdCurrencyAmount
 } from 'src/shared';
@@ -69,16 +70,14 @@ export class BalancesStore {
     }
 
     fetchPortfolio = this.portfolio$.createAsyncAction(async () => {
-        // const response = await apiClient.api.getProjectDepositsHistory(
-        //     this.projectsStore.selectedProject!.id
-        // );
+        const response = await apiClient.api.getProjectDepositsHistory(
+            this.projectsStore.selectedProject!.id
+        );
 
-        // return {
-        //     balances: [new TonCurrencyAmount(response.data.balance.balance)],
-        //     refills: response.data.history.map(mapDTODepositToRefill)
-        // };
-
-        return undefined;
+        return {
+            balances: [new TonCurrencyAmount(response.data.balance.balance)],
+            refills: response.data.history.map(mapDTODepositToRefill)
+        };
     });
 
     fetchDepositAddress = this.depositAddress$.createAsyncAction(async () => {
@@ -123,25 +122,25 @@ export class BalancesStore {
     };
 }
 
-// function mapDTODepositToRefill(dtoDeposit: DTODeposit): Refill {
-//     const commonFields = {
-//         id: new Date(dtoDeposit.income_date).getTime(),
-//         date: new Date(dtoDeposit.income_date),
-//         amount: new TonCurrencyAmount(dtoDeposit.amount)
-//     };
+function mapDTODepositToRefill(dtoDeposit: DTODeposit): Refill {
+    const commonFields = {
+        id: new Date(dtoDeposit.income_date).getTime(),
+        date: new Date(dtoDeposit.income_date),
+        amount: new TonCurrencyAmount(dtoDeposit.amount)
+    };
 
-//     if (dtoDeposit.type === DTODepositTypeEnum.DTODeposit) {
-//         return {
-//             ...commonFields,
-//             type: 'deposit',
-//             fromAddress: dtoDeposit.source_address
-//                 ? TonAddress.parse(dtoDeposit.source_address)
-//                 : undefined
-//         };
-//     }
+    if (dtoDeposit.type === DTODepositTypeEnum.DTODeposit) {
+        return {
+            ...commonFields,
+            type: 'deposit',
+            fromAddress: dtoDeposit.source_address
+                ? TonAddress.parse(dtoDeposit.source_address)
+                : undefined
+        };
+    }
 
-//     return {
-//         ...commonFields,
-//         type: 'promoCode'
-//     };
-// }
+    return {
+        ...commonFields,
+        type: 'promoCode'
+    };
+}
