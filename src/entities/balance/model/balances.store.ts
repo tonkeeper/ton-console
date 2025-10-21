@@ -75,6 +75,9 @@ export class BalancesStore {
         );
 
         return {
+            // TODO: PRICES remove this after backend will be updated
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             balances: [new TonCurrencyAmount(response.data.balance.balance)],
             refills: response.data.history.map(mapDTODepositToRefill)
         };
