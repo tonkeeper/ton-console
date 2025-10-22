@@ -16,7 +16,7 @@ import { ProjectsStore } from '../../project/model/projects.store';
 import { Portfolio, Refill } from './interfaces';
 import { ratesStore } from 'src/entities';
 import { createStandaloneToast } from '@chakra-ui/react';
-import { subscriptionsStore, billingStore } from 'src/widgets';
+import { subscriptionsStore, billingStore } from 'src/features/billing';
 
 export class BalancesStore {
     portfolio$ = new Loadable<Portfolio | null>(null);

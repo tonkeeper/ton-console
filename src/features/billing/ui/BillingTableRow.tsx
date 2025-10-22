@@ -3,7 +3,7 @@ import { Center, chakra, Link, Spinner, Td, Tr } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { toDateTime, explorer, shortAddress } from 'src/shared';
 import { toJS } from 'mobx';
-import { BillingHistoryItem, billingStore } from 'src/widgets';
+import { BillingHistoryItem, billingStore } from 'src/features/billing';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 
 const LoadingRaw: FunctionComponent<{ style: React.CSSProperties }> = ({

@@ -5,3 +5,4 @@ export type {
     BillingHistoryPaymentItem,
     BillingHistoryRefillItem
 } from './billing-history';
+export type { Subscription } from './subscription';
