@@ -16,6 +16,7 @@ import { ProjectsStore } from '../../project/model/projects.store';
 import { Portfolio, Refill } from './interfaces';
 import { ratesStore } from 'src/entities';
 import { createStandaloneToast } from '@chakra-ui/react';
+import { subscriptionsStore, billingStore } from 'src/widgets';
 
 export class BalancesStore {
     portfolio$ = new Loadable<Portfolio | null>(null);
@@ -23,6 +24,8 @@ export class BalancesStore {
     depositAddress$ = new Loadable<string | undefined>(undefined);
 
     private readonly projectsStore: ProjectsStore;
+
+    private previousBalance: string | null = null;
 
     get balances(): CurrencyAmount[] {
         return this.portfolio$.value?.balances || [];
@@ -58,6 +61,18 @@ export class BalancesStore {
                 if (project) {
                     this.fetchDepositAddress();
                     this.fetchPortfolio();
+                }
+            }
+        );
+
+        // Update subscriptions and billing only when balance actually changes
+        createImmediateReaction(
+            () => this.balances[0]?.stringCurrencyAmount,
+            currentBalance => {
+                if (currentBalance !== this.previousBalance) {
+                    subscriptionsStore.fetchSubscriptions();
+                    billingStore.loadFirstPage();
+                    this.previousBalance = currentBalance || null;
                 }
             }
         );
