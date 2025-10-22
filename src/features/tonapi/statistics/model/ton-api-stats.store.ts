@@ -47,9 +47,9 @@ export class TonApiStatsStore {
     });
 
     fetchLiteproxyStats = this.liteproxyStats$.createAsyncAction(async () => {
-        const weekAgo = Math.round(Date.now() / 1000 - 3600 * 24 * 7);
+        const weekAgo = Math.round(Date.now() / 1000 - 3600 * 6);
         const end = Math.floor(Date.now() / 1000);
-        const halfAnHourPeriod = 60 * 30;
+        const halfAnHourPeriod = 60;
 
         // Fetch both liteproxy_requests and liteproxy_connections metrics
         const requestsResponse = await apiClient.api.getProjectTonApiStats({
