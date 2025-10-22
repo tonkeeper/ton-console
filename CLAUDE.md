@@ -192,6 +192,12 @@ git status
 - Write clear commit messages
 - Ensure all tests pass before committing
 
+**IMPORTANT:** Do NOT interact with git (commit, add, push, etc.) unless explicitly asked by the user. Only make git operations when the user specifically requests it. This includes:
+- Do NOT run `git add`, `git commit`, `git push`
+- Do NOT use git hooks or auto-commit features
+- Only run `git diff`, `git status` for information purposes when needed
+- Wait for explicit user instructions before any git modifications
+
 ## Key Best Practices
 
 ### 1. Study Patterns BEFORE Coding
