@@ -136,15 +136,18 @@ class WebhooksStore {
         const now = new Date();
         const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
 
-        const startTimestamp = Math.floor(startOfMonth.getTime() / 1000);
+        const startMonthTimestamp = Math.floor(startOfMonth.getTime() / 1000);
         const endTimestamp = Math.floor(now.getTime() / 1000);
+
+        const parts = (endTimestamp - startMonthTimestamp) / (60 * 60);
+        const startTimestamp = parts > 500 ? endTimestamp - 500 * (60 * 60) : startMonthTimestamp;
 
         const response = await apiClient.api
             .getProjectTonApiStats({
                 project_id: projectsStore.selectedProject!.id,
                 start: startTimestamp,
                 end: endTimestamp,
-                step: 3600,
+                step: 60 * 60,
                 dashboard: DTOGetProjectTonApiStatsParamsDashboardEnum.DTOTonapiWebhook
             })
             .then(res => res.data.stats);
