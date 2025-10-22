@@ -1,7 +1,7 @@
 import { FC, useEffect } from 'react';
 import { Overlay } from 'src/shared';
 import { observer } from 'mobx-react-lite';
-import { billingStore } from 'src/widgets';
+import { billingStore } from 'src/features/billing';
 import BalanceBlock from './BalanceBlock';
 import SubscriptionsBlock from './SubscriptionsBlock';
 import BillingBlock from './BillingBlock';

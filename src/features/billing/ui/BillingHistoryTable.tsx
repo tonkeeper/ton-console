@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Box, BoxProps } from '@chakra-ui/react';
+import { Box, BoxProps, Center, Spinner } from '@chakra-ui/react';
 import { Observer, observer } from 'mobx-react-lite';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -9,15 +9,55 @@ import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 import { billingStore } from '../model';
 import BillingTableRow from './BillingTableRow';
 
-const BillingHistoryTable: FC<BoxProps> = props => {
+interface BillingHistoryTableProps extends BoxProps {
+    isLoading?: boolean;
+    hasEverLoaded?: boolean;
+    skeletonRowCount?: number;
+    hasBillingHistory?: boolean;
+}
+
+const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
+    isLoading = billingStore.billingHistoryLoading,
+    hasEverLoaded = false,
+    skeletonRowCount = 1,
+    hasBillingHistory = billingStore.billingHistory.length > 0,
+    ...props
+}) => {
     const rowHeight = '48px';
 
+    // First load - show Spinner (height of header + one row: 48px + 48px = 96px)
+    if (!hasEverLoaded && isLoading) {
+        return (
+            <Center h="96px">
+                <Spinner />
+            </Center>
+        );
+    }
+
+    // No data and not loading - show Empty message (height of header + one row: 48px + 48px = 96px)
+    if (!isLoading && !hasBillingHistory) {
+        return (
+            <Box h="96px" py="10" color="text.secondary" textAlign="center">
+                No billing history yet
+            </Box>
+        );
+    }
+
+    // Table with data or skeleton
     const minH = billingStore.isResolved
         ? Math.min(parseInt(rowHeight) * (billingStore.billingHistory.length + 1) + 6, 800) + 'px'
         : '102px';
 
+    // Table with data or skeleton
     return (
-        <BillingHistoryTableContext.Provider value={{ rowHeight }}>
+        <BillingHistoryTableContext.Provider
+            value={{
+                rowHeight,
+                isLoading,
+                hasEverLoaded,
+                skeletonRowCount
+            }}
+        >
             <Box minH={minH} {...props}>
                 <InfiniteLoader
                     isItemLoaded={billingStore.isItemLoaded}
