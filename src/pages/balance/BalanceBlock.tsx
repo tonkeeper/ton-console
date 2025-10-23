@@ -11,10 +11,12 @@ const BalanceBlock: FC = () => {
 
     const isLoading = balanceStore.currentBalance$.isLoading;
     const balance = balanceStore.balance;
+    const tonRate = balanceStore.tonRate$.value;
 
     const usdtAmount = balance ? Number(toDecimals(balance.usdt.amount, 6)) : 0;
     const usdtPromoAmount = balance ? Number(toDecimals(balance.usdt.promo_amount, 6)) : 0;
     const tonAmount = balance ? Number(toDecimals(balance.ton?.amount || 0, 9)) : 0;
+    const tonAmountUsd = tonAmount && tonRate ? tonAmount * tonRate : 0;
     const totalAmount = balance ? Number(balance.total) : 0;
 
     return (
@@ -39,8 +41,8 @@ const BalanceBlock: FC = () => {
                         </Button>
                     </Flex>
 
-                    <Flex gap="8" flexWrap="wrap">
-                        <Flex align="center" gap="2">
+                    <Flex columnGap="8" flexWrap="wrap">
+                        <Flex align="center" columnGap="2">
                             <Text textStyle="body2" color="text.secondary">
                                 Balance:
                             </Text>
@@ -50,6 +52,25 @@ const BalanceBlock: FC = () => {
                                 <Text textStyle="body2">{usdtAmount.toFixed(2)} USDT</Text>
                             )}
                         </Flex>
+                        {tonAmount > 0 && (
+                            <Flex align="center" columnGap="2">
+                                <Text textStyle="body2" color="text.secondary">
+                                    TON Balance:
+                                </Text>
+                                {isLoading ? (
+                                    <Skeleton w="150px" h="5" />
+                                ) : (
+                                    <Text textStyle="body2">
+                                        {tonAmount.toFixed(2)} TON{' '}
+                                        {tonAmountUsd > 0 && (
+                                            <Span color="text.secondary">
+                                                ≈ ${tonAmountUsd.toFixed(2)}
+                                            </Span>
+                                        )}
+                                    </Text>
+                                )}
+                            </Flex>
+                        )}
                         <Flex align="center" gap="2">
                             <Flex align="center" gap="1">
                                 <Text textStyle="body2" color="text.secondary">

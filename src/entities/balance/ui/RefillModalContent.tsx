@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Box,
     Button,
@@ -74,6 +74,7 @@ const RefillModalContent: FC<{
     const depositAddress = balanceStore.depositAddress$.value;
     const usdtDepositWallet = depositAddress?.usdt_deposit_wallet;
     const tonDepositWallet = depositAddress?.ton_deposit_wallet;
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const currency_addresses: Record<Currency, string | undefined> = {
         USDT: usdtDepositWallet,
@@ -81,12 +82,18 @@ const RefillModalContent: FC<{
     } as const;
 
     const [currency, setCurrency] = useState<Currency>('USDT');
-    const [amount, setAmount] = useState<string>('20');
+    const [amount, setAmount] = useState<string>('');
 
     const { getRootProps, getRadioProps } = useRadioGroup({
         name: 'currency',
         defaultValue: currency,
-        onChange: val => setCurrency(val as Currency)
+        onChange: val => {
+            setCurrency(val as Currency);
+            setAmount('');
+            if (inputRef.current) {
+                inputRef.current.focus();
+            }
+        }
     });
 
     const paymentLink = useMemo(() => {
@@ -164,7 +171,9 @@ const RefillModalContent: FC<{
 
                         <InputGroup mb="4">
                             <Input
+                                ref={inputRef}
                                 placeholder="Enter amount"
+                                autoFocus
                                 pr="60px"
                                 value={amount}
                                 onChange={e => {
