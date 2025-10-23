@@ -1,74 +1,77 @@
-import { FC, useEffect, useRef, useState } from 'react';
-import { CRYPTO_CURRENCY, H2, IconButton, Overlay, RefreshIcon16, Span, toDecimals } from 'src/shared';
-import { Box, Button, Flex, Skeleton, useDisclosure } from '@chakra-ui/react';
-import { CurrencyRate, PromoCodeModal, RefillModal } from 'src/entities';
+import { FC } from 'react';
+import { H2, Overlay, Span, toDecimals, InfoTooltip } from 'src/shared';
+import { Box, Button, Flex, Skeleton, useDisclosure, Link, Text } from '@chakra-ui/react';
+import { PromoCodeModal, RefillModal } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { balanceStore } from 'src/shared/stores';
 
 const BalanceBlock: FC = () => {
-    const [h2Width, setH2Width] = useState(0);
     const { isOpen: isRefillOpen, onClose: onRefillClose, onOpen: onRefillOpen } = useDisclosure();
     const { isOpen: isPromoOpen, onClose: onPromoClose, onOpen: onPromoOpen } = useDisclosure();
 
-    const h2Ref = useRef<HTMLSpanElement | null>(null);
-
-    useEffect(() => {
-        if (h2Ref.current) {
-            setH2Width(Math.ceil(h2Ref.current.getBoundingClientRect().width));
-        }
-    }, [balanceStore.balance?.usdt.amount]);
-
-    const isRefreshing = balanceStore.currentBalance$.isLoading;
+    const isLoading = balanceStore.currentBalance$.isLoading;
     const balance = balanceStore.balance;
+
+    const usdtAmount = balance ? Number(toDecimals(balance.usdt.amount, 6)) : 0;
+    const usdtPromoAmount = balance ? Number(toDecimals(balance.usdt.promo_amount, 6)) : 0;
+    const tonAmount = balance ? Number(toDecimals(balance.ton?.amount || 0, 9)) : 0;
+    const totalAmount = balance ? Number(balance.total) : 0;
 
     return (
         <>
             <Overlay h="fit-content" p="0" mb={4} display="flex" flexDirection="column">
                 <Box pt="5" pb="6" px="6">
-                    <Flex align="center" gap="2" mb="1">
-                        <H2 minW={h2Width} display="flex" alignItems="center" gap="2">
-                            {balanceStore.currentBalance$.isLoading ? (
-                                <Skeleton w={h2Width || '100px'} h="6" />
+                    <Text textStyle="body2" color="text.secondary" mb="1">
+                        Total Balance
+                    </Text>
+                    <Flex align="center" justify="space-between" mb="5">
+                        <H2 display="flex" alignItems="center" gap="2">
+                            {isLoading ? (
+                                <Skeleton w="200px" h="10" />
                             ) : (
-                                <Span ref={h2Ref} title={balance?.usdt.amount.toString()}>
-                                    {balance
-                                        ? `${(
-                                              Number(toDecimals(balance.usdt.amount, 6))
-                                          ).toString()} USDT`
-                                        : 'N/A'}
+                                <Span title={totalAmount.toString()}>
+                                    {balance?.ton?.amount && '≈ '}${totalAmount.toFixed(2)}
                                 </Span>
                             )}
                         </H2>
-                        <IconButton
-                            icon={<RefreshIcon16 />}
-                            onClick={() => balanceStore.fetchBalance()}
-                            aria-label="Refresh"
-                            isDisabled={isRefreshing}
-                        />
-                    </Flex>
-                    {balance && balance.ton && BigInt(balance.ton.amount) > 0n ? (
-                        
-                        <CurrencyRate
-                            textStyle="body2"
-                            color="text.secondary"
-                            mb="5"
-                            skeletonWidth="70px"
-                            currency={CRYPTO_CURRENCY.TON}
-                            leftSign="≈"
-                            amount={balance.ton.amount}
-                            amountLoading={balanceStore.currentBalance$.isLoading}
-                            contentUnderSkeleton="&nbsp;USD"
-                        />
-                    ) : null}
-                    <Flex gap="3">
-                        <Button onClick={onRefillOpen}>Refill</Button>
-                        <Button
-                            isLoading={balanceStore.applyPromoCode.isLoading}
-                            onClick={onPromoOpen}
-                            variant="secondary"
-                        >
-                            Use Promo Code
+                        <Button onClick={onRefillOpen} variant="secondary">
+                            Refill
                         </Button>
+                    </Flex>
+
+                    <Flex gap="8" flexWrap="wrap">
+                        <Flex align="center" gap="2">
+                            <Text textStyle="body2" color="text.secondary">
+                                Balance:
+                            </Text>
+                            {isLoading ? (
+                                <Skeleton w="100px" h="5" />
+                            ) : (
+                                <Text textStyle="body2">{usdtAmount.toFixed(2)} USDT</Text>
+                            )}
+                        </Flex>
+                        <Flex align="center" gap="2">
+                            <Flex align="center" gap="1">
+                                <Text textStyle="body2" color="text.secondary">
+                                    Promo Balance:
+                                </Text>
+                                <InfoTooltip>Apply promo codes to get bonus balance</InfoTooltip>
+                            </Flex>
+                            {isLoading ? (
+                                <Skeleton w="80px" h="5" />
+                            ) : (
+                                <Text textStyle="body2">{usdtPromoAmount.toFixed(2)} USDT</Text>
+                            )}
+                            <Link
+                                color="accent.blue"
+                                textStyle="body2"
+                                onClick={onPromoOpen}
+                                cursor="pointer"
+                                _hover={{ textDecoration: 'underline' }}
+                            >
+                                Use Promo Code
+                            </Link>
+                        </Flex>
                     </Flex>
                 </Box>
             </Overlay>
