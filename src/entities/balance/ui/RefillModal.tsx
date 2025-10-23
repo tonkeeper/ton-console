@@ -1,12 +1,19 @@
-import { FunctionComponent } from 'react';
+import { FC, useEffect } from 'react';
 import { Modal, ModalOverlay } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import RefillModalContent from 'src/entities/balance/ui/RefillModalContent';
+import { balanceStore } from 'src/shared/stores';
 
-const RefillModal: FunctionComponent<{
+const RefillModal: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = props => {
+    useEffect(() => {
+        if (props.isOpen) {
+            balanceStore.fetchDepositAddress();
+        }
+    }, [props.isOpen]);
+
     return (
         <Modal scrollBehavior="inside" size="md" {...props}>
             <ModalOverlay />
