@@ -23,7 +23,7 @@ import { AppMessagesPackage, appMessagesStore } from '../model';
 import { CurrencyRate, RefillModalContent } from 'src/entities';
 import MessagesPaymentConfirmationModalContent from './MessagesPaymentConfirmationModalContent';
 import { observer } from 'mobx-react-lite';
-import { balancesStore } from 'src/shared/stores';
+import { balanceStore } from 'src/shared/stores';
 
 const MessagesRefillModal: FunctionComponent<{
     isOpen: boolean;
@@ -39,10 +39,10 @@ const MessagesRefillModal: FunctionComponent<{
     });
     const group = getRootProps();
 
-    const balance = balancesStore.tonBalanceUSDEquivalent;
-    const notEnoughUsd =
-        balance && selectedPlan && balance.isLT(selectedPlan?.price)
-            ? selectedPlan.price.amount.minus(balance.amount).decimalPlaces(1).toNumber()
+    const balance = balanceStore.balance;
+    const notEnoughAmount =
+        balance && selectedPlan && BigInt(balance.ton?.amount || 0) < BigInt(selectedPlan.price.amount.toNumber())
+            ? BigInt(selectedPlan.price.amount.toNumber()) - BigInt(balance.ton?.amount || 0)
             : 0;
 
     useEffect(() => {
@@ -60,7 +60,7 @@ const MessagesRefillModal: FunctionComponent<{
     }, [isOpen]);
 
     const onPrimaryButtonClick = (): void => {
-        if (notEnoughUsd) {
+        if (notEnoughAmount) {
             tonRefillModal.onOpen();
         } else {
             confirmPaymentModal.onOpen();
@@ -116,10 +116,10 @@ const MessagesRefillModal: FunctionComponent<{
                         <Spinner />
                     </Center>
                 )}
-                {!!notEnoughUsd && (
+                {!!notEnoughAmount && (
                     <Text textStyle="body2" mt="3" color="text.secondary">
                         <FilledWarnIcon16 />
-                        &nbsp;Not enough ${notEnoughUsd} to buy the plan, fund your account
+                        &nbsp;Not enough ${notEnoughAmount.toString()} to buy the plan, fund your account
                     </Text>
                 )}
             </ModalBody>
@@ -128,7 +128,7 @@ const MessagesRefillModal: FunctionComponent<{
                     Cancel
                 </Button>
                 <Button flex={1} onClick={onPrimaryButtonClick} variant="primary">
-                    {notEnoughUsd ? 'Refill balance' : 'Choose'}
+                    {notEnoughAmount ? 'Refill balance' : 'Choose'}
                 </Button>
             </ModalFooter>
         </ModalContent>

@@ -11,18 +11,18 @@ import { JettonStore } from 'src/features/jetton/model/jetton.store';
 import { LiteproxysStore } from 'src/features/tonapi/liteproxy/model/liteproxy.store';
 import { TonApiStatsStore } from 'src/features/tonapi/statistics/model/ton-api-stats.store';
 import { TonApiTiersStore } from 'src/features/tonapi/pricing/model/ton-api-tiers.store';
-import { BalancesStore } from 'src/entities/balance/model/balances.store';
+import { BalanceStore } from 'src/entities/balance/model/balance.store';
 import { DappStore } from 'src/entities/dapp/model/dapp.store';
 import { AnalyticsGPTGenerationStore } from 'src/features/analytics/model/analytics-gpt-generation.store';
 import { UserStore } from 'src/entities/user/model/user.store';
 import { AppStore } from './app.store';
 import { awaitValueResolved } from 'src/shared';
 
-export const projectsStore = new ProjectsStore();
 export const userStore = new UserStore();
+export const projectsStore = new ProjectsStore();
 export const appStore = new AppStore({ userStore, projectsStore });
 
-let balancesStore: BalancesStore;
+let balanceStore: BalanceStore;
 let dappStore: DappStore;
 let analyticsGraphQueryStore: AnalyticsGraphQueryStore;
 let analyticsHistoryTableStore: AnalyticsHistoryTableStore;
@@ -40,7 +40,7 @@ let tonApiStatsStore: TonApiStatsStore;
 let tonApiTiersStore: TonApiTiersStore;
 
 const initializeDependentStores = () => {
-    balancesStore = new BalancesStore(projectsStore);
+    balanceStore = new BalanceStore(projectsStore);
     dappStore = new DappStore(projectsStore);
     analyticsGraphQueryStore = new AnalyticsGraphQueryStore();
     analyticsHistoryTableStore = new AnalyticsHistoryTableStore();
@@ -63,7 +63,7 @@ awaitValueResolved(projectsStore.projects$).then(() => {
 });
 
 export {
-    balancesStore,
+    balanceStore,
     dappStore,
     analyticsGraphQueryStore,
     analyticsHistoryTableStore,

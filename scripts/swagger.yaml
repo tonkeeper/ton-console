@@ -3319,7 +3319,6 @@ components:
         - long_polling_sub
         - entity_per_conn
         - capabilities
-        - payment_currency
         - instant_payment
       properties:
         id:
@@ -3346,8 +3345,6 @@ components:
         usd_price:
           type: number
           example: 100
-        payment_currency:
-          $ref: '#/components/schemas/CryptoCurrency'
         instant_payment:
           type: boolean
           example: false
@@ -3390,7 +3387,6 @@ components:
         - capabilities
         - usd_price
         - date_create
-        - payment_currency
         - instant_payment
       properties:
         id:
@@ -3425,8 +3421,6 @@ components:
           type: integer
           format: int64
           example: 1690889913000
-        payment_currency:
-          $ref: '#/components/schemas/CryptoCurrency'
         instant_payment:
           type: boolean
           example: false
@@ -3497,12 +3491,9 @@ components:
     Balance:
       type: object
       required:
-        - currency
         - amount
         - promo_amount
       properties:
-        currency:
-          $ref: '#/components/schemas/CryptoCurrency'
         amount:
           description: "deposited amount"
           type: string
@@ -4393,7 +4384,6 @@ components:
         - name
         - usd_price
         - rps
-        - payment_currency
       properties:
         id:
           type: integer
@@ -4408,8 +4398,6 @@ components:
         rps:
           type: number
           example: 10.0
-        payment_currency:
-          $ref: '#/components/schemas/CryptoCurrency'
     ProjectLiteproxyTierDetail:
       type: object
       required:
@@ -4418,7 +4406,6 @@ components:
         - rps
         - usd_price
         - date_create
-        - payment_currency
       properties:
         id:
           type: integer
@@ -4441,8 +4428,6 @@ components:
           type: integer
           format: int64
           example: 1690889913000
-        payment_currency:
-          $ref: '#/components/schemas/CryptoCurrency'
 
   responses:
     InsufficientFunds:
@@ -4549,7 +4534,6 @@ components:
           schema:
             type: object
             required:
-              - ton_deposit_wallet
               - usdt_deposit_wallet
             properties:
               ton_deposit_wallet:
@@ -4700,12 +4684,11 @@ components:
           schema:
             type: object
             required:
-              - balances
-              - history
+              - usdt_balance
             properties:
-              balances:
-                type: array
-                items:
+              usdt_balance:
+                  $ref: '#/components/schemas/Balance'
+              ton_balance:
                   $ref: '#/components/schemas/Balance'
               history:
                 type: array
@@ -5357,12 +5340,12 @@ components:
           schema:
             type: object
             required:
-              - price_per_jetton
+              - usd_price_per_jetton
             properties:
-              price_per_jetton:
-                type: integer
-                format: uint64
-                example: 100000000
+              usd_price_per_jetton:
+                type: number
+                format: float64
+                example: 0.1
     MintlessJettons:
       description: "Mintless Jettons"
       content:
@@ -5389,9 +5372,9 @@ components:
           schema:
             type: object
             required:
-              - price_per_nft
+              - usd_price_per_nft
             properties:
-              price_per_nft:
+              usd_price_per_nft:
                 type: number
                 format: float64
                 example: 0.01

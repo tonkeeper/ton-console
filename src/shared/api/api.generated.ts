@@ -136,7 +136,6 @@ export interface DTOTier {
     rpc: number;
     /** @example 100 */
     usd_price: number;
-    payment_currency: DTOCryptoCurrency;
     /** @example false */
     instant_payment: boolean;
 }
@@ -189,7 +188,6 @@ export interface DTOAppTier {
      * @example 1690889913000
      */
     date_create: number;
-    payment_currency: DTOCryptoCurrency;
     /** @example false */
     instant_payment: boolean;
 }
@@ -218,24 +216,6 @@ export interface DTOProServiceAppTier {
     date_create: number;
 }
 
-export interface DTODeposit {
-    type: DTODepositTypeEnum;
-    /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
-    deposit_address?: string;
-    /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
-    source_address?: string;
-    /**
-     * @format int64
-     * @example 1690889913000
-     */
-    income_date: number;
-    /**
-     * @format int64
-     * @example 1000000000
-     */
-    amount: number;
-}
-
 export interface DTOBillingTransaction {
     /**
      * @format uuid
@@ -259,7 +239,6 @@ export interface DTOBillingTransaction {
 }
 
 export interface DTOBalance {
-    currency: DTOCryptoCurrency;
     /**
      * deposited amount
      * @example "123000000000"
@@ -890,7 +869,6 @@ export interface DTOLiteproxyTier {
     usd_price: number;
     /** @example 10 */
     rps: number;
-    payment_currency: DTOCryptoCurrency;
 }
 
 export interface DTOProjectLiteproxyTierDetail {
@@ -915,7 +893,6 @@ export interface DTOProjectLiteproxyTierDetail {
      * @example 1690889913000
      */
     date_create: number;
-    payment_currency: DTOCryptoCurrency;
 }
 
 /** backend error code */
@@ -923,11 +900,6 @@ export enum DTOErrorCodeEnum {
     DTOValue1 = 1,
     DTOValue2 = 2,
     DTOValue3 = 3
-}
-
-export enum DTODepositTypeEnum {
-    DTOPromoCode = 'promo_code',
-    DTODeposit = 'deposit'
 }
 
 export enum DTOBillingTransactionTypeEnum {
@@ -1692,7 +1664,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             this.request<
                 {
                     /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
-                    ton_deposit_wallet: string;
+                    ton_deposit_wallet?: string;
                     /** @example "0QB7BSerVyP9xAKnxp3QpqR8JO2HKwZhl10zsfwg7aJ281ZR" */
                     usdt_deposit_wallet: string;
                 },
@@ -1704,32 +1676,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 }
             >({
                 path: `/api/v1/project/${id}/deposit/address`,
-                method: 'GET',
-                ...params
-            }),
-
-        /**
-         * No description
-         *
-         * @tags project
-         * @name GetProjectDepositsHistory
-         * @summary Get project deposits history
-         * @request GET:/api/v1/project/{id}/deposits/history
-         */
-        getProjectDepositsHistory: (id: number, params: RequestParams = {}) =>
-            this.request<
-                {
-                    balance: DTOBalance;
-                    history: DTODeposit[];
-                },
-                {
-                    /** Error message */
-                    error: string;
-                    /** backend error code */
-                    code: number;
-                }
-            >({
-                path: `/api/v1/project/${id}/deposits/history`,
                 method: 'GET',
                 ...params
             }),
@@ -1762,8 +1708,9 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<
                 {
-                    balances: DTOBalance[];
-                    history: DTOBillingTransaction[];
+                    usdt_balance: DTOBalance;
+                    ton_balance?: DTOBalance;
+                    history?: DTOBillingTransaction[];
                 },
                 {
                     /** Error message */
@@ -4739,7 +4686,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                      * @format float64
                      * @example 0.01
                      */
-                    price_per_nft: number;
+                    usd_price_per_nft: number;
                 },
                 {
                     /** Error message */
@@ -4863,10 +4810,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             this.request<
                 {
                     /**
-                     * @format uint64
-                     * @example 100000000
+                     * @format float64
+                     * @example 0.1
                      */
-                    price_per_jetton: number;
+                    usd_price_per_jetton: number;
                 },
                 {
                     /** Error message */

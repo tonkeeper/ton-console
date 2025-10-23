@@ -6,10 +6,11 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { BillingTableStructure } from './BillingTableStructure';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
-import { billingStore } from '../model';
+import { BillingStore } from '../model';
 import BillingTableRow from './BillingTableRow';
 
 interface BillingHistoryTableProps extends BoxProps {
+    billingStore: BillingStore;
     isLoading?: boolean;
     hasEverLoaded?: boolean;
     skeletonRowCount?: number;
@@ -17,16 +18,19 @@ interface BillingHistoryTableProps extends BoxProps {
 }
 
 const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
-    isLoading = billingStore.billingHistoryLoading,
+    billingStore,
+    isLoading = undefined,
     hasEverLoaded = false,
     skeletonRowCount = 1,
-    hasBillingHistory = billingStore.billingHistory.length > 0,
+    hasBillingHistory = undefined,
     ...props
 }) => {
+    const actualIsLoading = isLoading ?? billingStore.billingHistoryLoading;
+    const actualHasBillingHistory = hasBillingHistory ?? billingStore.billingHistory.length > 0;
     const rowHeight = '48px';
 
     // First load - show Spinner (height of header + one row: 48px + 48px = 96px)
-    if (!hasEverLoaded && isLoading) {
+    if (!hasEverLoaded && actualIsLoading) {
         return (
             <Center h="96px">
                 <Spinner />
@@ -35,7 +39,7 @@ const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
     }
 
     // No data and not loading - show Empty message (height of header + one row: 48px + 48px = 96px)
-    if (!isLoading && !hasBillingHistory) {
+    if (!actualIsLoading && !actualHasBillingHistory) {
         return (
             <Box h="96px" py="10" color="text.secondary" textAlign="center">
                 No billing history yet
@@ -52,8 +56,9 @@ const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
     return (
         <BillingHistoryTableContext.Provider
             value={{
+                billingStore,
                 rowHeight,
-                isLoading,
+                isLoading: actualIsLoading,
                 hasEverLoaded,
                 skeletonRowCount
             }}
