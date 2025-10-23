@@ -49,6 +49,7 @@ export class BalanceStore {
         makeAutoObservable(this);
         this.projectsStore = projectsStore;
         this.fetchTonRate();
+        this.fetchDepositAddress();
 
         createImmediateReaction(
             () => this.projectsStore.selectedProject,

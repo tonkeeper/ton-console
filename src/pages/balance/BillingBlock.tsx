@@ -14,6 +14,12 @@ const BillingBlock: FC<BillingBlockProps> = ({ billingStore }) => {
     const hasBillingHistory = billingStore.billingHistory.length > 0;
     const isLoading = billingStore.billingHistoryLoading;
 
+    // Reset state when store instance changes
+    useEffect(() => {
+        setHasEverLoaded(false);
+        setPreviousRowCount(0);
+    }, [billingStore]);
+
     // Track whether data has ever been loaded and remember the row count
     useEffect(() => {
         if (!isLoading && hasBillingHistory) {
