@@ -169,6 +169,11 @@ const RefillModalContent: FC<{
                             </Stack>
                         )}
 
+                        {currency === 'TON' && (
+                            <Text textStyle="body2" color="accent.orange" mb="1" textAlign="center">
+                                TON Balance is deprecated, please use USDT instead
+                            </Text>
+                        )}
                         <InputGroup mb="4">
                             <Input
                                 ref={inputRef}

@@ -15,9 +15,22 @@ const BalanceBlock: FC = () => {
 
     const usdtAmount = balance ? Number(toDecimals(balance.usdt.amount, 6)) : 0;
     const usdtPromoAmount = balance ? Number(toDecimals(balance.usdt.promo_amount, 6)) : 0;
+
     const tonAmount = balance ? Number(toDecimals(balance.ton?.amount || 0, 9)) : 0;
     const tonAmountUsd = tonAmount && tonRate ? tonAmount * tonRate : 0;
-    const totalAmount = balance ? Number(balance.total) : 0;
+    const tonPromoAmount = balance ? Number(toDecimals(balance.ton?.promo_amount || 0, 9)) : 0;
+    const tonPromoAmountUsd = tonPromoAmount && tonRate ? tonPromoAmount * tonRate : 0;
+
+    const totalTonAmount = tonAmount + tonPromoAmount;
+
+    const formattedTotalAmount = balance?.total !== undefined
+    ? new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2,
+      }).format(balance?.total)
+    : null;
 
     return (
         <>
@@ -28,71 +41,94 @@ const BalanceBlock: FC = () => {
                     </Text>
                     <Flex align="center" justify="space-between" mb="5">
                         <H2 display="flex" alignItems="center" gap="2">
-                            {isLoading ? (
+                            {isLoading || balance?.total === undefined ? (
                                 <Skeleton w="200px" h="10" />
                             ) : (
-                                <Span title={totalAmount.toString()}>
-                                    {balance?.ton?.amount && '≈ '}${totalAmount.toFixed(2)}
+                                <Span title={balance?.total.toString()}>
+                                    {formattedTotalAmount}
                                 </Span>
                             )}
                         </H2>
-                        <Button onClick={onRefillOpen} variant="secondary">
-                            Refill
-                        </Button>
+                        <Flex gap="2">
+                            <Button onClick={onRefillOpen} variant="secondary">
+                                Refill
+                            </Button>
+                            <Button onClick={onPromoOpen} variant="secondary">
+                                Use Promo Code
+                            </Button>
+                        </Flex>
                     </Flex>
 
-                    <Flex columnGap="8" flexWrap="wrap">
-                        <Flex align="center" columnGap="2">
-                            <Text textStyle="body2" color="text.secondary">
-                                Balance:
-                            </Text>
-                            {isLoading ? (
-                                <Skeleton w="100px" h="5" />
-                            ) : (
-                                <Text textStyle="body2">{usdtAmount.toFixed(2)} USDT</Text>
-                            )}
-                        </Flex>
-                        {tonAmount > 0 && (
-                            <Flex align="center" columnGap="2">
+                    <Flex columnGap="8" rowGap="4" flexWrap="wrap">
+                        {/* Left Column - USDT Balance and Promo */}
+                        <Box minW="200px">
+                            <Flex align="center" columnGap="2" mb="2">
                                 <Text textStyle="body2" color="text.secondary">
-                                    TON Balance:
+                                    Balance:
                                 </Text>
                                 {isLoading ? (
-                                    <Skeleton w="150px" h="5" />
+                                    <Skeleton w="100px" h="5" />
                                 ) : (
-                                    <Text textStyle="body2">
-                                        {tonAmount.toFixed(2)} TON{' '}
-                                        {tonAmountUsd > 0 && (
+                                    <Text textStyle="body2" title={usdtAmount.toString()}>{usdtAmount.toFixed(2)} USDT</Text>
+                                )}
+                            </Flex>
+                            <Flex align="center" columnGap="2">
+                                <Flex align="center" gap="1">
+                                    <Text textStyle="body2" color="text.secondary">
+                                        Promo Balance:
+                                    </Text>
+                                    <InfoTooltip>
+                                        Apply promo codes to get bonus balance
+                                    </InfoTooltip>
+                                </Flex>
+                                {isLoading ? (
+                                    <Skeleton w="80px" h="5" />
+                                ) : (
+                                    <Text textStyle="body2" title={usdtPromoAmount.toString()}>{usdtPromoAmount.toFixed(2)} USDT</Text>
+                                )}
+                            </Flex>
+                        </Box>
+
+                        {/* Right Column - TON Balance and TON Promo (if exists) */}
+                        {totalTonAmount > 0 && (
+                            <Box flex="1" minW="200px">
+                                <Flex align="center" columnGap="2" mb="2">
+                                    <Text textStyle="body2" color="text.secondary">
+                                        TON Balance:
+                                    </Text>
+                                    {isLoading ? (
+                                        <Skeleton w="150px" h="5" />
+                                    ) : (
+                                        <Text textStyle="body2" title={tonAmount.toString()}>
+                                            {tonAmount.toFixed(2)} TON{' '}
                                             <Span color="text.secondary">
                                                 ≈ ${tonAmountUsd.toFixed(2)}
                                             </Span>
-                                        )}
-                                    </Text>
-                                )}
-                            </Flex>
+                                        </Text>
+                                    )}
+                                </Flex>
+                                <Flex align="center" columnGap="2">
+                                    <Flex align="center" gap="1">
+                                        <Text textStyle="body2" color="text.secondary">
+                                            TON Promo Balance:
+                                        </Text>
+                                        <InfoTooltip>
+                                            Apply promo codes to get bonus balance
+                                        </InfoTooltip>
+                                    </Flex>
+                                    {isLoading ? (
+                                        <Skeleton w="150px" h="5" />
+                                    ) : (
+                                        <Text textStyle="body2" title={tonPromoAmount.toString()}>
+                                            {tonPromoAmount.toFixed(2)} TON{' '}
+                                            <Span color="text.secondary">
+                                                ≈ ${tonPromoAmountUsd.toFixed(2)}
+                                            </Span>
+                                        </Text>
+                                    )}
+                                </Flex>
+                            </Box>
                         )}
-                        <Flex align="center" gap="2">
-                            <Flex align="center" gap="1">
-                                <Text textStyle="body2" color="text.secondary">
-                                    Promo Balance:
-                                </Text>
-                                <InfoTooltip>Apply promo codes to get bonus balance</InfoTooltip>
-                            </Flex>
-                            {isLoading ? (
-                                <Skeleton w="80px" h="5" />
-                            ) : (
-                                <Text textStyle="body2">{usdtPromoAmount.toFixed(2)} USDT</Text>
-                            )}
-                            <Link
-                                color="accent.blue"
-                                textStyle="body2"
-                                onClick={onPromoOpen}
-                                cursor="pointer"
-                                _hover={{ textDecoration: 'underline' }}
-                            >
-                                Use Promo Code
-                            </Link>
-                        </Flex>
                     </Flex>
                 </Box>
             </Overlay>
