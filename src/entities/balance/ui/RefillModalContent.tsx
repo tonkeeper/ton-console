@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, useMemo, useRef, useState } from 'react';
 import {
     Box,
     Button,
@@ -138,11 +138,7 @@ const RefillModalContent: FC<{
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody pt="0" pb="4">
-                {balanceStore.depositAddress$.isLoading ? (
-                    <Center h="80px">
-                        <Spinner />
-                    </Center>
-                ) : balanceStore.depositAddress$.error ? (
+                {balanceStore.depositAddress$.error ? (
                     <Box color="accent.orange">
                         <Box>Balance refill is not available right now.</Box>
                         <Box>Please try again later.</Box>
@@ -207,8 +203,14 @@ const RefillModalContent: FC<{
                             justifyContent="center"
                             flexDirection="column"
                         >
-                            {paymentLink ? (
+                            {paymentLink && balanceStore.depositAddress$.isResolved ? (
                                 <QRCodeSVG bgColor="transparent" size={200} value={paymentLink} />
+                            ) : !balanceStore.depositAddress$.isResolved && !balanceStore.depositAddress$.isLoading ? (
+                                <Center h="200px">
+                                    <Text textStyle="body2" color="text.secondary">
+                                        Error fetching deposit address
+                                    </Text>
+                                </Center>
                             ) : (
                                 <svg
                                     width="200"

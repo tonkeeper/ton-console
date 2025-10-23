@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { H2, Overlay, Span, toDecimals, InfoTooltip } from 'src/shared';
-import { Box, Button, Flex, Skeleton, useDisclosure, Link, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Skeleton, useDisclosure, Text } from '@chakra-ui/react';
 import { PromoCodeModal, RefillModal } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { balanceStore } from 'src/shared/stores';
