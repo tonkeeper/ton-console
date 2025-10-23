@@ -7,10 +7,15 @@ export function createTransferLink(
         amount?: string | number | BigNumber | TokenCurrencyAmount;
         text?: string;
         exp?: Date | number | string;
+        jetton?: string;
     }
 ): string {
     const baseUrl = 'https://app.tonkeeper.com/transfer';
     const link = new URL(address ? `${baseUrl}/${address}` : baseUrl);
+
+    if (options?.jetton) {
+        link.searchParams.append('jetton', options.jetton);
+    }
 
     if (options?.amount) {
         let value: string;
