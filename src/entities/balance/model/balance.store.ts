@@ -16,9 +16,15 @@ const USDT_DECIMALS = 6;
 const TON_DECIMALS = 9;
 
 export type Balance = {
-    total: string;
-    usdt: DTOBalance;
-    ton?: DTOBalance;
+    total: number;
+    usdt: {
+        amount: bigint;
+        promo_amount: bigint;
+    };
+    ton?: {
+        amount: bigint;
+        promo_amount: bigint;
+    };
 };
 
 export type RefillAddresses = {
@@ -64,9 +70,8 @@ export class BalanceStore {
     }
 
     private convertBalanceToDecimal(balance: DTOBalance, decimals: number): number {
-        const amount = Number(toDecimals(balance.amount, decimals));
-        const promoAmount = Number(toDecimals(balance.promo_amount, decimals));
-        return amount + promoAmount;
+        const total = BigInt(balance.amount) + BigInt(balance.promo_amount);
+        return Number(toDecimals(total, decimals));
     }
 
     private async ensureTonRateLoaded(): Promise<number> {
@@ -92,8 +97,8 @@ export class BalanceStore {
 
         const tonRate = await this.ensureTonRateLoaded();
         const totalTon = this.convertBalanceToDecimal(tonBalance, TON_DECIMALS);
-
-        return totalUsdt + totalTon * tonRate;
+        const total = totalUsdt + totalTon * tonRate;
+        return total;
     }
 
     fetchBalance = this.currentBalance$.createAsyncAction(async (): Promise<Balance> => {
@@ -106,9 +111,15 @@ export class BalanceStore {
         const total = await this.calculateTotal(usdt_balance, ton_balance);
 
         return {
-            total: total.toString(),
-            usdt: usdt_balance,
-            ...(ton_balance && { ton: ton_balance })
+            total: total,
+            usdt: {
+                amount: BigInt(usdt_balance.amount),
+                promo_amount: BigInt(usdt_balance.promo_amount)
+            },
+            ...(ton_balance && { ton: {
+                amount: BigInt(ton_balance.amount),
+                promo_amount: BigInt(ton_balance.promo_amount)
+            } })
         };
     });
 
