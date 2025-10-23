@@ -8,12 +8,6 @@ const RefillModal: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = props => {
-    useEffect(() => {
-        if (props.isOpen) {
-            balanceStore.fetchDepositAddress();
-        }
-    }, [props.isOpen]);
-
     return (
         <Modal scrollBehavior="inside" size="md" {...props}>
             <ModalOverlay />
