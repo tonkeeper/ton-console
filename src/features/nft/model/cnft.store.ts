@@ -41,7 +41,7 @@ export class CNFTStore {
 
     loadConfig = this.pricePerNFT$.createAsyncAction(async () => {
         const response = await apiClient.api.getCNftConfig();
-        return new TonCurrencyAmount(response.data.price_per_nft);
+        return new TonCurrencyAmount(response.data.usd_price_per_nft);
     });
 
     loadHistory = this.history$.createAsyncAction(getPaidCNftCollections);

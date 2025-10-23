@@ -20,16 +20,18 @@ import {
 import { FunctionComponent } from 'react';
 import { toDate, VerticalDotsIcon16, MenuButtonIcon } from 'src/shared';
 import { observer } from 'mobx-react-lite';
-import { subscriptionsStore } from 'src/features/billing';
+import { SubscriptionsStore } from 'src/features/billing';
 import { useNavigate } from 'react-router-dom';
 
 interface SubscriptionsTableProps {
+    subscriptionsStore: SubscriptionsStore;
     isLoading?: boolean;
     hasEverLoaded?: boolean;
     hasSubscriptions?: boolean;
 }
 
 const SubscriptionsTable: FunctionComponent<SubscriptionsTableProps> = ({
+    subscriptionsStore,
     isLoading = subscriptionsStore.subscriptionsLoading,
     hasEverLoaded = false,
     hasSubscriptions = subscriptionsStore.subscriptions.length > 0,

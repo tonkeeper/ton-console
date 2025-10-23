@@ -12,7 +12,7 @@ import {
 import { FormProvider, useForm } from 'react-hook-form';
 import BigNumber from 'bignumber.js';
 import { RefillModal } from 'src/entities';
-import { balancesStore } from 'src/shared/stores';
+import { balanceStore } from 'src/shared/stores';
 
 const FaucetPage: FunctionComponent = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
@@ -46,7 +46,7 @@ const FaucetPage: FunctionComponent = () => {
         setReceiverAddress(form.receiverAddress);
         setAmount(form.amount);
 
-        if (price && balancesStore.tonBalance?.isGTE(price)) {
+        if (price && balanceStore.balance?.ton && BigInt(balanceStore.balance.ton.amount) >= BigInt(price.amount.toNumber())) {
             return onOpen();
         }
 

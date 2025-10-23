@@ -18,7 +18,7 @@ import { observer } from 'mobx-react-lite';
 import { invoicesAppStore } from 'src/features';
 import { NftIcon24 } from 'src/shared';
 import { JettonIcon24 } from 'src/shared/ui/icons/JettonIcon24';
-import { balancesStore } from 'src/shared/stores';
+import { balanceStore } from 'src/shared/stores';
 
 const Aside: FC = () => {
     return (
@@ -81,12 +81,12 @@ const Aside: FC = () => {
                         Balance
                     </Text>
                     <TextWithSkeleton
-                        isLoading={!balancesStore.portfolio$.isResolved}
+                        isLoading={!balanceStore.currentBalance$.isResolved}
                         textStyle="body3"
                         color="text.secondary"
                         skeletonWidth="45px"
                     >
-                        {balancesStore.balances[0]?.stringCurrencyAmount}
+                        {balanceStore.balance?.total}
                     </TextWithSkeleton>
                 </Flex>
             </DropDownMenuItem>

@@ -15,7 +15,7 @@ import {
 import { CURRENCY, DTOLiteproxyTier, H4, Pad, UsdCurrencyAmount } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { CurrencyRate } from 'src/entities';
-import { liteproxysStore, balancesStore } from 'src/shared/stores';
+import { liteproxysStore, balanceStore } from 'src/shared/stores';
 
 const LiteserversPaymentDetailsModal: FunctionComponent<{
     isOpen: boolean;
@@ -24,7 +24,7 @@ const LiteserversPaymentDetailsModal: FunctionComponent<{
 }> = ({ tier, ...rest }) => {
     const onConfirm = useCallback(async () => {
         await liteproxysStore.selectTier(tier!.id);
-        await balancesStore.fetchPortfolio();
+        await balanceStore.fetchBalance();
         rest.onClose();
     }, [tier]);
 

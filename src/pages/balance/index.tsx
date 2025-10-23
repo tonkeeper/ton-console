@@ -1,18 +1,19 @@
 import { FC, useEffect } from 'react';
 import { Overlay } from 'src/shared';
 import { observer } from 'mobx-react-lite';
-import { billingStore } from 'src/features/billing';
+import { useLocalObservable } from 'mobx-react-lite';
+import { BillingStore } from 'src/features/billing';
 import BalanceBlock from './BalanceBlock';
 import SubscriptionsBlock from './SubscriptionsBlock';
 import BillingBlock from './BillingBlock';
 import { Divider } from '@chakra-ui/react';
 
 const BalancePage: FC = () => {
+    const billingStore = useLocalObservable(() => new BillingStore());
+
     useEffect(() => {
-        billingStore.clear();
-        billingStore.loadFirstPage();
-        return billingStore.clear;
-    }, []);
+        return () => billingStore.clearState();
+    }, [billingStore]);
 
     return (
         <>
@@ -20,7 +21,7 @@ const BalancePage: FC = () => {
             <Overlay h="fit-content" p="0" display="flex" flexDirection="column">
                 <SubscriptionsBlock />
                 <Divider />
-                <BillingBlock />
+                <BillingBlock billingStore={billingStore} />
             </Overlay>
         </>
     );

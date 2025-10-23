@@ -14,11 +14,11 @@ import {
 import { CopyPad, createTransferLink, H4, Pad } from 'src/shared';
 import { QRCodeSVG } from 'qrcode.react';
 import { observer } from 'mobx-react-lite';
-import { balancesStore } from 'src/shared/stores';
+import { balanceStore } from 'src/shared/stores';
 const RefillModalContent: FunctionComponent<{
     onClose: () => void;
 }> = props => {
-    const depositAddress = balancesStore.depositAddress$.value;
+    const depositAddress = balanceStore.depositAddress$.value;
     return (
         <ModalContent>
             <ModalHeader>
@@ -31,11 +31,11 @@ const RefillModalContent: FunctionComponent<{
             <ModalCloseButton />
             <ModalBody pt="0" pb="4">
                 <>
-                    {balancesStore.depositAddress$.isLoading ? (
+                    {balanceStore.depositAddress$.isLoading ? (
                         <Center h="80px">
                             <Spinner />
                         </Center>
-                    ) : balancesStore.depositAddress$.error ? (
+                    ) : balanceStore.depositAddress$.error ? (
                         <Box color="accent.orange">
                             <Box>Balance refill is not available right now.</Box>
                             <Box>Please try again later.</Box>
