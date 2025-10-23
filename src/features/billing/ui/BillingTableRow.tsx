@@ -3,7 +3,7 @@ import { Center, chakra, Link, Spinner, Td, Tr } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { toDateTime, explorer, shortAddress } from 'src/shared';
 import { toJS } from 'mobx';
-import { BillingHistoryItem, billingStore } from 'src/features/billing';
+import { BillingHistoryItem } from 'src/features/billing';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 
 const LoadingRaw: FunctionComponent<{ style: React.CSSProperties }> = ({
@@ -113,6 +113,12 @@ const BillingTableRow: FunctionComponent<{ index: number; style: React.CSSProper
     index,
     style
 }) => {
+    const { billingStore } = useContext(BillingHistoryTableContext);
+
+    if (!billingStore) {
+        return <LoadingRaw style={style} />;
+    }
+
     if (billingStore.isItemLoaded(index)) {
         const historyItem = toJS(billingStore.billingHistory[index]);
         return <ItemRow key={historyItem.id} style={style} historyItem={historyItem} />;

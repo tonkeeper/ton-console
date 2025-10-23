@@ -1,85 +1,131 @@
 import { makeAutoObservable } from 'mobx';
-import { createAsyncAction } from 'src/shared';
+import {
+    apiClient,
+    createAsyncAction,
+    createImmediateReaction,
+    DTOBillingTransaction,
+    DTOBillingTransactionTypeEnum,
+    DTOCryptoCurrency,
+    Loadable,
+    TonCurrencyAmount,
+    UsdCurrencyAmount
+} from 'src/shared';
 import { BillingHistory, BillingHistoryPaymentItem, BillingHistoryRefillItem } from './interfaces';
-import { balancesStore } from 'src/shared/stores';
-import { paymentsTableStore } from './payments-table.store';
+import { projectsStore, balanceStore } from 'src/shared/stores';
 
-class BillingStore {
+export class BillingStore {
+    billingHistory$ = new Loadable<DTOBillingTransaction[]>([]);
+
+    private pageSize = 20;
+
     get isResolved() {
-        return balancesStore.portfolio$.isResolved && paymentsTableStore.charges$.isResolved;
+        return this.billingHistory$.isResolved;
     }
 
     get totalItems() {
-        return balancesStore.refills.length + paymentsTableStore.totalPayments;
+        return this.billingHistory$.value?.length || 0;
     }
 
     get tableContentLength(): number {
-        return paymentsTableStore.hasNextPage
-            ? this.billingHistory.length + 1
-            : this.billingHistory.length;
+        return this.billingHistory.length;
     }
 
     get billingHistory(): BillingHistory {
-        const refills: BillingHistoryRefillItem[] = balancesStore.refills.map(item => ({
-            ...item,
-            action: 'refill'
-        }));
-        const payments: BillingHistoryPaymentItem[] = paymentsTableStore.payments.map(item => ({
-            ...item,
-            action: 'payment'
-        }));
-        const history = [...refills, ...payments].sort((a, b) => (a.date < b.date ? 1 : -1));
-        if (payments.length !== paymentsTableStore.totalPayments) {
-            let lastPaymentIndex = 0;
-            history.forEach((item, index) => {
-                if (item.action === 'payment') {
-                    lastPaymentIndex = index;
-                }
-            });
-
-            return history.slice(0, lastPaymentIndex + 1);
-        }
-
-        return history;
+        return (this.billingHistory$.value || []).map(dtoTx =>
+            mapDTOTransactionToHistoryItem(dtoTx)
+        );
     }
 
     get billingHistoryLoading(): boolean {
-        return paymentsTableStore.charges$.isLoading || balancesStore.portfolio$.isLoading;
+        return this.billingHistory$.isLoading;
     }
 
     get isPageLoading() {
-        return this.loadFirstPage.isLoading || this.loadNextPage.isLoading;
+        return this.loadNextPage.isLoading;
     }
 
     constructor() {
         makeAutoObservable(this);
+
+        createImmediateReaction(
+            () => balanceStore.currentBalance$,
+            () => {
+                this.fetchHistory();
+            }
+        );
     }
 
-    loadFirstPage = createAsyncAction(async () => {
-        paymentsTableStore.loadFirstPage.cancelAllPendingCalls();
+    fetchHistory = this.billingHistory$.createAsyncAction(
+        async () => {
+            const response = await apiClient.api.getProjectBillingHistory(
+                projectsStore.selectedProject!.id,
+                { limit: this.pageSize }
+            );
 
-        await Promise.all([balancesStore.fetchPortfolio(), paymentsTableStore.loadFirstPage()]);
-    });
+            return response.data.history;
+        },
+        { resetBeforeExecution: true }
+    );
 
     loadNextPage = createAsyncAction(async () => {
-        paymentsTableStore.loadNextPage.cancelAllPendingCalls();
-        await paymentsTableStore.loadNextPage();
+        const currentHistory = this.billingHistory$.value || [];
+        if (currentHistory.length === 0) {
+            return;
+        }
+
+        const lastTransaction = currentHistory[currentHistory.length - 1];
+        const response = await apiClient.api.getProjectBillingHistory(
+            projectsStore.selectedProject!.id,
+            { limit: this.pageSize, before_tx: lastTransaction.id }
+        );
+
+        if (!response.data.history) {
+            throw new Error('No history found');
+        }
+
+        this.billingHistory$.value = [...currentHistory, ...response.data.history];
     });
 
-    updateCurrentListSilently = createAsyncAction(async () => {
-        paymentsTableStore.updateCurrentListSilently.cancelAllPendingCalls();
-        await Promise.all([
-            balancesStore.fetchPortfolio(),
-            paymentsTableStore.updateCurrentListSilently()
-        ]);
-    });
+    isItemLoaded = (index: number): boolean => index < this.billingHistory.length;
 
-    isItemLoaded = (index: number): boolean =>
-        !paymentsTableStore.hasNextPage || index < this.billingHistory.length;
-
-    clear() {
-        paymentsTableStore.clearState();
+    clearState(): void {
+        this.billingHistory$.clear();
     }
 }
 
-export const billingStore = new BillingStore();
+function mapDTOTransactionToHistoryItem(
+    dtoTx: DTOBillingTransaction
+): BillingHistoryRefillItem | BillingHistoryPaymentItem {
+    const date = new Date(dtoTx.created_at);
+    const id = date.getTime();
+    const amount = mapDTOCurrencyToAmount(dtoTx.currency, dtoTx.amount);
+
+    if (dtoTx.type === DTOBillingTransactionTypeEnum.DTODeposit) {
+        return {
+            id,
+            date,
+            amount,
+            type: 'deposit' as const,
+            action: 'refill' as const
+        };
+    } else {
+        return {
+            id,
+            date,
+            amount,
+            action: 'payment' as const,
+            name: dtoTx.reason
+        };
+    }
+}
+
+function mapDTOCurrencyToAmount(currency: DTOCryptoCurrency, amount: string) {
+    switch (currency) {
+        case DTOCryptoCurrency.DTO_TON:
+            return new TonCurrencyAmount(amount);
+        case DTOCryptoCurrency.DTO_USDT:
+            return new UsdCurrencyAmount(amount);
+        default:
+            throw new Error(`Unknown currency: ${currency}`);
+    }
+}

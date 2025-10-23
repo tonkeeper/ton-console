@@ -1,6 +1,8 @@
 import { createContext } from 'react';
+import type { BillingStore } from '../model';
 
 interface BillingHistoryTableContextType {
+    billingStore?: BillingStore;
     rowHeight: string;
     isLoading?: boolean;
     hasEverLoaded?: boolean;

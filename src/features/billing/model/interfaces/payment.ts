@@ -1,7 +1,7 @@
 import { CurrencyAmount, UsdCurrencyAmount } from 'src/shared';
 
 export interface Payment {
-    id: string;
+    id: number;
     name: string;
     date: Date;
     amount: CurrencyAmount;

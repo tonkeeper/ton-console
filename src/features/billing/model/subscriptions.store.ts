@@ -1,9 +1,10 @@
 import { makeAutoObservable } from 'mobx';
-import { createAsyncAction } from 'src/shared';
+import { createAsyncAction, createImmediateReaction } from 'src/shared';
 import { TonApiSelectedTier } from 'src/features';
 import { Subscription } from './interfaces/subscription';
 import { tonApiTiersStore } from 'src/shared/stores';
-class SubscriptionsStore {
+
+export class SubscriptionsStore {
     get subscriptions(): Subscription[] {
         const tier = tonApiTiersStore.selectedTier$.value;
         if (tier && tier.renewsDate) {
@@ -19,6 +20,13 @@ class SubscriptionsStore {
 
     constructor() {
         makeAutoObservable(this);
+
+        createImmediateReaction(
+            () => tonApiTiersStore.selectedTier$,
+            () => {
+                this.fetchSubscriptions();
+            }
+        );
     }
 
     fetchSubscriptions = createAsyncAction(async () => {
@@ -38,5 +46,3 @@ function mapTonapiTierToSubscription(tier: Required<TonApiSelectedTier>): Subscr
         // }
     };
 }
-
-export const subscriptionsStore = new SubscriptionsStore();

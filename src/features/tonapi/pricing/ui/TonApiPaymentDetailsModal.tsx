@@ -16,7 +16,7 @@ import { CURRENCY, H4, InfoTooltip, Pad, UsdCurrencyAmount } from 'src/shared';
 import { TonApiTier } from '../model';
 import { observer } from 'mobx-react-lite';
 import { CurrencyRate } from 'src/entities';
-import { tonApiTiersStore, balancesStore } from 'src/shared/stores';
+import { tonApiTiersStore, balanceStore } from 'src/shared/stores';
 
 const TonApiPaymentDetailsModal: FunctionComponent<{
     isOpen: boolean;
@@ -25,7 +25,7 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
 }> = ({ tier, ...rest }) => {
     const onConfirm = useCallback(async () => {
         await tonApiTiersStore.selectTier(tier!.id);
-        await balancesStore.fetchPortfolio();
+        await balanceStore.fetchBalance();
         rest.onClose();
     }, [tier]);
 
