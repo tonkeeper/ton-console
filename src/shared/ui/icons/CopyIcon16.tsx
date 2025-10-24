@@ -1,7 +1,7 @@
-import { Icon } from '@chakra-ui/react';
-import { ComponentProps, forwardRef } from 'react';
+import { Icon, IconProps } from '@chakra-ui/react';
+import { forwardRef } from 'react';
 
-export const CopyIcon16 = forwardRef<SVGSVGElement, ComponentProps<typeof Icon>>((props, ref) => {
+export const CopyIcon16 = forwardRef<SVGSVGElement, IconProps>((props, ref) => {
     return (
         <Icon
             ref={ref}

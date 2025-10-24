@@ -1,9 +1,9 @@
-import { ComponentProps, FC } from 'react';
-import { Checkbox } from '@chakra-ui/react';
+import { FC } from 'react';
+import { Checkbox, CheckboxProps } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { invoicesTableStore } from 'src/features';
 
-const FilterInvoiceByOverpayment: FC<ComponentProps<typeof Checkbox>> = props => {
+const FilterInvoiceByOverpayment: FC<CheckboxProps> = props => {
     return (
         <Checkbox
             h="fit-content"

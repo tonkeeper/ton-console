@@ -1,10 +1,10 @@
-import { ComponentProps, FC } from 'react';
-import { Box, Button, Divider, Flex } from '@chakra-ui/react';
+import { FC } from 'react';
+import { Box, BoxProps, Button, Divider, Flex } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { EmptyFolderIcon48, H4, Overlay } from 'src/shared';
 import { Link } from 'react-router-dom';
 
-const DashboardPage: FC<ComponentProps<typeof Box>> = props => {
+const DashboardPage: FC<BoxProps> = props => {
     return (
         <Box {...props}>
             <Overlay>

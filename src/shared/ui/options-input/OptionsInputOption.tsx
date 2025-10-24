@@ -1,10 +1,10 @@
-import { ComponentProps, FC, PropsWithChildren, useContext } from 'react';
-import { Box, Fade, Flex, useRadio } from '@chakra-ui/react';
+import { FC, PropsWithChildren, useContext } from 'react';
+import { Box, BoxProps, Fade, Flex, useRadio } from '@chakra-ui/react';
 import { FilledTickIcon18 } from 'src/shared';
 import { OptionsInputContext } from './context';
 
 export const OptionsInputOption: FC<
-    PropsWithChildren<ComponentProps<typeof Box> & { value: string }>
+    PropsWithChildren<BoxProps & { value: string }>
 > = ({ value, ...rest }) => {
     const { getRadioProps: getRadioGroupProps } = useContext(OptionsInputContext);
     const radioProps = getRadioGroupProps?.({ value });

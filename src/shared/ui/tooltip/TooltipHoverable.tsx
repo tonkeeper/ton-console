@@ -1,6 +1,5 @@
 import {
     cloneElement,
-    ComponentProps,
     FC,
     isValidElement,
     PropsWithChildren,
@@ -11,6 +10,7 @@ import {
 } from 'react';
 import {
     Popover,
+    PopoverProps,
     PopoverArrow,
     PopoverContent,
     PopoverTrigger,
@@ -34,7 +34,7 @@ export const TooltipHoverable: FC<
             host: ReactElement | string;
             canBeShown?: boolean;
             inPortal?: boolean;
-        } & ComponentProps<typeof Popover>
+        } & PopoverProps
     >
 > = ({ host, canBeShown, inPortal, children, ...rest }) => {
     const { ref, isTruncated } = useIsTextTruncated();

@@ -1,6 +1,6 @@
-import { ComponentProps, FC, useState } from 'react';
+import { FC, useState } from 'react';
 import {
-    Box,
+    BoxProps,
     Button,
     Flex,
     FocusLock,
@@ -8,6 +8,7 @@ import {
     Menu,
     MenuItem,
     MenuList,
+    MenuListProps,
     useDisclosure,
     useMenuItem,
     useOutsideClick,
@@ -64,7 +65,7 @@ const months = [
     { month: monthsNames[mod(currentMonthIndex - 1, 12)], year: prevMonthYear }
 ];
 
-const FilterInvoiceByPeriod: FC<ComponentProps<typeof Box>> = props => {
+const FilterInvoiceByPeriod: FC<BoxProps> = props => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const period = invoicesTableStore.pagination.filter.period;
 
@@ -126,7 +127,7 @@ const FilterInvoiceByPeriod: FC<ComponentProps<typeof Box>> = props => {
 };
 
 const MenuInput: FC<
-    ComponentProps<typeof MenuList> & { onClose: () => void }
+    MenuListProps & { onClose: () => void }
 > = props => {
     const toast = useToast();
     const [lockFocus, setLockFocus] = useState(false);

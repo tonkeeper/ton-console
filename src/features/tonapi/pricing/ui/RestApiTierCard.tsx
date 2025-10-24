@@ -1,4 +1,4 @@
-import { ComponentProps, FC } from 'react';
+import { FC } from 'react';
 import {
     Box,
     Button,
@@ -9,7 +9,8 @@ import {
     ListIcon,
     ListItem,
     Stack,
-    Text
+    Text,
+    TextProps
 } from '@chakra-ui/react';
 import { CURRENCY, H2, InfoTooltip, DoneIconCircle24, toDate } from 'src/shared';
 import { RestApiSelectedTier, RestApiTier } from '../model';
@@ -18,7 +19,7 @@ import { CurrencyRate } from 'src/entities';
 export const RestApiTierCard: FC<
     CardProps & {
         tier: RestApiTier | RestApiSelectedTier;
-        tonPriceStyles?: ComponentProps<typeof Text>;
+        tonPriceStyles?: TextProps;
         onChoseTier?: (tier: RestApiTier) => void;
         isChosen?: boolean;
     }

@@ -1,14 +1,14 @@
-import { ComponentProps, forwardRef } from 'react';
-import { Input, InputGroup, InputRightElement, Spinner } from '@chakra-ui/react';
+import { forwardRef } from 'react';
+import { Input, InputGroup, InputProps, InputRightElement, Spinner } from '@chakra-ui/react';
 import { AsyncValidationState } from '../../hooks';
 import { TickIcon } from '../icons';
 
 export const AsyncInput = forwardRef<
     HTMLInputElement,
-    ComponentProps<typeof Input> & {
-        validationState: AsyncValidationState;
+    InputProps & {
+        validationState?: AsyncValidationState;
     }
->(({ validationState, ...rest }, ref) => {
+>(({ validationState = 'idle', ...rest }, ref) => {
     return (
         <InputGroup>
             <Input ref={ref} autoComplete="off" {...rest} />

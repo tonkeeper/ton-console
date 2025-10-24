@@ -1,6 +1,7 @@
-import { ComponentProps, FC } from 'react';
+import { FC } from 'react';
 import {
     Box,
+    BoxProps,
     Button,
     Code,
     Flex,
@@ -22,7 +23,7 @@ import {
 } from 'src/features';
 import { observer } from 'mobx-react-lite';
 
-const AppMessagesAuthDocs: FC<ComponentProps<typeof Box>> = props => {
+const AppMessagesAuthDocs: FC<BoxProps> = props => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     return (
         <Box {...props}>

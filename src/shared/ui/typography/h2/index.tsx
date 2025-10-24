@@ -1,6 +1,6 @@
-import { Box, forwardRef } from '@chakra-ui/react';
-import { ComponentProps, FC } from 'react';
+import { Box, BoxProps, forwardRef } from '@chakra-ui/react';
+import { FC } from 'react';
 
-export const H2: FC<ComponentProps<typeof Box>> = forwardRef((props, ref) => (
+export const H2: FC<BoxProps> = forwardRef((props, ref) => (
     <Box ref={ref} as="h2" textStyle="h2" cursor="default" {...props} />
 ));

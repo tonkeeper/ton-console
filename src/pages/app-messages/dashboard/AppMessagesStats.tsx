@@ -1,10 +1,10 @@
-import { ComponentProps, FC } from 'react';
-import { Box, Flex, Skeleton } from '@chakra-ui/react';
+import { FC } from 'react';
+import { Box, BoxProps, Flex, Skeleton } from '@chakra-ui/react';
 import { formatWithSuffix, InfoTooltip, Span, useIntervalUpdate } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { appMessagesStore } from 'src/features';
 
-const AppMessagesStats: FC<ComponentProps<typeof Box>> = props => {
+const AppMessagesStats: FC<BoxProps> = props => {
     const stats = appMessagesStore.stats$.value;
     const balance = appMessagesStore.balance$.value;
     const isResolved =

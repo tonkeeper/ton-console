@@ -1,10 +1,10 @@
-import { ComponentProps, FC } from 'react';
+import { FC } from 'react';
 import { Logo } from 'src/widgets/header/ui/logo';
-import { Flex } from '@chakra-ui/react';
+import { Flex, FlexProps } from '@chakra-ui/react';
 import { TgUserButton, SelectProject } from 'src/entities';
 import { DocumentationButton } from './ui/DocumentationButton';
 
-export const Header: FC<ComponentProps<typeof Flex>> = props => {
+export const Header: FC<FlexProps> = props => {
     return (
         <Flex
             as="header"

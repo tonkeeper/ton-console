@@ -1,10 +1,11 @@
-import { ComponentProps, FC } from 'react';
-import { ListItem, OrderedList } from '@chakra-ui/react';
+import { FC } from 'react';
+import { ListItem, ListProps, OrderedList } from '@chakra-ui/react';
 import { TonAddress } from 'src/shared';
 
-export const GraphAddressesList: FC<
-    ComponentProps<typeof OrderedList> & { addresses: TonAddress[] }
-> = ({ addresses, ...props }) => {
+export const GraphAddressesList: FC<ListProps & { addresses: TonAddress[] }> = ({
+    addresses,
+    ...props
+}) => {
     return (
         <OrderedList
             sx={{

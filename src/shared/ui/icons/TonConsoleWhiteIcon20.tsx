@@ -1,7 +1,7 @@
-import { Icon } from '@chakra-ui/react';
-import { ComponentProps, forwardRef } from 'react';
+import { Icon, IconProps } from '@chakra-ui/react';
+import { forwardRef } from 'react';
 
-export const TonConsoleWhiteIcon20 = forwardRef<SVGElement, ComponentProps<typeof Icon>>(
+export const TonConsoleWhiteIcon20 = forwardRef<SVGSVGElement, IconProps>(
     (props, ref) => {
         return (
             <Icon

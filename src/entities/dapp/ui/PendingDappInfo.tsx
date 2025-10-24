@@ -1,5 +1,5 @@
-import { ComponentProps, FC } from 'react';
-import { Box, Button, Text, useDisclosure } from '@chakra-ui/react';
+import { FC } from 'react';
+import { Box, BoxProps, Button, Text, useDisclosure } from '@chakra-ui/react';
 import { PendingDapp } from '../model';
 import { ConfirmAppResetModal } from './ConfirmAppResetModal';
 import DappCard from './DappCard';
@@ -8,7 +8,7 @@ export const PendingDappInfo: FC<
     {
         pendingDapp: PendingDapp;
         onReset: () => void;
-    } & ComponentProps<typeof Box>
+    } & BoxProps
 > = ({ pendingDapp, onReset, ...rest }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
