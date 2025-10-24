@@ -6,7 +6,7 @@ import { BillingStore } from 'src/features/billing';
 import BalanceBlock from './BalanceBlock';
 import SubscriptionsBlock from './SubscriptionsBlock';
 import BillingBlock from './BillingBlock';
-import { Divider } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 
 const BalancePage: FC = () => {
     const billingStore = useLocalObservable(() => new BillingStore());
@@ -17,10 +17,11 @@ const BalancePage: FC = () => {
 
     return (
         <>
-            <BalanceBlock />
-            <Overlay h="fit-content" p="0" display="flex" flexDirection="column">
+            <Flex gap={4} mb={4} wrap="wrap" align="stretch">
+                <BalanceBlock />
                 <SubscriptionsBlock />
-                <Divider />
+            </Flex>
+            <Overlay h="fit-content" p="0" display="flex" flexDirection="column">
                 <BillingBlock billingStore={billingStore} />
             </Overlay>
         </>
