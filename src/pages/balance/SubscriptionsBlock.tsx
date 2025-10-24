@@ -1,9 +1,9 @@
 import { FC, useEffect, useState } from 'react';
-import { Box } from '@chakra-ui/react';
-import { H4 } from 'src/shared';
+import { Box, Text } from '@chakra-ui/react';
+import { Overlay } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { useLocalObservable } from 'mobx-react-lite';
-import { SubscriptionsTable, SubscriptionsStore } from 'src/features/billing';
+import { SubscriptionsStore, SubscriptionList } from 'src/features/billing';
 
 const SubscriptionsBlock: FC = () => {
     const subscriptionsStore = useLocalObservable(() => new SubscriptionsStore());
@@ -18,15 +18,17 @@ const SubscriptionsBlock: FC = () => {
     }, [isLoading, hasSubscriptions]);
 
     return (
-        <Box px="6" py="5">
-            <H4 mb="5">Plans</H4>
-            <SubscriptionsTable
-                subscriptionsStore={subscriptionsStore}
-                isLoading={isLoading}
-                hasEverLoaded={hasEverLoaded}
-                hasSubscriptions={hasSubscriptions}
-            />
-        </Box>
+        <Overlay height="auto" p="0" display="flex" flexDirection="column" flex="1" minW="330px">
+            <Box px="6" py="5">
+                <Text fontSize="lg" fontWeight="semibold" mb="2">Active Plans</Text>
+                <SubscriptionList
+                    subscriptionsStore={subscriptionsStore}
+                    isLoading={isLoading}
+                    hasEverLoaded={hasEverLoaded}
+                    hasSubscriptions={hasSubscriptions}
+                />
+            </Box>
+        </Overlay>
     );
 };
 
