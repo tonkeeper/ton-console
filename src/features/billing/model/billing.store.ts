@@ -48,9 +48,21 @@ export class BillingStore {
         makeAutoObservable(this);
 
         createImmediateReaction(
-            () => balanceStore.currentBalance$,
-            () => {
-                this.fetchHistory();
+            () => projectsStore.selectedProject,
+            project => {
+                this.clearState();
+                if (project) {
+                    this.fetchHistory();
+                }
+            }
+        );
+
+        createImmediateReaction(
+            () => balanceStore.balance?.total,
+            total => {
+                if (total !== undefined && projectsStore.selectedProject) {
+                    this.fetchHistory();
+                }
             }
         );
     }
