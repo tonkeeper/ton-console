@@ -4,6 +4,6 @@ export interface Subscription {
     id: string;
     plan: string;
     interval: string;
-    renewsDate: Date;
+    renewsDate?: Date;
     price: UsdCurrencyAmount;
 }

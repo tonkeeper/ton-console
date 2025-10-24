@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { H4, Overlay, TgChannelCardLink } from 'src/shared';
 import { Box, Divider, Flex, Text } from '@chakra-ui/react';
-import { TonApiTiers } from 'src/features';
+import { TonApiTiers } from 'src/features/tonapi/pricing';
 import { Link } from 'react-router-dom';
 
 const PricingPage: FC = () => {

@@ -8,14 +8,14 @@ import {
     UsdCurrencyAmount,
     createAsyncAction
 } from 'src/shared';
-import { TonApiTier } from './interfaces';
+import { RestApiTier } from './interfaces';
 import { projectsStore } from 'src/shared/stores';
-import { TonApiSelectedTier } from './interfaces';
+import { RestApiSelectedTier } from './interfaces';
 
-export class TonApiTiersStore {
-    tiers$ = new Loadable<TonApiTier[]>([]);
+export class RestApiTiersStore {
+    tiers$ = new Loadable<RestApiTier[]>([]);
 
-    selectedTier$ = new Loadable<TonApiSelectedTier | null>(null);
+    selectedTier$ = new Loadable<RestApiSelectedTier | null>(null);
 
     constructor() {
         makeAutoObservable(this);
@@ -32,10 +32,6 @@ export class TonApiTiersStore {
                 }
             }
         );
-    }
-
-    get freeTier(): TonApiTier | undefined {
-        return this.tiers$.value.find(tier => tier.price.amount.isZero());
     }
 
     fetchTiers = this.tiers$.createAsyncAction(async () => {
@@ -88,21 +84,17 @@ export class TonApiTiersStore {
     }
 }
 
-function mapTierDTOToTier(tierDTO: DTOTier): TonApiTier {
+function mapTierDTOToTier(tierDTO: DTOTier): RestApiTier {
     return {
         id: tierDTO.id,
         name: tierDTO.name,
         price: new UsdCurrencyAmount(tierDTO.usd_price),
-        description: {
-            requestsPerSecondLimit: tierDTO.rpc,
-            realtimeConnectionsLimit: tierDTO.long_polling_sub,
-            entitiesPerRealtimeConnectionLimit: tierDTO.entity_per_conn,
-            mempool: tierDTO.capabilities.includes('mempool')
-        }
+        rps: tierDTO.rpc,
+        type: tierDTO.instant_payment ? 'pay-as-you-go' : 'monthly',
     };
 }
 
-function mapAppTierDTOToSelectedTier(tierDTO: DTOAppTier | null): TonApiSelectedTier | null {
+function mapAppTierDTOToSelectedTier(tierDTO: DTOAppTier | null): RestApiSelectedTier | null {
     if (!tierDTO) {
         return null;
     }
@@ -111,14 +103,9 @@ function mapAppTierDTOToSelectedTier(tierDTO: DTOAppTier | null): TonApiSelected
         id: tierDTO.id,
         name: tierDTO.name,
         price: new UsdCurrencyAmount(tierDTO.usd_price),
-        description: {
-            requestsPerSecondLimit: tierDTO.rpc,
-            realtimeConnectionsLimit: tierDTO.long_polling_sub,
-            entitiesPerRealtimeConnectionLimit: tierDTO.entity_per_conn,
-            mempool: tierDTO.capabilities.includes('mempool')
-        },
-        subscriptionDate: new Date(tierDTO.date_create),
-        renewsDate: tierDTO.next_payment ? new Date(tierDTO.next_payment) : undefined,
+        rps: tierDTO.rpc,
+        type: tierDTO.instant_payment ? 'pay-as-you-go' : 'monthly',
+        renewsDate: tierDTO.next_payment && tierDTO.usd_price ? new Date(tierDTO.next_payment) : undefined,
         active: true
     };
 }

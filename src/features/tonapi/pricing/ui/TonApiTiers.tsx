@@ -12,14 +12,14 @@ import {
     Box,
     Divider
 } from '@chakra-ui/react';
-import TonApiPaymentDetailsModal from './TonApiPaymentDetailsModal';
-import { TonApiTier } from '../model';
-import { TonApiTierCard } from './TonApiTierCard';
+import RestApiPaymentDetailsModal from './RestApiPaymentDetailsModal';
+import { RestApiTier } from '../model';
+import { RestApiTierCard } from './RestApiTierCard';
 import { RefillModal } from 'src/entities';
 import { DTOLiteproxyTier, UsdCurrencyAmount } from 'src/shared';
-import { SelectTonApiTier } from './SelecTonApitTier';
+import { SelectRestApiTier } from './SelectRestApiTier';
 import { SelectLiteserverTier } from './SelectLiteserverTier';
-import { TonApiUnlimitedTierCard } from './TonApiUnlimitedTierCard';
+import { RestApiUnlimitedTierCard } from './RestApiUnlimitedTierCard';
 import { ChevronRightIcon16 } from 'src/shared/ui/icons/ChevronRightIcon16';
 import TonApiPricingModal from './TonApiPricingModal';
 import WebhooksPricingModal from './WebhooksPricingModal';
@@ -28,12 +28,12 @@ import { LiteserversTierCard } from './LiteserversTierCard';
 import LiteserversPaymentDetailsModal from './LiteserversPaymentDetailsModal';
 import LiteserversPricingModal from './LiteserversPricingModal';
 import { webhooksStore } from '../../webhooks';
-import { liteproxysStore, tonApiTiersStore } from 'src/shared/stores';
+import { liteproxysStore, restApiTiersStore } from 'src/shared/stores';
 
 const TonApiTiers: FC = () => {
-    const storeSelectedTonApiTier = tonApiTiersStore.selectedTier$.value;
-    const [tierTonApiForChange, setTierTonApiForChange] = useState<TonApiTier | undefined>();
-    const [currentTonApiTier, setCurrentTonApiTier] = useState<TonApiTier | 'custom' | null>(
+    const storeSelectedTonApiTier = restApiTiersStore.selectedTier$.value;
+    const [tierRestApiForChange, setTierRestApiForChange] = useState<RestApiTier | undefined>();
+    const [currentTonApiTier, setCurrentTonApiTier] = useState<RestApiTier | 'custom' | null>(
         storeSelectedTonApiTier
     );
 
@@ -86,8 +86,8 @@ const TonApiTiers: FC = () => {
     } = useDisclosure();
 
     if (
-        !tonApiTiersStore.tiers$.isResolved ||
-        !tonApiTiersStore.selectedTier$.isResolved ||
+        !restApiTiersStore.tiers$.isResolved ||
+        !restApiTiersStore.selectedTier$.isResolved ||
         !currentTonApiTier ||
         !storeSelectedTonApiTier
     ) {
@@ -98,8 +98,8 @@ const TonApiTiers: FC = () => {
         );
     }
 
-    const onChoseTonApiTier = async (tier: TonApiTier): Promise<void> => {
-        const { valid, unspent_money } = await tonApiTiersStore.checkValidChangeTier(tier.id);
+    const onChoseTonApiTier = async (tier: RestApiTier): Promise<void> => {
+        const { valid, unspent_money } = await restApiTiersStore.checkValidChangeTier(tier.id);
 
         if (!valid) {
             onRefillTonApiModalOpen();
@@ -107,7 +107,7 @@ const TonApiTiers: FC = () => {
         }
         const unspentMoney = unspent_money ? new UsdCurrencyAmount(unspent_money) : undefined;
 
-        setTierTonApiForChange({
+        setTierRestApiForChange({
             ...tier,
             unspentMoney
         });
@@ -117,7 +117,7 @@ const TonApiTiers: FC = () => {
     //     onRefillLiteproxyModalOpen();
     // };
 
-    const handleSelectTier = (tier: TonApiTier | 'custom'): void => {
+    const handleSelectTier = (tier: RestApiTier | 'custom'): void => {
         if (tier === 'custom') {
             setCurrentTonApiTier('custom');
         } else if (storeSelectedTonApiTier.id === tier.id) {
@@ -127,11 +127,11 @@ const TonApiTiers: FC = () => {
         }
     };
 
-    const onPaymentModalClose = (): void => setTierTonApiForChange(undefined);
+    const onPaymentModalClose = (): void => setTierRestApiForChange(undefined);
 
     const isCurrentSubscription =
         currentTonApiTier !== 'custom' &&
-        tonApiTiersStore.selectedTier$.value?.id === currentTonApiTier?.id;
+        restApiTiersStore.selectedTier$.value?.id === currentTonApiTier?.id;
 
     const liteserversExists = liteproxysStore.liteproxyList$.value.length > 0;
 
@@ -149,11 +149,11 @@ const TonApiTiers: FC = () => {
                 </Button>
             </Flex>
             <Flex direction={{ base: 'column', lg: 'row' }} gap={6} mb="4">
-                <SelectTonApiTier onSelectTier={handleSelectTier} currentTier={currentTonApiTier} />
+                <SelectRestApiTier onSelectTier={handleSelectTier} currentTier={currentTonApiTier} />
                 {currentTonApiTier === 'custom' ? (
-                    <TonApiUnlimitedTierCard w="100%" maxW="497px" />
+                    <RestApiUnlimitedTierCard w="100%" maxW="497px" />
                 ) : (
-                    <TonApiTierCard
+                    <RestApiTierCard
                         h="100%"
                         tier={currentTonApiTier}
                         onChoseTier={onChoseTonApiTier}
@@ -225,11 +225,11 @@ const TonApiTiers: FC = () => {
                 )}
             </Flex>
 
-            {tierTonApiForChange && (
-                <TonApiPaymentDetailsModal
-                    isOpen={!!tierTonApiForChange}
+            {tierRestApiForChange && (
+                <RestApiPaymentDetailsModal
+                    isOpen={!!tierRestApiForChange}
                     onClose={onPaymentModalClose}
-                    tier={tierTonApiForChange}
+                    tier={tierRestApiForChange}
                 />
             )}
 

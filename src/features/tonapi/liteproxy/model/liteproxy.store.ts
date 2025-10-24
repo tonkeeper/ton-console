@@ -3,6 +3,7 @@ import {
     createImmediateReaction,
     DTOLiteproxyKey,
     DTOLiteproxyTier,
+    DTOProjectLiteproxyTierDetail,
     Loadable
 } from 'src/shared';
 import { projectsStore } from 'src/shared/stores';
@@ -13,7 +14,7 @@ export class LiteproxysStore {
 
     liteproxyTiers$ = new Loadable<DTOLiteproxyTier[] | null>(null);
 
-    selectedTier$ = new Loadable<DTOLiteproxyTier | null>(null);
+    selectedTier$ = new Loadable<DTOProjectLiteproxyTierDetail | null>(null);
 
     constructor() {
         makeAutoObservable(this);

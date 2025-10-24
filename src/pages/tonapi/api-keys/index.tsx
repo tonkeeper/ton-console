@@ -5,12 +5,12 @@ import { ApiKeysTable, CreateApiKeyModal } from 'src/features';
 import { Overlay } from 'src/shared';
 import { Button, Center, Spinner, useDisclosure } from '@chakra-ui/react';
 import { SelectPlanFirstly } from 'src/pages/tonapi/api-keys/SelectPlanFirstly';
-import { tonApiTiersStore, apiKeysStore } from 'src/shared/stores';
+import { restApiTiersStore, apiKeysStore } from 'src/shared/stores';
 
 const ApiKeysPage: FunctionComponent = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    if (!tonApiTiersStore.selectedTier$.isResolved || !apiKeysStore.apiKeys$.isResolved) {
+    if (!restApiTiersStore.selectedTier$.isResolved || !apiKeysStore.apiKeys$.isResolved) {
         return (
             <Center h="300px">
                 <Spinner />
@@ -18,7 +18,7 @@ const ApiKeysPage: FunctionComponent = () => {
         );
     }
 
-    if (!tonApiTiersStore.selectedTier$.value) {
+    if (!restApiTiersStore.selectedTier$.value) {
         return <SelectPlanFirstly />;
     }
 

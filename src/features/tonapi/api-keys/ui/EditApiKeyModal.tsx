@@ -13,7 +13,7 @@ import { observer } from 'mobx-react-lite';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ApiKey, CreateApiKeyForm } from '../model';
 import { ApiKeyForm, ApiKeyFormInternal, toApiKeyFormDefaultValues } from './ApiKeyForm';
-import { tonApiTiersStore } from 'src/shared/stores';
+import { restApiTiersStore } from 'src/shared/stores';
 import { apiKeysStore } from 'src/shared/stores';
 
 const EditApiKeyModal: FunctionComponent<{
@@ -50,7 +50,7 @@ const EditApiKeyModal: FunctionComponent<{
         [apiKey, rest.onClose]
     );
 
-    const maxLimit = tonApiTiersStore.selectedTier$.value?.description.requestsPerSecondLimit || 1;
+    const maxLimit = restApiTiersStore.selectedTier$.value?.rps ?? 1;
 
     return (
         <Modal scrollBehavior="inside" {...rest}>

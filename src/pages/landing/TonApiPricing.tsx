@@ -1,12 +1,12 @@
 import { ComponentProps, FunctionComponent } from 'react';
 import { Box, forwardRef, Grid } from '@chakra-ui/react';
-import { TonApiTierCard, TonApiUnlimitedTierCard } from 'src/features';
 import { observer } from 'mobx-react-lite';
 import { H3 } from 'src/shared';
-import { tonApiTiersStore } from 'src/shared/stores';
+import { restApiTiersStore } from 'src/shared/stores';
+import { RestApiTierCard, RestApiUnlimitedTierCard } from 'src/features/tonapi/pricing';
 
 const TonApiPricing: FunctionComponent<ComponentProps<typeof Box>> = forwardRef((props, ref) => {
-    if (!tonApiTiersStore?.tiers$.isResolved) {
+    if (!restApiTiersStore?.tiers$.isResolved) {
         return null;
     }
 
@@ -16,8 +16,8 @@ const TonApiPricing: FunctionComponent<ComponentProps<typeof Box>> = forwardRef(
                 TON API Pricing
             </H3>
             <Grid gap="4" templateColumns="repeat(auto-fit, minmax(300px, 1fr))" w="100%">
-                {tonApiTiersStore.tiers$.value.map(tier => (
-                    <TonApiTierCard
+                {restApiTiersStore.tiers$.value.map(tier => (
+                    <RestApiTierCard
                         tier={tier}
                         key={tier.id}
                         variant="elevated"
@@ -25,7 +25,7 @@ const TonApiPricing: FunctionComponent<ComponentProps<typeof Box>> = forwardRef(
                     />
                 ))}
 
-                <TonApiUnlimitedTierCard h="100%" variant="elevated" />
+                <RestApiUnlimitedTierCard h="100%" variant="elevated" />
             </Grid>
         </Box>
     );
