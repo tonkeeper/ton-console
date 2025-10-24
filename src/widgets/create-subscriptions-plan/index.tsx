@@ -10,10 +10,10 @@ import {
     ModalOverlay,
     useDisclosure
 } from '@chakra-ui/react';
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { CreateSubscriptionsPlanForm } from './create-subscriptions-plan-form';
 
-export const CreateSubscriptionsPlan: FunctionComponent = () => {
+export const CreateSubscriptionsPlan: FC = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (

@@ -1,4 +1,4 @@
-import { ComponentProps, FunctionComponent, useState } from 'react';
+import { ComponentProps, FC, useState } from 'react';
 import {
     Box,
     Button,
@@ -64,7 +64,7 @@ const months = [
     { month: monthsNames[mod(currentMonthIndex - 1, 12)], year: prevMonthYear }
 ];
 
-const FilterInvoiceByPeriod: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const FilterInvoiceByPeriod: FC<ComponentProps<typeof Box>> = props => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const period = invoicesTableStore.pagination.filter.period;
 
@@ -125,7 +125,7 @@ const FilterInvoiceByPeriod: FunctionComponent<ComponentProps<typeof Box>> = pro
     );
 };
 
-const MenuInput: FunctionComponent<
+const MenuInput: FC<
     ComponentProps<typeof MenuList> & { onClose: () => void }
 > = props => {
     const toast = useToast();

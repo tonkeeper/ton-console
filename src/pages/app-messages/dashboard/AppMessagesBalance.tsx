@@ -1,10 +1,10 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FC } from 'react';
 import { formatWithSuffix, H4, Overlay } from 'src/shared';
 import { Box, Button, Skeleton, Text, useDisclosure } from '@chakra-ui/react';
 import { appMessagesStore, MessagesRefillModal } from 'src/features';
 import { observer } from 'mobx-react-lite';
 
-const AppMessagesBalance: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const AppMessagesBalance: FC<ComponentProps<typeof Box>> = props => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const balanceIsZero = appMessagesStore.balance$.isResolved && !appMessagesStore.balance$.value;

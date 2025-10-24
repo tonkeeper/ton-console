@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Modal,
@@ -14,7 +14,7 @@ import { Invoice, invoicesTableStore } from 'src/features';
 import { observer } from 'mobx-react-lite';
 import { H4, Span } from 'src/shared';
 
-const CancelInvoiceConfirmation: FunctionComponent<{
+const CancelInvoiceConfirmation: FC<{
     invoice: Invoice;
     isOpen: boolean;
     onClose: () => void;

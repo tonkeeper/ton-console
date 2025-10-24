@@ -1,9 +1,9 @@
-import { FunctionComponent, PropsWithChildren, useEffect } from 'react';
+import { FC, PropsWithChildren, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { projectsStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 
-const ApplyQueryParams: FunctionComponent<PropsWithChildren> = ({ children }) => {
+const ApplyQueryParams: FC<PropsWithChildren> = ({ children }) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
 

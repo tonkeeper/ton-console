@@ -1,4 +1,4 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FC } from 'react';
 import {
     Box,
     Button,
@@ -15,7 +15,7 @@ import { ArrowIcon, MenuButtonDefault, Span, TickIcon } from 'src/shared';
 import { invoicesTableStore, InvoiceStatus } from '../../models';
 import { invoiceBadges } from './InvoiceStatusBadge';
 
-const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const FilterInvoiceByStatus: FC<ComponentProps<typeof Box>> = props => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (

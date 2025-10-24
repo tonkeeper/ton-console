@@ -1,7 +1,7 @@
 import { Icon } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FC } from 'react';
 
-export const DeleteIcon24: FunctionComponent<ComponentProps<typeof Icon>> = props => {
+export const DeleteIcon24: FC<ComponentProps<typeof Icon>> = props => {
     return (
         <Icon
             w="24px"

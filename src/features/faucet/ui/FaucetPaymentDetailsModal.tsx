@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Box,
     Button,
@@ -25,7 +25,7 @@ import { CurrencyRate } from 'src/entities';
 import { faucetStore } from 'src/features';
 import { observer } from 'mobx-react-lite';
 
-const FaucetPaymentDetailsModal: FunctionComponent<{
+const FaucetPaymentDetailsModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     amount?: TonCurrencyAmount;

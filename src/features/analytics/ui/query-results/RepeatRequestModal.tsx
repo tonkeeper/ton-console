@@ -1,4 +1,4 @@
-import { FunctionComponent, useId, useState } from 'react';
+import { FC, useId, useState } from 'react';
 import {
     Button,
     Modal,
@@ -15,7 +15,7 @@ import { analyticsQueryStore } from '../../model';
 import RepeatRequestModalContent from 'src/features/analytics/ui/query-results/RepeatRequestModalContent';
 import { toJS } from 'mobx';
 
-const RepeatRequestModal: FunctionComponent<{
+const RepeatRequestModal: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ isOpen, onClose }) => {

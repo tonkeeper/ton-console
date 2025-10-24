@@ -1,6 +1,6 @@
 import {
     ComponentProps,
-    FunctionComponent,
+    FC,
     useCallback,
     useEffect,
     useRef
@@ -41,7 +41,7 @@ const inputsLabels = {
     // url: 'App URL'
 };
 
-export const DAppUrlInputForm: FunctionComponent<
+export const DAppUrlInputForm: FC<
     ComponentProps<typeof Box> & {
         onSubmit: (dappForm: CreateDappForm) => void;
         submitButtonLoading: boolean;

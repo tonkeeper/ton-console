@@ -1,10 +1,10 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { H4, Overlay } from 'src/shared';
 import { Box, Divider, Link, Text } from '@chakra-ui/react';
 import { DappRegistrationForm } from 'src/entities';
 import { APP_MESSAGES_LINKS } from 'src/features';
 
-export const RegisterApp: FunctionComponent = () => {
+export const RegisterApp: FC = () => {
     return (
         <Overlay px="0">
             <Box maxW="800px" px="6">

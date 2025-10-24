@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback } from 'react';
+import { FC, useCallback } from 'react';
 import {
     Button,
     Modal,
@@ -17,7 +17,7 @@ import { observer } from 'mobx-react-lite';
 import { CurrencyRate } from 'src/entities';
 import { liteproxysStore, balanceStore } from 'src/shared/stores';
 
-const LiteserversPaymentDetailsModal: FunctionComponent<{
+const LiteserversPaymentDetailsModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     tier: DTOLiteproxyTier;

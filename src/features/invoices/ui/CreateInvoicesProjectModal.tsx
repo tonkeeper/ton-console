@@ -1,4 +1,4 @@
-import { FunctionComponent, useId } from 'react';
+import { FC, useId } from 'react';
 import {
     Button,
     Modal,
@@ -14,7 +14,7 @@ import { H4 } from 'src/shared';
 import { invoicesAppStore } from '../models';
 import { observer } from 'mobx-react-lite';
 
-const CreateInvoicesProjectModal: FunctionComponent<{
+const CreateInvoicesProjectModal: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ isOpen, onClose }) => {

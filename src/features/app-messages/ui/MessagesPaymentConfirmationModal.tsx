@@ -1,9 +1,9 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Modal, ModalOverlay } from '@chakra-ui/react';
 import MessagesPaymentConfirmationModalContent from './MessagesPaymentConfirmationModalContent';
 import { AppMessagesPackage } from '../model';
 
-export const MessagesPaymentConfirmationModal: FunctionComponent<{
+export const MessagesPaymentConfirmationModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     pkg: AppMessagesPackage;

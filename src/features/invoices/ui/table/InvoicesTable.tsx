@@ -1,4 +1,4 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FC } from 'react';
 import { Box } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FixedSizeList } from 'react-window';
@@ -9,7 +9,7 @@ import InvoicesTableRaw from './InvoicesTableRaw';
 import { InvoicesTableStructure } from './InvoicesTableStructure';
 import { InvoicesTableContext } from 'src/features/invoices/ui/table/invoices-table-context';
 
-const InvoicesTable: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const InvoicesTable: FC<ComponentProps<typeof Box>> = props => {
     const rawHeight = '48px';
 
     return (

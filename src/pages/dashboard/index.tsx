@@ -1,9 +1,9 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { H4, Overlay, TgChannelCardLink } from 'src/shared';
 import { DashboardCardsList, DashboardChart, FeaturesList } from 'src/features';
 import { Flex, Text } from '@chakra-ui/react';
 
-const DashboardPage: FunctionComponent = () => {
+const DashboardPage: FC = () => {
     return (
         <>
             <Overlay h="fit-content" mb="4">

@@ -1,4 +1,4 @@
-import { ComponentProps, FunctionComponent, useEffect } from 'react';
+import { ComponentProps, FC, useEffect } from 'react';
 import { Box, Button, Flex } from '@chakra-ui/react';
 import { H4, Overlay } from 'src/shared';
 import {
@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 // import { projectsStore } from 'src/shared/stores';
 
-const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
+const HistoryPage: FC<ComponentProps<typeof Box>> = () => {
     useEffect(() => {
         analyticsHistoryTableStore.loadFirstPage();
     }, []);

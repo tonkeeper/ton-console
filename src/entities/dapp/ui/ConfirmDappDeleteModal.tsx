@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Modal,
@@ -11,7 +11,7 @@ import {
     Text
 } from '@chakra-ui/react';
 
-export const ConfirmDappDeleteModal: FunctionComponent<{
+export const ConfirmDappDeleteModal: FC<{
     appUrl: string;
     isOpen: boolean;
     onClose: (confirm?: boolean) => void;

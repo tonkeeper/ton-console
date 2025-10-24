@@ -1,4 +1,4 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FC } from 'react';
 import {
     Box,
     Button,
@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 import { analyticsGraphQueryStore } from '../../model';
 import { useSearchParams } from 'react-router-dom';
 
-const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const GraphAnalyticsForm: FC<ComponentProps<typeof Box>> = props => {
     const textAreaLineHeight = 22;
     const {
         register,

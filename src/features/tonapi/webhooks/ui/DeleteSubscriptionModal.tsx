@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback } from 'react';
+import { FC, useCallback } from 'react';
 import { Text } from '@chakra-ui/react';
 import { webhooksStore } from '../model';
 import { observer } from 'mobx-react-lite';
@@ -6,7 +6,7 @@ import { ConfirmationDialog } from 'src/entities';
 import { Subscription } from '../model/webhooks.store';
 import { Address } from '@ton/core';
 
-const DeleteSubscriptionsModal: FunctionComponent<{
+const DeleteSubscriptionsModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     subscription: Subscription;

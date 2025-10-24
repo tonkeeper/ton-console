@@ -1,4 +1,4 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FC } from 'react';
 import { Button } from '@chakra-ui/react';
 
 const externalLinkProps = {
@@ -10,7 +10,7 @@ const enabledLinkProps = {
     as: 'a'
 } as const;
 
-export const ButtonLink: FunctionComponent<
+export const ButtonLink: FC<
     ComponentProps<typeof Button> & { isExternal?: boolean }
 > = ({ isExternal, ...rest }) => (
     <Button

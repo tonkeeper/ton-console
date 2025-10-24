@@ -1,4 +1,4 @@
-import { FunctionComponent, Suspense, useEffect } from 'react';
+import { FC, Suspense, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import TonapiRouting from 'src/pages/tonapi';
 import { lazy } from '@loadable/component';
@@ -24,7 +24,7 @@ const AppMessagesPage = lazy(() => import('./app-messages'));
 const FaucetPage = lazy(() => import('./faucet'));
 const UserProfilePage = lazy(() => import('./user-profile'));
 
-const Routing: FunctionComponent = () => {
+const Routing: FC = () => {
     const location = useLocation();
     const params = new URLSearchParams(location.search);
     const queryBackUrl = params.get('backUrl');

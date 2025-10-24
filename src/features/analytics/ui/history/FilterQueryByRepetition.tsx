@@ -1,9 +1,9 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FC } from 'react';
 import { Checkbox } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { analyticsHistoryTableStore } from 'src/features';
 
-const FilterQueryByRepetition: FunctionComponent<ComponentProps<typeof Checkbox>> = props => {
+const FilterQueryByRepetition: FC<ComponentProps<typeof Checkbox>> = props => {
     return (
         <Checkbox
             h="fit-content"

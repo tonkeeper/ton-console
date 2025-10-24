@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Card,
@@ -15,7 +15,7 @@ import { AppMessagesPackage, appMessagesStore } from '../model';
 import { CurrencyRate } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 
-const MessagesPaymentConfirmationModalContent: FunctionComponent<{
+const MessagesPaymentConfirmationModalContent: FC<{
     onClose: () => void;
     pkg: AppMessagesPackage;
 }> = ({ onClose, pkg }) => {

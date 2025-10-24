@@ -10,13 +10,13 @@ import {
     Td,
     Center
 } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent, PropsWithChildren, useContext, useRef } from 'react';
+import { ComponentProps, FC, PropsWithChildren, useContext, useRef } from 'react';
 import { analyticsHistoryTableStore } from '../../model';
 import { observer } from 'mobx-react-lite';
 import { AnalyticsHistoryTableContext } from './analytics-history-table-context';
 import { EmptyFolderIcon48 } from 'src/shared';
 
-const EmptyTable: FunctionComponent<PropsWithChildren<ComponentProps<typeof Box>>> = ({
+const EmptyTable: FC<PropsWithChildren<ComponentProps<typeof Box>>> = ({
     children,
     ...props
 }) => {

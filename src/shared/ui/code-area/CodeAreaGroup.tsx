@@ -2,7 +2,7 @@ import {
     Children,
     ComponentProps,
     createContext,
-    FunctionComponent,
+    FC,
     isValidElement,
     PropsWithChildren,
     useMemo
@@ -12,7 +12,7 @@ import { CodeAreaFooter } from 'src/shared/ui/code-area/CodeAreaFooter';
 
 export const CodeAreaGroupContext = createContext<{ hasFooter: boolean }>({ hasFooter: false });
 
-export const CodeAreaGroup: FunctionComponent<PropsWithChildren<ComponentProps<typeof Box>>> = ({
+export const CodeAreaGroup: FC<PropsWithChildren<ComponentProps<typeof Box>>> = ({
     children,
     ...props
 }) => {

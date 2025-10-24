@@ -1,9 +1,9 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FC } from 'react';
 import { Box, Flex } from '@chakra-ui/react';
 import { Invoice } from 'src/features';
 import { FilledInfoIcon16, Span } from 'src/shared';
 
-export const InvoiceOverpayment: FunctionComponent<
+export const InvoiceOverpayment: FC<
     { invoice: Invoice } & ComponentProps<typeof Box>
 > = props => {
     const { invoice, ...rest } = props;

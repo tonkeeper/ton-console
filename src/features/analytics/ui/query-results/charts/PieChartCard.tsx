@@ -1,4 +1,4 @@
-import { ComponentProps, FunctionComponent, useMemo } from 'react';
+import { ComponentProps, FC, useMemo } from 'react';
 import { Box, Flex } from '@chakra-ui/react';
 import { ChartCard } from './ChartCard';
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
@@ -7,7 +7,7 @@ import { PieChartOptions } from '../../../model';
 
 const RADIAN = Math.PI / 180;
 
-export const PieChartCard: FunctionComponent<
+export const PieChartCard: FC<
     ComponentProps<typeof Box> & {
         onClose: () => void;
         dataSource: Record<string, number>[];

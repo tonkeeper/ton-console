@@ -1,7 +1,7 @@
 import { Box } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent, PropsWithChildren } from 'react';
+import { ComponentProps, FC, PropsWithChildren } from 'react';
 
-export const DropDownMenu: FunctionComponent<
+export const DropDownMenu: FC<
     ComponentProps<typeof Box> & PropsWithChildren
 > = props => {
     return (

@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
     chakra,
     FormControl,
@@ -34,7 +34,7 @@ const intervalSecondsMultiplier: Record<TimeInterval, number> = {
     minute: 60
 };
 
-const RepeatRequestModalContent: FunctionComponent<{
+const RepeatRequestModalContent: FC<{
     query: AnalyticsQuery;
     formId: string;
     onIsDirtyChange: (val: boolean) => void;

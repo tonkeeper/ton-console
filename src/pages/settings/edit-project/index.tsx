@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Center, Flex, Text } from '@chakra-ui/react';
 import { DeleteProjectConfirmation, ProjectForm, ProjectFormValues } from 'src/entities';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -9,7 +9,7 @@ import { projectsStore } from 'src/shared/stores';
 
 const availableDeleteProject = import.meta.env.VITE_AVAILABLE_DELETE_PROJECT === 'true';
 
-const EditProjectPage: FunctionComponent = () => {
+const EditProjectPage: FC = () => {
     const formId = 'edit-project-form';
     const selectedProject = projectsStore.selectedProject;
 

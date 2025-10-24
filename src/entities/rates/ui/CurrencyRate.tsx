@@ -1,4 +1,4 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren, useState } from 'react';
+import { ComponentProps, FC, PropsWithChildren, useState } from 'react';
 import { Box, Skeleton, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { Amount, CRYPTO_CURRENCY, getWindow, subtractPixels } from 'src/shared';
@@ -6,7 +6,7 @@ import { ratesStore } from 'src/entities/rates';
 import { computed } from 'mobx';
 import BigNumber from 'bignumber.js';
 
-const CurrencyRate: FunctionComponent<
+const CurrencyRate: FC<
     PropsWithChildren<
         ComponentProps<typeof Text> & {
             showSkeletonOnUpdate?: boolean;

@@ -1,9 +1,9 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Divider, Flex, Link, Text } from '@chakra-ui/react';
 import { H4, Overlay } from 'src/shared';
 import { ANALYTICS_LINKS, GraphAnalyticsForm } from 'src/features';
 
-export const GraphHome: FunctionComponent = () => {
+export const GraphHome: FC = () => {
     return (
         <Overlay display="flex" flexDirection="column">
             <Flex align="center" justify="space-between" mb="1">

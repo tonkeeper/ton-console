@@ -1,8 +1,8 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FC } from 'react';
 import { Center, Text } from '@chakra-ui/react';
 import { CardLink, EXTERNAL_LINKS, TonConsoleWhiteIcon20 } from 'src/shared';
 
-export const TgChannelCardLink: FunctionComponent<
+export const TgChannelCardLink: FC<
     ComponentProps<typeof CardLink> & { size?: 'md' | 'sm' }
 > = ({ size, ...props }) => {
     return (
