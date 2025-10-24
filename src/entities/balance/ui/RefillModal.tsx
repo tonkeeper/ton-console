@@ -1,8 +1,7 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { Modal, ModalOverlay } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import RefillModalContent from 'src/entities/balance/ui/RefillModalContent';
-import { balanceStore } from 'src/shared/stores';
 
 const RefillModal: FC<{
     isOpen: boolean;
