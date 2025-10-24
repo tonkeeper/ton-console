@@ -1,13 +1,12 @@
 import { FC } from 'react';
 import { H2, Overlay, Span, toDecimals, InfoTooltip } from 'src/shared';
 import { Box, Button, Flex, Skeleton, useDisclosure, Text, Divider } from '@chakra-ui/react';
-import { PromoCodeModal, RefillModal } from 'src/entities';
+import { RefillModal } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { balanceStore } from 'src/shared/stores';
 
 const BalanceBlock: FC = () => {
     const { isOpen: isRefillOpen, onClose: onRefillClose, onOpen: onRefillOpen } = useDisclosure();
-    const { isOpen: isPromoOpen, onClose: onPromoClose, onOpen: onPromoOpen } = useDisclosure();
 
     const isLoading = balanceStore.currentBalance$.isLoading;
     const balance = balanceStore.balance;
@@ -137,7 +136,6 @@ const BalanceBlock: FC = () => {
                 </Box>
             </Overlay>
             <RefillModal isOpen={isRefillOpen} onClose={onRefillClose} />
-            <PromoCodeModal isOpen={isPromoOpen} onClose={onPromoClose} />
         </>
     );
 };
