@@ -1,6 +1,7 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Box,
+    BoxProps,
     Button,
     Center,
     Flex,
@@ -21,7 +22,7 @@ import { AddWebhookModal, invoicesAppStore, InvoicesWebhook, INVOICES_LINKS } fr
 import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
 
-const WebhookItem: FunctionComponent<{ webhook: InvoicesWebhook }> = observer(({ webhook }) => {
+const WebhookItem: FC<{ webhook: InvoicesWebhook }> = observer(({ webhook }) => {
     const { hasCopied, onCopy } = useClipboard(webhook.value);
 
     return (
@@ -65,7 +66,7 @@ const WebhookItem: FunctionComponent<{ webhook: InvoicesWebhook }> = observer(({
     );
 });
 
-const InvoicesWebhooks: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const InvoicesWebhooks: FC<BoxProps> = props => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (

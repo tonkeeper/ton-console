@@ -1,10 +1,10 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Button, Checkbox, Divider, Flex, Text, useClipboard } from '@chakra-ui/react';
 import { CopyIcon16, ErrorIconCircle24, H4, InfoTooltip, Overlay } from 'src/shared';
 import { AnalyticsGraphQueryError, GraphAddressesList } from 'src/features';
 import { useSearchParams } from 'react-router-dom';
 
-export const GraphError: FunctionComponent<{ query: AnalyticsGraphQueryError }> = ({ query }) => {
+export const GraphError: FC<{ query: AnalyticsGraphQueryError }> = ({ query }) => {
     const [_, setSearchParams] = useSearchParams();
     const { hasCopied, onCopy } = useClipboard(query.addresses.map(a => a.userFriendly).join('\n'));
     return (

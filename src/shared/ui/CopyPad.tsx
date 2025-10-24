@@ -76,20 +76,16 @@ export const CopyPad: FC<
                 pr={variant === 'flat' ? '0' : '2.5'}
                 px={variant === 'flat' ? '0' : '4'}
                 py={variant === 'flat' ? '0' : '3'}
-                _hover={
-                    !isLoading && {
-                        svg: {
-                            color: 'icon.primary'
-                        }
-                    }
-                }
+                _hover={isLoading ? undefined : { svg: { color: 'icon.primary' } }}
                 sx={
-                    !isLoading && {
-                        svg: {
-                            transitionProperty: 'color',
-                            transitionDuration: '200ms'
-                        }
-                    }
+                    isLoading
+                        ? undefined
+                        : {
+                              svg: {
+                                  transitionProperty: 'color',
+                                  transitionDuration: '200ms'
+                              }
+                          }
                 }
                 {...(variant === 'flat' && { bgColor: 'transparent' })}
                 {...rest}

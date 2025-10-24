@@ -1,5 +1,5 @@
-import { ComponentProps, FunctionComponent, useMemo } from 'react';
-import { Box } from '@chakra-ui/react';
+import { FC, useMemo } from 'react';
+import { BoxProps } from '@chakra-ui/react';
 import { ChartCard } from './ChartCard';
 import {
     Bar,
@@ -14,8 +14,8 @@ import {
 import { hashString, toColor } from 'src/shared';
 import { BarChartOptions } from '../../../model';
 
-export const BarChartCard: FunctionComponent<
-    ComponentProps<typeof Box> & {
+export const BarChartCard: FC<
+    BoxProps & {
         onClose: () => void;
         dataSource: Record<string, number>[];
         options?: Omit<BarChartOptions, 'type'>;

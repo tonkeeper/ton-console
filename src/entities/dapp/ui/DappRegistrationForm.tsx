@@ -1,14 +1,14 @@
 import { observer } from 'mobx-react-lite';
 import { dappUrlValidator } from '../model';
 import { DAppUrlInputForm } from './DappUrlInputForm';
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Divider } from '@chakra-ui/react';
 import { PendingDappInfo } from './PendingDappInfo';
 import { DappVerification } from './DappVerification';
 import { toJS } from 'mobx';
 import { dappStore } from 'src/shared/stores';
 
-const DappRegistrationForm: FunctionComponent = () => {
+const DappRegistrationForm: FC = () => {
     if (!dappStore.pendingDapp) {
         return (
             <DAppUrlInputForm

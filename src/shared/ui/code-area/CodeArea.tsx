@@ -1,5 +1,5 @@
-import { ComponentProps, FunctionComponent, useContext, useRef } from 'react';
-import { Box, useTheme } from '@chakra-ui/react';
+import { FC, useContext, useRef } from 'react';
+import { Box, BoxProps, useTheme } from '@chakra-ui/react';
 import CodeMirror from '@uiw/react-codemirror';
 import { draculaInit } from '@uiw/codemirror-theme-dracula/src';
 import { tags as t } from '@lezer/highlight';
@@ -7,14 +7,14 @@ import { CodeAreaGroupContext } from './CodeAreaGroup';
 import type { Extension } from '@codemirror/state';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
-export const CodeArea: FunctionComponent<
-    {
+export const CodeArea: FC<
+    Omit<BoxProps, 'onChange'> & {
         value: string;
         onChange: (value: string) => void;
         extensions?: Extension[];
         isDisabled?: boolean;
         isLoading?: boolean;
-    } & ComponentProps<typeof Box>
+    }
 > = ({ value, onChange, extensions, isDisabled, isLoading, ...rest }) => {
     const theme = useTheme();
     const ref = useRef<HTMLDivElement | null>(null);

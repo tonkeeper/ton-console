@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import {
     Box,
     chakra,
@@ -36,7 +36,7 @@ type ApiKeyFormWithoutLimit = {
 
 export type ApiKeyFormInternal = ApiKeyFormWithLimit | ApiKeyFormWithoutLimit;
 
-export const ApiKeyForm: FunctionComponent<
+export const ApiKeyForm: FC<
     StyleProps & {
         id?: string;
         maxLimit: number;

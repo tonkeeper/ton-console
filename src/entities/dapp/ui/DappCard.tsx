@@ -1,8 +1,9 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Box,
     Card,
     CardBody,
+    CardProps,
     Menu,
     MenuButton,
     MenuItem,
@@ -16,8 +17,8 @@ import { ConfirmDappDeleteModal } from './ConfirmDappDeleteModal';
 import { observer } from 'mobx-react-lite';
 import { dappStore } from 'src/shared/stores';
 
-const DappCard: FunctionComponent<
-    ComponentProps<typeof Card> & {
+const DappCard: FC<
+    CardProps & {
         dapp: Pick<Dapp, 'name' | 'image' | 'url'> & { id?: Dapp['id'] };
         withMenu?: boolean;
     }

@@ -1,10 +1,10 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { ButtonLink, H3, InvoiceIcon40, Overlay } from 'src/shared';
 import { Flex, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { INVOICES_LINKS } from 'src/features';
 
-const JoinInvoices: FunctionComponent = () => {
+const JoinInvoices: FC = () => {
     return (
         <Overlay pt="60px" display="flex" flexDirection="column" alignItems="center">
             <InvoiceIcon40 mb="5" />

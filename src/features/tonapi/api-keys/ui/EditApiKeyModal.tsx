@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useEffect } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import {
     Button,
     Modal,
@@ -16,7 +16,7 @@ import { ApiKeyForm, ApiKeyFormInternal, toApiKeyFormDefaultValues } from './Api
 import { restApiTiersStore } from 'src/shared/stores';
 import { apiKeysStore } from 'src/shared/stores';
 
-const EditApiKeyModal: FunctionComponent<{
+const EditApiKeyModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     apiKey: ApiKey | undefined;

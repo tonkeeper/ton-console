@@ -10,7 +10,7 @@ import {
     Text,
     Divider
 } from '@chakra-ui/react';
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { toDate, VerticalDotsIcon16, MenuButtonIcon } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { SubscriptionsStore } from 'src/features/billing';
@@ -28,7 +28,7 @@ interface SubscriptionListItemProps {
     subscription?: Subscription;
 }
 
-const SubscriptionListItem: FunctionComponent<SubscriptionListItemProps> = ({ subscription }) => {
+const SubscriptionListItem: FC<SubscriptionListItemProps> = ({ subscription }) => {
     const navigate = useNavigate();
 
     return (
@@ -81,7 +81,7 @@ const SubscriptionListItem: FunctionComponent<SubscriptionListItemProps> = ({ su
     );
 };
 
-const SubscriptionList: FunctionComponent<SubscriptionListProps> = ({
+const SubscriptionList: FC<SubscriptionListProps> = ({
     subscriptionsStore,
     ...props
 }) => {

@@ -1,10 +1,10 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Button, Checkbox, Divider, Flex, Text, useClipboard } from '@chakra-ui/react';
 import { ButtonLink, CopyIcon16, DoneIconCircle24, H4, InfoTooltip, Overlay } from 'src/shared';
 import { AnalyticsGraphQuerySuccess, GraphAddressesList } from 'src/features';
 import { useSearchParams } from 'react-router-dom';
 
-export const GraphSuccess: FunctionComponent<{ query: AnalyticsGraphQuerySuccess }> = ({
+export const GraphSuccess: FC<{ query: AnalyticsGraphQuerySuccess }> = ({
     query
 }) => {
     const [_, setSearchParams] = useSearchParams();

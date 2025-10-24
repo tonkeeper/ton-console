@@ -1,5 +1,5 @@
-import { ComponentProps, FunctionComponent, useCallback, useEffect, useState } from 'react';
-import { Box, Center, Spinner } from '@chakra-ui/react';
+import { FC, useCallback, useEffect, useState } from 'react';
+import { Box, BoxProps, Center, Spinner } from '@chakra-ui/react';
 import { Overlay, useIntervalUpdate, usePrevious } from 'src/shared';
 import { analyticsGraphQueryStore } from 'src/features';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -9,7 +9,7 @@ import { GraphHome } from './GraphHome';
 import { observer } from 'mobx-react-lite';
 import { projectsStore } from 'src/shared/stores';
 
-const GraphPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
+const GraphPage: FC<BoxProps> = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const queryId = searchParams.get('id');

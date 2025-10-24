@@ -1,12 +1,20 @@
-import { ComponentProps, ReactElement, useContext, useRef, useState } from 'react';
-import { Box, Fade, forwardRef, Input, InputGroup, InputRightElement } from '@chakra-ui/react';
+import { ReactElement, useContext, useRef, useState } from 'react';
+import {
+    Box,
+    Fade,
+    forwardRef,
+    Input,
+    InputGroup,
+    InputProps,
+    InputRightElement
+} from '@chakra-ui/react';
 import { OptionsInputContext } from './context';
 import { FilledTickIcon18, mergeRefs } from 'src/shared';
 import { useIMask } from 'react-imask';
 import { useForm } from 'react-hook-form';
 
 export const OptionsInputText = forwardRef<
-    ComponentProps<typeof Input> & {
+    InputProps & {
         rightElement?: ReactElement;
         mask?: Parameters<typeof useIMask>[0];
     },

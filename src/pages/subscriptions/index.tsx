@@ -1,7 +1,7 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { EmptyPage } from 'src/pages/subscriptions/ui/empty-page';
 
-const SubscriptionsPage: FunctionComponent = () => {
+const SubscriptionsPage: FC = () => {
     return <EmptyPage />;
 };
 

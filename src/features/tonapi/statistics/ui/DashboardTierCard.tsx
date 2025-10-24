@@ -1,10 +1,10 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { FC } from 'react';
 import { RestApiSelectedTier } from '../../pricing';
-import { Card, CardBody, CardHeader, List, ListIcon, ListItem, Text } from '@chakra-ui/react';
+import { Card, CardBody, CardHeader, CardProps, List, ListIcon, ListItem, Text } from '@chakra-ui/react';
 import { TickIcon, toDate } from 'src/shared';
 
-export const DashboardTierCard: FunctionComponent<
-    { tier: RestApiSelectedTier } & ComponentProps<typeof Card>
+export const DashboardTierCard: FC<
+    { tier: RestApiSelectedTier } & CardProps
 > = ({ tier, ...rest }) => {
     return (
         <Card {...rest}>

@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Modal,
@@ -12,7 +12,7 @@ import {
 import { H4, Span } from 'src/shared';
 import { Invoice } from '../../models';
 
-export const ConfirmRefundModal: FunctionComponent<{
+export const ConfirmRefundModal: FC<{
     invoice?: Invoice;
     isOpen: boolean;
     onClose: () => void;

@@ -1,17 +1,28 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren, ReactElement } from 'react';
-import { Box, Card, CardBody, CardFooter, Flex, Image, Text, chakra } from '@chakra-ui/react';
+import { FC, PropsWithChildren, ReactElement } from 'react';
+import {
+    Box,
+    BoxProps,
+    Card,
+    CardBody,
+    CardFooter,
+    Flex,
+    Image,
+    ImageProps,
+    Text,
+    chakra
+} from '@chakra-ui/react';
 import type * as CSS from 'csstype';
 
-export const FeatureCard: FunctionComponent<
+export const FeatureCard: FC<
     PropsWithChildren<
-        ComponentProps<typeof Box> & {
+        BoxProps & {
             background: CSS.Property.Color;
             fallback?: ReactElement;
             src: string;
             heading: string;
             description: string;
             imgBorder?: boolean;
-            imgHeight: ComponentProps<typeof Image>['height'];
+            imgHeight: ImageProps['height'];
             imgSources?: { media: string; srcSet: string }[];
         }
     >

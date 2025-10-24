@@ -1,11 +1,11 @@
-import { ComponentProps, FunctionComponent } from 'react';
-import { Card } from '@chakra-ui/react';
+import { FC } from 'react';
+import { CardProps } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { DappCard } from 'src/entities';
 import { dappStore } from 'src/shared/stores';
 
-const CurrentDappCard: FunctionComponent<
-    ComponentProps<typeof Card> & { withMenu?: boolean }
+const CurrentDappCard: FC<
+    CardProps & { withMenu?: boolean }
 > = props => {
     const dapp = dappStore.dapps$.value[0];
 

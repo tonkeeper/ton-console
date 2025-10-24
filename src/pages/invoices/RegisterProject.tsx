@@ -1,10 +1,10 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { ButtonLink, FolderIcon40, H4, Overlay } from 'src/shared';
 import { Button, Divider, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import { CreateInvoicesProjectModal, INVOICES_LINKS, invoicesAppStore } from 'src/features';
 import { observer } from 'mobx-react-lite';
 
-const RegisterProject: FunctionComponent = () => {
+const RegisterProject: FC = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (

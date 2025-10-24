@@ -1,7 +1,7 @@
 import {
     Children,
     cloneElement,
-    FunctionComponent,
+    FC,
     isValidElement,
     PropsWithChildren,
     ReactElement,
@@ -35,7 +35,7 @@ export interface DropDownMenuItemExpandableProps extends PropsWithChildren {
 }
 
 const _hover = { backgroundColor: 'button.secondary.backgroundHover' };
-export const DropDownMenuItemExpandable: FunctionComponent<
+export const DropDownMenuItemExpandable: FC<
     DropDownMenuItemExpandableProps
 > = props => {
     const [shouldAnimate, setShouldAnimate] = useState(false);
@@ -50,7 +50,7 @@ export const DropDownMenuItemExpandable: FunctionComponent<
 
     const children = useMemo(() => {
         return Children.map(props.children, child => {
-            if (!isValidElement<FunctionComponent<{ layer?: number }>>(child)) {
+            if (!isValidElement<FC<{ layer?: number }>>(child)) {
                 return child;
             }
 

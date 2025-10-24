@@ -1,4 +1,4 @@
-import { FunctionComponent, useId, useState } from 'react';
+import { FC, useId, useState } from 'react';
 import {
     Button,
     Modal,
@@ -15,7 +15,7 @@ import { Invoice } from 'src/features';
 import { ViewInvoiceModalContent } from './ViewInvoiceModalContent';
 import { invoicesTableStore } from '../models';
 
-const CreateInvoiceModal: FunctionComponent<{
+const CreateInvoiceModal: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ isOpen, onClose }) => {

@@ -12,9 +12,10 @@ import {
     MenuList,
     MenuItem,
     Menu,
-    Box
+    Box,
+    TableContainerProps
 } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import {
     CopyIcon16,
     copyToClipboard,
@@ -32,7 +33,7 @@ import EditApiKeyModal from './EditApiKeyModal';
 import DeleteApiKeyModal from './DeleteApiKeyModal';
 import { apiKeysStore } from 'src/shared/stores';
 
-const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
+const ApiKeysTable: FC<TableContainerProps> = props => {
     const [modal, setModal] = useState<{ key: ApiKey; action: 'edit' | 'delete' } | null>();
     const [copiedKey, setCopiedKey] = useState<number | undefined>();
 

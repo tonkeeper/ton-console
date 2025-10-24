@@ -1,5 +1,5 @@
-import { ComponentProps, FunctionComponent } from 'react';
-import { Box } from '@chakra-ui/react';
+import { FC } from 'react';
+import { Box, BoxProps } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -9,7 +9,7 @@ import InvoicesTableRaw from './InvoicesTableRaw';
 import { InvoicesTableStructure } from './InvoicesTableStructure';
 import { InvoicesTableContext } from 'src/features/invoices/ui/table/invoices-table-context';
 
-const InvoicesTable: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const InvoicesTable: FC<BoxProps> = props => {
     const rawHeight = '48px';
 
     return (

@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { H4, Overlay } from 'src/shared';
 import { Box, Divider, Flex, Text } from '@chakra-ui/react';
 import { CurrentDappCard } from 'src/entities';
@@ -6,7 +6,7 @@ import AppMessagesStats from './AppMessagesStats';
 import AppMessagesAuthDocs from './AppMessagesAuthDocs';
 import AppMessagesBalance from './AppMessagesBalance';
 
-export const AppMessagesDashboard: FunctionComponent = () => {
+export const AppMessagesDashboard: FC = () => {
     return (
         <Flex gap="4">
             <Overlay px="0">

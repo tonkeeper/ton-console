@@ -1,18 +1,18 @@
 import {
     Children,
-    ComponentProps,
+   
     createContext,
-    FunctionComponent,
+    FC,
     isValidElement,
     PropsWithChildren,
     useMemo
 } from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box, BoxProps } from '@chakra-ui/react';
 import { CodeAreaFooter } from 'src/shared/ui/code-area/CodeAreaFooter';
 
 export const CodeAreaGroupContext = createContext<{ hasFooter: boolean }>({ hasFooter: false });
 
-export const CodeAreaGroup: FunctionComponent<PropsWithChildren<ComponentProps<typeof Box>>> = ({
+export const CodeAreaGroup: FC<PropsWithChildren<BoxProps>> = ({
     children,
     ...props
 }) => {

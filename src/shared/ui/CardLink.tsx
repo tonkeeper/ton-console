@@ -1,9 +1,9 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren, ReactNode, useId } from 'react';
-import { Box, Card, CardBody, Link, Text } from '@chakra-ui/react';
+import { FC, PropsWithChildren, ReactNode, useId } from 'react';
+import { Box, Card, CardBody, CardProps, Link, Text } from '@chakra-ui/react';
 import { ArrowIcon, ConsoleDocsIcon32, EXTERNAL_LINKS } from 'src/shared';
 
-export const CardLink: FunctionComponent<
-    PropsWithChildren<ComponentProps<typeof Card> & { href?: string; icon?: ReactNode }>
+export const CardLink: FC<
+    PropsWithChildren<CardProps & { href?: string; icon?: ReactNode }>
 > = ({ children, icon, ...rest }) => {
     const arrowId = useId();
 

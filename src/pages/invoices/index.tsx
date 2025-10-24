@@ -1,5 +1,5 @@
 import RegisterProject from './RegisterProject';
-import { FunctionComponent, PropsWithChildren, Suspense, useEffect } from 'react';
+import { FC, PropsWithChildren, Suspense, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { invoicesAppStore } from 'src/features';
 import { Center, Spinner } from '@chakra-ui/react';
@@ -10,7 +10,7 @@ import JoinInvoices from './JoinInvoices';
 const InvoiceDashboardPage = lazy(() => import('./dashboard'));
 const ManageInvoicesPage = lazy(() => import('./manage'));
 
-const WaitForAppResolving: FunctionComponent<PropsWithChildren> = observer(({ children }) => {
+const WaitForAppResolving: FC<PropsWithChildren> = observer(({ children }) => {
     if (!invoicesAppStore.invoicesApp$.isResolved) {
         return (
             <Center h="200px">

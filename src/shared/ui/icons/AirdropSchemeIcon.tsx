@@ -1,7 +1,6 @@
-import { forwardRef, Icon } from '@chakra-ui/react';
-import { ComponentProps } from 'react';
+import { forwardRef, Icon, IconProps } from '@chakra-ui/react';
 
-export const AirdropSchemeIcon = forwardRef<ComponentProps<typeof Icon>, typeof Icon>(
+export const AirdropSchemeIcon = forwardRef<IconProps, typeof Icon>(
     (props, ref) => {
         return (
             <Icon

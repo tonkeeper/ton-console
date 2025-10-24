@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
     Box,
     Button,
@@ -25,7 +25,7 @@ import MessagesPaymentConfirmationModalContent from './MessagesPaymentConfirmati
 import { observer } from 'mobx-react-lite';
 import { balanceStore } from 'src/shared/stores';
 
-const MessagesRefillModal: FunctionComponent<{
+const MessagesRefillModal: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ isOpen, onClose }) => {

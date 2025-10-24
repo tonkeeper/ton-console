@@ -7,7 +7,8 @@ import {
     Box,
     Center,
     useDisclosure,
-    Tooltip
+    Tooltip,
+    BoxProps
 } from '@chakra-ui/react';
 import {
     ArrowIcon,
@@ -19,13 +20,13 @@ import {
     Span,
     useIsTextTruncated
 } from 'src/shared';
-import { ComponentProps, FunctionComponent } from 'react';
+import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Project } from 'src/entities/project';
 import { projectsStore } from 'src/shared/stores';
 import { CreateProjectModal } from './CreateProjectModal';
 
-const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const SelectProject_: FC<BoxProps> = props => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     if (!projectsStore.selectedProject) {

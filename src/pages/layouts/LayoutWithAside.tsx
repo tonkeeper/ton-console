@@ -2,11 +2,11 @@ import { Box, Grid, GridItem } from '@chakra-ui/react';
 import { Aside, Footer, Header } from 'src/widgets';
 import { Overlay } from 'src/shared';
 import { Outlet } from 'react-router-dom';
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorPage from './ui/ErrorPage';
 
-export const LayoutWithAside: FunctionComponent = () => {
+export const LayoutWithAside: FC = () => {
     return (
         <Grid
             gap="4"

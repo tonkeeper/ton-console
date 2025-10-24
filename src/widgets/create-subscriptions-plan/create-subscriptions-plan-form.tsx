@@ -1,9 +1,9 @@
 import { useForm } from 'react-hook-form';
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Button, FormControl, FormErrorMessage, FormLabel, Input } from '@chakra-ui/react';
 import { ImageInput } from 'src/shared';
 
-export const CreateSubscriptionsPlanForm: FunctionComponent = () => {
+export const CreateSubscriptionsPlanForm: FC = () => {
     const {
         handleSubmit,
         register,

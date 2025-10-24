@@ -1,7 +1,6 @@
-import { Icon, forwardRef } from '@chakra-ui/react';
-import { ComponentProps } from 'react';
+import { Icon, IconProps, forwardRef } from '@chakra-ui/react';
 
-export const FileIcon16 = forwardRef<ComponentProps<typeof Icon>, typeof Icon>((props, ref) => {
+export const FileIcon16 = forwardRef<IconProps, typeof Icon>((props, ref) => {
     return (
         <Icon
             ref={ref}

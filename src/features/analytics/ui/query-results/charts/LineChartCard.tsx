@@ -1,5 +1,5 @@
-import { ComponentProps, FunctionComponent, useMemo } from 'react';
-import { Box } from '@chakra-ui/react';
+import { FC, useMemo } from 'react';
+import { Box, BoxProps } from '@chakra-ui/react';
 import { ChartCard } from './ChartCard';
 import {
     CartesianGrid,
@@ -14,8 +14,8 @@ import {
 import { hashString, hexToRGBA, toColor } from 'src/shared';
 import { LineChartOptions } from '../../../model';
 
-export const LineChartCard: FunctionComponent<
-    ComponentProps<typeof Box> & {
+export const LineChartCard: FC<
+    BoxProps & {
         onClose: () => void;
         dataSource: Record<string, number>[];
         options?: Omit<LineChartOptions, 'type'>;

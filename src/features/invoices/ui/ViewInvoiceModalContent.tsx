@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Card,
@@ -17,7 +17,7 @@ import { CopyPad, H4, Span, toTimeLeft } from 'src/shared';
 import { CurrencyRate } from 'src/entities';
 import { useCountdown } from 'src/shared/hooks/useCountdown';
 
-export const ViewInvoiceModalContent: FunctionComponent<{
+export const ViewInvoiceModalContent: FC<{
     onClose: () => void;
     invoice: Invoice;
 }> = ({ onClose, invoice }) => {

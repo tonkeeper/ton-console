@@ -1,10 +1,10 @@
-import { ComponentProps, FunctionComponent } from 'react';
-import { Box, Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
+import { FC } from 'react';
+import { Box, BoxProps, Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { CopyPad } from 'src/shared';
 import { invoicesAppStore, InvoicesTokenRegenerateConfirmation } from 'src/features';
 
-const InvoicesStats: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const InvoicesStats: FC<BoxProps> = props => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (

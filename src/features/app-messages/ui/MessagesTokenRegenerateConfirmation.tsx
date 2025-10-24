@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Modal,
@@ -12,7 +12,7 @@ import {
 import { appMessagesStore } from '../model';
 import { observer } from 'mobx-react-lite';
 
-const MessagesTokenRegenerateConfirmation: FunctionComponent<{
+const MessagesTokenRegenerateConfirmation: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ isOpen, onClose }) => {
