@@ -91,7 +91,7 @@ const FeaturesList: FunctionComponent<
                 </Button>
             </FeatureCard>
 
-            <FeatureCard
+            {/* <FeatureCard
                 h="100%"
                 background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
                 src="/assets/images/tonkeeper-price-graph.webp"
@@ -104,7 +104,7 @@ const FeaturesList: FunctionComponent<
                 <Button onClick={openFeedbackModal('token-stats')} variant={buttonVariant}>
                     Become Partner
                 </Button>
-            </FeatureCard>
+            </FeatureCard> */}
 
             <FeatureCard
                 h="100%"
@@ -178,7 +178,7 @@ const FeaturesList: FunctionComponent<
                 )}
             </FeatureCard>
 
-            <FeatureCard
+            {/* <FeatureCard
                 h="100%"
                 background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
                 imgSources={[
@@ -199,9 +199,9 @@ const FeaturesList: FunctionComponent<
                 >
                     Become Partner
                 </Button>
-            </FeatureCard>
+            </FeatureCard> */}
 
-            <FeatureCard
+            {/* <FeatureCard
                 h="100%"
                 background="linear-gradient(104deg, #2EA5FF 0%, #0F97FF 100%);"
                 imgSources={[
@@ -219,7 +219,7 @@ const FeaturesList: FunctionComponent<
                 <Button onClick={openFeedbackModal('tonviewer-app-widget')} variant={buttonVariant}>
                     Become Partner
                 </Button>
-            </FeatureCard>
+            </FeatureCard> */}
 
             <FeatureCard
                 h="100%"
