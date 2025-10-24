@@ -9,7 +9,7 @@ import {
     tonapiMainnet,
     toDecimals
 } from 'src/shared';
-import { ProjectsStore } from '../../project/model/projects.store';
+import { ProjectsStore } from '../project/model/projects.store';
 import { createStandaloneToast } from '@chakra-ui/react';
 
 const USDT_DECIMALS = 6;
@@ -117,27 +117,27 @@ export class BalanceStore {
                 amount: BigInt(usdt_balance.amount),
                 promo_amount: BigInt(usdt_balance.promo_amount)
             },
-            ...(ton_balance && { ton: {
-                amount: BigInt(ton_balance.amount),
-                promo_amount: BigInt(ton_balance.promo_amount)
-            } })
+            ...(ton_balance && {
+                ton: {
+                    amount: BigInt(ton_balance.amount),
+                    promo_amount: BigInt(ton_balance.promo_amount)
+                }
+            })
         };
     });
 
-    fetchTonRate = this.tonRate$.createAsyncAction(async () => {
-        const data = await tonapiMainnet.rates.getRates({
-            tokens: ['ton'],
-            currencies: ['usd']
-        });
-
-        return data.rates['TON'].prices?.USD;
-    });
+    fetchTonRate = this.tonRate$.createAsyncAction(
+        (): Promise<number | undefined> =>
+            tonapiMainnet.rates
+                .getRates({ tokens: ['ton'], currencies: ['usd'] })
+                .then(data => data.rates['TON'].prices?.USD)
+    );
 
     fetchDepositAddress = this.depositAddress$.createAsyncAction(
         async (): Promise<RefillAddresses> =>
             await apiClient.api
                 .getDepositAddress(this.projectsStore.selectedProject!.id)
-                .then(response => response.data as RefillAddresses)
+                .then(response => response.data)
     );
 
     applyPromoCode = createAsyncAction(async (promoCode: string) => {
