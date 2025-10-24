@@ -10,7 +10,7 @@ import { Subscription } from './interfaces/subscription';
 import { liteproxysStore, restApiTiersStore } from 'src/shared/stores';
 
 export class SubscriptionsStore {
-    get subscriptions(): Subscription[] {
+    get subscriptions(): { liteproxy: Subscription | null; restApi: Subscription | null } {
         const reastApiTier = restApiTiersStore.selectedTier$.value;
         const liteproxyTier = liteproxysStore.selectedTier$.value;
 
@@ -18,7 +18,8 @@ export class SubscriptionsStore {
     }
 
     get subscriptionsLoading(): boolean {
-        return restApiTiersStore.selectedTier$.isLoading;
+        console.log(restApiTiersStore.selectedTier$.isLoading, liteproxysStore.selectedTier$.isLoading);
+        return restApiTiersStore.selectedTier$.isLoading || liteproxysStore.selectedTier$.isLoading;
     }
 
     constructor() {
@@ -33,29 +34,37 @@ export class SubscriptionsStore {
     }
 
     fetchSubscriptions = createAsyncAction(async () => {
-        await restApiTiersStore.fetchSelectedTier();
+        restApiTiersStore.fetchSelectedTier();
+        liteproxysStore.fetchSelectedTier();
     });
 }
 
 function mapTierToSubscription(
     reastApiTier: RestApiSelectedTier | null,
     liteproxyTier: DTOProjectLiteproxyTierDetail | null
-): Subscription[] {
+): { liteproxy: Subscription | null; restApi: Subscription | null } {
+    const liteproxyNextPayment =
+        liteproxyTier?.name === 'Free'
+            ? undefined
+            : liteproxyTier?.next_payment
+            ? new Date(liteproxyTier.next_payment)
+            : undefined;
+
     const liteproxySubscription: Subscription | null = liteproxyTier && {
         id: `liteproxy-${liteproxyTier.id}`,
-        plan: `Liteproxy «${liteproxyTier.name}»`,
+        plan: `Liteservers «${liteproxyTier.name}»`,
         interval: 'Monthly',
-        renewsDate: liteproxyTier.next_payment ? new Date(liteproxyTier.next_payment) : undefined,
+        renewsDate: liteproxyNextPayment ? new Date(liteproxyNextPayment) : undefined,
         price: new UsdCurrencyAmount(liteproxyTier.usd_price)
     };
 
-    const tonapiSubscription: Subscription | null = reastApiTier && {
+    const restApiSubscription: Subscription | null = reastApiTier && {
         id: `tonapi-${reastApiTier.id}`,
-        plan: `TonAPI «${reastApiTier.name}»`,
+        plan: `REST API «${reastApiTier.name}»`,
         interval: reastApiTier.type === 'monthly' ? 'Monthly' : 'Pay as you go',
         renewsDate: reastApiTier.renewsDate,
         price: reastApiTier?.price
     };
 
-    return [liteproxySubscription, tonapiSubscription].filter(s => s !== null);
+    return { liteproxy: liteproxySubscription, restApi: restApiSubscription };
 }
