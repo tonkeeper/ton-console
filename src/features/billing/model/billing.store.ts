@@ -118,7 +118,7 @@ export class BillingStore {
 function mapDTOTransactionToBillingHistoryItem(
     dtoTx: DTOBillingTransaction
 ): BillingHistoryItem {
-    const date = new Date(dtoTx.created_at);
+    const date = new Date(dtoTx.created_at * 1000);
     const amount = mapDTOCurrencyToAmount(dtoTx.currency, dtoTx.amount);
 
     return {
