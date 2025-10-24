@@ -6,7 +6,8 @@ import {
     HStack,
     Box,
     Center,
-    useDisclosure
+    useDisclosure,
+    Tooltip
 } from '@chakra-ui/react';
 import {
     ArrowIcon,
@@ -30,6 +31,18 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
     if (!projectsStore.selectedProject) {
         return null;
     }
+    const isLimitReached = projectsStore.projects$.value.length >= 10;
+
+    const createProjectMenuItem = ({ isDisabled }: { isDisabled: boolean }) => (
+        <MenuItem isDisabled={isDisabled} onClick={() => !isDisabled && onOpen()}>
+            <Center w="7" minW="7" h="7" mr="2" borderRadius="sm" bgColor="background.contentTint">
+                <PlusIcon16 />
+            </Center>
+            <Text textStyle="label2" color="text.primary" noOfLines={1}>
+                Create Project
+            </Text>
+        </MenuItem>
+    );
 
     return (
         <Box {...props}>
@@ -66,21 +79,14 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
                     {projectsStore.projects$.value.map(project => (
                         <SelectProjectItem project={project} key={project.id} />
                     ))}
-                    <MenuItem onClick={onOpen}>
-                        <Center
-                            w="7"
-                            minW="7"
-                            h="7"
-                            mr="2"
-                            borderRadius="sm"
-                            bgColor="background.contentTint"
-                        >
-                            <PlusIcon16 />
-                        </Center>
-                        <Text textStyle="label2" color="text.primary" noOfLines={1}>
-                            Create Project
-                        </Text>
-                    </MenuItem>
+
+                    {isLimitReached ? (
+                        <Tooltip hasArrow label="Project limit reached (10 max)">
+                            {createProjectMenuItem({ isDisabled: true })}
+                        </Tooltip>
+                    ) : (
+                        createProjectMenuItem({ isDisabled: false })
+                    )}
                 </MenuList>
             </Menu>
             <CreateProjectModal isOpen={isOpen} onClose={onClose} />
