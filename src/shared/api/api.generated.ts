@@ -229,13 +229,65 @@ export interface DTOBillingTransaction {
      */
     amount: string;
     currency: DTOCryptoCurrency;
-    reason: string;
-    additional_info: string;
+    info: DTOBillingTxInfo;
     /**
      * @format int64
      * @example 1690889913000
      */
     created_at: number;
+}
+
+export interface DTOBillingTxInfo {
+    reason: DTOBillingTxInfoReasonEnum;
+}
+
+export interface DTOTonapiMonthlyPaymentMeta {
+    tier: DTOTier;
+}
+
+export interface DTOTonapiInstantPaymentMeta {
+    tier: DTOTier;
+}
+
+export interface DTOTonapiChangeTierMeta {
+    new_tier: DTOTier;
+}
+
+export interface DTOLiteproxyMonthlyPaymentMeta {
+    tier: DTOLiteproxyTier;
+}
+
+export interface DTOLiteproxyChangeTierMeta {
+    new_tier: DTOLiteproxyTier;
+}
+
+export interface DTOTestnetTonsPurchaseMeta {
+    testnet_coins: string;
+}
+
+export interface DTOCnftIndexingPaymentMeta {
+    collection: string;
+    count: number;
+}
+
+export interface DTOMessagePackagePurchaseMeta {
+    count: number;
+}
+
+export interface DTOPromoCodeActivationMeta {
+    id: string;
+}
+
+export interface DTOStreamingApiPaymentMeta {
+    period: number;
+}
+
+export interface DTOReplenishmentOfDepositMeta {
+    tx_hash: string;
+}
+
+export interface DTOAnalyticsRequestPaymentMeta {
+    time: number;
 }
 
 export interface DTOBalance {
@@ -905,6 +957,23 @@ export enum DTOErrorCodeEnum {
 export enum DTOBillingTransactionTypeEnum {
     DTODeposit = 'deposit',
     DTOCharge = 'charge'
+}
+
+export enum DTOBillingTxInfoReasonEnum {
+    DTOTonapiMonthlyPayment = 'tonapi_monthly_payment',
+    DTOTonapiInstantPayment = 'tonapi_instant_payment',
+    DTOTonapiChangeTier = 'tonapi_change_tier',
+    DTOLiteproxyMonthlyPayment = 'liteproxy_monthly_payment',
+    DTOLiteproxyChangeTier = 'liteproxy_change_tier',
+    DTOTestnetTonsPurchase = 'testnet_tons_purchase',
+    DTOCnftIndexingPayment = 'cnft_indexing_payment',
+    DTOMessagePackagePurchase = 'message_package_purchase',
+    DTOPromoCodeActivation = 'promo_code_activation',
+    DTOChatgptRequestPayment = 'chatgpt_request_payment',
+    DTOStreamingApiPayment = 'streaming_api_payment',
+    DTOReplenishmentOfDeposit = 'replenishment_of_deposit',
+    DTOAnalyticsRequestPayment = 'analytics_request_payment',
+    DTOOther = 'other'
 }
 
 export enum DTOParticipantPermissionsEnum {
@@ -1710,7 +1779,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 {
                     usdt_balance: DTOBalance;
                     ton_balance?: DTOBalance;
-                    history?: DTOBillingTransaction[];
+                    history: DTOBillingTransaction[];
                 },
                 {
                     /** Error message */

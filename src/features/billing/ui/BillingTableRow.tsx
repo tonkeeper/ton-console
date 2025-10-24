@@ -1,12 +1,12 @@
-import { FunctionComponent, useContext } from 'react';
-import { Center, chakra, Link, Spinner, Td, Tr } from '@chakra-ui/react';
+import { FC, useContext } from 'react';
+import { Center, Spinner, Td, Tr } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { toDateTime, explorer, shortAddress } from 'src/shared';
+import { toDateTime, DTOBillingTransactionTypeEnum } from 'src/shared';
 import { toJS } from 'mobx';
-import { BillingHistoryItem } from 'src/features/billing';
+import { BillingHistoryItem } from 'src/features/billing/model/billing.store';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 
-const LoadingRaw: FunctionComponent<{ style: React.CSSProperties }> = ({
+const LoadingRaw: FC<{ style: React.CSSProperties }> = ({
     style: { top, ...style }
 }) => {
     const { rowHeight } = useContext(BillingHistoryTableContext);
@@ -26,7 +26,22 @@ const LoadingRaw: FunctionComponent<{ style: React.CSSProperties }> = ({
     );
 };
 
-const ItemRow: FunctionComponent<{ historyItem: BillingHistoryItem; style: React.CSSProperties }> =
+const mapTypeToLabel: Record<DTOBillingTransactionTypeEnum, string> = {
+    [DTOBillingTransactionTypeEnum.DTOCharge]: 'Charge',
+    [DTOBillingTransactionTypeEnum.DTODeposit]: 'Deposit'
+};
+
+const mapTypeToColor: Record<DTOBillingTransactionTypeEnum, string> = {
+    [DTOBillingTransactionTypeEnum.DTOCharge]: 'text.primary',
+    [DTOBillingTransactionTypeEnum.DTODeposit]: 'accent.green'
+};
+
+const mapTypeToSign: Record<DTOBillingTransactionTypeEnum, string> = {
+    [DTOBillingTransactionTypeEnum.DTOCharge]: '-',
+    [DTOBillingTransactionTypeEnum.DTODeposit]: '+'
+};
+
+const ItemRow: FC<{ historyItem: BillingHistoryItem; style: React.CSSProperties }> =
     observer(({ historyItem, style }) => {
         const { rowHeight } = useContext(BillingHistoryTableContext);
 
@@ -52,64 +67,26 @@ const ItemRow: FunctionComponent<{ historyItem: BillingHistoryItem; style: React
                     {toDateTime(historyItem.date)}
                 </Td>
                 <Td minW="320px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
-                    {historyItem.action === 'payment' ? (
-                        historyItem.name
-                    ) : (
-                        <>
-                            {historyItem.type === 'deposit' ? (
-                                <>
-                                    Refill
-                                    {historyItem.fromAddress && (
-                                        <>
-                                            {' '}
-                                            from{' '}
-                                            <Link
-                                                color="text.accent"
-                                                href={explorer.accountLink(historyItem.fromAddress)}
-                                                isExternal
-                                            >
-                                                {shortAddress(historyItem.fromAddress)}
-                                            </Link>
-                                        </>
-                                    )}
-                                </>
-                            ) : (
-                                'Refill with promo code'
-                            )}
-                        </>
-                    )}
+                    {mapTypeToLabel[historyItem.type]}: {historyItem.reason}
                 </Td>
                 <Td
                     w="100%"
                     minW="300px"
                     h={rowHeight}
                     maxH={rowHeight}
-                    color={historyItem.action === 'payment' ? 'text.primary' : 'accent.green'}
+                    color={mapTypeToColor[historyItem.type] ?? 'text.accent'}
                     borderRight="1px"
                     borderRightColor="background.contentTint"
                     title={historyItem.amount.stringAmountWithoutRound}
                 >
-                    {historyItem.action === 'payment' ? (
-                        <>
-                            -{historyItem.amount.stringCurrencyAmount}
-                            {historyItem.amountUsdEquivalent && (
-                                <>
-                                    &nbsp;
-                                    <chakra.span color="text.secondary">
-                                        ({historyItem.amountUsdEquivalent.stringCurrencyAmount})
-                                    </chakra.span>
-                                </>
-                            )}
-                        </>
-                    ) : (
-                        <>+{historyItem.amount.stringCurrencyAmount}</>
-                    )}
+                    {mapTypeToSign[historyItem.type]}
+                    {historyItem.amount.stringCurrencyAmount}
                 </Td>
             </Tr>
         );
     });
 
-const BillingTableRow: FunctionComponent<{ index: number; style: React.CSSProperties }> = ({
+const BillingTableRow: FC<{ index: number; style: React.CSSProperties }> = ({
     index,
     style
 }) => {
