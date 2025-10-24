@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { H2, Overlay, Span, toDecimals, InfoTooltip } from 'src/shared';
-import { Box, Button, Flex, Skeleton, useDisclosure, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Skeleton, useDisclosure, Text, Divider } from '@chakra-ui/react';
 import { PromoCodeModal, RefillModal } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { balanceStore } from 'src/shared/stores';
@@ -23,59 +23,61 @@ const BalanceBlock: FC = () => {
 
     const totalTonAmount = tonAmount + tonPromoAmount;
 
-    const formattedTotalAmount = balance?.total !== undefined
-    ? new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 2,
-      }).format(balance?.total)
-    : null;
+    const formattedTotalAmount =
+        balance?.total !== undefined
+            ? new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2
+              }).format(balance?.total)
+            : null;
 
     return (
         <>
-            <Overlay h="fit-content" p="0" mb={4} display="flex" flexDirection="column">
-                <Box pt="5" pb="6" px="6">
-                    <Text textStyle="body2" color="text.secondary" mb="1">
-                        Total Balance
-                    </Text>
-                    <Flex align="center" justify="space-between" mb="5">
-                        <H2 display="flex" alignItems="center" gap="2">
-                            {isLoading || balance?.total === undefined ? (
-                                <Skeleton w="200px" h="10" />
-                            ) : (
-                                <Span title={balance?.total.toString()}>
-                                    {formattedTotalAmount}
-                                </Span>
-                            )}
-                        </H2>
-                        <Flex gap="2">
-                            <Button onClick={onRefillOpen} variant="secondary">
-                                Refill
-                            </Button>
-                            <Button onClick={onPromoOpen} variant="secondary">
-                                Use Promo Code
-                            </Button>
-                        </Flex>
+            <Overlay h="100%" p="0" display="flex" flexDirection="column" flex="1" minW="330px">
+                <Box>
+                    <Flex align="center" justify="space-between" py="5" px="6">
+                        <Box>
+                            <Text textStyle="body2" color="text.secondary" mb="1">
+                                Total Balance
+                            </Text>
+                            <H2 display="flex" alignItems="center" gap="2">
+                                {isLoading || balance?.total === undefined ? (
+                                    <Skeleton w="200px" h="10" />
+                                ) : (
+                                    <Span title={balance?.total.toString()}>
+                                        {formattedTotalAmount}
+                                    </Span>
+                                )}
+                            </H2>
+                        </Box>
+                        <Button onClick={onRefillOpen} variant="secondary" size="sm">
+                            Refill
+                        </Button>
                     </Flex>
 
-                    <Flex columnGap="8" rowGap="4" flexWrap="wrap">
+                    <Divider />
+
+                    <Flex columnGap="3" rowGap="2" flexWrap="wrap" pt="3" pb="5" px="6">
                         {/* Left Column - USDT Balance and Promo */}
-                        <Box minW="200px">
-                            <Flex align="center" columnGap="2" mb="2">
-                                <Text textStyle="body2" color="text.secondary">
-                                    Balance:
+                        <Box minW="170px">
+                            <Flex>
+                                <Text textStyle="body2" minW="80px" color="text.secondary" mb="1">
+                                    Balance
                                 </Text>
                                 {isLoading ? (
-                                    <Skeleton w="100px" h="5" />
+                                    <Skeleton w="80px" h="5" />
                                 ) : (
-                                    <Text textStyle="body2" title={usdtAmount.toString()}>{usdtAmount.toFixed(2)} USDT</Text>
+                                    <Text textStyle="body2" title={usdtAmount.toString()}>
+                                        {usdtAmount.toFixed(2)} USDT
+                                    </Text>
                                 )}
                             </Flex>
-                            <Flex align="center" columnGap="2">
-                                <Flex align="center" gap="1">
+                            <Flex>
+                                <Flex align="center" minW="80px" gap="1" mb="1">
                                     <Text textStyle="body2" color="text.secondary">
-                                        Promo Balance:
+                                        Promo
                                     </Text>
                                     <InfoTooltip>
                                         Apply promo codes to get bonus balance
@@ -84,22 +86,24 @@ const BalanceBlock: FC = () => {
                                 {isLoading ? (
                                     <Skeleton w="80px" h="5" />
                                 ) : (
-                                    <Text textStyle="body2" title={usdtPromoAmount.toString()}>{usdtPromoAmount.toFixed(2)} USDT</Text>
+                                    <Text textStyle="body2" title={usdtPromoAmount.toString()}>
+                                        {usdtPromoAmount.toFixed(2)} USDT
+                                    </Text>
                                 )}
                             </Flex>
                         </Box>
 
                         {/* Right Column - TON Balance and TON Promo (if exists) */}
                         {totalTonAmount > 0 && (
-                            <Box flex="1" minW="200px">
-                                <Flex align="center" columnGap="2" mb="2">
-                                    <Text textStyle="body2" color="text.secondary">
-                                        TON Balance:
+                            <Box flex="1" >
+                                <Flex>
+                                    <Text textStyle="body2" minW="110px" color="text.secondary" mb="1">
+                                        TON Balance
                                     </Text>
                                     {isLoading ? (
                                         <Skeleton w="150px" h="5" />
                                     ) : (
-                                        <Text textStyle="body2" title={tonAmount.toString()}>
+                                        <Text textStyle="body2" title={tonAmount.toString()} whiteSpace="nowrap">
                                             {tonAmount.toFixed(2)} TON{' '}
                                             <Span color="text.secondary">
                                                 ≈ ${tonAmountUsd.toFixed(2)}
@@ -107,10 +111,10 @@ const BalanceBlock: FC = () => {
                                         </Text>
                                     )}
                                 </Flex>
-                                <Flex align="center" columnGap="2">
-                                    <Flex align="center" gap="1">
+                                <Flex>
+                                    <Flex align="center" minW="110px" gap="1" mb="1">
                                         <Text textStyle="body2" color="text.secondary">
-                                            TON Promo Balance:
+                                            TON Promo
                                         </Text>
                                         <InfoTooltip>
                                             Apply promo codes to get bonus balance
@@ -119,7 +123,7 @@ const BalanceBlock: FC = () => {
                                     {isLoading ? (
                                         <Skeleton w="150px" h="5" />
                                     ) : (
-                                        <Text textStyle="body2" title={tonPromoAmount.toString()}>
+                                        <Text textStyle="body2" title={tonPromoAmount.toString()} whiteSpace="nowrap">
                                             {tonPromoAmount.toFixed(2)} TON{' '}
                                             <Span color="text.secondary">
                                                 ≈ ${tonPromoAmountUsd.toFixed(2)}
