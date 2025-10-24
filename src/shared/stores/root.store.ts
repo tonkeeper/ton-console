@@ -11,7 +11,7 @@ import { JettonStore } from 'src/features/jetton/model/jetton.store';
 import { LiteproxysStore } from 'src/features/tonapi/liteproxy/model/liteproxy.store';
 import { TonApiStatsStore } from 'src/features/tonapi/statistics/model/ton-api-stats.store';
 import { TonApiTiersStore } from 'src/features/tonapi/pricing/model/ton-api-tiers.store';
-import { BalanceStore } from 'src/entities/balance/model/balance.store';
+import { BalanceStore } from 'src/entities/balance/balance.store';
 import { DappStore } from 'src/entities/dapp/model/dapp.store';
 import { AnalyticsGPTGenerationStore } from 'src/features/analytics/model/analytics-gpt-generation.store';
 import { UserStore } from 'src/entities/user/model/user.store';

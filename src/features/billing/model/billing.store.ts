@@ -3,15 +3,25 @@ import {
     apiClient,
     createAsyncAction,
     createImmediateReaction,
+    CRYPTO_CURRENCY,
     DTOBillingTransaction,
     DTOBillingTransactionTypeEnum,
+    DTOBillingTxInfoReasonEnum,
     DTOCryptoCurrency,
     Loadable,
+    TokenCurrencyAmount,
     TonCurrencyAmount,
     UsdCurrencyAmount
 } from 'src/shared';
-import { BillingHistory, BillingHistoryPaymentItem, BillingHistoryRefillItem } from './interfaces';
 import { projectsStore, balanceStore } from 'src/shared/stores';
+
+export type BillingHistoryItem = {
+    id: string;
+    date: Date;
+    amount: TonCurrencyAmount | UsdCurrencyAmount;
+    type: DTOBillingTransactionTypeEnum;
+    reason: DTOBillingTxInfoReasonEnum;
+};
 
 export class BillingStore {
     billingHistory$ = new Loadable<DTOBillingTransaction[]>([]);
@@ -30,9 +40,9 @@ export class BillingStore {
         return this.billingHistory.length;
     }
 
-    get billingHistory(): BillingHistory {
+    get billingHistory(): BillingHistoryItem[] {
         return (this.billingHistory$.value || []).map(dtoTx =>
-            mapDTOTransactionToHistoryItem(dtoTx)
+            mapDTOTransactionToBillingHistoryItem(dtoTx)
         );
     }
 
@@ -105,30 +115,20 @@ export class BillingStore {
     }
 }
 
-function mapDTOTransactionToHistoryItem(
+function mapDTOTransactionToBillingHistoryItem(
     dtoTx: DTOBillingTransaction
-): BillingHistoryRefillItem | BillingHistoryPaymentItem {
+): BillingHistoryItem {
     const date = new Date(dtoTx.created_at);
-    const id = date.getTime();
     const amount = mapDTOCurrencyToAmount(dtoTx.currency, dtoTx.amount);
 
-    if (dtoTx.type === DTOBillingTransactionTypeEnum.DTODeposit) {
-        return {
-            id,
-            date,
-            amount,
-            type: 'deposit' as const,
-            action: 'refill' as const
-        };
-    } else {
-        return {
-            id,
-            date,
-            amount,
-            action: 'payment' as const,
-            name: dtoTx.reason
-        };
-    }
+    return {
+        id: dtoTx.id,
+        date,
+        amount,
+        type: dtoTx.type,
+        reason: dtoTx.info.reason,
+        // meta: dtoTx.info.meta,
+    };
 }
 
 function mapDTOCurrencyToAmount(currency: DTOCryptoCurrency, amount: string) {
@@ -136,7 +136,7 @@ function mapDTOCurrencyToAmount(currency: DTOCryptoCurrency, amount: string) {
         case DTOCryptoCurrency.DTO_TON:
             return new TonCurrencyAmount(amount);
         case DTOCryptoCurrency.DTO_USDT:
-            return new UsdCurrencyAmount(amount);
+            return new TokenCurrencyAmount({ weiAmount: amount, currency: CRYPTO_CURRENCY.USDT, decimals: 6 });
         default:
             throw new Error(`Unknown currency: ${currency}`);
     }

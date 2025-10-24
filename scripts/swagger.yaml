@@ -3460,8 +3460,7 @@ components:
         - type
         - amount
         - currency
-        - reason
-        - additional_info
+        - info
         - created_at
       properties:
         id:
@@ -3480,14 +3479,140 @@ components:
           example: "123000000000"
         currency:
           $ref: '#/components/schemas/CryptoCurrency'
-        reason:
-          type: string
-        additional_info:
-          type: string
+        info:
+          $ref: '#/components/schemas/BillingTxInfo'
         created_at:
           type: integer
           format: int64
           example: 1690889913000
+    BillingTxInfo:
+      type: object
+      required:
+        - reason
+#        - meta
+#      additionalProperties: false
+      properties:
+        reason:
+          type: string
+          enum:
+            - tonapi_monthly_payment
+            - tonapi_instant_payment
+            - tonapi_change_tier
+            - liteproxy_monthly_payment
+            - liteproxy_change_tier
+            - testnet_tons_purchase
+            - cnft_indexing_payment
+            - message_package_purchase
+            - promo_code_activation
+            - chatgpt_request_payment
+            - streaming_api_payment
+            - replenishment_of_deposit
+            - analytics_request_payment
+            - other
+#        meta:
+#          oneOf:
+#            - $ref: '#/components/schemas/TonapiMonthlyPaymentMeta'
+#            - $ref: '#/components/schemas/TonapiInstantPaymentMeta'
+#            - $ref: '#/components/schemas/TonapiChangeTierMeta'
+#            - $ref: '#/components/schemas/LiteproxyMonthlyPaymentMeta'
+#            - $ref: '#/components/schemas/LiteproxyChangeTierMeta'
+#            - $ref: '#/components/schemas/TestnetTonsPurchaseMeta'
+#            - $ref: '#/components/schemas/CnftIndexingPaymentMeta'
+#            - $ref: '#/components/schemas/MessagePackagePurchaseMeta'
+#            - $ref: '#/components/schemas/PromoCodeActivationMeta'
+#            - $ref: '#/components/schemas/StreamingApiPaymentMeta'
+#            - $ref: '#/components/schemas/ReplenishmentOfDepositMeta'
+#            - $ref: '#/components/schemas/AnalyticsRequestPaymentMeta'
+#            - type: object
+#              additionalProperties: true
+    TonapiMonthlyPaymentMeta:
+      type: object
+      required:
+        - tier
+      properties:
+        tier:
+          $ref: '#/components/schemas/Tier'
+    TonapiInstantPaymentMeta:
+      type: object
+      required:
+        - tier
+      properties:
+        tier:
+          $ref: '#/components/schemas/Tier'
+    TonapiChangeTierMeta:
+      type: object
+      required:
+        - new_tier
+      properties:
+        new_tier:
+          $ref: '#/components/schemas/Tier'
+    LiteproxyMonthlyPaymentMeta:
+      type: object
+      required:
+        - tier
+      properties:
+        tier:
+          $ref: '#/components/schemas/LiteproxyTier'
+    LiteproxyChangeTierMeta:
+      type: object
+      required:
+        - new_tier
+      properties:
+        new_tier:
+          $ref: '#/components/schemas/LiteproxyTier'
+    TestnetTonsPurchaseMeta:
+      type: object
+      required:
+        - testnet_coins
+      properties:
+        testnet_coins:
+          type: string
+          x-js-format: bigint
+    CnftIndexingPaymentMeta:
+      type: object
+      required:
+        - collection
+        - count
+      properties:
+        collection:
+          type: string
+        count:
+          type: integer
+    MessagePackagePurchaseMeta:
+      type: object
+      required:
+        - count
+      properties:
+        count:
+          type: integer
+    PromoCodeActivationMeta:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+    StreamingApiPaymentMeta:
+      type: object
+      required:
+        - period
+      properties:
+        period:
+          type: integer
+    ReplenishmentOfDepositMeta:
+      type: object
+      required:
+        - tx_hash
+      properties:
+        tx_hash:
+          type: string
+    AnalyticsRequestPaymentMeta:
+      type: object
+      required:
+        - time
+      properties:
+        time:
+          type: integer
     Balance:
       type: object
       required:
@@ -4684,6 +4809,7 @@ components:
           schema:
             type: object
             required:
+              - history
               - usdt_balance
             properties:
               usdt_balance:
@@ -5509,4 +5635,3 @@ components:
                 type: integer
                 format: int64
                 example: 1000000000
-
