@@ -13,18 +13,18 @@ import {
     Box
 } from '@chakra-ui/react';
 import { CURRENCY, H4, InfoTooltip, Pad, UsdCurrencyAmount } from 'src/shared';
-import { TonApiTier } from '../model';
+import { RestApiTier } from '../model';
 import { observer } from 'mobx-react-lite';
 import { CurrencyRate } from 'src/entities';
-import { tonApiTiersStore, balanceStore } from 'src/shared/stores';
+import { restApiTiersStore, balanceStore } from 'src/shared/stores';
 
-const TonApiPaymentDetailsModal: FunctionComponent<{
+const RestApiPaymentDetailsModal: FunctionComponent<{
     isOpen: boolean;
     onClose: () => void;
-    tier: TonApiTier;
+    tier: RestApiTier;
 }> = ({ tier, ...rest }) => {
     const onConfirm = useCallback(async () => {
-        await tonApiTiersStore.selectTier(tier!.id);
+        await restApiTiersStore.selectTier(tier!.id);
         await balanceStore.fetchBalance();
         rest.onClose();
     }, [tier]);
@@ -69,7 +69,7 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
                                 Included
                             </Text>
                             <Text textStyle="body2" color="text.primary" textAlign="right">
-                                {tier.description.requestsPerSecondLimit} requests per second
+                                {tier.rps} requests per second
                             </Text>
                         </Flex>
                         <Flex justify="space-between" gap="10" mb="3">
@@ -170,7 +170,7 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
                     </Button>
                     <Button
                         flex={1}
-                        isLoading={tonApiTiersStore.selectTier.isLoading}
+                        isLoading={restApiTiersStore.selectTier.isLoading}
                         onClick={onConfirm}
                         variant="primary"
                     >
@@ -182,4 +182,4 @@ const TonApiPaymentDetailsModal: FunctionComponent<{
     );
 };
 
-export default observer(TonApiPaymentDetailsModal);
+export default observer(RestApiPaymentDetailsModal);

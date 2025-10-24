@@ -10,13 +10,13 @@ import { InvoicesTableStore } from 'src/features/invoices/models/invoices-table.
 import { JettonStore } from 'src/features/jetton/model/jetton.store';
 import { LiteproxysStore } from 'src/features/tonapi/liteproxy/model/liteproxy.store';
 import { TonApiStatsStore } from 'src/features/tonapi/statistics/model/ton-api-stats.store';
-import { TonApiTiersStore } from 'src/features/tonapi/pricing/model/ton-api-tiers.store';
 import { BalanceStore } from 'src/entities/balance/balance.store';
 import { DappStore } from 'src/entities/dapp/model/dapp.store';
 import { AnalyticsGPTGenerationStore } from 'src/features/analytics/model/analytics-gpt-generation.store';
 import { UserStore } from 'src/entities/user/model/user.store';
 import { AppStore } from './app.store';
 import { awaitValueResolved } from 'src/shared';
+import { RestApiTiersStore } from 'src/features/tonapi/pricing/model/rest-api-tiers.store';
 
 export const userStore = new UserStore();
 export const projectsStore = new ProjectsStore();
@@ -37,7 +37,7 @@ let invoicesTableStore: InvoicesTableStore;
 let jettonStore: JettonStore;
 let liteproxysStore: LiteproxysStore;
 let tonApiStatsStore: TonApiStatsStore;
-let tonApiTiersStore: TonApiTiersStore;
+let restApiTiersStore: RestApiTiersStore;
 
 const initializeDependentStores = () => {
     balanceStore = new BalanceStore(projectsStore);
@@ -55,7 +55,7 @@ const initializeDependentStores = () => {
     jettonStore = new JettonStore();
     liteproxysStore = new LiteproxysStore();
     tonApiStatsStore = new TonApiStatsStore();
-    tonApiTiersStore = new TonApiTiersStore();
+    restApiTiersStore = new RestApiTiersStore();
 };
 
 awaitValueResolved(projectsStore.projects$).then(() => {
@@ -78,5 +78,5 @@ export {
     jettonStore,
     liteproxysStore,
     tonApiStatsStore,
-    tonApiTiersStore
+    restApiTiersStore
 };

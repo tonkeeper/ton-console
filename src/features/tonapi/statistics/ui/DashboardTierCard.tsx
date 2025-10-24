@@ -1,10 +1,10 @@
 import { ComponentProps, FunctionComponent } from 'react';
-import { TonApiSelectedTier } from '../../pricing';
+import { RestApiSelectedTier } from '../../pricing';
 import { Card, CardBody, CardHeader, List, ListIcon, ListItem, Text } from '@chakra-ui/react';
 import { TickIcon, toDate } from 'src/shared';
 
 export const DashboardTierCard: FunctionComponent<
-    { tier: TonApiSelectedTier } & ComponentProps<typeof Card>
+    { tier: RestApiSelectedTier } & ComponentProps<typeof Card>
 > = ({ tier, ...rest }) => {
     return (
         <Card {...rest}>
@@ -23,7 +23,7 @@ export const DashboardTierCard: FunctionComponent<
                     <ListItem display="flex">
                         <ListIcon as={TickIcon} color="text.primary" />
                         <Text textStyle="body2" color="text.primary">
-                            {tier.description.requestsPerSecondLimit} requests per second
+                            {tier.rps} requests per second
                         </Text>
                     </ListItem>
                 </List>

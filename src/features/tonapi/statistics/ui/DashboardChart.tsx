@@ -1,5 +1,5 @@
-import { ComponentProps, FunctionComponent, useCallback, useMemo } from 'react';
-import { Box, Center, Spinner, Text, useTheme } from '@chakra-ui/react';
+import { FC, useCallback, useMemo } from 'react';
+import { Box, BoxProps, Center, Spinner, Text, useTheme } from '@chakra-ui/react';
 import {
     LineChart,
     Line,
@@ -12,14 +12,14 @@ import {
     ReferenceLine
 } from 'recharts';
 import { observer } from 'mobx-react-lite';
-import { tonApiStatsStore, tonApiTiersStore } from 'src/shared/stores';
+import { tonApiStatsStore, restApiTiersStore } from 'src/shared/stores';
 import { toDate, toDateTime } from 'src/shared';
 import { toJS } from 'mobx';
 
-const DashboardChart: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const DashboardChart: FC<BoxProps> = props => {
     const { colors } = useTheme();
-    const data = tonApiStatsStore.stats$.value?.chart;
-    const selectedTier = tonApiTiersStore.selectedTier$.value;
+    const data = tonApiStatsStore.restStats$.value;
+    const selectedTier = restApiTiersStore.selectedTier$.value;
 
     const ticks = useMemo(() => {
         if (!data?.length) {
@@ -42,11 +42,11 @@ const DashboardChart: FunctionComponent<ComponentProps<typeof Box>> = props => {
             return false;
         }
 
-        const requests = data.map(item => item.requests || 0);
-        return Math.max(...requests) >= selectedTier.description.requestsPerSecondLimit * 0.67;
+        const requests = data.map(item => item.value);
+        return Math.max(...requests) >= selectedTier.rps * 0.67;
     }, [data, selectedTier]);
 
-    if (!tonApiStatsStore.stats$.isResolved || !tonApiTiersStore.selectedTier$.isResolved) {
+    if (!tonApiStatsStore.restStats$.isResolved || !restApiTiersStore.selectedTier$.isResolved) {
         return (
             <Center h="200px" {...props}>
                 <Spinner />
@@ -86,7 +86,7 @@ const DashboardChart: FunctionComponent<ComponentProps<typeof Box>> = props => {
                         <>
                             <ReferenceLine
                                 ifOverflow="extendDomain"
-                                y={selectedTier?.description.requestsPerSecondLimit}
+                                y={selectedTier?.rps}
                                 stroke={colors.accent.red}
                             />
                             <Line

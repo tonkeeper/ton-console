@@ -15,7 +15,7 @@ import {
 import { H2, TickIcon } from 'src/shared';
 import { openFeedbackModal } from 'src/features/feedback/model/feedback';
 
-export const TonApiUnlimitedTierCard: FC<CardProps> = props => {
+export const RestApiUnlimitedTierCard: FC<CardProps> = props => {
     const { ...rest } = props;
 
     return (

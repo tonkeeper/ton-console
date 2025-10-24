@@ -11,15 +11,15 @@ import {
     Stack,
     Text
 } from '@chakra-ui/react';
-import { CURRENCY, H2, InfoTooltip, Span, DoneIconCircle24, toDate } from 'src/shared';
-import { TonApiSelectedTier, TonApiTier } from '../model';
+import { CURRENCY, H2, InfoTooltip, DoneIconCircle24, toDate } from 'src/shared';
+import { RestApiSelectedTier, RestApiTier } from '../model';
 import { CurrencyRate } from 'src/entities';
 
-export const TonApiTierCard: FC<
+export const RestApiTierCard: FC<
     CardProps & {
-        tier: TonApiTier | TonApiSelectedTier;
+        tier: RestApiTier | RestApiSelectedTier;
         tonPriceStyles?: ComponentProps<typeof Text>;
-        onChoseTier?: (tier: TonApiTier) => void;
+        onChoseTier?: (tier: RestApiTier) => void;
         isChosen?: boolean;
     }
 > = ({ tier, tonPriceStyles, isChosen = false, onChoseTier, ...rest }) => (
@@ -56,12 +56,12 @@ export const TonApiTierCard: FC<
                     <ListItem display="flex">
                         <ListIcon as={DoneIconCircle24} color="accent.green" />
                         <Box textStyle="body2" color="text.primary">
-                            {tier.description.requestsPerSecondLimit} requests per second
+                            {tier.rps} requests per second
                             {tier.price.amount.isZero() && (
                                 <>
                                     &nbsp;
                                     <InfoTooltip>
-                                        {tier.description.requestsPerSecondLimit} request per second
+                                        {tier.rps} request per second
                                         for requests with free api token, 0.25 requests per second
                                         for requests without api token
                                     </InfoTooltip>
@@ -69,39 +69,6 @@ export const TonApiTierCard: FC<
                             )}
                         </Box>
                     </ListItem>
-                    <ListItem display="flex">
-                        <ListIcon as={DoneIconCircle24} color="accent.green" />
-                        <Box textStyle="body2" color="text.primary">
-                            {tier.description.realtimeConnectionsLimit} realtime connections&nbsp;
-                            <Span whiteSpace="nowrap">
-                                <InfoTooltip>
-                                    Subscribe to any TON account changes using server sent events or
-                                    websockets
-                                </InfoTooltip>
-                            </Span>
-                        </Box>
-                    </ListItem>
-                    <ListItem display="flex">
-                        <ListIcon as={DoneIconCircle24} color="accent.green" />
-                        <Box textStyle="body2" color="text.primary">
-                            Watch up to {tier.description.entitiesPerRealtimeConnectionLimit}{' '}
-                            accounts for each connection
-                        </Box>
-                    </ListItem>
-                    {tier.description.mempool && (
-                        <ListItem display="flex">
-                            <ListIcon as={DoneIconCircle24} color="accent.green" />
-                            <Box textStyle="body2" color="text.primary">
-                                mempool events{' '}
-                                <Span whiteSpace="nowrap">
-                                    streaming&nbsp;
-                                    <InfoTooltip>
-                                        Get access to the TON blockchain mempool
-                                    </InfoTooltip>
-                                </Span>
-                            </Box>
-                        </ListItem>
-                    )}
                 </List>
             </Flex>
             {onChoseTier && (
