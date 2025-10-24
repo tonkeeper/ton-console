@@ -72,16 +72,14 @@ export class TonApiTiersStore {
         }
     );
 
-    checkValidChangeTier = createAsyncAction(async (tierId: number) => {
+    checkValidChangeTier = createAsyncAction((tierId: number) => {
         if (!projectsStore.selectedProject) {
             throw new Error('Project is not selected');
         }
 
-        const result = await apiClient.api.validChangeTonApiTier(tierId, {
+        return apiClient.api.validChangeTonApiTier(tierId, {
             project_id: projectsStore.selectedProject.id
-        });
-
-        return result.data;
+        }).then(result => result.data);
     });
 
     clearState(): void {
