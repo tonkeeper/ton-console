@@ -13,7 +13,7 @@ import { observer } from 'mobx-react-lite';
 import { CreateApiKeyForm } from '../model';
 import { ApiKeyForm } from './ApiKeyForm';
 import { FormProvider, useForm } from 'react-hook-form';
-import { apiKeysStore, tonApiTiersStore } from 'src/shared/stores';
+import { apiKeysStore, restApiTiersStore } from 'src/shared/stores';
 
 const CreateApiKeyModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'create-api-key-form';
@@ -38,7 +38,7 @@ const CreateApiKeyModal: FC<{ isOpen: boolean; onClose: () => void }> = props =>
         }
     }, [reset, props.isOpen]);
 
-    const maxLimit = tonApiTiersStore.selectedTier$.value?.description.requestsPerSecondLimit || 1;
+    const maxLimit = restApiTiersStore.selectedTier$.value?.rps ?? 1;
 
     return (
         <Modal scrollBehavior="inside" {...props}>

@@ -86,7 +86,7 @@ const SubscriptionList: FunctionComponent<SubscriptionListProps> = ({
                                   {subscription.plan}
                               </Text>
                               <Text fontSize="sm" color="text.secondary">
-                                  {subscription.interval} · Renews {toDate(subscription.renewsDate)}
+                                  {subscription.interval} · { subscription.renewsDate && `Renews ${toDate(subscription.renewsDate)}`}
                               </Text>
                           </Flex>
                           <Flex align="center" gap="4" flexShrink={0}>

@@ -13,7 +13,6 @@ import {
 } from '@chakra-ui/react';
 import { FC } from 'react';
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { TonApiStats } from '../model/interfaces';
 import { observer } from 'mobx-react-lite';
 import { tonApiStatsStore } from 'src/shared/stores';
 
@@ -28,28 +27,6 @@ const dateFormatter = (time: number) => {
         hour: '2-digit',
         minute: '2-digit'
     })}`;
-};
-
-const getLiteproxyRequestsData = (
-    data: TonApiStats
-): Array<{ time: number; value: number | undefined }> => {
-    return data.chart
-        .filter(item => item.liteproxyRequests !== undefined)
-        .map(item => ({
-            time: item.time,
-            value: item.liteproxyRequests
-        }));
-};
-
-const getLiteproxyConnectionsData = (
-    data: TonApiStats
-): Array<{ time: number; value: number | undefined }> => {
-    return data.chart
-        .filter(item => item.liteproxyConnections !== undefined)
-        .map(item => ({
-            time: item.time,
-            value: item.liteproxyConnections
-        }));
 };
 
 const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = observer(({ isOpen, onClose }) => {
@@ -103,7 +80,7 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = observer(({ isOpen, on
                         <Box h={250}>
                             <ResponsiveContainer height="100%">
                                 <LineChart
-                                    data={getLiteproxyRequestsData(value)}
+                                    data={value.requests}
                                     margin={{ left: 0, right: 0 }}
                                 >
                                     <XAxis
@@ -131,7 +108,7 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = observer(({ isOpen, on
                         <Box h={250}>
                             <ResponsiveContainer height="100%">
                                 <LineChart
-                                    data={getLiteproxyConnectionsData(value)}
+                                    data={value.connections}
                                     margin={{ left: 0, right: 0 }}
                                 >
                                     <XAxis

@@ -15,58 +15,40 @@ import {
     Th,
     Td
 } from '@chakra-ui/react';
-import { DoneIconCircle24, H4 } from 'src/shared';
-import { tonApiTiersStore } from 'src/shared/stores';
+import { H4 } from 'src/shared';
+import { restApiTiersStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
+
+interface Tier {
+    id: number;
+    name: string;
+    rps: string;
+    price: string;
+    type: 'monthly' | 'pay-as-you-go' | null;
+}
 
 const TonApiPricingModal: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ onClose, isOpen }) => {
-    const currentTier = tonApiTiersStore.selectedTier$.value;
+    const currentTier = restApiTiersStore.selectedTier$.value;
 
     if (!currentTier) {
         return null;
     }
 
-    const tiers: {
-        id: number;
-        name: string;
-        mempool: boolean | null;
-        entitiesPerRealtimeConnectionLimit: number | null;
-        realtimeConnectionsLimit: string | null;
-        requestsPerSecondLimit: string | null;
-        price: string;
-    }[] = tonApiTiersStore.tiers$.value.map(
-        ({
-            id,
-            price,
-            description: {
-                requestsPerSecondLimit,
-                realtimeConnectionsLimit,
-                entitiesPerRealtimeConnectionLimit,
-                mempool
-            },
-            name
-        }) => ({
-            id,
-            name,
-            mempool,
-            entitiesPerRealtimeConnectionLimit,
-            realtimeConnectionsLimit: realtimeConnectionsLimit.toString(),
-            requestsPerSecondLimit: requestsPerSecondLimit.toString(),
-            price: price.amount.eq(0) ? 'Free' : price.stringCurrencyAmount
-        })
-    );
+    const tiers: Tier[] = restApiTiersStore.tiers$.value.map(({ price, rps, ...rest }) => ({
+        ...rest,
+        rps: rps.toString(),
+        price: price.amount.eq(0) ? 'Free' : price.stringCurrencyAmount
+    }));
 
     tiers.push({
         id: -1,
         name: 'Custom',
-        mempool: null,
-        requestsPerSecondLimit: 'Unlimited',
-        entitiesPerRealtimeConnectionLimit: null,
-        realtimeConnectionsLimit: 'Unlimited',
-        price: 'Custom'
+        rps: 'Unlimited',
+        price: 'Custom',
+        type: null
     });
 
     return (
@@ -97,45 +79,10 @@ const TonApiPricingModal: FC<{
                         <Tbody>
                             <Tr>
                                 <Td minW={235}>Requests per sec</Td>
-                                {tiers.map(({ id, requestsPerSecondLimit }) => (
+                                {tiers.map(({ id, rps }) => (
                                     <Td key={id}>
                                         <Text textStyle="body2" color="text.secondary">
-                                            {requestsPerSecondLimit}
-                                        </Text>
-                                    </Td>
-                                ))}
-                            </Tr>
-
-                            <Tr>
-                                <Td minW={235}>Realtime connections</Td>
-                                {tiers.map(({ id, realtimeConnectionsLimit }) => (
-                                    <Td key={id}>
-                                        <Text textStyle="body2" color="text.secondary">
-                                            {realtimeConnectionsLimit}
-                                        </Text>
-                                    </Td>
-                                ))}
-                            </Tr>
-
-                            <Tr>
-                                <Td minW={235}>Account Tracking</Td>
-                                {tiers.map(({ id, entitiesPerRealtimeConnectionLimit }) => (
-                                    <Td key={id}>
-                                        <Text textStyle="body2" color="text.secondary">
-                                            {entitiesPerRealtimeConnectionLimit}
-                                        </Text>
-                                    </Td>
-                                ))}
-                            </Tr>
-
-                            <Tr>
-                                <Td minW={235}>Mempool event streaming</Td>
-                                {tiers.map(({ id, mempool }) => (
-                                    <Td key={id}>
-                                        <Text textStyle="body2" color="text.secondary">
-                                            {mempool && <DoneIconCircle24 width={5} />}
-                                            {mempool === false && '-'}
-                                            {mempool === null && ''}
+                                            {rps}
                                         </Text>
                                     </Td>
                                 ))}

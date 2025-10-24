@@ -19,10 +19,10 @@ import {
 } from 'src/shared';
 import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
-import { TonApiTier } from '../model';
-import { tonApiTiersStore } from 'src/shared/stores';
+import { RestApiTier } from '../model';
+import { restApiTiersStore } from 'src/shared/stores';
 
-const SelectTonApiTierItem = observer<{
+const SelectRestApiTierItem = observer<{
     name: string;
     amount?: string;
     onSelect: () => void;
@@ -60,14 +60,14 @@ const SelectTonApiTierItem = observer<{
     );
 });
 
-interface SelectTonApiTierProps extends BoxProps {
-    onSelectTier: (value: TonApiTier | 'custom') => void;
-    currentTier: TonApiTier | 'custom';
+interface SelectRestApiTierProps extends BoxProps {
+    onSelectTier: (value: RestApiTier | 'custom') => void;
+    currentTier: RestApiTier | 'custom';
 }
 
-export const SelectTonApiTier: FC<SelectTonApiTierProps> = observer(
+export const SelectRestApiTier: FC<SelectRestApiTierProps> = observer(
     ({ onSelectTier, currentTier, ...props }) => {
-        const chosedTier = tonApiTiersStore.selectedTier$.value;
+        const chosedTier = restApiTiersStore.selectedTier$.value;
 
         if (!chosedTier) {
             return null;
@@ -84,8 +84,8 @@ export const SelectTonApiTier: FC<SelectTonApiTierProps> = observer(
                         </HStack>
                     </MenuButtonDefault>
                     <MenuList zIndex={100} w="316px">
-                        {tonApiTiersStore.tiers$.value.map(tier => (
-                            <SelectTonApiTierItem
+                        {restApiTiersStore.tiers$.value.map(tier => (
+                            <SelectRestApiTierItem
                                 key={tier.id}
                                 name={tier.name}
                                 amount={tier.price.stringCurrencyAmount}
@@ -93,7 +93,7 @@ export const SelectTonApiTier: FC<SelectTonApiTierProps> = observer(
                                 isCurrent={tier.id === chosedTier.id}
                             />
                         ))}
-                        <SelectTonApiTierItem
+                        <SelectRestApiTierItem
                             name="Custom"
                             onSelect={() => onSelectTier('custom')}
                         />
