@@ -1,6 +1,7 @@
-import { ComponentProps, FC } from 'react';
+import { FC } from 'react';
 import {
     Box,
+    BoxProps,
     Button,
     Center,
     Checkbox,
@@ -20,7 +21,7 @@ const QueryTypesLabels: Record<AnalyticsQueryType, string> = {
     graph: 'Graph'
 };
 
-const FilterQueryByType: FC<ComponentProps<typeof Box>> = props => {
+const FilterQueryByType: FC<BoxProps> = props => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     const selectedTypesNumber = analyticsHistoryTableStore.pagination.filter.type?.length;

@@ -8,9 +8,10 @@ import {
     Box,
     Spinner,
     Td,
-    Center
+    Center,
+    BoxProps
 } from '@chakra-ui/react';
-import { ComponentProps, FC, PropsWithChildren, useContext, useRef } from 'react';
+import { FC, PropsWithChildren, useContext, useRef } from 'react';
 import InvoicesTableColumnLabel from './InvoicesTableSortButton';
 import { invoicesTableStore } from 'src/features';
 import { InvoicesTableContext } from 'src/features/invoices/ui/table/invoices-table-context';
@@ -36,7 +37,7 @@ const EmptyTable: FC<PropsWithChildren> = ({ children }) => {
 };
 
 export const InvoicesTableStructure = observer(
-    forwardRef<PropsWithChildren<ComponentProps<typeof Box>>, typeof Box>(
+    forwardRef<PropsWithChildren<BoxProps>, typeof Box>(
         ({ children, ...rest }, ref) => {
             let body = children;
             const { rawHeight } = useContext(InvoicesTableContext);

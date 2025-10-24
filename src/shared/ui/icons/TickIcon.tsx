@@ -1,8 +1,7 @@
-import { forwardRef, Icon } from '@chakra-ui/react';
-import { ComponentProps } from 'react';
+import { forwardRef, Icon, IconProps } from '@chakra-ui/react';
 
 export const TickIcon = forwardRef<
-    ComponentProps<typeof Icon> & { isIndeterminate?: unknown; isChecked?: unknown },
+    IconProps & { isIndeterminate?: unknown; isChecked?: unknown },
     typeof Icon
 >((props, ref) => {
     const { isIndeterminate: _, isChecked: __, ...rest } = props;

@@ -1,6 +1,6 @@
-import { Box, Button, Flex, Link, Text, Tooltip, useClipboard } from '@chakra-ui/react';
+import { Box, BoxProps, Button, Flex, Link, Text, Tooltip, useClipboard } from '@chakra-ui/react';
 import { addPath, ButtonLink, CopyPad, FileIcon16, Span } from 'src/shared';
-import { ComponentProps, FC } from 'react';
+import { FC } from 'react';
 import { DAPPS_LINKS, PendingDapp } from '../model';
 
 export const DappVerification: FC<
@@ -8,7 +8,7 @@ export const DappVerification: FC<
         pendingDapp: PendingDapp;
         onSubmit: () => unknown;
         submitLoading: boolean;
-    } & ComponentProps<typeof Box>
+    } & BoxProps
 > = ({ pendingDapp, onSubmit, submitLoading, ...rest }) => {
     const verificationFile = 'tc-verify.json';
     const verifyUrl = addPath(pendingDapp.url, 'tc-verify.json');

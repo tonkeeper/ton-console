@@ -1,5 +1,5 @@
-import { ComponentProps, FC, useMemo } from 'react';
-import { Box } from '@chakra-ui/react';
+import { FC, useMemo } from 'react';
+import { Box, BoxProps } from '@chakra-ui/react';
 import { ChartCard } from './ChartCard';
 import {
     Area,
@@ -15,7 +15,7 @@ import { hashString, hexToRGBA, toColor } from 'src/shared';
 import { AreaChartOptions } from '../../../model';
 
 export const AreaChartCard: FC<
-    ComponentProps<typeof Box> & {
+    BoxProps & {
         onClose: () => void;
         dataSource: Record<string, number>[];
         options?: Omit<AreaChartOptions, 'type'>;

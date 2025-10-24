@@ -1,5 +1,5 @@
-import { ComponentProps, FC } from 'react';
-import { Badge, Center, Spinner } from '@chakra-ui/react';
+import { FC } from 'react';
+import { Badge, BadgeProps, Center, Spinner } from '@chakra-ui/react';
 import { InvoiceStatus } from '../../models';
 import { Span } from 'src/shared';
 
@@ -23,7 +23,7 @@ export const invoiceBadges: Record<InvoiceStatus, { color: string; label: string
 };
 
 export const InvoiceStatusBadge: FC<
-    ComponentProps<typeof Badge> & { status: InvoiceStatus; isLoading?: boolean }
+    BadgeProps & { status: InvoiceStatus; isLoading?: boolean }
 > = ({ status, isLoading, ...rest }) => {
     const badge = invoiceBadges[status];
 

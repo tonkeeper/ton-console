@@ -1,5 +1,5 @@
-import { ComponentProps, FC, useRef, useState } from 'react';
-import { Box, Grid } from '@chakra-ui/react';
+import { FC, useRef, useState } from 'react';
+import { Box, BoxProps, Grid } from '@chakra-ui/react';
 import { VariableSizeGrid } from 'react-window';
 import { AnalyticsTableSource } from 'src/features';
 import { AnalyticsQueryResultsTableRow } from './AnalyticsQueryResultsTableRow';
@@ -11,7 +11,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 const MAX_INITIAL_COL_WIDTH = 500;
 
 export const AnalyticsTable: FC<
-    ComponentProps<typeof Box> & { source: AnalyticsTableSource }
+    BoxProps & { source: AnalyticsTableSource }
 > = ({ source, ...rest }) => {
     const gridRef = useRef<VariableSizeGrid>(null);
 

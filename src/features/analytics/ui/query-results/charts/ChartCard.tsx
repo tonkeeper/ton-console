@@ -1,9 +1,9 @@
-import { ComponentProps, FC, PropsWithChildren } from 'react';
-import { Box, Flex } from '@chakra-ui/react';
+import { FC, PropsWithChildren } from 'react';
+import { Box, BoxProps, Flex } from '@chakra-ui/react';
 import { CloseIcon24, IconButton, Span } from 'src/shared';
 
 export const ChartCard: FC<
-    PropsWithChildren<ComponentProps<typeof Box>> & { label: string; onClose: () => void }
+    PropsWithChildren<BoxProps> & { label: string; onClose: () => void }
 > = ({ label, children, onClose, ...rest }) => {
     return (
         <Box

@@ -1,5 +1,5 @@
-import { ComponentProps, FC } from 'react';
-import { Box, Grid, Text } from '@chakra-ui/react';
+import { FC } from 'react';
+import { Box, BoxProps, Grid, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { CRYPTO_CURRENCY, formatNumber, useIntervalUpdate } from 'src/shared';
 import { invoicesAppStore, InvoicesStatistics } from 'src/features';
@@ -75,7 +75,7 @@ const StatsCurentcy: FC<{ stats?: InvoicesStatistics; currency: CRYPTO_CURRENCY 
     );
 };
 
-const InvoicesStats: FC<ComponentProps<typeof Box>> = props => {
+const InvoicesStats: FC<BoxProps> = props => {
     useIntervalUpdate(invoicesAppStore.fetchInvoicesStatistics);
 
     return (

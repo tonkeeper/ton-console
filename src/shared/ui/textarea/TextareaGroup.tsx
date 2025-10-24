@@ -1,13 +1,13 @@
 import {
     Children,
-    ComponentProps,
+   
     FC,
     isValidElement,
     PropsWithChildren,
     useMemo,
     useState
 } from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box, BoxProps } from '@chakra-ui/react';
 import { TextareaFooter } from './TextareaFooter';
 import { TextareaGroupContext } from './textarea-group-context';
 import { TextareaRight } from './TextareaRight';
@@ -19,7 +19,7 @@ const horizontalStyles = {
     }
 };
 
-export const TextareaGroup: FC<PropsWithChildren<ComponentProps<typeof Box>>> = ({
+export const TextareaGroup: FC<PropsWithChildren<BoxProps>> = ({
     children,
     ...props
 }) => {

@@ -1,5 +1,5 @@
-import { ComponentProps, FC, PropsWithChildren, useState } from 'react';
-import { Box, Skeleton, Text } from '@chakra-ui/react';
+import { FC, PropsWithChildren, useState } from 'react';
+import { Box, Skeleton, Text, TextProps } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { Amount, CRYPTO_CURRENCY, getWindow, subtractPixels } from 'src/shared';
 import { ratesStore } from 'src/entities/rates';
@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 
 const CurrencyRate: FC<
     PropsWithChildren<
-        ComponentProps<typeof Text> & {
+        TextProps & {
             showSkeletonOnUpdate?: boolean;
             skeletonVariant?: string;
             leftSign?: string;

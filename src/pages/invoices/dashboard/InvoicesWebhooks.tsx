@@ -1,6 +1,7 @@
-import { ComponentProps, FC } from 'react';
+import { FC } from 'react';
 import {
     Box,
+    BoxProps,
     Button,
     Center,
     Flex,
@@ -65,7 +66,7 @@ const WebhookItem: FC<{ webhook: InvoicesWebhook }> = observer(({ webhook }) => 
     );
 });
 
-const InvoicesWebhooks: FC<ComponentProps<typeof Box>> = props => {
+const InvoicesWebhooks: FC<BoxProps> = props => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (

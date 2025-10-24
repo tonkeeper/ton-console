@@ -1,12 +1,12 @@
-import { ChangeEvent, ComponentProps, useRef, useState, UIEvent, useLayoutEffect } from 'react';
-import { Box, forwardRef, Textarea } from '@chakra-ui/react';
+import { ChangeEvent, useRef, useState, UIEvent, useLayoutEffect } from 'react';
+import { Box, BoxProps, forwardRef, Textarea, TextareaProps } from '@chakra-ui/react';
 import { mergeRefs } from 'src/shared';
-import ResizeTextarea from 'react-textarea-autosize';
+import ResizeTextarea, { TextareaAutosizeProps } from 'react-textarea-autosize';
 
 export const NumberedTextArea = forwardRef<
-    ComponentProps<typeof Textarea> & {
-        wrapperProps?: ComponentProps<typeof Box>;
-    } & ComponentProps<typeof ResizeTextarea>,
+    TextareaProps & {
+        wrapperProps?: BoxProps;
+    } & TextareaAutosizeProps,
     typeof Textarea
 >(({ onChange, onScroll, wrapperProps, minRows, ...rest }, ref) => {
     const [linesNumber, setLinesNumber] = useState(1);

@@ -1,10 +1,10 @@
-import { ComponentProps, FC } from 'react';
-import { Box, Center, Grid, GridItem, Spinner } from '@chakra-ui/react';
+import { FC } from 'react';
+import { Box, BoxProps, Center, Grid, GridItem, Spinner } from '@chakra-ui/react';
 import { DashboardTierCard } from '../../tonapi';
 import { restApiTiersStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 
-const DashboardCardsList: FC<ComponentProps<typeof Box>> = props => {
+const DashboardCardsList: FC<BoxProps> = props => {
     if (!restApiTiersStore.selectedTier$.isResolved) {
         return (
             <Center h="78px" {...props}>

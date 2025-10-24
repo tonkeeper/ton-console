@@ -1,11 +1,11 @@
-import { ComponentProps, FC } from 'react';
-import { Box, forwardRef, Grid } from '@chakra-ui/react';
+import { forwardRef } from 'react';
+import { Box, BoxProps, Grid } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { H3 } from 'src/shared';
 import { restApiTiersStore } from 'src/shared/stores';
 import { RestApiTierCard, RestApiUnlimitedTierCard } from 'src/features/tonapi/pricing';
 
-const TonApiPricing: FC<ComponentProps<typeof Box>> = forwardRef((props, ref) => {
+const TonApiPricing = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
     if (!restApiTiersStore?.tiers$.isResolved) {
         return null;
     }

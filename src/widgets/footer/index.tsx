@@ -1,8 +1,8 @@
-import { ComponentProps, FC } from 'react';
-import { Flex, Link } from '@chakra-ui/react';
+import { FC } from 'react';
+import { Flex, FlexProps, Link } from '@chakra-ui/react';
 import { EXTERNAL_LINKS } from 'src/shared';
 
-export const Footer: FC<ComponentProps<typeof Flex>> = props => {
+export const Footer: FC<FlexProps> = props => {
     return (
         <Flex as="footer" columnGap="4" {...props} wrap="wrap">
             <Link p="1" href={EXTERNAL_LINKS.SUPPORT} isExternal>

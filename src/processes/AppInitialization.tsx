@@ -14,7 +14,7 @@ const FadeAnimation: FC<FadeProps> = props => (
 );
 
 const AppInitialization: FC<PropsWithChildren> = props => {
-    const ref = useRef<SVGElement | null>(null);
+    const ref = useRef<SVGSVGElement | null>(null);
 
     useEffect(() => {
         if (appStore.isInitialized && ref.current) {

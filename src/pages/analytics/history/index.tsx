@@ -1,5 +1,5 @@
-import { ComponentProps, FC, useEffect } from 'react';
-import { Box, Button, Flex } from '@chakra-ui/react';
+import { FC, useEffect } from 'react';
+import { Box, BoxProps, Button, Flex } from '@chakra-ui/react';
 import { H4, Overlay } from 'src/shared';
 import {
     AnalyticsHistoryTable,
@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 // import { projectsStore } from 'src/shared/stores';
 
-const HistoryPage: FC<ComponentProps<typeof Box>> = () => {
+const HistoryPage: FC<BoxProps> = () => {
     useEffect(() => {
         analyticsHistoryTableStore.loadFirstPage();
     }, []);

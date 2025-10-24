@@ -1,7 +1,7 @@
-import { Icon } from '@chakra-ui/react';
-import { ComponentProps, FC } from 'react';
+import { Icon, IconProps } from '@chakra-ui/react';
+import { FC } from 'react';
 
-export const CancelIcon24: FC<ComponentProps<typeof Icon>> = props => {
+export const CancelIcon24: FC<IconProps> = props => {
     return (
         <Icon
             w="24px"

@@ -1,4 +1,4 @@
-import { ComponentProps, FC } from 'react';
+import { FC } from 'react';
 import {
     Box,
     Button,
@@ -9,7 +9,8 @@ import {
     ListIcon,
     ListItem,
     Stack,
-    Text
+    Text,
+    TextProps
 } from '@chakra-ui/react';
 import {
     CURRENCY,
@@ -25,7 +26,7 @@ import { CurrencyRate } from 'src/entities';
 export const LiteserversTierCard: FC<
     CardProps & {
         tier: DTOLiteproxyTier | DTOProjectLiteproxyTierDetail;
-        tonPriceStyles?: ComponentProps<typeof Text>;
+        tonPriceStyles?: TextProps;
         onChoseTier?: (tier: DTOLiteproxyTier) => void;
         isChosen?: boolean;
     }

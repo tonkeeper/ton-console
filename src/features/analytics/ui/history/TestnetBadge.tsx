@@ -1,8 +1,8 @@
-import { ComponentProps, FC } from 'react';
-import { Box, Flex } from '@chakra-ui/react';
+import { FC } from 'react';
+import { Box, BoxProps, Flex } from '@chakra-ui/react';
 import { Span } from 'src/shared';
 
-export const TestnetBadge: FC<ComponentProps<typeof Box>> = props => {
+export const TestnetBadge: FC<BoxProps> = props => {
     return (
         <Flex
             align="center"

@@ -1,7 +1,7 @@
-import { Box } from '@chakra-ui/react';
-import { ComponentProps, forwardRef } from 'react';
+import { Box, BoxProps } from '@chakra-ui/react';
+import { forwardRef } from 'react';
 
-export const H3Thin = forwardRef<HTMLHeadingElement, ComponentProps<typeof Box>>((props, ref) => (
+export const H3Thin = forwardRef<HTMLHeadingElement, BoxProps>((props, ref) => (
     <Box ref={ref} as="h3" textStyle="h3Thin" cursor="default" {...props} />
 ));
 

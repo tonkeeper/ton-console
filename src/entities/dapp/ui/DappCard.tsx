@@ -1,8 +1,9 @@
-import { ComponentProps, FC } from 'react';
+import { FC } from 'react';
 import {
     Box,
     Card,
     CardBody,
+    CardProps,
     Menu,
     MenuButton,
     MenuItem,
@@ -17,7 +18,7 @@ import { observer } from 'mobx-react-lite';
 import { dappStore } from 'src/shared/stores';
 
 const DappCard: FC<
-    ComponentProps<typeof Card> & {
+    CardProps & {
         dapp: Pick<Dapp, 'name' | 'image' | 'url'> & { id?: Dapp['id'] };
         withMenu?: boolean;
     }

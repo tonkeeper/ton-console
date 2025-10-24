@@ -1,5 +1,5 @@
 import {
-    ComponentProps,
+   
     FC,
     useCallback,
     useEffect,
@@ -8,6 +8,7 @@ import {
 } from 'react';
 import {
     Box,
+    BoxProps,
     Button,
     chakra,
     Flex,
@@ -42,8 +43,8 @@ const inputsLabels = {
 };
 
 export const DAppUrlInputForm: FC<
-    ComponentProps<typeof Box> & {
-        onSubmit: (dappForm: CreateDappForm) => void;
+    Omit<BoxProps, 'onSubmit'> & {
+        onSubmit: (dappForm: CreateDappForm) => void | Promise<void>;
         submitButtonLoading: boolean;
         validator: (
             val: string
