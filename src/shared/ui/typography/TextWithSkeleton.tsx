@@ -1,9 +1,9 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren } from 'react';
+import { ComponentProps, FC, PropsWithChildren } from 'react';
 import { Skeleton, Text, useTheme } from '@chakra-ui/react';
 import { subtractPixels } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 
-const TextWithSkeleton: FunctionComponent<
+const TextWithSkeleton: FC<
     PropsWithChildren<
         { isLoading: boolean; skeletonWidth: string | number } & (
             | { textStyle: string }

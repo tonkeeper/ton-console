@@ -1,4 +1,4 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FC } from 'react';
 import { Box, Divider } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { H4, Overlay } from 'src/shared';
@@ -8,7 +8,7 @@ import InvoicesAuthorization from './InvoicesAuthorization';
 import InvoicesWebhooks from './InvoicesWebhooks';
 import InvoicesApi from './InvoicesApi';
 
-const InvoiceDashboardPage: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const InvoiceDashboardPage: FC<ComponentProps<typeof Box>> = props => {
     return (
         <Overlay {...props}>
             <H4 mb="1">Overview</H4>

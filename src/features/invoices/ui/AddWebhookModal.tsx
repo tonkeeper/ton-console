@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useId } from 'react';
+import { FC, useEffect, useId } from 'react';
 import {
     Button,
     FormControl,
@@ -17,7 +17,7 @@ import { useForm } from 'react-hook-form';
 import { invoicesAppStore } from 'src/features';
 import { observer } from 'mobx-react-lite';
 
-const AddWebhookModal: FunctionComponent<{
+const AddWebhookModal: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ isOpen, onClose }) => {

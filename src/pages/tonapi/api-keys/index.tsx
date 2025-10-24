@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { EmptyApiKeys } from './EmptyApiKeys';
 import { observer } from 'mobx-react-lite';
 import { ApiKeysTable, CreateApiKeyModal } from 'src/features';
@@ -7,7 +7,7 @@ import { Button, Center, Spinner, useDisclosure } from '@chakra-ui/react';
 import { SelectPlanFirstly } from 'src/pages/tonapi/api-keys/SelectPlanFirstly';
 import { restApiTiersStore, apiKeysStore } from 'src/shared/stores';
 
-const ApiKeysPage: FunctionComponent = () => {
+const ApiKeysPage: FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     if (!restApiTiersStore.selectedTier$.isResolved || !apiKeysStore.apiKeys$.isResolved) {

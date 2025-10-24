@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Modal,
@@ -14,7 +14,7 @@ import { ProjectFormValues } from 'src/entities';
 import { observer } from 'mobx-react-lite';
 import { projectsStore } from 'src/shared/stores';
 
-const CreateProjectModal_: FunctionComponent<{ isOpen: boolean; onClose: () => void }> = props => {
+const CreateProjectModal_: FC<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'create-project-form';
 
     const onSubmit = (form: ProjectFormValues): void => {

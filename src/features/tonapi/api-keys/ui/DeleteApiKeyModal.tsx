@@ -1,11 +1,11 @@
-import { FunctionComponent, useCallback } from 'react';
+import { FC, useCallback } from 'react';
 import { Text } from '@chakra-ui/react';
 import { ApiKey } from '../model';
 import { observer } from 'mobx-react-lite';
 import { ConfirmationDialog } from 'src/entities';
 import { apiKeysStore } from 'src/shared/stores';
 
-const DeleteApiKeyModal: FunctionComponent<{
+const DeleteApiKeyModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     apiKey: ApiKey;

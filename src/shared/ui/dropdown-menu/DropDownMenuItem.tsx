@@ -1,5 +1,5 @@
 import { Box, Button, chakra } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent, PropsWithChildren, ReactNode, useMemo } from 'react';
+import { ComponentProps, FC, PropsWithChildren, ReactNode, useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { eqPaths } from 'src/shared';
 
@@ -31,7 +31,7 @@ const MenuItemButton = chakra(Button, {
     }
 });
 
-export const DropDownMenuItem: FunctionComponent<
+export const DropDownMenuItem: FC<
     ComponentProps<typeof Box> &
         PropsWithChildren & { layer?: number; leftIcon?: ReactNode; linkTo?: string; path?: string }
 > = props => {

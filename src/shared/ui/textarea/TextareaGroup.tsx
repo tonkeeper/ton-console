@@ -1,7 +1,7 @@
 import {
     Children,
     ComponentProps,
-    FunctionComponent,
+    FC,
     isValidElement,
     PropsWithChildren,
     useMemo,
@@ -19,7 +19,7 @@ const horizontalStyles = {
     }
 };
 
-export const TextareaGroup: FunctionComponent<PropsWithChildren<ComponentProps<typeof Box>>> = ({
+export const TextareaGroup: FC<PropsWithChildren<ComponentProps<typeof Box>>> = ({
     children,
     ...props
 }) => {

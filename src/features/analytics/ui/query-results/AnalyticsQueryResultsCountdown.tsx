@@ -1,9 +1,9 @@
-import { ComponentProps, FunctionComponent, useEffect, useState } from 'react';
+import { ComponentProps, FC, useEffect, useState } from 'react';
 import { Box, Flex } from '@chakra-ui/react';
 import { toTimeLeft, useCountup } from 'src/shared';
 import { AnalyticsQueryPending } from '../../model';
 
-export const AnalyticsQueryResultsCountdown: FunctionComponent<
+export const AnalyticsQueryResultsCountdown: FC<
     ComponentProps<typeof Box> & { query: AnalyticsQueryPending }
 > = ({ query, ...rest }) => {
     const [renderDate, setRenderDate] = useState(() => Date.now());

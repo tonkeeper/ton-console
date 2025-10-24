@@ -1,8 +1,8 @@
-import { FunctionComponent, PropsWithChildren, useEffect, useState } from 'react';
+import { FC, PropsWithChildren, useEffect, useState } from 'react';
 import { projectsStore } from '../stores/root.store';
 import { awaitValueResolved } from '../lib/mobx/await-value-resolved';
 
-export const StoresInitializer: FunctionComponent<PropsWithChildren> = ({ children }) => {
+export const StoresInitializer: FC<PropsWithChildren> = ({ children }) => {
     const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {

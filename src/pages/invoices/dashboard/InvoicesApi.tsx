@@ -1,4 +1,4 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FC } from 'react';
 import {
     Box,
     Code,
@@ -15,7 +15,7 @@ import { CopyPad, CardLink } from 'src/shared';
 import { invoicesAppStore, INVOICES_LINKS } from 'src/features';
 import { observer } from 'mobx-react-lite';
 
-const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const InvoicesApi: FC<ComponentProps<typeof Box>> = props => {
     return (
         <Box {...props}>
             <Tabs mb="4" isLazy={true}>

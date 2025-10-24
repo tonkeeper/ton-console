@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import {
     chakra,
     Flex,
@@ -22,7 +22,7 @@ export type FaucetFormInternal = {
     address: string;
 };
 
-export const FaucetForm: FunctionComponent<
+export const FaucetForm: FC<
     StyleProps & {
         id?: string;
         tonLimit?: TonCurrencyAmount;

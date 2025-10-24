@@ -1,4 +1,4 @@
-import { ComponentProps, FunctionComponent, useContext, useRef } from 'react';
+import { ComponentProps, FC, useContext, useRef } from 'react';
 import { Box, useTheme } from '@chakra-ui/react';
 import CodeMirror from '@uiw/react-codemirror';
 import { draculaInit } from '@uiw/codemirror-theme-dracula/src';
@@ -7,7 +7,7 @@ import { CodeAreaGroupContext } from './CodeAreaGroup';
 import type { Extension } from '@codemirror/state';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
-export const CodeArea: FunctionComponent<
+export const CodeArea: FC<
     {
         value: string;
         onChange: (value: string) => void;

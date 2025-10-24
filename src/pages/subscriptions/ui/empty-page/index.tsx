@@ -1,10 +1,10 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { H4, Overlay } from 'src/shared';
 import { Button, Flex, List, ListItem, Text } from '@chakra-ui/react';
 import { SubscriptionIcon } from './SubscriptionIcon';
 import { CreateSubscriptionsPlan } from 'src/widgets';
 
-export const EmptyPage: FunctionComponent = () => {
+export const EmptyPage: FC = () => {
     return (
         <Overlay display="flex" alignItems="center" h="100%">
             <Flex align="center" direction="column" w="100%" pt="8" pb="14">

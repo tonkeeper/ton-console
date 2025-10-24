@@ -1,4 +1,4 @@
-import { FunctionComponent, useRef } from 'react';
+import { FC, useRef } from 'react';
 import { ButtonLink, DocsIcon16, EXTERNAL_LINKS, H1, H2, H3, Overlay, TgIcon } from 'src/shared';
 import { Button, Flex, Text, useBreakpointValue } from '@chakra-ui/react';
 import { userStore } from 'src/shared/stores';
@@ -7,7 +7,7 @@ import TonApiPricing from './TonApiPricing';
 import { Footer } from 'src/widgets';
 import { FeaturesList } from 'src/features';
 
-const LandingPage: FunctionComponent = () => {
+const LandingPage: FC = () => {
     const tonapiRef = useRef<HTMLDivElement | null>(null);
 
     const onTonapiClick = (): void => {

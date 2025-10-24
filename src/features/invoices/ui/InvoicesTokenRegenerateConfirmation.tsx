@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Modal,
@@ -12,7 +12,7 @@ import {
 import { invoicesAppStore } from 'src/features';
 import { observer } from 'mobx-react-lite';
 
-const InvoicesTokenRegenerateConfirmation: FunctionComponent<{
+const InvoicesTokenRegenerateConfirmation: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ isOpen, onClose }) => {

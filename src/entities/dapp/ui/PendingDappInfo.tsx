@@ -1,10 +1,10 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FC } from 'react';
 import { Box, Button, Text, useDisclosure } from '@chakra-ui/react';
 import { PendingDapp } from '../model';
 import { ConfirmAppResetModal } from './ConfirmAppResetModal';
 import DappCard from './DappCard';
 
-export const PendingDappInfo: FunctionComponent<
+export const PendingDappInfo: FC<
     {
         pendingDapp: PendingDapp;
         onReset: () => void;

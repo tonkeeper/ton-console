@@ -1,8 +1,8 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren, ReactElement } from 'react';
+import { ComponentProps, FC, PropsWithChildren, ReactElement } from 'react';
 import { Box, Card, CardBody, CardFooter, Flex, Image, Text, chakra } from '@chakra-ui/react';
 import type * as CSS from 'csstype';
 
-export const FeatureCard: FunctionComponent<
+export const FeatureCard: FC<
     PropsWithChildren<
         ComponentProps<typeof Box> & {
             background: CSS.Property.Color;

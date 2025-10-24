@@ -1,8 +1,8 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Text } from '@chakra-ui/react';
 import { ConfirmationDialog } from 'src/entities/confirmation-dialog';
 
-export const DeleteProjectConfirmation: FunctionComponent<
+export const DeleteProjectConfirmation: FC<
     { projectName: string } & { isOpen: boolean; onClose: () => void; onConfirm: () => void }
 > = props => {
     const { projectName, isOpen, onClose, onConfirm } = props;

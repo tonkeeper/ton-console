@@ -1,8 +1,8 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren, useContext } from 'react';
+import { ComponentProps, FC, PropsWithChildren, useContext } from 'react';
 import { Box } from '@chakra-ui/react';
 import { TextareaGroupContext } from './textarea-group-context';
 
-export const TextareaRight: FunctionComponent<PropsWithChildren<ComponentProps<typeof Box>>> = ({
+export const TextareaRight: FC<PropsWithChildren<ComponentProps<typeof Box>>> = ({
     children,
     ...rest
 }) => {

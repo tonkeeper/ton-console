@@ -10,13 +10,13 @@ import {
     Td,
     Center
 } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent, PropsWithChildren, useContext, useRef } from 'react';
+import { ComponentProps, FC, PropsWithChildren, useContext, useRef } from 'react';
 import InvoicesTableColumnLabel from './InvoicesTableSortButton';
 import { invoicesTableStore } from 'src/features';
 import { InvoicesTableContext } from 'src/features/invoices/ui/table/invoices-table-context';
 import { observer } from 'mobx-react-lite';
 
-const EmptyTable: FunctionComponent<PropsWithChildren> = ({ children }) => {
+const EmptyTable: FC<PropsWithChildren> = ({ children }) => {
     const { rawHeight } = useContext(InvoicesTableContext);
     return (
         <Tr h={rawHeight} maxH={rawHeight}>

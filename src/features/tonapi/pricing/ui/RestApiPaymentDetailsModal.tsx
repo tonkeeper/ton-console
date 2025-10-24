@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback } from 'react';
+import { FC, useCallback } from 'react';
 import {
     Button,
     Modal,
@@ -18,7 +18,7 @@ import { observer } from 'mobx-react-lite';
 import { CurrencyRate } from 'src/entities';
 import { restApiTiersStore, balanceStore } from 'src/shared/stores';
 
-const RestApiPaymentDetailsModal: FunctionComponent<{
+const RestApiPaymentDetailsModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     tier: RestApiTier;

@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import {
     chakra,
     FormControl,
@@ -46,7 +46,7 @@ const invoiceLifeTimeMask = {
     max: 60 * 24 * 90 // 3 months
 };
 
-export const CreateInvoiceFrom: FunctionComponent<
+export const CreateInvoiceFrom: FC<
     StyleProps & {
         id?: string;
         onSubmit: SubmitHandler<InvoiceForm>;

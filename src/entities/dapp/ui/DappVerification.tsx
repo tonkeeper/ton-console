@@ -1,9 +1,9 @@
 import { Box, Button, Flex, Link, Text, Tooltip, useClipboard } from '@chakra-ui/react';
 import { addPath, ButtonLink, CopyPad, FileIcon16, Span } from 'src/shared';
-import { ComponentProps, FunctionComponent } from 'react';
+import { ComponentProps, FC } from 'react';
 import { DAPPS_LINKS, PendingDapp } from '../model';
 
-export const DappVerification: FunctionComponent<
+export const DappVerification: FC<
     {
         pendingDapp: PendingDapp;
         onSubmit: () => unknown;

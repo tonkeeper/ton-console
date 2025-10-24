@@ -1,7 +1,7 @@
 import {
     cloneElement,
     ComponentProps,
-    FunctionComponent,
+    FC,
     isValidElement,
     PropsWithChildren,
     ReactElement,
@@ -28,7 +28,7 @@ const defaultModifiers = [
     }
 ];
 
-export const TooltipHoverable: FunctionComponent<
+export const TooltipHoverable: FC<
     PropsWithChildren<
         {
             host: ReactElement | string;

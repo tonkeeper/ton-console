@@ -1,9 +1,9 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { AirdropSchemeIcon, H3, Overlay } from 'src/shared';
 import { Card, Button, Flex, Text } from '@chakra-ui/react';
 
-export const EmptyAirdrops: FunctionComponent = () => {
+export const EmptyAirdrops: FC = () => {
     return (
         <Overlay display="flex" alignItems="center" justifyContent="center">
             <Flex align="flex-start" direction="column" gap="32px" maxW="800px">

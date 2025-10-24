@@ -1,10 +1,10 @@
-import { FunctionComponent, useCallback } from 'react';
+import { FC, useCallback } from 'react';
 import { Text } from '@chakra-ui/react';
 import { Webhook, webhooksStore } from '../model';
 import { observer } from 'mobx-react-lite';
 import { ConfirmationDialog } from 'src/entities';
 
-const DeleteWebhooksModal: FunctionComponent<{
+const DeleteWebhooksModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     webhook: Webhook;

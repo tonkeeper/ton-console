@@ -1,6 +1,6 @@
 import { Box, Flex } from '@chakra-ui/react';
 import {
-    FunctionComponent,
+    FC,
     memo,
     PropsWithChildren,
     useContext,
@@ -12,7 +12,7 @@ import {
 import { AnalyticsTableContext } from './analytics-table-context';
 import { getTextWidth } from './analytics-query-ui-utils';
 
-export const AnalyticsQueryTableStructure: FunctionComponent<PropsWithChildren> = memo(() => {
+export const AnalyticsQueryTableStructure: FC<PropsWithChildren> = memo(() => {
     const {
         columnsWidths,
         isResizingProcess,

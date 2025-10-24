@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 import { ButtonLink, DownloadIcon16, H4, Overlay } from 'src/shared';
 import {
@@ -15,7 +15,7 @@ import {
 } from 'src/features';
 import { Box, Button, Flex, useDisclosure } from '@chakra-ui/react';
 
-const ManageInvoicesPage: FunctionComponent = () => {
+const ManageInvoicesPage: FC = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     return (
         <Overlay display="flex" flexDirection="column">

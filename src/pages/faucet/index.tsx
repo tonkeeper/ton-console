@@ -1,4 +1,4 @@
-import { FunctionComponent, useId, useState } from 'react';
+import { FC, useId, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { H4, isNumber, Overlay, Span, TonCurrencyAmount, useIntervalUpdate } from 'src/shared';
 import { Button, Divider, Flex, Link, useDisclosure } from '@chakra-ui/react';
@@ -14,7 +14,7 @@ import BigNumber from 'bignumber.js';
 import { RefillModal } from 'src/entities';
 import { balanceStore } from 'src/shared/stores';
 
-const FaucetPage: FunctionComponent = () => {
+const FaucetPage: FC = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { isOpen: isRefillOpen, onClose: onRefillClose, onOpen: onRefillOpen } = useDisclosure();
     const [receiverAddress, setReceiverAddress] = useState('');

@@ -1,9 +1,9 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { CreateIcon96, H4, Overlay } from 'src/shared';
 import { Button, Flex, Text } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
-export const SelectPlanFirstly: FunctionComponent = () => {
+export const SelectPlanFirstly: FC = () => {
     return (
         <Overlay display="flex" alignItems="center" justifyContent="center">
             <Flex align="center" direction="column" maxW="512px">
