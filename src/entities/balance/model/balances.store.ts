@@ -128,7 +128,7 @@ export class BalancesStore {
 function mapDTODepositToRefill(dtoDeposit: DTODeposit): Refill {
     const commonFields = {
         id: new Date(dtoDeposit.income_date).getTime(),
-        date: new Date(dtoDeposit.income_date),
+        date: new Date(dtoDeposit.income_date * 1000),
         amount: new TonCurrencyAmount(dtoDeposit.amount)
     };
 
