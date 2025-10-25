@@ -13,7 +13,7 @@ const DashboardPage: FC = () => {
                 </Flex>
                 <DashboardCardsList mb="6" />
                 <Text textStyle="label1" mb="5" color="text.primary">
-                    Api requests on behalf
+                    REST API requests on behalf
                 </Text>
                 <DashboardChart />
             </Overlay>
