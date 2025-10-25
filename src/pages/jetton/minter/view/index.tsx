@@ -3,7 +3,8 @@ import { Address } from '@ton/core';
 import { TonConnectButton, useTonAddress } from '@tonconnect/ui-react';
 import { observer } from 'mobx-react-lite';
 import { FC, useEffect, useMemo } from 'react';
-import { JettonCard, jettonStore } from 'src/features';
+import { useLocalObservable } from 'mobx-react-lite';
+import { JettonCard, JettonStore } from 'src/features';
 import { isValidAddress } from 'src/features/jetton/lib/utils';
 import JettonWallet from 'src/features/jetton/ui/minter/JettonWallet';
 import { H4, Overlay } from 'src/shared';
@@ -16,6 +17,8 @@ const JettonViewPage: FC<BoxProps> = () => {
         () => (connectedWalletAddressStr ? Address.parse(connectedWalletAddressStr) : null),
         [connectedWalletAddressStr]
     );
+
+    const jettonStore = useLocalObservable(() => new JettonStore());
 
     useEffect(() => {
         const jettonAddress = address && isValidAddress(address) ? Address.parse(address) : null;
@@ -31,7 +34,7 @@ const JettonViewPage: FC<BoxProps> = () => {
             jettonStore.setJettonAddress(null);
             jettonStore.setConnectedWalletAddress(null);
         };
-    }, []);
+    }, [jettonStore]);
 
     const jettonInfo = jettonStore.jettonInfo$.value;
     const jettonInfoLoading = jettonStore.jettonInfo$.isLoading;
@@ -56,12 +59,13 @@ const JettonViewPage: FC<BoxProps> = () => {
                 </Overlay>
             ) : (
                 <>
-                    <JettonCard data={jettonInfo} />
+                    <JettonCard data={jettonInfo} jettonStore={jettonStore} />
                     <Divider mt={6} />
 
                     <JettonWallet
                         connectedWalletAddress={connectedWalletAddress}
                         jettonInfo={jettonInfo}
+                        jettonStore={jettonStore}
                     />
                 </>
             )}
