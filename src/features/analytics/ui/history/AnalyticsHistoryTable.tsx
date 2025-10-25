@@ -1,22 +1,37 @@
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { Box, BoxProps } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
-import { analyticsHistoryTableStore } from '../../model';
+import { AnalyticsHistoryTableStore } from '../../model';
 import AnalyticsHistoryTableRow from './AnalyticsHistoryTableRow';
 import { AnalyticsHistoryTableStructure } from './AnalyticsHistoryTableStructure';
 import { AnalyticsHistoryTableContext } from './analytics-history-table-context';
 import ExplainSQLModal from '../ExplainSQLModal';
 
-const AnalyticsHistoryTable: FC<BoxProps> = props => {
+interface AnalyticsHistoryTableProps extends BoxProps {
+    analyticsHistoryTableStore: AnalyticsHistoryTableStore;
+}
+
+const AnalyticsHistoryTable: FC<AnalyticsHistoryTableProps> = ({
+    analyticsHistoryTableStore,
+    ...props
+}) => {
     const [queryForModal, setQueryForModal] = useState<string | null>(null);
     const rowHeight = '68px';
 
+    const contextValue = useMemo(() => ({
+        rowHeight,
+        setQueryForModal,
+        analyticsHistoryTableStore
+    }), [analyticsHistoryTableStore]);
+
     return (
         <>
-            <AnalyticsHistoryTableContext.Provider value={{ rowHeight, setQueryForModal }}>
+            <AnalyticsHistoryTableContext.Provider
+                value={contextValue}
+            >
                 <Box {...props}>
                     <InfiniteLoader
                         isItemLoaded={analyticsHistoryTableStore.isItemLoaded}

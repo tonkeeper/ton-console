@@ -1,9 +1,12 @@
 import { createContext } from 'react';
+import { AnalyticsHistoryTableStore } from '../../model';
 
-export const AnalyticsHistoryTableContext = createContext<{
+interface AnalyticsHistoryTableContextValue {
     rowHeight: string;
     setQueryForModal: (value: string) => void;
-}>({
-    rowHeight: '68px',
-    setQueryForModal: () => {}
-});
+    analyticsHistoryTableStore: AnalyticsHistoryTableStore;
+}
+
+export const AnalyticsHistoryTableContext = createContext<AnalyticsHistoryTableContextValue | null>(
+    null
+) as React.Context<AnalyticsHistoryTableContextValue>;

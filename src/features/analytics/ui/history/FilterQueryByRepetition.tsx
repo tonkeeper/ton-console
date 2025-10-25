@@ -1,9 +1,16 @@
 import { FC } from 'react';
 import { Checkbox, CheckboxProps } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { analyticsHistoryTableStore } from 'src/features';
+import { AnalyticsHistoryTableStore } from 'src/features';
 
-const FilterQueryByRepetition: FC<CheckboxProps> = props => {
+interface FilterQueryByRepetitionProps extends CheckboxProps {
+    analyticsHistoryTableStore: AnalyticsHistoryTableStore;
+}
+
+const FilterQueryByRepetition: FC<FilterQueryByRepetitionProps> = ({
+    analyticsHistoryTableStore,
+    ...props
+}) => {
     return (
         <Checkbox
             h="fit-content"

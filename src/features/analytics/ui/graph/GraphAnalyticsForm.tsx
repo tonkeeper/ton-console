@@ -13,10 +13,17 @@ import { InfoTooltip, NumberedTextArea } from 'src/shared';
 import { Observer, observer } from 'mobx-react-lite';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { useForm } from 'react-hook-form';
-import { analyticsGraphQueryStore } from '../../model';
+import { AnalyticsGraphQueryStore } from '../../model';
 import { useSearchParams } from 'react-router-dom';
 
-const GraphAnalyticsForm: FC<BoxProps> = props => {
+interface GraphAnalyticsFormProps extends BoxProps {
+    analyticsGraphQueryStore: AnalyticsGraphQueryStore;
+}
+
+const GraphAnalyticsForm: FC<GraphAnalyticsFormProps> = ({
+    analyticsGraphQueryStore,
+    ...props
+}) => {
     const textAreaLineHeight = 22;
     const {
         register,
