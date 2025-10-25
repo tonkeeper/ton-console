@@ -1,4 +1,4 @@
-import { Address } from 'ton-core';
+import { Address } from '@ton/core';
 
 export class TonAddress extends Address {
     static parse(source: string): TonAddress {
