@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 import { Box, Text } from '@chakra-ui/react';
 import { Overlay } from 'src/shared';
 import { observer } from 'mobx-react-lite';
@@ -11,7 +11,7 @@ const SubscriptionsBlock: FC = () => {
     return (
         <Overlay height="auto" p="0" display="flex" flexDirection="column" flex="1" minW="330px">
             <Box px="6" py="5">
-                <Text fontSize="lg" mb="2" fontWeight="semibold">
+                <Text mb="2" fontSize="lg" fontWeight="semibold">
                     Active Plans
                 </Text>
                 <SubscriptionList subscriptionsStore={subscriptionsStore} />

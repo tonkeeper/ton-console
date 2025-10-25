@@ -2,17 +2,19 @@ import { FC, PropsWithChildren, ReactNode, useId } from 'react';
 import { Box, Card, CardBody, CardProps, Link, Text } from '@chakra-ui/react';
 import { ArrowIcon, ConsoleDocsIcon32, EXTERNAL_LINKS } from 'src/shared';
 
-export const CardLink: FC<
-    PropsWithChildren<CardProps & { href?: string; icon?: ReactNode }>
-> = ({ children, icon, ...rest }) => {
+export const CardLink: FC<PropsWithChildren<CardProps & { href?: string; icon?: ReactNode }>> = ({
+    children,
+    icon,
+    ...rest
+}) => {
     const arrowId = useId();
 
     return (
         <Card
             as={Link}
+            py="3"
             pr="5"
             pl="4"
-            py="3"
             _hover={{
                 textDecoration: 'unset',
                 bg: 'background.contentTint',
@@ -24,7 +26,7 @@ export const CardLink: FC<
             variant="outline"
             {...rest}
         >
-            <CardBody display="flex" pb="0" px="0">
+            <CardBody display="flex" px="0" pb="0">
                 <Box alignSelf="center" mr="3">
                     {icon || <ConsoleDocsIcon32 />}
                 </Box>

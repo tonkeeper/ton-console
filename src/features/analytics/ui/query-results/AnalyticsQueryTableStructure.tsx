@@ -104,8 +104,8 @@ export const AnalyticsQueryTableStructure: FC<PropsWithChildren> = memo(() => {
                         pr={i === headings.length - 1 ? 4 : 0}
                         pl={i === 0 ? 4 : 2}
                         bg="background.contentTint"
-                        borderTopLeftRadius={i === 0 ? 'sm' : 'unset'}
                         borderTopRightRadius={i === headings.length - 1 ? 'sm' : 'unset'}
+                        borderTopLeftRadius={i === 0 ? 'sm' : 'unset'}
                         _hover={{
                             bg: 'background.page'
                         }}

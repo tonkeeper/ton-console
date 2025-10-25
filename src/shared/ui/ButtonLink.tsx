@@ -10,9 +10,10 @@ const enabledLinkProps = {
     as: 'a'
 } as const;
 
-export const ButtonLink: FC<
-    ComponentProps<typeof Button> & { isExternal?: boolean }
-> = ({ isExternal, ...rest }) => (
+export const ButtonLink: FC<ComponentProps<typeof Button> & { isExternal?: boolean }> = ({
+    isExternal,
+    ...rest
+}) => (
     <Button
         {...(!rest.isDisabled && enabledLinkProps)}
         {...(!rest.isDisabled && isExternal && externalLinkProps)}

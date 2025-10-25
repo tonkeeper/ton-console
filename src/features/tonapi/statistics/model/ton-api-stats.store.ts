@@ -15,6 +15,7 @@ export interface ChartPoint {
 
 export class TonApiStatsStore {
     restStats$ = new Loadable<ChartPoint[] | null>(null);
+
     liteproxyStats$ = new Loadable<{
         requests: ChartPoint[];
         connections: ChartPoint[];

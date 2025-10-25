@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types*/
+ 
 
 import { memo, useRef } from 'react';
 import { Box, BoxProps, Flex, Link, Tooltip, useClipboard, useDisclosure } from '@chakra-ui/react';

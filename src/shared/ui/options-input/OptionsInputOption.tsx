@@ -3,9 +3,10 @@ import { Box, BoxProps, Fade, Flex, useRadio } from '@chakra-ui/react';
 import { FilledTickIcon18 } from 'src/shared';
 import { OptionsInputContext } from './context';
 
-export const OptionsInputOption: FC<
-    PropsWithChildren<BoxProps & { value: string }>
-> = ({ value, ...rest }) => {
+export const OptionsInputOption: FC<PropsWithChildren<BoxProps & { value: string }>> = ({
+    value,
+    ...rest
+}) => {
     const { getRadioProps: getRadioGroupProps } = useContext(OptionsInputContext);
     const radioProps = getRadioGroupProps?.({ value });
 
@@ -21,9 +22,9 @@ export const OptionsInputOption: FC<
             align="center"
             justify="space-between"
             gap="2"
+            py="3"
             pr="3"
             pl="4"
-            py="3"
             bg="field.background"
             border="none"
             borderRadius="md"

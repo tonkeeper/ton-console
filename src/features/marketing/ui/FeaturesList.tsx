@@ -1,14 +1,16 @@
 import { FC } from 'react';
-import { Box, BoxProps, Button, SimpleGrid } from '@chakra-ui/react';
+import { BoxProps, Button, SimpleGrid } from '@chakra-ui/react';
 import { FeatureCard } from './FeatureCard';
 import { userStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 import { useNavigate } from 'react-router-dom';
 import { openFeedbackModal } from 'src/features/feedback/model/feedback';
 
-const FeaturesList: FC<
-    BoxProps & { onTonapiClick?: () => void; isContrast?: boolean }
-> = ({ onTonapiClick, isContrast, ...rest }) => {
+const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boolean }> = ({
+    onTonapiClick,
+    isContrast,
+    ...rest
+}) => {
     const navigate = useNavigate();
 
     const loginAndNavigateTo = async (path: string): Promise<void> => {

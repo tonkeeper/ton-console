@@ -17,7 +17,7 @@ const BalancePage: FC = () => {
 
     return (
         <>
-            <Flex gap={4} mb={4} wrap="wrap" align="stretch">
+            <Flex align="stretch" wrap="wrap" gap={4} mb={4}>
                 <BalanceBlock />
                 <SubscriptionsBlock />
             </Flex>

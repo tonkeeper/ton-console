@@ -46,7 +46,7 @@ export const FeatureCard: FC<
             size="xl"
             {...rest}
         >
-            <CardBody h="274px" minH="274px" maxH="274px" pb="0" px="10px" bg={background}>
+            <CardBody h="274px" minH="274px" maxH="274px" px="10px" pb="0" bg={background}>
                 <chakra.picture h="100%" alignItems="center" justifyContent="center" display="flex">
                     {imgSources?.map(item => (
                         <source key={item.media} media={item.media} srcSet={item.srcSet} />

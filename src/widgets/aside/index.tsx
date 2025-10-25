@@ -22,14 +22,15 @@ import { balanceStore } from 'src/shared/stores';
 
 const Aside: FC = () => {
     const totalAmount = balanceStore.balance?.total;
-    const formattedTotalAmount = totalAmount !== undefined
-        ? new Intl.NumberFormat('en-US', {
-              style: 'currency',
-              currency: 'USD',
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 2,
-          }).format(totalAmount)
-        : null;
+    const formattedTotalAmount =
+        totalAmount !== undefined
+            ? new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2
+              }).format(totalAmount)
+            : null;
     return (
         <DropDownMenu>
             <DropDownMenuItem linkTo="dashboard" leftIcon={<DashboardIcon />}>

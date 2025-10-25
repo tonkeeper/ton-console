@@ -82,7 +82,7 @@ const AddProjectParticipantModal: FC<{
                     </Box>
                 </ModalHeader>
                 <ModalCloseButton />
-                <ModalBody paddingY={1}>
+                <ModalBody py={1}>
                     <chakra.form
                         w="100%"
                         onSubmit={handleSubmit(submitMiddleware)}

@@ -192,7 +192,7 @@ export const CreateInvoiceFrom: FC<
                 </FormErrorMessage>
                 <Text
                     textStyle="body3"
-                    mt={!!formState.errors.description ? '0' : '2'}
+                    mt={formState.errors.description ? '0' : '2'}
                     color="text.secondary"
                 >
                     Only the administrator can see this description.

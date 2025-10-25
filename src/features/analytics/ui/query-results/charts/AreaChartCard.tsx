@@ -1,5 +1,5 @@
 import { FC, useMemo } from 'react';
-import { Box, BoxProps } from '@chakra-ui/react';
+import { BoxProps } from '@chakra-ui/react';
 import { ChartCard } from './ChartCard';
 import {
     Area,

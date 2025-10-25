@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { Box, BoxProps, Button, Flex } from '@chakra-ui/react';
+import { BoxProps, Button, Flex } from '@chakra-ui/react';
 import { H4, Overlay } from 'src/shared';
 import {
     AnalyticsHistoryTable,

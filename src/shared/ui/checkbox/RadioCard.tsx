@@ -2,9 +2,7 @@ import { Box, BoxProps, Center, Fade, Flex, useRadio } from '@chakra-ui/react';
 import { FC } from 'react';
 import { FilledTickIcon18, ejectRadioProps } from 'src/shared';
 
-export const RadioCard: FC<
-    Parameters<typeof useRadio>[0] & BoxProps
-> = props => {
+export const RadioCard: FC<Parameters<typeof useRadio>[0] & BoxProps> = props => {
     const { radioProps, rest } = ejectRadioProps<BoxProps>(props);
     const { getInputProps, getRadioProps } = useRadio(radioProps);
 
@@ -17,9 +15,9 @@ export const RadioCard: FC<
             <Flex
                 {...checkbox}
                 gap="2"
+                py="3"
                 pr="5"
                 pl="3"
-                py="3"
                 border="1px"
                 borderColor="separator.common"
                 borderRadius="md"

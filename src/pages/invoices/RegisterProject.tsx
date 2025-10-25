@@ -13,7 +13,7 @@ const RegisterProject: FC = () => {
             <Text textStyle="body2" mb="5" color="text.secondary">
                 Easy TON transaction tracking
             </Text>
-            <Divider w="auto" mb="76px" mx="-6" />
+            <Divider w="auto" mx="-6" mb="76px" />
             <Flex align="center" direction="column">
                 <FolderIcon40 mb="4" />
                 <Text mb="5" color="text.secondary">

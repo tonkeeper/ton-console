@@ -35,9 +35,7 @@ export interface DropDownMenuItemExpandableProps extends PropsWithChildren {
 }
 
 const _hover = { backgroundColor: 'button.secondary.backgroundHover' };
-export const DropDownMenuItemExpandable: FC<
-    DropDownMenuItemExpandableProps
-> = props => {
+export const DropDownMenuItemExpandable: FC<DropDownMenuItemExpandableProps> = props => {
     const [shouldAnimate, setShouldAnimate] = useState(false);
     const path = useMemo(() => {
         let value = props.path;
@@ -96,9 +94,9 @@ export const DropDownMenuItemExpandable: FC<
                     justifyContent="space-between"
                     gap="3"
                     display="flex"
+                    py="2"
                     pr="3"
-                    pl={props.layer ? props.layer * 16 : 3}
-                    py="2" /*Chakra UI bug workaround*/
+                    pl={props.layer ? props.layer * 16 : 3} /*Chakra UI bug workaround*/
                     color="text.primary"
                     fontSize="14px"
                     borderRadius="md"

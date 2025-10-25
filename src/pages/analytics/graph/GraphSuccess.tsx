@@ -4,9 +4,7 @@ import { ButtonLink, CopyIcon16, DoneIconCircle24, H4, InfoTooltip, Overlay } fr
 import { AnalyticsGraphQuerySuccess, GraphAddressesList } from 'src/features';
 import { useSearchParams } from 'react-router-dom';
 
-export const GraphSuccess: FC<{ query: AnalyticsGraphQuerySuccess }> = ({
-    query
-}) => {
+export const GraphSuccess: FC<{ query: AnalyticsGraphQuerySuccess }> = ({ query }) => {
     const [_, setSearchParams] = useSearchParams();
     const { hasCopied, onCopy } = useClipboard(query.addresses.map(a => a.userFriendly).join('\n'));
 
@@ -28,7 +26,7 @@ export const GraphSuccess: FC<{ query: AnalyticsGraphQuerySuccess }> = ({
                     New Request
                 </Button>
             </Flex>
-            <Divider w="auto" mb="5" mx="-6" />
+            <Divider w="auto" mx="-6" mb="5" />
             <Flex align="center" gap="1" mb="3">
                 <Checkbox
                     mb="0 !important"

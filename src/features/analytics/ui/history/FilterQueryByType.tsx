@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import {
-    Box,
     BoxProps,
     Button,
     Center,
@@ -53,7 +52,7 @@ const FilterQueryByType: FC<BoxProps> = props => {
                 </Flex>
             </MenuButtonDefault>
             <MenuList zIndex={100} w="240px">
-                <Flex justify="space-between" mb="2" pt="2" px="1" color="text.secondary">
+                <Flex justify="space-between" mb="2" px="1" pt="2" color="text.secondary">
                     <Span textStyle="label2">Display only</Span>
                     {!!selectedTypesNumber && (
                         <Button

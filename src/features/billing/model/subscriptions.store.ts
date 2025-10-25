@@ -18,7 +18,6 @@ export class SubscriptionsStore {
     }
 
     get subscriptionsLoading(): boolean {
-        console.log(restApiTiersStore.selectedTier$.isLoading, liteproxysStore.selectedTier$.isLoading);
         return restApiTiersStore.selectedTier$.isLoading || liteproxysStore.selectedTier$.isLoading;
     }
 

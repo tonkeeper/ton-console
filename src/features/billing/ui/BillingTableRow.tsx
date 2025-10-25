@@ -6,9 +6,7 @@ import { toJS } from 'mobx';
 import { BillingHistoryItem } from 'src/features/billing/model/billing.store';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 
-const LoadingRaw: FC<{ style: React.CSSProperties }> = ({
-    style: { top, ...style }
-}) => {
+const LoadingRaw: FC<{ style: React.CSSProperties }> = ({ style: { top, ...style } }) => {
     const { rowHeight } = useContext(BillingHistoryTableContext);
     return (
         <Tr
@@ -41,8 +39,8 @@ const mapTypeToSign: Record<DTOBillingTransactionTypeEnum, string> = {
     [DTOBillingTransactionTypeEnum.DTODeposit]: '+'
 };
 
-const ItemRow: FC<{ historyItem: BillingHistoryItem; style: React.CSSProperties }> =
-    observer(({ historyItem, style }) => {
+const ItemRow: FC<{ historyItem: BillingHistoryItem; style: React.CSSProperties }> = observer(
+    ({ historyItem, style }) => {
         const { rowHeight } = useContext(BillingHistoryTableContext);
 
         return (
@@ -84,12 +82,10 @@ const ItemRow: FC<{ historyItem: BillingHistoryItem; style: React.CSSProperties 
                 </Td>
             </Tr>
         );
-    });
+    }
+);
 
-const BillingTableRow: FC<{ index: number; style: React.CSSProperties }> = ({
-    index,
-    style
-}) => {
+const BillingTableRow: FC<{ index: number; style: React.CSSProperties }> = ({ index, style }) => {
     const { billingStore } = useContext(BillingHistoryTableContext);
 
     if (!billingStore) {

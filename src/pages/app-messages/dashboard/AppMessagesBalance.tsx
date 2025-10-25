@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { formatWithSuffix, H4, Overlay } from 'src/shared';
-import { Box, BoxProps, Button, Skeleton, Text, useDisclosure } from '@chakra-ui/react';
+import { BoxProps, Button, Skeleton, Text, useDisclosure } from '@chakra-ui/react';
 import { appMessagesStore, MessagesRefillModal } from 'src/features';
 import { observer } from 'mobx-react-lite';
 

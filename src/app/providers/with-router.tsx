@@ -1,4 +1,4 @@
-/* eslint-disable react/display-name */
+ 
 
 import { ReactNode } from 'react';
 import { BrowserRouter } from 'react-router-dom';

@@ -16,7 +16,7 @@ export const CopyPad: FC<
         variant?: 'primary' | 'flat';
         hideCopyIcon?: boolean;
     }
-    // eslint-disable-next-line complexity
+     
 > = ({
     text,
     textView = text,

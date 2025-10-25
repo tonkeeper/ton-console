@@ -1,7 +1,7 @@
 import { FC, useContext, useRef } from 'react';
 import { Box, BoxProps, useTheme } from '@chakra-ui/react';
 import CodeMirror from '@uiw/react-codemirror';
-import { draculaInit } from '@uiw/codemirror-theme-dracula/src';
+import { draculaInit } from '@uiw/codemirror-theme-dracula';
 import { tags as t } from '@lezer/highlight';
 import { CodeAreaGroupContext } from './CodeAreaGroup';
 import type { Extension } from '@codemirror/state';
