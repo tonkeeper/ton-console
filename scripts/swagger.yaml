@@ -2689,7 +2689,6 @@ components:
                 example: "My token"
               limit_rps:
                 type: number
-                nullable: true
                 example: 5
                 maximum: 100000
                 minimum: 0
