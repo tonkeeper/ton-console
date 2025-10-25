@@ -11,7 +11,7 @@ const SubscriptionsBlock: FC = () => {
     return (
         <Overlay height="auto" p="0" display="flex" flexDirection="column" flex="1" minW="330px">
             <Box px="6" py="5">
-                <Text fontSize="lg" mb="1" fontWeight="semibold">
+                <Text fontSize="lg" mb="2" fontWeight="semibold">
                     Active Plans
                 </Text>
                 <SubscriptionList subscriptionsStore={subscriptionsStore} />
