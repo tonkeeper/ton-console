@@ -15,7 +15,7 @@ import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
 import { isNumber, isAddressValid, TonCurrencyAmount, mergeRefs, tonMask, Span } from 'src/shared';
 import { useIMask } from 'react-imask';
 import { RequestFaucetForm } from '../model';
-import { Address } from 'ton-core';
+import { Address } from '@ton/core';
 
 export type FaucetFormInternal = {
     tonAmount: string;

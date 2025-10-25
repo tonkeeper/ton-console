@@ -11,7 +11,7 @@ import {
     StyleProps
 } from '@chakra-ui/react';
 import { Controller, SubmitHandler, useFormContext } from 'react-hook-form';
-import { Address } from 'ton-core';
+import { Address } from '@ton/core';
 import { AddSubscriptionsForm } from '../model/interfaces/add-subscriptions-form';
 import { isValidAddress } from 'src/features/jetton/lib/utils';
 import { toBinaryRadio } from 'src/shared';
