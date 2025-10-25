@@ -9,27 +9,26 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { FormProvider, useForm } from 'react-hook-form';
-import { ApiKey, CreateApiKeyForm, ApiKeysStore } from '../model';
+import { ApiKey, CreateApiKeyForm, useEditApiKeyMutation } from '../model';
 import { ApiKeyForm, ApiKeyFormInternal, toApiKeyFormDefaultValues } from './ApiKeyForm';
 import { restApiTiersStore } from 'src/shared/stores';
 
 const EditApiKeyModal: FC<{
-    apiKeysStore: ApiKeysStore;
     isOpen: boolean;
     onClose: () => void;
     apiKey: ApiKey | undefined;
-}> = ({ apiKeysStore, apiKey, ...rest }) => {
+}> = ({ apiKey, onClose, ...rest }) => {
     const formId = 'create-api-key-form';
+    const { mutate: editApiKey, isPending } = useEditApiKeyMutation();
 
     const methods = useForm<ApiKeyFormInternal>({
         defaultValues: toApiKeyFormDefaultValues(apiKey)
     });
 
     useEffect(() => {
-        reset(toApiKeyFormDefaultValues(apiKey));
-    }, [apiKey]);
+        methods.reset(toApiKeyFormDefaultValues(apiKey));
+    }, [apiKey, methods]);
 
     const {
         reset,
@@ -39,21 +38,27 @@ const EditApiKeyModal: FC<{
     const onSubmit = useCallback(
         (form: CreateApiKeyForm): void => {
             if (apiKey) {
-                apiKeysStore
-                    .editApiKey({
+                editApiKey(
+                    {
                         id: apiKey.id,
                         ...form
-                    })
-                    .then(rest.onClose);
+                    },
+                    {
+                        onSuccess: () => {
+                            reset();
+                            onClose();
+                        }
+                    }
+                );
             }
         },
-        [apiKey, rest.onClose]
+        [apiKey, editApiKey, onClose, reset]
     );
 
     const maxLimit = restApiTiersStore.selectedTier$.value?.rps ?? 1;
 
     return (
-        <Modal scrollBehavior="inside" {...rest}>
+        <Modal onClose={onClose} scrollBehavior="inside" {...rest}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Edit API Key</ModalHeader>
@@ -65,14 +70,14 @@ const EditApiKeyModal: FC<{
                 </ModalBody>
 
                 <ModalFooter gap="3">
-                    <Button flex={1} onClick={rest.onClose} variant="secondary">
+                    <Button flex={1} onClick={onClose} variant="secondary">
                         Cancel
                     </Button>
                     <Button
                         flex={1}
                         form={formId}
                         isDisabled={!isDirty}
-                        isLoading={apiKeysStore.editApiKey.isLoading}
+                        isLoading={isPending}
                         type="submit"
                         variant="primary"
                     >
@@ -84,4 +89,4 @@ const EditApiKeyModal: FC<{
     );
 };
 
-export default observer(EditApiKeyModal);
+export default EditApiKeyModal;

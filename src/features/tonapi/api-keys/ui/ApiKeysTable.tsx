@@ -27,16 +27,15 @@ import {
     IconButton,
     MenuButtonIcon
 } from 'src/shared';
-import { ApiKey, ApiKeysStore } from '../model';
-import { observer } from 'mobx-react-lite';
+import { ApiKey } from '../model';
 import EditApiKeyModal from './EditApiKeyModal';
 import DeleteApiKeyModal from './DeleteApiKeyModal';
 
 interface ApiKeysTableProps extends TableContainerProps {
-    apiKeysStore: ApiKeysStore;
+    apiKeys: ApiKey[];
 }
 
-const ApiKeysTable: FC<ApiKeysTableProps> = ({ apiKeysStore, ...props }) => {
+const ApiKeysTable: FC<ApiKeysTableProps> = ({ apiKeys, ...props }) => {
     const [modal, setModal] = useState<{ key: ApiKey; action: 'edit' | 'delete' } | null>();
     const [copiedKey, setCopiedKey] = useState<number | undefined>();
 
@@ -80,7 +79,7 @@ const ApiKeysTable: FC<ApiKeysTableProps> = ({ apiKeysStore, ...props }) => {
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {apiKeysStore.apiKeys$.value.map(apiKey => (
+                        {apiKeys.map(apiKey => (
                             <Tr key={apiKey.id}>
                                 <Td overflow="hidden" maxW="200px">
                                     <TooltipHoverable
@@ -155,7 +154,6 @@ const ApiKeysTable: FC<ApiKeysTableProps> = ({ apiKeysStore, ...props }) => {
             </TableContainer>
             {modal && (
                 <EditApiKeyModal
-                    apiKeysStore={apiKeysStore}
                     isOpen={modal?.action === 'edit'}
                     apiKey={modal?.key}
                     onClose={closeModal}
@@ -163,7 +161,6 @@ const ApiKeysTable: FC<ApiKeysTableProps> = ({ apiKeysStore, ...props }) => {
             )}
             {modal && (
                 <DeleteApiKeyModal
-                    apiKeysStore={apiKeysStore}
                     isOpen={modal?.action === 'delete'}
                     apiKey={modal?.key}
                     onClose={closeModal}
@@ -173,4 +170,4 @@ const ApiKeysTable: FC<ApiKeysTableProps> = ({ apiKeysStore, ...props }) => {
     );
 };
 
-export default observer(ApiKeysTable);
+export default ApiKeysTable;
