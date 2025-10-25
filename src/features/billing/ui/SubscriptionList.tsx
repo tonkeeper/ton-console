@@ -32,22 +32,23 @@ const SubscriptionListItem: FC<SubscriptionListItemProps> = ({ subscription }) =
     const navigate = useNavigate();
 
     return (
-        <Flex justify="space-between" py="1" gap="4">
-            <Flex flexDirection="column" flex="1">
+        <Flex justify="space-between" gap="4" py="1">
+            <Flex direction="column" flex="1">
                 {subscription ? (
                     <>
                         <Text fontSize="sm" fontWeight="semibold">
                             {subscription.plan}
                         </Text>
-                        <Text fontSize="sm" color="text.secondary">
+                        <Text color="text.secondary" fontSize="sm">
                             {subscription.interval}
-                            {subscription.renewsDate && ` · Renews ${toDate(subscription.renewsDate)}`}
+                            {subscription.renewsDate &&
+                                ` · Renews ${toDate(subscription.renewsDate)}`}
                         </Text>
                     </>
                 ) : (
                     <>
-                        <Skeleton h="5" w="150px" />
-                        <Skeleton h="4" w="200px" />
+                        <Skeleton w="150px" h="5" />
+                        <Skeleton w="200px" h="4" />
                     </>
                 )}
             </Flex>
@@ -72,7 +73,7 @@ const SubscriptionListItem: FC<SubscriptionListItemProps> = ({ subscription }) =
                     </Flex>
                 ) : (
                     <>
-                        <Skeleton h="5" w="80px" />
+                        <Skeleton w="80px" h="5" />
                         <Box w="24px" />
                     </>
                 )}
@@ -81,10 +82,7 @@ const SubscriptionListItem: FC<SubscriptionListItemProps> = ({ subscription }) =
     );
 };
 
-const SubscriptionList: FC<SubscriptionListProps> = ({
-    subscriptionsStore,
-    ...props
-}) => {
+const SubscriptionList: FC<SubscriptionListProps> = ({ subscriptionsStore, ...props }) => {
     const isLoading = subscriptionsStore.subscriptionsLoading;
 
     // First load - show Spinner

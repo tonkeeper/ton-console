@@ -46,7 +46,11 @@ const FaucetPage: FC = () => {
         setReceiverAddress(form.receiverAddress);
         setAmount(form.amount);
 
-        if (price && balanceStore.balance?.ton && BigInt(balanceStore.balance.ton.amount) >= BigInt(price.amount.toNumber())) {
+        if (
+            price &&
+            balanceStore.balance?.ton &&
+            BigInt(balanceStore.balance.ton.amount) >= BigInt(price.amount.toNumber())
+        ) {
             return onOpen();
         }
 

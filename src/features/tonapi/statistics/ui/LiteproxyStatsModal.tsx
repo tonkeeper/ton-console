@@ -79,10 +79,7 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = observer(({ isOpen, on
                         </Text>
                         <Box h={250}>
                             <ResponsiveContainer height="100%">
-                                <LineChart
-                                    data={value.requests}
-                                    margin={{ left: 0, right: 0 }}
-                                >
+                                <LineChart data={value.requests} margin={{ left: 0, right: 0 }}>
                                     <XAxis
                                         dataKey="time"
                                         type="number"
@@ -107,10 +104,7 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = observer(({ isOpen, on
                         </Text>
                         <Box h={250}>
                             <ResponsiveContainer height="100%">
-                                <LineChart
-                                    data={value.connections}
-                                    margin={{ left: 0, right: 0 }}
-                                >
+                                <LineChart data={value.connections} margin={{ left: 0, right: 0 }}>
                                     <XAxis
                                         dataKey="time"
                                         type="number"

@@ -130,12 +130,12 @@ export class BalanceStore {
         (): Promise<number | undefined> =>
             tonapiMainnet.rates
                 .getRates({ tokens: ['ton'], currencies: ['usd'] })
-                .then(data => data.rates['TON'].prices?.USD)
+                .then(data => data.rates.TON.prices?.USD)
     );
 
     fetchDepositAddress = this.depositAddress$.createAsyncAction(
         async (): Promise<RefillAddresses> =>
-            await apiClient.api
+            apiClient.api
                 .getDepositAddress(this.projectsStore.selectedProject!.id)
                 .then(response => response.data)
     );

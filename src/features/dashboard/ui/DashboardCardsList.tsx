@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Box, BoxProps, Center, Grid, GridItem, Spinner } from '@chakra-ui/react';
+import { BoxProps, Center, Grid, GridItem, Spinner } from '@chakra-ui/react';
 import { DashboardTierCard } from '../../tonapi';
 import { restApiTiersStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';

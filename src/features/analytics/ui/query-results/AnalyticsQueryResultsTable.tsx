@@ -10,9 +10,10 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 
 const MAX_INITIAL_COL_WIDTH = 500;
 
-export const AnalyticsTable: FC<
-    BoxProps & { source: AnalyticsTableSource }
-> = ({ source, ...rest }) => {
+export const AnalyticsTable: FC<BoxProps & { source: AnalyticsTableSource }> = ({
+    source,
+    ...rest
+}) => {
     const gridRef = useRef<VariableSizeGrid>(null);
 
     const [isResizingProcess, setIsResizingProcess] = useState(false);

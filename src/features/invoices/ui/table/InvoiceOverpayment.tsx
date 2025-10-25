@@ -1,11 +1,9 @@
 import { FC } from 'react';
-import { Box, BoxProps, Flex } from '@chakra-ui/react';
+import { BoxProps, Flex } from '@chakra-ui/react';
 import { Invoice } from 'src/features';
 import { FilledInfoIcon16, Span } from 'src/shared';
 
-export const InvoiceOverpayment: FC<
-    { invoice: Invoice } & BoxProps
-> = props => {
+export const InvoiceOverpayment: FC<{ invoice: Invoice } & BoxProps> = props => {
     const { invoice, ...rest } = props;
 
     return (

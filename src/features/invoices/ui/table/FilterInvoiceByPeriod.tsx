@@ -126,9 +126,7 @@ const FilterInvoiceByPeriod: FC<BoxProps> = props => {
     );
 };
 
-const MenuInput: FC<
-    MenuListProps & { onClose: () => void }
-> = props => {
+const MenuInput: FC<MenuListProps & { onClose: () => void }> = props => {
     const toast = useToast();
     const [lockFocus, setLockFocus] = useState(false);
 

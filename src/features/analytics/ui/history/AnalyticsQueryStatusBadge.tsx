@@ -18,14 +18,13 @@ const queryBadges: Record<AnalyticsQuery['status'], { color: string; label: stri
     }
 };
 
-export const AnalyticsQueryStatusBadge: FC<
-    BadgeProps & { status: AnalyticsQuery['status'] }
-> = forwardRef(({ status, ...rest }, ref) => {
-    const badge = queryBadges[status];
+export const AnalyticsQueryStatusBadge: FC<BadgeProps & { status: AnalyticsQuery['status'] }> =
+    forwardRef(({ status, ...rest }, ref) => {
+        const badge = queryBadges[status];
 
-    return (
-        <Badge ref={ref} pos="relative" bgColor={badge.color} {...rest}>
-            <Span>{badge.label}</Span>
-        </Badge>
-    );
-});
+        return (
+            <Badge ref={ref} pos="relative" bgColor={badge.color} {...rest}>
+                <Span>{badge.label}</Span>
+            </Badge>
+        );
+    });
