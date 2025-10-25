@@ -30,7 +30,7 @@ import {
     fromDecimals
 } from 'src/shared';
 import { ConfirmationDialog } from 'src/entities';
-import { jettonStore } from '../../model';
+import { JettonStore } from '../../model';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import JettonEditForm, { EditJettonMetadata } from './JettonEditForm';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -158,7 +158,8 @@ const ModalEdit: FC<{
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (value: JettonMetadata) => void;
-}> = ({ isOpen, onClose, onSubmit }) => {
+    jettonStore: JettonStore;
+}> = ({ isOpen, onClose, onSubmit, jettonStore }) => {
     const formId = 'jetton-edit-form';
 
     const metadata = jettonStore.jettonInfo$.value?.metadata;
@@ -214,6 +215,7 @@ const ModalEdit: FC<{
 
 type JettonCardProps = StyleProps & {
     data: JettonInfo;
+    jettonStore: JettonStore;
 };
 
 const JettonCard: FC<JettonCardProps> = observer(
@@ -224,6 +226,7 @@ const JettonCard: FC<JettonCardProps> = observer(
             totalSupply,
             admin
         },
+        jettonStore,
         ...rest
     }) => {
         const toast = useToast();
@@ -473,6 +476,7 @@ const JettonCard: FC<JettonCardProps> = observer(
                     isOpen={isEditModalOpen}
                     onClose={() => setIsEditModalOpen(false)}
                     onSubmit={handleUpdateMetadata}
+                    jettonStore={jettonStore}
                 />
             </Box>
         );

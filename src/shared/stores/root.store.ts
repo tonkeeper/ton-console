@@ -6,7 +6,6 @@ import { AnalyticsQueryRequestStore } from 'src/features/analytics/model/analyti
 import { AppMessagesStore } from 'src/features/app-messages/model/app-messages.store';
 import { InvoicesAppStore } from 'src/features/invoices/models/invoices-app.store';
 import { InvoicesTableStore } from 'src/features/invoices/models/invoices-table.store';
-import { JettonStore } from 'src/features/jetton/model/jetton.store';
 import { LiteproxysStore } from 'src/features/tonapi/liteproxy/model/liteproxy.store';
 import { TonApiStatsStore } from 'src/features/tonapi/statistics/model/ton-api-stats.store';
 import { BalanceStore } from 'src/entities/balance/balance.store';
@@ -32,7 +31,6 @@ let analyticsGPTGenerationStore: AnalyticsGPTGenerationStore;
 let appMessagesStore: AppMessagesStore;
 let invoicesAppStore: InvoicesAppStore;
 let invoicesTableStore: InvoicesTableStore;
-let jettonStore: JettonStore;
 let liteproxysStore: LiteproxysStore;
 let tonApiStatsStore: TonApiStatsStore;
 let restApiTiersStore: RestApiTiersStore;
@@ -49,7 +47,6 @@ const initializeDependentStores = () => {
     appMessagesStore = new AppMessagesStore();
     invoicesAppStore = new InvoicesAppStore();
     invoicesTableStore = new InvoicesTableStore();
-    jettonStore = new JettonStore();
     liteproxysStore = new LiteproxysStore();
     tonApiStatsStore = new TonApiStatsStore();
     restApiTiersStore = new RestApiTiersStore();
@@ -71,7 +68,6 @@ export {
     appMessagesStore,
     invoicesAppStore,
     invoicesTableStore,
-    jettonStore,
     liteproxysStore,
     tonApiStatsStore,
     restApiTiersStore
