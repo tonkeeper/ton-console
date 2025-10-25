@@ -27,13 +27,16 @@ import {
     IconButton,
     MenuButtonIcon
 } from 'src/shared';
-import { ApiKey } from '../model';
+import { ApiKey, ApiKeysStore } from '../model';
 import { observer } from 'mobx-react-lite';
 import EditApiKeyModal from './EditApiKeyModal';
 import DeleteApiKeyModal from './DeleteApiKeyModal';
-import { apiKeysStore } from 'src/shared/stores';
 
-const ApiKeysTable: FC<TableContainerProps> = props => {
+interface ApiKeysTableProps extends TableContainerProps {
+    apiKeysStore: ApiKeysStore;
+}
+
+const ApiKeysTable: FC<ApiKeysTableProps> = ({ apiKeysStore, ...props }) => {
     const [modal, setModal] = useState<{ key: ApiKey; action: 'edit' | 'delete' } | null>();
     const [copiedKey, setCopiedKey] = useState<number | undefined>();
 
@@ -152,6 +155,7 @@ const ApiKeysTable: FC<TableContainerProps> = props => {
             </TableContainer>
             {modal && (
                 <EditApiKeyModal
+                    apiKeysStore={apiKeysStore}
                     isOpen={modal?.action === 'edit'}
                     apiKey={modal?.key}
                     onClose={closeModal}
@@ -159,6 +163,7 @@ const ApiKeysTable: FC<TableContainerProps> = props => {
             )}
             {modal && (
                 <DeleteApiKeyModal
+                    apiKeysStore={apiKeysStore}
                     isOpen={modal?.action === 'delete'}
                     apiKey={modal?.key}
                     onClose={closeModal}
