@@ -1,20 +1,20 @@
 import { FC, useCallback } from 'react';
 import { Text } from '@chakra-ui/react';
-import { ApiKey } from '../model';
+import { ApiKey, ApiKeysStore } from '../model';
 import { observer } from 'mobx-react-lite';
 import { ConfirmationDialog } from 'src/entities';
-import { apiKeysStore } from 'src/shared/stores';
 
 const DeleteApiKeyModal: FC<{
+    apiKeysStore: ApiKeysStore;
     isOpen: boolean;
     onClose: () => void;
     apiKey: ApiKey;
-}> = ({ apiKey, isOpen, onClose }) => {
+}> = ({ apiKeysStore, apiKey, isOpen, onClose }) => {
     const onConfirm = useCallback(() => {
         if (apiKey) {
             apiKeysStore.deleteApiKey(apiKey.id).then(onClose);
         }
-    }, [apiKey]);
+    }, [apiKey, onClose]);
 
     return (
         <ConfirmationDialog

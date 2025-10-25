@@ -2,8 +2,13 @@ import { FC } from 'react';
 import { CreateIcon96, H4, Overlay } from 'src/shared';
 import { Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import { CreateApiKeyModal } from 'src/features';
+import { ApiKeysStore } from 'src/features/tonapi/api-keys/model';
 
-export const EmptyApiKeys: FC = () => {
+interface EmptyApiKeysProps {
+    apiKeysStore: ApiKeysStore;
+}
+
+export const EmptyApiKeys: FC<EmptyApiKeysProps> = ({ apiKeysStore }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     return (
         <Overlay display="flex" alignItems="center" justifyContent="center">
@@ -15,7 +20,7 @@ export const EmptyApiKeys: FC = () => {
                 </Text>
                 <Button onClick={onOpen}>Create API key</Button>
             </Flex>
-            <CreateApiKeyModal isOpen={isOpen} onClose={onClose} />
+            <CreateApiKeyModal apiKeysStore={apiKeysStore} isOpen={isOpen} onClose={onClose} />
         </Overlay>
     );
 };
