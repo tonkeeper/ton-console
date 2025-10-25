@@ -36,7 +36,7 @@ const SubscriptionListItem: FC<SubscriptionListItemProps> = ({ subscription }) =
             <Flex flexDirection="column" flex="1">
                 {subscription ? (
                     <>
-                        <Text fontSize="md" fontWeight="semibold">
+                        <Text fontSize="sm" fontWeight="semibold">
                             {subscription.plan}
                         </Text>
                         <Text fontSize="sm" color="text.secondary">
