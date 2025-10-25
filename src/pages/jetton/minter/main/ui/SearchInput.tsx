@@ -23,7 +23,7 @@ export const SearchInput: FC<StyleProps> = props => {
             const address = Address.parse(searchValue.trim());
 
             navigate(`/jetton/minter/view/${address.toString()}`);
-        } catch (error) {
+        } catch (_error) {
             toast({
                 title: 'Invalid address',
                 status: 'error',

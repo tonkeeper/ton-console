@@ -21,7 +21,7 @@ export const GraphError: FC<{ query: AnalyticsGraphQueryError }> = ({ query }) =
                 New Request
             </Button>
 
-            <Divider w="auto" mb="5" mx="-6" />
+            <Divider w="auto" mx="-6" mb="5" />
             <Flex align="center" gap="1" mb="3">
                 <Checkbox
                     mb="0 !important"

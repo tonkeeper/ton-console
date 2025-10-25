@@ -46,7 +46,7 @@ export const dappUrlValidator = async (
             success: true,
             result
         };
-    } catch (e) {
+    } catch (_e) {
         return {
             message: 'Cannot fetch manifest'
         };

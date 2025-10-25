@@ -24,7 +24,7 @@ const UserProfilePage: FC = () => {
     return (
         <Overlay>
             <H4 mb="5">Profile</H4>
-            <Divider w="auto" mb="4" mx="-6" />
+            <Divider w="auto" mx="-6" mb="4" />
 
             <Flex direction="column" w="100%" maxW="512px">
                 <Flex gap={3}>
@@ -39,7 +39,7 @@ const UserProfilePage: FC = () => {
                         <Text textStyle="label2" mt={1}>
                             {user.name}
                         </Text>
-                        <Flex textStyle="body2" gap={1} marginY={2}>
+                        <Flex textStyle="body2" gap={1} my={2}>
                             <Text textStyle="label2">User ID:</Text> {/* User ID:{' '} */}
                             <CopyPad
                                 variant="flat"

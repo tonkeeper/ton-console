@@ -12,9 +12,9 @@ export const CardLink: FC<PropsWithChildren<CardProps & { href?: string; icon?: 
     return (
         <Card
             as={Link}
+            py="3"
             pr="5"
             pl="4"
-            py="3"
             _hover={{
                 textDecoration: 'unset',
                 bg: 'background.contentTint',
@@ -26,7 +26,7 @@ export const CardLink: FC<PropsWithChildren<CardProps & { href?: string; icon?: 
             variant="outline"
             {...rest}
         >
-            <CardBody display="flex" pb="0" px="0">
+            <CardBody display="flex" px="0" pb="0">
                 <Box alignSelf="center" mr="3">
                     {icon || <ConsoleDocsIcon32 />}
                 </Box>

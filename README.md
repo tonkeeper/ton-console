@@ -28,10 +28,6 @@ Runs lint for staged files and checks typescript typings
 2. `npm ci`
 3. `npm run build:staging`
 
-## Build for dev2
-1. `nvm use`
-2. `npm ci`
-3. `npm run build:staging2`
 
 ## Build for prod
 1. `nvm use`

@@ -15,9 +15,9 @@ export const RadioCard: FC<Parameters<typeof useRadio>[0] & BoxProps> = props =>
             <Flex
                 {...checkbox}
                 gap="2"
+                py="3"
                 pr="5"
                 pl="3"
-                py="3"
                 border="1px"
                 borderColor="separator.common"
                 borderRadius="md"

@@ -31,7 +31,7 @@ const ExistUserMenu: FC<{ user: User }> = observer(({ user }) => {
                 </HStack>
             </MenuButtonDefault>
             <MenuList w="216px">
-                <Flex textStyle="body2" gap={1} marginY={2} paddingX={3}>
+                <Flex textStyle="body2" gap={1} my={2} px={3}>
                     My user ID:{' '}
                     <CopyPad
                         variant="flat"

@@ -7,9 +7,9 @@ export const TextareaFooter: FC<PropsWithChildren<BoxProps>> = ({ children, ...r
     return (
         <Box
             pos="relative"
+            px="4"
             pt="3"
             pb="4"
-            px="4"
             border="1px"
             borderColor={focused ? 'field.activeBorder' : 'field.border'}
             borderTop="none"

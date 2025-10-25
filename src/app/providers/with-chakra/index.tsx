@@ -1,4 +1,4 @@
-/* eslint-disable react/display-name */
+ 
 
 import { ReactNode } from 'react';
 import theme from './theme';

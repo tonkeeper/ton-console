@@ -55,7 +55,6 @@ export class AirdropStore {
         vesting,
         name
     }: AirdropMetadata & { adminAddress: string }) => {
-        console.log('vesting', vesting);
 
         if (!isValidVesting(vesting)) {
             throw new Error(
@@ -70,7 +69,7 @@ export class AirdropStore {
                     admin: adminAddress,
                     jetton: address,
                     royalty_parameters: { min_commission: toNano(fee).toString() },
-                    vesting_parameters: !!vesting?.length
+                    vesting_parameters: vesting?.length
                         ? {
                               unlocks_list: vesting.map(item => ({
                                   unlock_time: Math.floor(

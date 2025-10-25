@@ -156,7 +156,7 @@ export class BalanceStore {
                 duration: 2000
             });
             return true;
-        } catch (e) {
+        } catch (_e) {
             toast({
                 title: 'Invalid Promo Code',
                 status: 'error',

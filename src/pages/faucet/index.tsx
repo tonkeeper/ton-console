@@ -60,7 +60,7 @@ const FaucetPage: FC = () => {
     return (
         <Overlay h="fit-content">
             <H4 mb="5">Testnet Assets</H4>
-            <Divider w="auto" mb="4" mx="-6" />
+            <Divider w="auto" mx="-6" mb="4" />
             <FormProvider {...methods}>
                 <FaucetForm
                     id={formId}

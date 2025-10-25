@@ -136,12 +136,12 @@ const DeployComponentInner = ({
                 validUntil: Math.floor(new Date().getTime() / 1000 + 120),
                 messages: messages
             });
-            if (!!hideEnableButton) {
+            if (hideEnableButton) {
                 hideEnableButton();
             }
             setLoading(true);
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     };
 
