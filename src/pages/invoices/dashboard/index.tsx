@@ -13,11 +13,11 @@ const InvoiceDashboardPage: FC<BoxProps> = props => {
         <Overlay {...props}>
             <H4 mb="1">Overview</H4>
             <InvoicesProjectInfo mb="5" />
-            <Divider w="auto" mb="5" mx="-6" />
+            <Divider w="auto" mx="-6" mb="5" />
             <InvoicesStats mb="6" />
-            <Divider w="auto" mb="5" mx="-6" />
+            <Divider w="auto" mx="-6" mb="5" />
             <InvoicesAuthorization />
-            <Divider w="auto" mb="5" mx="-6" />
+            <Divider w="auto" mx="-6" mb="5" />
             <InvoicesWebhooks mb="6" />
             <InvoicesApi />
         </Overlay>

@@ -67,7 +67,7 @@ export class InvoicesAppStore {
             }
 
             return mapInvoicesAppDTOToInvoicesApp(response.data.app);
-        } catch (e) {
+        } catch (_e) {
             return null;
         }
     });

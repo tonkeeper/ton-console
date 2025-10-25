@@ -15,7 +15,7 @@ export const AppMessagesDashboard: FC = () => {
                     <CurrentDappCard withMenu />
                 </Box>
                 <Divider />
-                <Box mb="6" pt="5" px="6">
+                <Box mb="6" px="6" pt="5">
                     <Text textStyle="label1" mb="5">
                         Statistics
                     </Text>

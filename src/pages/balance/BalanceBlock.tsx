@@ -58,7 +58,7 @@ const BalanceBlock: FC = () => {
 
                     <Divider />
 
-                    <Flex wrap="wrap" rowGap="2" columnGap="3" pt="3" pb="5" px="6">
+                    <Flex wrap="wrap" rowGap="2" columnGap="3" px="6" pt="3" pb="5">
                         {/* Left Column - USDT Balance and Promo */}
                         <Box minW="170px">
                             <Flex>

@@ -91,7 +91,7 @@ const UploadComponentInner = (props: { id: string; airdropStore: AirdropOldStore
         setError(null);
         try {
             new URL(url!);
-        } catch (e) {
+        } catch (_e) {
             setError('Incorrect file URL');
         }
 
@@ -209,7 +209,7 @@ const UploadComponentInner = (props: { id: string; airdropStore: AirdropOldStore
                                     accept=".csv"
                                     style={{ display: 'none' }}
                                     onChange={e => {
-                                        if (!!e.target.files?.length) {
+                                        if (e.target.files?.length) {
                                             handleFileChange(e.target.files[0]);
                                         }
                                     }}
