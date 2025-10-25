@@ -33,6 +33,8 @@ export class AnalyticsHistoryTableStore {
 
     pageSize = 30;
 
+    private disposers: Array<() => void> = [];
+
     get hasNextPage(): boolean {
         return this.queries$.value.length < this.totalQueries;
     }
@@ -43,12 +45,12 @@ export class AnalyticsHistoryTableStore {
 
     constructor() {
         makeAutoObservable(this);
-        let dispose: (() => void) | undefined;
+        let paginationDispose: (() => void) | undefined;
 
-        createImmediateReaction(
+        const projectDispose = createImmediateReaction(
             () => projectsStore.selectedProject,
             project => {
-                dispose?.();
+                paginationDispose?.();
                 this.clearState();
                 this.pagination = {
                     filter: {
@@ -61,15 +63,22 @@ export class AnalyticsHistoryTableStore {
                 if (project) {
                     this.loadFirstPage();
 
-                    dispose = reaction(
+                    paginationDispose = reaction(
                         () => JSON.stringify(this.pagination),
                         () => {
                             this.loadFirstPage({ cancelPreviousCall: true });
                         }
                     );
+                    this.disposers.push(paginationDispose);
                 }
             }
         );
+        this.disposers.push(projectDispose);
+    }
+
+    destroy(): void {
+        this.disposers.forEach(dispose => dispose?.());
+        this.disposers = [];
     }
 
     isItemLoaded = (index: number): boolean =>

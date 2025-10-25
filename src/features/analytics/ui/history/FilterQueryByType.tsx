@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { ArrowIcon, MenuButtonDefault, Span, TickIcon } from 'src/shared';
-import { analyticsHistoryTableStore, AnalyticsQueryType } from 'src/features';
+import { AnalyticsHistoryTableStore, AnalyticsQueryType } from 'src/features';
 
 const QueryTypesLabels: Record<AnalyticsQueryType, string> = {
     sql: 'SQL',
@@ -20,7 +20,11 @@ const QueryTypesLabels: Record<AnalyticsQueryType, string> = {
     graph: 'Graph'
 };
 
-const FilterQueryByType: FC<BoxProps> = props => {
+interface FilterQueryByTypeProps extends BoxProps {
+    analyticsHistoryTableStore: AnalyticsHistoryTableStore;
+}
+
+const FilterQueryByType: FC<FilterQueryByTypeProps> = ({ analyticsHistoryTableStore, ...props }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     const selectedTypesNumber = analyticsHistoryTableStore.pagination.filter.type?.length;

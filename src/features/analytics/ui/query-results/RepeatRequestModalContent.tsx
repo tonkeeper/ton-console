@@ -17,7 +17,7 @@ import {
 import { ArrowIcon, isNumber, MenuButtonDefault, mergeRefs, toBinaryRadio } from 'src/shared';
 import { Controller, useForm } from 'react-hook-form';
 import { observer } from 'mobx-react-lite';
-import { AnalyticsQuery, analyticsQueryStore } from '../../model';
+import { AnalyticsQuery, AnalyticsQueryStore } from '../../model';
 import { useIMask } from 'react-imask';
 
 type TimeInterval = 'day' | 'hour' | 'minute';
@@ -34,12 +34,21 @@ const intervalSecondsMultiplier: Record<TimeInterval, number> = {
     minute: 60
 };
 
-const RepeatRequestModalContent: FC<{
+interface RepeatRequestModalContentProps {
     query: AnalyticsQuery;
     formId: string;
     onIsDirtyChange: (val: boolean) => void;
     onClose: () => void;
-}> = ({ query, formId, onIsDirtyChange, onClose }) => {
+    analyticsQueryStore: AnalyticsQueryStore;
+}
+
+const RepeatRequestModalContent: FC<RepeatRequestModalContentProps> = ({
+    query,
+    formId,
+    onIsDirtyChange,
+    onClose,
+    analyticsQueryStore
+}) => {
     const [selectedInterval, setSelectedInterval] = useState<TimeInterval>(() => {
         if (!query.repeatFrequencyMs) {
             return 'day';

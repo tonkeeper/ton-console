@@ -3,15 +3,27 @@ import { BoxProps, Button, Center, Flex, Skeleton, Spacer, useDisclosure } from 
 import { observer } from 'mobx-react-lite';
 import { InfoIcon16, Span, TooltipHoverable, toTimeLeft } from 'src/shared';
 import {
-    analyticsQueryGPTRequestStore,
-    analyticsQuerySQLRequestStore,
-    analyticsQueryStore
+    AnalyticsQueryStore,
+    AnalyticsQueryRequestStore
 } from 'src/features';
 import { useSearchParams } from 'react-router-dom';
 import { computed } from 'mobx';
 import ExplainSQLModal from './ExplainSQLModal';
 
-const AnalyticsQueryControlPanel: FC<BoxProps & { type: 'sql' | 'gpt' }> = ({ type, ...props }) => {
+interface AnalyticsQueryControlPanelProps extends BoxProps {
+    type: 'sql' | 'gpt';
+    analyticsQueryStore: AnalyticsQueryStore;
+    analyticsQuerySQLRequestStore: AnalyticsQueryRequestStore;
+    analyticsQueryGPTRequestStore: AnalyticsQueryRequestStore;
+}
+
+const AnalyticsQueryControlPanel: FC<AnalyticsQueryControlPanelProps> = ({
+    type,
+    analyticsQueryStore,
+    analyticsQuerySQLRequestStore,
+    analyticsQueryGPTRequestStore,
+    ...props
+}) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const store = type === 'sql' ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
     const request = store.request$.value;

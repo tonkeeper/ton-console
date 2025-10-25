@@ -1,7 +1,8 @@
 import { FC, useCallback, useEffect, useState } from 'react';
+import { useLocalObservable } from 'mobx-react-lite';
 import { BoxProps, Center, Spinner } from '@chakra-ui/react';
 import { Overlay, useIntervalUpdate, usePrevious } from 'src/shared';
-import { analyticsGraphQueryStore } from 'src/features';
+import { AnalyticsGraphQueryStore } from 'src/features';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GraphSuccess } from './GraphSuccess';
 import { GraphError } from './GraphError';
@@ -14,6 +15,10 @@ const GraphPage: FC<BoxProps> = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const queryId = searchParams.get('id');
     const [queryResolved, setQueryResolved] = useState(false);
+
+    const analyticsGraphQueryStore = useLocalObservable(
+        () => new AnalyticsGraphQueryStore()
+    );
 
     useEffect(() => {
         if (queryId) {
@@ -46,8 +51,14 @@ const GraphPage: FC<BoxProps> = () => {
         if (query?.status === 'executing') {
             analyticsGraphQueryStore.refetchQuery();
         }
-    }, [query?.status]);
+    }, [query?.status, analyticsGraphQueryStore]);
     useIntervalUpdate(callback, 1000);
+
+    useEffect(() => {
+        return () => {
+            analyticsGraphQueryStore.destroy();
+        };
+    }, [analyticsGraphQueryStore]);
 
     if (!queryResolved) {
         return (
@@ -67,7 +78,7 @@ const GraphPage: FC<BoxProps> = () => {
         return <GraphError query={query} />;
     }
 
-    return <GraphHome />;
+    return <GraphHome analyticsGraphQueryStore={analyticsGraphQueryStore} />;
 };
 
 export default observer(GraphPage);

@@ -17,6 +17,8 @@ export class AnalyticsQueryRequestStore {
 
     private _network = Network.MAINNET;
 
+    private disposers: Array<() => void> = [];
+
     get network(): Network {
         return this._network;
     }
@@ -24,7 +26,7 @@ export class AnalyticsQueryRequestStore {
     constructor() {
         makeAutoObservable(this);
 
-        createReaction(
+        const dispose = createReaction(
             () => projectsStore.selectedProject?.id,
             (_, prevId) => {
                 if (prevId) {
@@ -32,6 +34,12 @@ export class AnalyticsQueryRequestStore {
                 }
             }
         );
+        this.disposers.push(dispose);
+    }
+
+    destroy(): void {
+        this.disposers.forEach(dispose => dispose?.());
+        this.disposers = [];
     }
 
     public estimateRequest = this.request$.createAsyncAction(
