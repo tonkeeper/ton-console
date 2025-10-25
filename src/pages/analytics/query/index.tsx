@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from 'react';
+import { useLocalObservable } from 'mobx-react-lite';
 import {
     Box,
     BoxProps,
@@ -30,13 +31,12 @@ import {
 } from 'src/shared';
 import {
     ANALYTICS_LINKS,
-    analyticsGPTGenerationStore,
+    AnalyticsGPTGenerationStore,
     AnalyticsQueryCode,
-    analyticsQueryGPTRequestStore,
+    AnalyticsQueryRequestStore,
     AnalyticsQueryGTPGeneration,
     AnalyticsQueryResults,
-    analyticsQuerySQLRequestStore,
-    analyticsQueryStore
+    AnalyticsQueryStore
 } from 'src/features';
 import { useNavigate } from 'react-router-dom';
 import { projectsStore } from 'src/shared/stores';
@@ -54,6 +54,19 @@ const QueryPage: FC<BoxProps> = () => {
     const [initialQueryGPT] = useState(queryType === 'gpt' ? decodedQuery : undefined);
     const [initialQuerySQL] = useState(queryType !== 'gpt' ? decodedQuery : undefined);
     const [queryResolved, setQueryResolved] = useState(false);
+
+    const analyticsGPTGenerationStore = useLocalObservable(
+        () => new AnalyticsGPTGenerationStore()
+    );
+    const analyticsQueryStore = useLocalObservable(
+        () => new AnalyticsQueryStore(analyticsGPTGenerationStore)
+    );
+    const analyticsQuerySQLRequestStore = useLocalObservable(
+        () => new AnalyticsQueryRequestStore()
+    );
+    const analyticsQueryGPTRequestStore = useLocalObservable(
+        () => new AnalyticsQueryRequestStore()
+    );
 
     useEffect(() => {
         analyticsQueryStore.fetchAllTablesSchema();
@@ -75,7 +88,7 @@ const QueryPage: FC<BoxProps> = () => {
         }
 
         updateSearchParams({ query: null });
-    }, [updateSearchParams]);
+    }, [queryId, updateSearchParams]);
 
     useEffect(() => {
         const typedNetwork = queryNetwork as Network;
@@ -84,7 +97,7 @@ const QueryPage: FC<BoxProps> = () => {
 
         analyticsQuerySQLRequestStore.setNetwork(validNetwork);
         analyticsQueryGPTRequestStore.setNetwork(validNetwork);
-    }, [queryNetwork, analyticsQuerySQLRequestStore, analyticsQueryGPTRequestStore]);
+    }, [queryNetwork]);
 
     const projectId = projectsStore.selectedProject?.id;
     const prevProjectId = usePrevious(projectId);
@@ -101,6 +114,15 @@ const QueryPage: FC<BoxProps> = () => {
             navigate('../history');
         }
     }, [prevProjectId, projectId]);
+
+    useEffect(() => {
+        return () => {
+            analyticsQueryStore.destroy?.();
+            analyticsGPTGenerationStore.destroy?.();
+            analyticsQuerySQLRequestStore.destroy?.();
+            analyticsQueryGPTRequestStore.destroy?.();
+        };
+    }, [analyticsQueryStore, analyticsGPTGenerationStore, analyticsQuerySQLRequestStore, analyticsQueryGPTRequestStore]);
 
     return (
         <Overlay display="flex" flexDirection="column">
@@ -167,6 +189,10 @@ const QueryPage: FC<BoxProps> = () => {
                                     flex="1"
                                     type="sql"
                                     defaultRequest={initialQuerySQL}
+                                    analyticsQueryStore={analyticsQueryStore}
+                                    analyticsQuerySQLRequestStore={analyticsQuerySQLRequestStore}
+                                    analyticsQueryGPTRequestStore={analyticsQueryGPTRequestStore}
+                                    analyticsGPTGenerationStore={analyticsGPTGenerationStore}
                                 />
                             </TabPanel>
                             <TabPanel flex="1">
@@ -174,15 +200,27 @@ const QueryPage: FC<BoxProps> = () => {
                                     <AnalyticsQueryGTPGeneration
                                         mb="5"
                                         defaultRequest={initialQueryGPT}
+                                        analyticsGPTGenerationStore={analyticsGPTGenerationStore}
+                                        analyticsQueryGPTRequestStore={analyticsQueryGPTRequestStore}
                                     />
                                     {!!analyticsGPTGenerationStore.generatedSQL$.value && (
-                                        <AnalyticsQueryCode flex="1" type="gpt" />
+                                        <AnalyticsQueryCode
+                                            flex="1"
+                                            type="gpt"
+                                            analyticsQueryStore={analyticsQueryStore}
+                                            analyticsQuerySQLRequestStore={analyticsQuerySQLRequestStore}
+                                            analyticsQueryGPTRequestStore={analyticsQueryGPTRequestStore}
+                                            analyticsGPTGenerationStore={analyticsGPTGenerationStore}
+                                        />
                                     )}
                                 </Box>
                             </TabPanel>
                         </TabPanels>
                     </Tabs>
-                    <AnalyticsQueryResults flex="1" />
+                    <AnalyticsQueryResults
+                        flex="1"
+                        analyticsQueryStore={analyticsQueryStore}
+                    />
                 </Flex>
             ) : (
                 <Center h="300px">

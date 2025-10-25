@@ -18,7 +18,7 @@ import {
     isAnalyticsQuerySuccessful
 } from './interfaces';
 import { projectsStore } from 'src/shared/stores';
-import { analyticsGPTGenerationStore } from 'src/features';
+import { AnalyticsGPTGenerationStore } from './analytics-gpt-generation.store';
 import { parse } from 'csv-parse/sync';
 
 export class AnalyticsQueryStore {
@@ -28,14 +28,19 @@ export class AnalyticsQueryStore {
 
     tablesSchema$ = new Loadable<AnalyticsTablesSchema | undefined>(undefined);
 
+    private analyticsGPTGenerationStore: AnalyticsGPTGenerationStore;
+
+    private disposers: Array<() => void> = [];
+
     get isQueryIntervalUpdateLoading(): boolean {
         return this.setRepeatOnQuery.isLoading || this.removeRepeatOnQuery.isLoading;
     }
 
-    constructor() {
+    constructor(analyticsGPTGenerationStore: AnalyticsGPTGenerationStore) {
+        this.analyticsGPTGenerationStore = analyticsGPTGenerationStore;
         makeAutoObservable(this);
 
-        createReaction(
+        const dispose1 = createReaction(
             () => projectsStore.selectedProject?.id,
             (_, prevId) => {
                 if (prevId) {
@@ -43,8 +48,9 @@ export class AnalyticsQueryStore {
                 }
             }
         );
+        this.disposers.push(dispose1);
 
-        createReaction(
+        const dispose2 = createReaction(
             () =>
                 (this.query$.value?.id || '').toString() +
                 (this.query$.value?.status || '').toString(),
@@ -58,6 +64,12 @@ export class AnalyticsQueryStore {
                 }
             }
         );
+        this.disposers.push(dispose2);
+    }
+
+    destroy(): void {
+        this.disposers.forEach(dispose => dispose?.());
+        this.disposers = [];
     }
 
     public fetchAllTablesSchema = this.tablesSchema$.createAsyncAction(
@@ -97,8 +109,8 @@ export class AnalyticsQueryStore {
                     project_id: projectsStore.selectedProject!.id,
                     query,
                     ...(query.trim() ===
-                        analyticsGPTGenerationStore.generatedSQL$.value?.trim() && {
-                        gpt_message: analyticsGPTGenerationStore.gptPrompt
+                        this.analyticsGPTGenerationStore.generatedSQL$.value?.trim() && {
+                        gpt_message: this.analyticsGPTGenerationStore.gptPrompt
                     })
                 },
                 {

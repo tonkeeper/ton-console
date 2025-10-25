@@ -1,13 +1,13 @@
 import { Button, Flex, useDisclosure, BoxProps, Spinner, Text } from '@chakra-ui/react';
-import { observer, useLocalObservable } from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
 import { EmptyPage } from 'src/entities';
 import { CNFTAddModal, CNFTTable, CNFTStore } from 'src/features';
-import { EXTERNAL_LINKS, H4, Overlay } from 'src/shared';
+import { EXTERNAL_LINKS, H4, Overlay, useLocalObservableWithDestroy } from 'src/shared';
 
 const CnftPage: FC<BoxProps> = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const cnftStore = useLocalObservable(() => new CNFTStore());
+    const cnftStore = useLocalObservableWithDestroy(() => new CNFTStore());
     const isSitesEmpty = cnftStore.history$.value.length === 0;
 
     if (isSitesEmpty && cnftStore.history$.isLoading) {

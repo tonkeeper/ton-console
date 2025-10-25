@@ -3,7 +3,6 @@ import { Box, Button, Center, Flex, Spinner, Td, Tr, useConst } from '@chakra-ui
 import { observer } from 'mobx-react-lite';
 import {
     AnalyticsGraphQuery,
-    analyticsHistoryTableStore,
     AnalyticsQuery,
     AnalyticsRepeatingQueryAggregated,
     isAnalyticsRepeatingQueryAggregated
@@ -46,6 +45,7 @@ const LoadingRow: FC<{ style: React.CSSProperties }> = ({ style: { top, ...style
 const DurationValueCell: FC<{
     query: AnalyticsQuery | AnalyticsGraphQuery | AnalyticsRepeatingQueryAggregated;
 }> = ({ query: q }) => {
+    const { analyticsHistoryTableStore } = useContext(AnalyticsHistoryTableContext);
     const renderTime = useConst(Date.now());
 
     const isAggregated = isAnalyticsRepeatingQueryAggregated(q);
@@ -269,6 +269,8 @@ const AnalyticsHistoryTableRow: FC<{
     index: number;
     style: React.CSSProperties;
 }> = ({ index, style }) => {
+    const { analyticsHistoryTableStore } = useContext(AnalyticsHistoryTableContext);
+
     if (analyticsHistoryTableStore.isItemLoaded(index)) {
         const query = toJS(analyticsHistoryTableStore.queries$.value[index]);
         const id = isAnalyticsRepeatingQueryAggregated(query) ? query.lastQuery.id : query.id;

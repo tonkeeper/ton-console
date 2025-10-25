@@ -34,7 +34,7 @@ import {
     CopyIcon16
 } from 'src/shared';
 import { observer } from 'mobx-react-lite';
-import { analyticsQueryStore, isAnalyticsQuerySuccessful } from '../../model';
+import { AnalyticsQueryStore, isAnalyticsQuerySuccessful } from '../../model';
 import { AnalyticsQueryResultsCountdown } from './AnalyticsQueryResultsCountdown';
 import { toJS } from 'mobx';
 import { AnalyticsTable } from './AnalyticsQueryResultsTable';
@@ -50,7 +50,14 @@ const ChartsCards = {
     pie: PieChartCard
 };
 
-const AnalyticsQueryResults: FC<BoxProps> = props => {
+interface AnalyticsQueryResultsProps extends BoxProps {
+    analyticsQueryStore: AnalyticsQueryStore;
+}
+
+const AnalyticsQueryResults: FC<AnalyticsQueryResultsProps> = ({
+    analyticsQueryStore,
+    ...props
+}) => {
     const query = analyticsQueryStore.query$.value;
     const { isOpen, onClose, onOpen } = useDisclosure();
     const toast = useToast();
@@ -272,7 +279,11 @@ const AnalyticsQueryResults: FC<BoxProps> = props => {
             {query?.status === 'success' && (
                 <AnalyticsTable flex="1" source={toJS(query.preview)} />
             )}
-            <RepeatRequestModal isOpen={isOpen} onClose={onClose} />
+            <RepeatRequestModal
+                isOpen={isOpen}
+                onClose={onClose}
+                analyticsQueryStore={analyticsQueryStore}
+            />
         </Flex>
     );
 };

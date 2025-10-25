@@ -14,10 +14,12 @@ import { projectsStore } from 'src/shared/stores';
 export class AnalyticsGraphQueryStore {
     query$ = new Loadable<AnalyticsGraphQuery | null>(null);
 
+    private disposers: Array<() => void> = [];
+
     constructor() {
         makeAutoObservable(this);
 
-        createReaction(
+        const dispose = createReaction(
             () => projectsStore.selectedProject?.id,
             (_, prevId) => {
                 if (prevId) {
@@ -25,6 +27,12 @@ export class AnalyticsGraphQueryStore {
                 }
             }
         );
+        this.disposers.push(dispose);
+    }
+
+    destroy(): void {
+        this.disposers.forEach(dispose => dispose?.());
+        this.disposers = [];
     }
 
     createQuery = this.query$.createAsyncAction(

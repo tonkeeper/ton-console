@@ -28,6 +28,8 @@ export class BillingStore {
 
     private pageSize = 20;
 
+    private disposers: Array<() => void> = [];
+
     get isResolved() {
         return this.billingHistory$.isResolved;
     }
@@ -57,7 +59,7 @@ export class BillingStore {
     constructor() {
         makeAutoObservable(this);
 
-        createImmediateReaction(
+        const dispose1 = createImmediateReaction(
             () => projectsStore.selectedProject,
             project => {
                 this.clearState();
@@ -66,8 +68,9 @@ export class BillingStore {
                 }
             }
         );
+        this.disposers.push(dispose1);
 
-        createImmediateReaction(
+        const dispose2 = createImmediateReaction(
             () => balanceStore.balance?.total,
             total => {
                 if (total !== undefined && projectsStore.selectedProject) {
@@ -75,6 +78,7 @@ export class BillingStore {
                 }
             }
         );
+        this.disposers.push(dispose2);
     }
 
     fetchHistory = this.billingHistory$.createAsyncAction(
@@ -112,6 +116,11 @@ export class BillingStore {
 
     clearState(): void {
         this.billingHistory$.clear();
+    }
+
+    destroy(): void {
+        this.disposers.forEach(dispose => dispose?.());
+        this.disposers = [];
     }
 }
 

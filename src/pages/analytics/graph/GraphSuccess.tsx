@@ -4,7 +4,11 @@ import { ButtonLink, CopyIcon16, DoneIconCircle24, H4, InfoTooltip, Overlay } fr
 import { AnalyticsGraphQuerySuccess, GraphAddressesList } from 'src/features';
 import { useSearchParams } from 'react-router-dom';
 
-export const GraphSuccess: FC<{ query: AnalyticsGraphQuerySuccess }> = ({ query }) => {
+interface GraphSuccessProps {
+    query: AnalyticsGraphQuerySuccess;
+}
+
+export const GraphSuccess: FC<GraphSuccessProps> = ({ query }) => {
     const [_, setSearchParams] = useSearchParams();
     const { hasCopied, onCopy } = useClipboard(query.addresses.map(a => a.userFriendly).join('\n'));
 

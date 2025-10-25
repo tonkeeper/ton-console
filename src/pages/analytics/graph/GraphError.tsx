@@ -4,7 +4,11 @@ import { CopyIcon16, ErrorIconCircle24, H4, InfoTooltip, Overlay } from 'src/sha
 import { AnalyticsGraphQueryError, GraphAddressesList } from 'src/features';
 import { useSearchParams } from 'react-router-dom';
 
-export const GraphError: FC<{ query: AnalyticsGraphQueryError }> = ({ query }) => {
+interface GraphErrorProps {
+    query: AnalyticsGraphQueryError;
+}
+
+export const GraphError: FC<GraphErrorProps> = ({ query }) => {
     const [_, setSearchParams] = useSearchParams();
     const { hasCopied, onCopy } = useClipboard(query.addresses.map(a => a.userFriendly).join('\n'));
     return (
