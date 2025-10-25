@@ -1,18 +1,22 @@
 import { makeAutoObservable, reaction } from 'mobx';
 import {
-    apiClient,
-    backendBaseURL,
     createImmediateReaction,
     CRYPTO_CURRENCY,
-    DTOCryptoCurrency,
-    DTOGetInvoicesParamsTypeOrderEnum,
-    DTOInvoiceFieldOrder,
-    DTOInvoicesInvoice,
-    DTOInvoiceStatus,
     Loadable,
     monthsNames,
     TonAddress
 } from 'src/shared';
+import {
+    getInvoices,
+    createInvoicesInvoice,
+    cancelInvoicesInvoice,
+    DTOCryptoCurrency,
+    DTOInvoiceFieldOrder,
+    DTOInvoicesInvoice,
+    GetInvoicesData,
+    GetInvoicesResponse,
+    DTOInvoiceStatus
+} from 'src/shared/api';
 import {
     Invoice,
     InvoiceCommon,
@@ -33,6 +37,9 @@ import {
     getTokenCurrencyAmountFromDTO
 } from './utils';
 
+export const apiClientBaseURL = import.meta.env.VITE_BASE_URL;
+export const backendBaseURL =
+    apiClientBaseURL === '/' ? import.meta.env.VITE_BASE_PROXY_URL : apiClientBaseURL;
 export class InvoicesTableStore {
     invoices$ = new Loadable<Invoice[]>([]);
 
@@ -78,10 +85,8 @@ export class InvoicesTableStore {
             url.searchParams.append('search_id', this.pagination.filter.id);
         }
         const sortByColumn = mapSortColumnToFieldOrder[this.pagination.sort.column];
-        const sortOrder =
-            this.pagination.sort.direction === 'asc'
-                ? DTOGetInvoicesParamsTypeOrderEnum.DTOAsc
-                : DTOGetInvoicesParamsTypeOrderEnum.DTODesc;
+        const sortOrder: GetInvoicesData['query']['type_order'] =
+            this.pagination.sort.direction === 'asc' ? 'asc' : 'desc';
         url.searchParams.append('field_order', sortByColumn);
         url.searchParams.append('type_order', sortOrder);
 
@@ -144,38 +149,35 @@ export class InvoicesTableStore {
         async () => {
             this.loadNextPage.cancelAllPendingCalls();
 
-            const response = await this.fetchInvoices();
+            const data = await this.fetchInvoices();
+            const invoices = data.items.map(mapInvoiceDTOToInvoice);
 
-            const invoices = response.data.items.map(mapInvoiceDTOToInvoice);
-
-            this.totalInvoices = response.data.count;
+            this.totalInvoices = data.count;
             return invoices;
         },
         { resetBeforeExecution: true }
     );
 
     loadNextPage = this.invoices$.createAsyncAction(async () => {
-        const response = await this.fetchInvoices({ offset: this.invoices$.value.length });
+        const data = await this.fetchInvoices({ offset: this.invoices$.value.length });
+        const invoices = data.items.map(mapInvoiceDTOToInvoice);
 
-        const invoices = response.data.items.map(mapInvoiceDTOToInvoice);
-
-        this.totalInvoices = response.data.count;
+        this.totalInvoices = data.count;
         return this.invoices$.value.concat(invoices);
     });
 
     updateCurrentListSilently = this.invoices$.createAsyncAction(async () => {
-        const response = await this.fetchInvoices();
+        const data = await this.fetchInvoices();
+        const invoices = data.items.map(mapInvoiceDTOToInvoice);
 
-        const invoices = response.data.items.map(mapInvoiceDTOToInvoice);
-
-        this.totalInvoices = response.data.count;
+        this.totalInvoices = data.count;
         return invoices;
     });
 
     private async fetchInvoices(options?: {
         offset?: number;
         pageSize?: number;
-    }): ReturnType<typeof apiClient.api.getInvoices> {
+    }): Promise<GetInvoicesResponse> {
         const searchId = this.pagination.filter.id;
         let filterByStatus = undefined;
 
@@ -186,47 +188,55 @@ export class InvoicesTableStore {
         }
 
         const sortByColumn = mapSortColumnToFieldOrder[this.pagination.sort.column];
-        const sortOrder =
-            this.pagination.sort.direction === 'asc'
-                ? DTOGetInvoicesParamsTypeOrderEnum.DTOAsc
-                : DTOGetInvoicesParamsTypeOrderEnum.DTODesc;
+        const sortOrder: GetInvoicesData['query']['type_order'] =
+            this.pagination.sort.direction === 'asc' ? 'asc' : 'desc';
 
         const period = preriodToDTO(this.pagination.filter.period);
 
-        return apiClient.api.getInvoices({
-            app_id: invoicesAppStore.invoicesApp$.value!.id,
-            ...(options?.offset !== undefined && { offset: options.offset }),
-            limit: options?.pageSize || this.pageSize,
-            ...(searchId && { search_id: searchId }),
-            field_order: sortByColumn,
-            type_order: sortOrder,
-            filter_status: filterByStatus,
-            currency:
-                this.pagination.filter.currency?.length === 1
-                    ? mapInvoiceCurrencyToDTOCurrency[this.pagination.filter.currency[0]]
-                    : undefined,
-            ...(this.pagination.filter.overpayment && { overpayment: true }),
-            ...period
+        const { data, error } = await getInvoices({
+            query: {
+                app_id: invoicesAppStore.invoicesApp$.value!.id,
+                ...(options?.offset !== undefined && { offset: options.offset }),
+                limit: options?.pageSize || this.pageSize,
+                ...(searchId && { search_id: searchId }),
+                field_order: sortByColumn,
+                type_order: sortOrder,
+                filter_status: filterByStatus,
+                currency:
+                    this.pagination.filter.currency?.length === 1
+                        ? mapInvoiceCurrencyToDTOCurrency[this.pagination.filter.currency[0]]
+                        : undefined,
+                ...(this.pagination.filter.overpayment && { overpayment: true }),
+                ...period
+            }
         });
+
+        if (error || !data) throw error;
+
+        return data;
     }
 
     createInvoice = this.invoices$.createAsyncAction(
         async (form: InvoiceForm) => {
-            const result = await apiClient.api.createInvoicesInvoice(
-                {
+            const { data, error } = await createInvoicesInvoice({
+                query: {
+                    app_id: invoicesAppStore.invoicesApp$.value!.id
+                },
+                body: {
                     amount: form.amount.stringWeiAmount,
                     description: form.description,
                     life_time: form.lifeTimeSeconds,
                     currency: convertCryptoCurrencyToDTOCryptoCurrency(form.currency)
-                },
-                {
-                    app_id: invoicesAppStore.invoicesApp$.value!.id
                 }
-            );
+            });
+
+            if (error || !data) {
+                throw error;
+            }
 
             await this.updateCurrentListSilently({ silently: true });
 
-            return mapInvoiceDTOToInvoice(result.data);
+            return mapInvoiceDTOToInvoice(data);
         },
         {
             notMutateState: true,
@@ -241,9 +251,13 @@ export class InvoicesTableStore {
 
     cancelInvoice = this.invoices$.createAsyncAction(
         async (id: Invoice['id']) => {
-            await apiClient.api.cancelInvoicesInvoice(id, {
-                app_id: invoicesAppStore.invoicesApp$.value!.id
+            const { error } = await cancelInvoicesInvoice({
+                path: { id },
+                query: { app_id: invoicesAppStore.invoicesApp$.value!.id }
             });
+
+            if (error) throw error;
+
             await this.updateCurrentListSilently({ silently: true });
         },
         {
@@ -332,25 +346,22 @@ export class InvoicesTableStore {
     }
 }
 
-const mapInvoiceDTOStatusToInvoiceStatus: Record<DTOInvoicesInvoice['status'], InvoiceStatus> = {
-    [DTOInvoiceStatus.DTOPaid]: 'success',
-    [DTOInvoiceStatus.DTOPending]: 'pending',
-    [DTOInvoiceStatus.DTOExpired]: 'expired',
-    [DTOInvoiceStatus.DTOCancelled]: 'cancelled'
+const mapInvoiceDTOStatusToInvoiceStatus: Record<DTOInvoiceStatus, InvoiceStatus> = {
+    [DTOInvoiceStatus.PAID]: 'success',
+    [DTOInvoiceStatus.PENDING]: 'pending',
+    [DTOInvoiceStatus.EXPIRED]: 'expired',
+    [DTOInvoiceStatus.CANCELLED]: 'cancelled'
 };
 
-const mapInvoiceStatusToInvoiceDTOStatus: Record<InvoiceStatus, DTOInvoicesInvoice['status']> =
+const mapInvoiceStatusToInvoiceDTOStatus: Record<InvoiceStatus, DTOInvoiceStatus> =
     Object.fromEntries(Object.entries(mapInvoiceDTOStatusToInvoiceStatus).map(a => a.reverse()));
 
-const mapInvoiceDTOCurrencyToInvoiceCurrency: Record<
-    DTOInvoicesInvoice['currency'],
-    InvoiceCurrency
-> = {
-    [DTOCryptoCurrency.DTO_TON]: CRYPTO_CURRENCY.TON,
-    [DTOCryptoCurrency.DTO_USDT]: CRYPTO_CURRENCY.USDT
+const mapInvoiceDTOCurrencyToInvoiceCurrency: Record<DTOCryptoCurrency, InvoiceCurrency> = {
+    [DTOCryptoCurrency.TON]: CRYPTO_CURRENCY.TON,
+    [DTOCryptoCurrency.USDT]: CRYPTO_CURRENCY.USDT
 };
 
-const mapInvoiceCurrencyToDTOCurrency: Record<InvoiceCurrency, DTOInvoicesInvoice['currency']> =
+const mapInvoiceCurrencyToDTOCurrency: Record<InvoiceCurrency, DTOCryptoCurrency> =
     Object.fromEntries(
         Object.entries(mapInvoiceDTOCurrencyToInvoiceCurrency).map(a => a.reverse())
     );
@@ -394,11 +405,11 @@ function mapInvoiceDTOToInvoice(invoiceDTO: DTOInvoicesInvoice): Invoice {
 }
 
 const mapSortColumnToFieldOrder: Record<InvoiceTableSortColumn, DTOInvoiceFieldOrder> = {
-    id: DTOInvoiceFieldOrder.DTOId,
-    description: DTOInvoiceFieldOrder.DTODescription,
-    amount: DTOInvoiceFieldOrder.DTOAmount,
-    status: DTOInvoiceFieldOrder.DTOStatus,
-    'creation-date': DTOInvoiceFieldOrder.DTODateCreate
+    id: DTOInvoiceFieldOrder.ID,
+    description: DTOInvoiceFieldOrder.DESCRIPTION,
+    amount: DTOInvoiceFieldOrder.AMOUNT,
+    status: DTOInvoiceFieldOrder.STATUS,
+    'creation-date': DTOInvoiceFieldOrder.DATE_CREATE
 };
 
 const preriodToDTO = (

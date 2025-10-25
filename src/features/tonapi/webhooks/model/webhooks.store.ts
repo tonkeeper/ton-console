@@ -1,10 +1,5 @@
-import {
-    apiClient,
-    createImmediateReaction,
-    DTOGetProjectTonApiStatsParamsDashboardEnum,
-    Loadable,
-    Network
-} from 'src/shared';
+import { createImmediateReaction, Loadable, Network } from 'src/shared';
+import { getProjectTonApiStats, DTOStats } from 'src/shared/api';
 import { Webhook, CreateWebhookForm } from './interfaces';
 import { projectsStore } from 'src/shared/stores';
 import { makeAutoObservable } from 'mobx';
@@ -142,17 +137,19 @@ class WebhooksStore {
         const parts = (endTimestamp - startMonthTimestamp) / (60 * 60);
         const startTimestamp = parts > 500 ? endTimestamp - 500 * (60 * 60) : startMonthTimestamp;
 
-        const response = await apiClient.api
-            .getProjectTonApiStats({
+        const { data, error } = await getProjectTonApiStats({
+            query: {
                 project_id: projectsStore.selectedProject!.id,
                 start: startTimestamp,
                 end: endTimestamp,
                 step: 60 * 60,
-                dashboard: DTOGetProjectTonApiStatsParamsDashboardEnum.DTOTonapiWebhook
-            })
-            .then(res => res.data.stats);
+                dashboard: 'tonapi_webhook'
+            }
+        });
 
-        return response;
+        if (error) throw error;
+
+        return data.stats as DTOStats;
     });
 
     createWebhook = this.webhooks$.createAsyncAction(

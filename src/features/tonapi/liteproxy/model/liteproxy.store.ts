@@ -1,11 +1,17 @@
 import {
-    apiClient,
     createImmediateReaction,
+    Loadable
+} from 'src/shared';
+import {
     DTOLiteproxyKey,
     DTOLiteproxyTier,
     DTOProjectLiteproxyTierDetail,
-    Loadable
-} from 'src/shared';
+    getLiteproxyKeys,
+    createLiteproxyKeys,
+    getLiteproxyTiers,
+    getProjectLiteproxyTier,
+    updateLiteproxyTier
+} from 'src/shared/api';
 import { projectsStore } from 'src/shared/stores';
 import { makeAutoObservable } from 'mobx';
 
@@ -33,34 +39,46 @@ export class LiteproxysStore {
         );
     }
 
-    fetchLiteproxyList = this.liteproxyList$.createAsyncAction(() =>
-        apiClient.api
-            .getLiteproxyKeys({ project_id: projectsStore.selectedProject!.id })
-            .then(({ data }) => data.keys)
-            .catch(({ response }) => {
-                if (response.data.error === 'keys not found') {
-                    return [];
-                }
+    fetchLiteproxyList = this.liteproxyList$.createAsyncAction(async () => {
+        const { data, error } = await getLiteproxyKeys({
+            query: { project_id: projectsStore.selectedProject!.id }
+        });
 
-                throw Error(response);
-            })
-    );
+        if (error) {
+            if (error.error === 'keys not found') return [];
+            throw error;
+        }
 
-    fetchLiteproxyTiers = this.liteproxyTiers$.createAsyncAction(() =>
-        apiClient.api.getLiteproxyTiers().then(({ data }) => data.tiers)
-    );
+        return data.keys;
+    });
+
+    fetchLiteproxyTiers = this.liteproxyTiers$.createAsyncAction(async () => {
+        const { data, error } = await getLiteproxyTiers();
+        if (error) throw error
+
+        return data.tiers;
+    });
 
     fetchSelectedTier = this.selectedTier$.createAsyncAction(async () => {
-        return apiClient.api
-            .getProjectLiteproxyTier({ project_id: projectsStore.selectedProject!.id })
-            .then(({ data }) => data.tier);
+        const { data, error } = await getProjectLiteproxyTier({
+            query: { project_id: projectsStore.selectedProject!.id }
+        });
+
+        if (error) throw error
+
+        return data.tier;
     });
 
     createLiteproxy = this.liteproxyList$.createAsyncAction(
-        () =>
-            apiClient.api
-                .createLiteproxyKeys({ project_id: projectsStore.selectedProject!.id })
-                .then(({ data }) => data.keys),
+        async () => {
+            const { data, error } = await createLiteproxyKeys({
+                query: { project_id: projectsStore.selectedProject!.id }
+            });
+
+            if (error) throw error
+
+            return data.keys;
+        },
         {
             successToast: {
                 title: 'Api key has been created successfully'
@@ -73,12 +91,12 @@ export class LiteproxysStore {
 
     selectTier = this.selectedTier$.createAsyncAction(
         async (tierId: number) => {
-            await apiClient.api.updateLiteproxyTier(
-                { project_id: projectsStore.selectedProject!.id },
-                {
-                    tier_id: tierId
-                }
-            );
+            const { error } = await updateLiteproxyTier({
+                query: { project_id: projectsStore.selectedProject!.id },
+                body: { tier_id: tierId }
+            });
+
+            if (error) throw error
 
             this.fetchSelectedTier();
         },

@@ -18,7 +18,11 @@ export default [
             '.lintstagedrc.cjs',
             'src/shared/lib/validators/address-validator.test.ts',
             'src/shared/lib/decimals.test.ts',
-            'src/features/tonapi/pricing/utils/calculating.test.ts'
+            'src/features/tonapi/pricing/utils/calculating.test.ts',
+            'src/shared/api/**/*.gen.ts',
+            'src/shared/api/console/**',
+            'src/shared/api/airdrop.generated.ts',
+            'src/shared/api/rt.tonapi.generated.ts'
         ]
     },
     js.configs.recommended,
@@ -100,7 +104,8 @@ export default [
                     store: 'always',
                     generated: 'always',
                     config: 'always',
-                    api: 'always'
+                    api: 'always',
+                    gen: 'always'
                 }
             ],
             'import/prefer-default-export': 'off',

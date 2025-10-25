@@ -1,14 +1,18 @@
 import { makeAutoObservable } from 'mobx';
 import {
-    apiClient,
     createAsyncAction,
     createImmediateReaction,
-    DTOBalance,
     Loadable,
     setIntervalWhenPageOnFocus,
     tonapiMainnet,
     toDecimals
 } from 'src/shared';
+import {
+    DTOBalance,
+    getProjectBillingHistory,
+    getDepositAddress,
+    promoCodeDepositProject
+} from 'src/shared/api';
 import { ProjectsStore } from '../project/model/projects.store';
 import { createStandaloneToast } from '@chakra-ui/react';
 
@@ -103,12 +107,18 @@ export class BalanceStore {
     }
 
     fetchBalance = this.currentBalance$.createAsyncAction(async (): Promise<Balance> => {
-        const response = await apiClient.api.getProjectBillingHistory(
-            this.projectsStore.selectedProject!.id,
-            { limit: 0 }
-        );
+        const { data, error } = await getProjectBillingHistory({
+            path: {
+                id: this.projectsStore.selectedProject!.id
+            },
+            query: {
+                limit: 0
+            }
+        });
 
-        const { usdt_balance, ton_balance } = response.data;
+        if (error) throw error
+
+        const { usdt_balance, ton_balance } = data;
         const total = await this.calculateTotal(usdt_balance, ton_balance);
 
         return {
@@ -134,20 +144,29 @@ export class BalanceStore {
     );
 
     fetchDepositAddress = this.depositAddress$.createAsyncAction(
-        async (): Promise<RefillAddresses> =>
-            apiClient.api
-                .getDepositAddress(this.projectsStore.selectedProject!.id)
-                .then(response => response.data)
+        async (): Promise<RefillAddresses> => {
+            const projectId = this.projectsStore.selectedProject!.id;
+            const { data, error } = await getDepositAddress({
+                path: { id: projectId }
+            });
+
+            if (error) throw error
+
+            return data;
+        }
     );
 
     applyPromoCode = createAsyncAction(async (promoCode: string) => {
         const { toast } = createStandaloneToast();
 
         try {
-            await apiClient.api.promoCodeDepositProject(
-                this.projectsStore.selectedProject!.id,
-                promoCode
-            );
+            const projectId = this.projectsStore.selectedProject!.id;
+            const { error } = await promoCodeDepositProject({
+                path: { id: projectId, promo_code: promoCode }
+            });
+
+            if (error) throw error
+
             await this.fetchBalance();
             toast({
                 title: 'Promo code succesfully used',

@@ -1,7 +1,8 @@
 import { makeAutoObservable } from 'mobx';
 import { loginViaTG } from './telegram-oauth';
 import { User } from './interfaces/user';
-import { apiClient, DTOUser, Loadable } from 'src/shared';
+import { Loadable } from 'src/shared';
+import { DTOUser, getUserInfo, authViaTg, accountLogout } from 'src/shared/api';
 import { projectsStore } from 'src/shared/stores';
 import { AxiosError } from 'axios';
 
@@ -29,8 +30,10 @@ export class UserStore {
     }
 
     private async fetchMe() {
-        const userRes = await apiClient.api.getUserInfo();
-        return mapDTOUserToUser(userRes.data.user);
+        const { data, error } = await getUserInfo();
+        if (error) throw error
+
+        return mapDTOUserToUser(data.user);
     }
 
     login = this.user$.createAsyncAction(async () => {
@@ -44,7 +47,11 @@ export class UserStore {
         const params = new URLSearchParams(new URL(url).search);
         const referral_id = params.get('referral') ?? undefined;
 
-        await apiClient.api.authViaTg({ ...tgOAuthResponse, referral_id });
+        const { error } = await authViaTg({
+            body: { ...tgOAuthResponse, referral_id }
+        });
+
+        if (error) throw error
 
         await projectsStore.fetchProjects();
         if (projectsStore.projects$.value.length && !projectsStore.selectedProject) {
@@ -87,7 +94,10 @@ export class UserStore {
 
     logout = this.user$.createAsyncAction(async () => {
         try {
-            await apiClient.api.accountLogout();
+            const { error } = await accountLogout();
+            if (error) {
+                console.error(error);
+            }
         } catch (e) {
             console.error(e);
         }

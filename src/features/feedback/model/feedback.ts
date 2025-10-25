@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx';
-import { apiClient, createAsyncAction } from 'src/shared';
+import { createAsyncAction } from 'src/shared';
+import { feedback, FeedbackResponse } from 'src/shared/api';
 import { createStandaloneToast } from '@chakra-ui/react';
 import { projectsStore, userStore } from 'src/shared/stores';
 import type { AxiosError } from 'axios';
@@ -40,17 +41,21 @@ export class FeetbackStore {
     }
 
     sendForm = createAsyncAction(
-        async (form: FeedbackFromI) => {
-            const res = await apiClient.api.feedback({
-                ...form,
-                x_source: this.params?.source as string,
-                x_project_id: projectsStore.selectedProject?.id.toString() as string,
-                x_project_name: projectsStore.selectedProject?.name as string,
-                x_tg_user_id: userStore.user$.value?.id.toString() as string,
-                x_tg_user_name: userStore.user$.value
-                    ? `${userStore.user$.value?.firstName} ${userStore.user$.value?.lastName}`
-                    : ''
+        async (form: FeedbackFromI): Promise<FeedbackResponse> => {
+            const { data, error } = await feedback({
+                body: {
+                    ...form,
+                    x_source: this.params?.source as string,
+                    x_project_id: projectsStore.selectedProject?.id.toString() as string,
+                    x_project_name: projectsStore.selectedProject?.name as string,
+                    x_tg_user_id: userStore.user$.value?.id.toString() as string,
+                    x_tg_user_name: userStore.user$.value
+                        ? `${userStore.user$.value?.firstName} ${userStore.user$.value?.lastName}`
+                        : ''
+                }
             });
+
+            if (error) throw error;
 
             const { toast } = createStandaloneToast();
             toast({
@@ -61,7 +66,7 @@ export class FeetbackStore {
 
             this.close();
 
-            return res;
+            return data;
         },
         e => {
             const { toast } = createStandaloneToast();

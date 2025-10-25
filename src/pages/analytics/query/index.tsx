@@ -141,14 +141,14 @@ const QueryPage: FC<BoxProps> = () => {
                     <MenuList w="122px">
                         <MenuItem
                             gap="2"
-                            onClick={() => updateSearchParams({ network: DTOChain.DTOMainnet })}
+                            onClick={() => updateSearchParams({ network: DTOChain.MAINNET })}
                         >
                             <Span textStyle="label2">Mainnet</Span>
                             {network === Network.MAINNET && <TickIcon />}
                         </MenuItem>
                         <MenuItem
                             gap="2"
-                            onClick={() => updateSearchParams({ network: DTOChain.DTOTestnet })}
+                            onClick={() => updateSearchParams({ network: DTOChain.TESTNET })}
                         >
                             <Span textStyle="label2">Testnet</Span>
                             {network === Network.TESTNET && <TickIcon />}

@@ -1,24 +1,25 @@
 import { makeAutoObservable } from 'mobx';
 import {
-    apiClient,
     createAsyncAction,
     createImmediateReaction,
     CRYPTO_CURRENCY,
-    DTOBillingTransaction,
-    DTOBillingTransactionTypeEnum,
-    DTOCryptoCurrency,
     Loadable,
     TokenCurrencyAmount,
     TonCurrencyAmount,
     UsdCurrencyAmount
 } from 'src/shared';
+import {
+    getProjectBillingHistory,
+    DTOBillingTransaction,
+    DTOCryptoCurrency
+} from 'src/shared/api';
 import { projectsStore, balanceStore } from 'src/shared/stores';
 
 export type BillingHistoryItem = {
     id: string;
     date: Date;
     amount: TonCurrencyAmount | UsdCurrencyAmount;
-    type: DTOBillingTransactionTypeEnum;
+    type: 'deposit' | 'charge';
     reason: string;
 };
 
@@ -84,12 +85,13 @@ export class BillingStore {
 
     fetchHistory = this.billingHistory$.createAsyncAction(
         async () => {
-            const response = await apiClient.api.getProjectBillingHistory(
-                projectsStore.selectedProject!.id,
-                { limit: this.pageSize }
-            );
+            const { data, error } = await getProjectBillingHistory({
+                path: { id: projectsStore.selectedProject!.id },
+                query: { limit: this.pageSize }
+            });
 
-            return response.data.history;
+            if (error) throw error;
+            return data.history;
         },
         { resetBeforeExecution: true }
     );
@@ -101,16 +103,17 @@ export class BillingStore {
         }
 
         const lastTransaction = currentHistory[currentHistory.length - 1];
-        const response = await apiClient.api.getProjectBillingHistory(
-            projectsStore.selectedProject!.id,
-            { limit: this.pageSize, before_tx: lastTransaction.id }
-        );
+        const { data, error } = await getProjectBillingHistory({
+            path: { id: projectsStore.selectedProject!.id },
+            query: { limit: this.pageSize, before_tx: lastTransaction.id }
+        });
 
-        if (!response.data.history) {
+        if (error) throw error;
+        if (!data.history) {
             throw new Error('No history found');
         }
 
-        this.billingHistory$.value = [...currentHistory, ...response.data.history];
+        this.billingHistory$.value = [...currentHistory, ...data.history];
     });
 
     isItemLoaded = (index: number): boolean => index < this.billingHistory.length;
@@ -158,9 +161,9 @@ function mapDTOTransactionToBillingHistoryItem(dtoTx: DTOBillingTransaction): Bi
 
 function mapDTOCurrencyToAmount(currency: DTOCryptoCurrency, amount: string) {
     switch (currency) {
-        case DTOCryptoCurrency.DTO_TON:
+        case DTOCryptoCurrency.TON:
             return new TonCurrencyAmount(amount);
-        case DTOCryptoCurrency.DTO_USDT:
+        case DTOCryptoCurrency.USDT:
             return new TokenCurrencyAmount({
                 weiAmount: amount,
                 currency: CRYPTO_CURRENCY.USDT,

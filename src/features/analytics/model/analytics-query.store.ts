@@ -1,14 +1,14 @@
 import { makeAutoObservable } from 'mobx';
+import { createReaction, Loadable, Network, TonCurrencyAmount } from 'src/shared';
 import {
-    apiClient,
-    createReaction,
+    getStatsDdl,
+    sendQueryToStats,
+    updateStatsQuery,
+    getSqlResultFromStats,
     DTOChain,
     DTOStatsQueryResult,
-    DTOStatsQueryStatus,
-    Loadable,
-    Network,
-    TonCurrencyAmount
-} from 'src/shared';
+    DTOStatsQueryStatus
+} from 'src/shared/api';
 import {
     AnalyticsChart,
     AnalyticsChartOptions,
@@ -75,8 +75,9 @@ export class AnalyticsQueryStore {
     public fetchAllTablesSchema = this.tablesSchema$.createAsyncAction(
         async () => {
             if (!this.tablesSchema$.value) {
-                const result = await apiClient.api.getStatsDdl();
-                return parseDDL(result.data as unknown as string);
+                const { data, error } = await getStatsDdl();
+                if (error) throw error;
+                return parseDDL(data as unknown as string);
             }
         },
         { resetBeforeExecution: true }
@@ -104,8 +105,8 @@ export class AnalyticsQueryStore {
 
     createQuery = this.query$.createAsyncAction(
         async (query: string, network: 'mainnet' | 'testnet') => {
-            const result = await apiClient.api.sendQueryToStats(
-                {
+            const { data, error } = await sendQueryToStats({
+                body: {
                     project_id: projectsStore.selectedProject!.id,
                     query,
                     ...(query.trim() ===
@@ -113,12 +114,13 @@ export class AnalyticsQueryStore {
                         gpt_message: this.analyticsGPTGenerationStore.gptPrompt
                     })
                 },
-                {
-                    chain: network === 'testnet' ? DTOChain.DTOTestnet : DTOChain.DTOMainnet
+                query: {
+                    chain: network === 'testnet' ? DTOChain.TESTNET : DTOChain.MAINNET
                 }
-            );
+            });
 
-            return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
+            if (error) throw error;
+            return mapDTOStatsSqlResultToAnalyticsQuery(data);
         },
         {
             errorToast: e => ({
@@ -130,14 +132,13 @@ export class AnalyticsQueryStore {
 
     setRepeatOnQuery = this.query$.createAsyncAction(
         async (repeatIntervalS: number) => {
-            const result = await apiClient.api.updateStatsQuery(
-                this.query$.value!.id,
-                {
-                    project_id: projectsStore.selectedProject!.id
-                },
-                { repeat_interval: repeatIntervalS }
-            );
-            this.query$.value!.repeatFrequencyMs = result.data.repeat_interval! * 1000;
+            const { data, error } = await updateStatsQuery({
+                path: { id: this.query$.value!.id },
+                query: { project_id: projectsStore.selectedProject!.id },
+                body: { repeat_interval: repeatIntervalS }
+            });
+            if (error) throw error;
+            this.query$.value!.repeatFrequencyMs = data.repeat_interval! * 1000;
         },
         {
             successToast: {
@@ -158,14 +159,13 @@ export class AnalyticsQueryStore {
 
     setNameForQuery = this.query$.createAsyncAction(
         async (name: string) => {
-            await apiClient.api.updateStatsQuery(
-                this.query$.value!.id,
-                {
-                    project_id: projectsStore.selectedProject!.id
-                },
-                { name }
-            );
+            const { error } = await updateStatsQuery({
+                path: { id: this.query$.value!.id },
+                query: { project_id: projectsStore.selectedProject!.id },
+                body: { name }
+            });
 
+            if (error) throw error;
             this.query$.value!.name = name;
         },
         {
@@ -187,14 +187,13 @@ export class AnalyticsQueryStore {
 
     removeRepeatOnQuery = this.query$.createAsyncAction(
         async () => {
-            await apiClient.api.updateStatsQuery(
-                this.query$.value!.id,
-                {
-                    project_id: projectsStore.selectedProject!.id
-                },
-                { repeat_interval: 0 }
-            );
+            const { error } = await updateStatsQuery({
+                path: { id: this.query$.value!.id },
+                query: { project_id: projectsStore.selectedProject!.id },
+                body: { repeat_interval: 0 }
+            });
 
+            if (error) throw error;
             delete this.query$.value!.repeatFrequencyMs;
         },
         {
@@ -215,14 +214,20 @@ export class AnalyticsQueryStore {
     );
 
     refetchQuery = this.query$.createAsyncAction(async () => {
-        const result = await apiClient.api.getSqlResultFromStats(this.query$.value!.id);
-        return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
+        const { data, error } = await getSqlResultFromStats({
+            path: { id: this.query$.value!.id }
+        });
+        if (error) throw error;
+        return mapDTOStatsSqlResultToAnalyticsQuery(data);
     });
 
     loadQuery = this.query$.createAsyncAction(
         async (queryId: string) => {
-            const result = await apiClient.api.getSqlResultFromStats(queryId);
-            return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
+            const { data, error } = await getSqlResultFromStats({
+                path: { id: queryId }
+            });
+            if (error) throw error;
+            return mapDTOStatsSqlResultToAnalyticsQuery(data);
         },
         { resetBeforeExecution: true }
     );
@@ -261,14 +266,14 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         network: value.testnet ? Network.TESTNET : Network.MAINNET
     } as const;
 
-    if (value.status === DTOStatsQueryStatus.DTOExecuting) {
+    if (value.status === DTOStatsQueryStatus.EXECUTING) {
         return {
             ...basicQuery,
             status: 'executing'
         };
     }
 
-    if (value.status === DTOStatsQueryStatus.DTOSuccess) {
+    if (value.status === DTOStatsQueryStatus.SUCCESS) {
         return {
             ...basicQuery,
             status: 'success',

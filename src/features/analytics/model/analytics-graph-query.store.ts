@@ -1,13 +1,15 @@
 import { makeAutoObservable } from 'mobx';
 import {
-    apiClient,
     createReaction,
-    DTOStatsQueryResult,
-    DTOStatsQueryStatus,
     Loadable,
     TonAddress,
     TonCurrencyAmount
 } from 'src/shared';
+import {
+    getGraphFromStats,
+    getSqlResultFromStats,
+    DTOStatsQueryResult
+} from 'src/shared/api';
 import { AnalyticsGraphQuery, AnalyticsGraphQueryBasic } from './interfaces';
 import { projectsStore } from 'src/shared/stores';
 
@@ -37,13 +39,16 @@ export class AnalyticsGraphQueryStore {
 
     createQuery = this.query$.createAsyncAction(
         async (form: { addresses: string[]; isBetweenSelectedOnly: boolean }) => {
-            const result = await apiClient.api.getGraphFromStats({
-                project_id: projectsStore.selectedProject!.id,
-                addresses: form.addresses.join(','),
-                only_between: form.isBetweenSelectedOnly
+            const { data, error } = await getGraphFromStats({
+                query: {
+                    project_id: projectsStore.selectedProject!.id,
+                    addresses: form.addresses.join(','),
+                    only_between: form.isBetweenSelectedOnly
+                }
             });
 
-            return mapDTOStatsGraphResultToAnalyticsGraphQuery(result.data);
+            if (error) throw error;
+            return mapDTOStatsGraphResultToAnalyticsGraphQuery(data);
         },
         {
             onError: () => {
@@ -57,16 +62,22 @@ export class AnalyticsGraphQueryStore {
     );
 
     refetchQuery = this.query$.createAsyncAction(async () => {
-        const result = await apiClient.api.getSqlResultFromStats(this.query$.value!.id);
+        const { data, error } = await getSqlResultFromStats({
+            path: { id: this.query$.value!.id }
+        });
 
-        return mapDTOStatsGraphResultToAnalyticsGraphQuery(result.data);
+        if (error) throw error;
+        return mapDTOStatsGraphResultToAnalyticsGraphQuery(data);
     });
 
     loadQuery = this.query$.createAsyncAction(async id => {
-        const result = await apiClient.api.getSqlResultFromStats(id);
+        const { data, error } = await getSqlResultFromStats({
+            path: { id }
+        });
 
+        if (error) throw error;
         this.refetchQuery.cancelAllPendingCalls();
-        return mapDTOStatsGraphResultToAnalyticsGraphQuery(result.data);
+        return mapDTOStatsGraphResultToAnalyticsGraphQuery(data);
     });
 
     clear(): void {
@@ -85,7 +96,7 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
         isBetweenSelectedOnly: value.query!.only_between!
     };
 
-    if (value.status === DTOStatsQueryStatus.DTOSuccess) {
+    if (value.status === 'success') {
         return {
             ...basicQuery,
             status: 'success',
@@ -100,7 +111,7 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
         };
     }
 
-    if (value.status === DTOStatsQueryStatus.DTOExecuting) {
+    if (value.status === 'executing') {
         return {
             ...basicQuery,
             status: 'executing'
