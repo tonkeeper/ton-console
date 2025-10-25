@@ -1,0 +1,1 @@
+import{y as c,bK as r,bu as t,j as i,av as n,br as d}from"./index-B2sQJZvA.js";var l=c(function(s,a){const e=r("Code",s),{className:C,...o}=t(s);return i.jsx(n.code,{ref:a,className:d("chakra-code",s.className),...o,__css:{display:"inline-block",...e}})});l.displayName="Code";export{l as C};
