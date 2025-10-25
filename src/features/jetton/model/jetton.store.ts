@@ -25,15 +25,18 @@ export class JettonStore {
 
     jettonWallet$ = new Loadable<JettonBalance | null>(null);
 
+    private disposers: Array<() => void> = [];
+
     constructor() {
         makeAutoObservable(this);
 
-        reaction(
+        const dispose1 = reaction(
             () => this.connectedWalletAddress,
             connectedWalletAddress => this.setShowWalletAddress(connectedWalletAddress)
         );
+        this.disposers.push(dispose1);
 
-        reaction(
+        const dispose2 = reaction(
             () => this.jettonAddress,
             jettonAddress => {
                 if (jettonAddress) {
@@ -43,8 +46,9 @@ export class JettonStore {
                 }
             }
         );
+        this.disposers.push(dispose2);
 
-        reaction(
+        const dispose3 = reaction(
             () => [this.jettonAddress, this.showWalletAddress],
             ([jettonAddress, userAddress]) => {
                 if (jettonAddress && userAddress) {
@@ -54,6 +58,12 @@ export class JettonStore {
                 }
             }
         );
+        this.disposers.push(dispose3);
+    }
+
+    destroy(): void {
+        this.disposers.forEach(dispose => dispose?.());
+        this.disposers = [];
     }
 
     get isOwner() {
