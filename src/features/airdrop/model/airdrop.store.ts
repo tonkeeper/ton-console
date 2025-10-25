@@ -5,7 +5,7 @@ import { ADAirdropData, ADDistributorData, airdropApiClient } from 'src/shared/a
 import { makeAutoObservable } from 'mobx';
 import { toNano } from '@ton/ton';
 import { AirdropMetadata } from 'src/features/airdrop/model/interfaces/AirdropMetadata';
-import { getAirdropStatus, AirdropStatusT } from 'src/pages/jetton/airdrops/airdrop/deployUtils';
+import { getAirdropStatus, AirdropStatusT } from '../lib/deploy-utils';
 
 export type AirdropFullT = ADAirdropData & {
     name: string;
