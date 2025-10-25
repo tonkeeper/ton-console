@@ -23,10 +23,12 @@ export class CNFTStore {
 
     currentAddress$ = new Loadable<CnftCollection | null>(null);
 
+    private disposers: Array<() => void> = [];
+
     constructor() {
         makeAutoObservable(this);
 
-        createImmediateReaction(
+        const dispose = createImmediateReaction(
             () => projectsStore.selectedProject,
             project => {
                 this.clearState();
@@ -37,6 +39,7 @@ export class CNFTStore {
                 }
             }
         );
+        this.disposers.push(dispose);
     }
 
     loadConfig = this.pricePerNFT$.createAsyncAction(async () => {
@@ -82,6 +85,11 @@ export class CNFTStore {
         this.pricePerNFT$.clear();
         this.history$.clear();
         this.currentAddress$.clear();
+    }
+
+    destroy(): void {
+        this.disposers.forEach(dispose => dispose?.());
+        this.disposers = [];
     }
 }
 

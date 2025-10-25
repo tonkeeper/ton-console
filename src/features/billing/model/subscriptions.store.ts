@@ -10,6 +10,8 @@ import { Subscription } from './interfaces/subscription';
 import { liteproxysStore, restApiTiersStore } from 'src/shared/stores';
 
 export class SubscriptionsStore {
+    private disposers: Array<() => void> = [];
+
     get subscriptions(): { liteproxy: Subscription | null; restApi: Subscription | null } {
         const reastApiTier = restApiTiersStore.selectedTier$.value;
         const liteproxyTier = liteproxysStore.selectedTier$.value;
@@ -24,18 +26,24 @@ export class SubscriptionsStore {
     constructor() {
         makeAutoObservable(this);
 
-        createImmediateReaction(
+        const dispose = createImmediateReaction(
             () => restApiTiersStore.selectedTier$,
             () => {
                 this.fetchSubscriptions();
             }
         );
+        this.disposers.push(dispose);
     }
 
     fetchSubscriptions = createAsyncAction(async () => {
         restApiTiersStore.fetchSelectedTier();
         liteproxysStore.fetchSelectedTier();
     });
+
+    destroy(): void {
+        this.disposers.forEach(dispose => dispose?.());
+        this.disposers = [];
+    }
 }
 
 function mapTierToSubscription(
