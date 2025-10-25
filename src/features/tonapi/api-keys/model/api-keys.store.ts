@@ -45,11 +45,12 @@ export class ApiKeysStore {
 
     createApiKey = this.apiKeys$.createAsyncAction(
         async ({ name, limitRps, origins, capabilities }: CreateApiKeyForm) => {
+            const projectId = this.projectsStore.selectedProject!.id;
             const { data, error } = await generateProjectTonApiToken({
-                query: { project_id: this.projectsStore.selectedProject!.id },
+                query: { project_id: projectId },
                 body: {
                     name,
-                    limit_rps: limitRps,
+                    limit_rps: limitRps ?? undefined,
                     origins,
                     capabilities
                 }
@@ -78,7 +79,7 @@ export class ApiKeysStore {
                 query: { project_id: this.projectsStore.selectedProject!.id },
                 body: {
                     name,
-                    limit_rps: limitRps,
+                    limit_rps: limitRps ?? undefined,
                     origins,
                     capabilities
                 }
