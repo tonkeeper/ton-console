@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.1
 info:
   title: "REST API to TON Console"
   version: 0.0.1
@@ -2688,9 +2688,8 @@ components:
                 type: string
                 example: "My token"
               limit_rps:
-                type: number
+                type: [number, "null"]
                 example: 5
-                nullable: true
                 maximum: 100000
                 minimum: 0
               origins:
@@ -3486,45 +3485,37 @@ components:
           format: int64
           example: 1690889913000
     BillingTxInfo:
-      type: object
-      required:
-        - reason
-#        - meta
-#      additionalProperties: false
-      properties:
-        reason:
-          type: string
-          enum:
-            - tonapi_monthly_payment
-            - tonapi_instant_payment
-            - tonapi_change_tier
-            - liteproxy_monthly_payment
-            - liteproxy_change_tier
-            - testnet_tons_purchase
-            - cnft_indexing_payment
-            - message_package_purchase
-            - promo_code_activation
-            - chatgpt_request_payment
-            - streaming_api_payment
-            - replenishment_of_deposit
-            - analytics_request_payment
-            - other
-#        meta:
-#          oneOf:
-#            - $ref: '#/components/schemas/TonapiMonthlyPaymentMeta'
-#            - $ref: '#/components/schemas/TonapiInstantPaymentMeta'
-#            - $ref: '#/components/schemas/TonapiChangeTierMeta'
-#            - $ref: '#/components/schemas/LiteproxyMonthlyPaymentMeta'
-#            - $ref: '#/components/schemas/LiteproxyChangeTierMeta'
-#            - $ref: '#/components/schemas/TestnetTonsPurchaseMeta'
-#            - $ref: '#/components/schemas/CnftIndexingPaymentMeta'
-#            - $ref: '#/components/schemas/MessagePackagePurchaseMeta'
-#            - $ref: '#/components/schemas/PromoCodeActivationMeta'
-#            - $ref: '#/components/schemas/StreamingApiPaymentMeta'
-#            - $ref: '#/components/schemas/ReplenishmentOfDepositMeta'
-#            - $ref: '#/components/schemas/AnalyticsRequestPaymentMeta'
-#            - type: object
-#              additionalProperties: true
+      oneOf:
+        - $ref: '#/components/schemas/TonapiMonthlyPaymentMeta'
+        - $ref: '#/components/schemas/TonapiInstantPaymentMeta'
+        - $ref: '#/components/schemas/TonapiChangeTierMeta'
+        - $ref: '#/components/schemas/LiteproxyMonthlyPaymentMeta'
+        - $ref: '#/components/schemas/LiteproxyChangeTierMeta'
+        - $ref: '#/components/schemas/TestnetTonsPurchaseMeta'
+        - $ref: '#/components/schemas/CnftIndexingPaymentMeta'
+        - $ref: '#/components/schemas/MessagePackagePurchaseMeta'
+        - $ref: '#/components/schemas/PromoCodeActivationMeta'
+        - $ref: '#/components/schemas/StreamingApiPaymentMeta'
+        - $ref: '#/components/schemas/ReplenishmentOfDepositMeta'
+        - $ref: '#/components/schemas/AnalyticsRequestPaymentMeta'
+        - $ref: '#/components/schemas/EmptyMeta'
+      discriminator:
+          propertyName: reason
+          mapping:
+            tonapi_monthly_payment: TonapiMonthlyPaymentMeta
+            tonapi_instant_payment: TonapiInstantPaymentMeta
+            tonapi_change_tier: TonapiChangeTierMeta
+            liteproxy_monthly_payment: LiteproxyMonthlyPaymentMeta
+            liteproxy_change_tier: LiteproxyChangeTierMeta
+            testnet_tons_purchase: TestnetTonsPurchaseMeta
+            cnft_indexing_payment: CnftIndexingPaymentMeta
+            message_package_purchase: MessagePackagePurchaseMeta
+            chatgpt_request_payment: EmptyMeta
+            promo_code_activation: PromoCodeActivationMeta
+            streaming_api_payment: StreamingApiPaymentMeta
+            replenishment_of_deposit: ReplenishmentOfDepositMeta
+            analytics_request_payment: AnalyticsRequestPaymentMeta
+            other: EmptyMeta
     TonapiMonthlyPaymentMeta:
       type: object
       required:
@@ -3613,6 +3604,8 @@ components:
       properties:
         time:
           type: integer
+    EmptyMeta:
+      type: object
     Balance:
       type: object
       required:

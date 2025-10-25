@@ -6,7 +6,6 @@ import {
     CRYPTO_CURRENCY,
     DTOBillingTransaction,
     DTOBillingTransactionTypeEnum,
-    DTOBillingTxInfoReasonEnum,
     DTOCryptoCurrency,
     Loadable,
     TokenCurrencyAmount,
@@ -20,7 +19,7 @@ export type BillingHistoryItem = {
     date: Date;
     amount: TonCurrencyAmount | UsdCurrencyAmount;
     type: DTOBillingTransactionTypeEnum;
-    reason: DTOBillingTxInfoReasonEnum;
+    reason: string;
 };
 
 export class BillingStore {
@@ -29,6 +28,8 @@ export class BillingStore {
     private pageSize = 20;
 
     private disposers: Array<() => void> = [];
+
+    private lastProjectId: number | null = null;
 
     get isResolved() {
         return this.billingHistory$.isResolved;
@@ -113,6 +114,23 @@ export class BillingStore {
     });
 
     isItemLoaded = (index: number): boolean => index < this.billingHistory.length;
+
+    ensureDataLoaded(): void {
+        const currentProjectId = projectsStore.selectedProject?.id || null;
+
+        // Reload if project changed or data not resolved
+        if (
+            currentProjectId !== this.lastProjectId ||
+            !this.billingHistory$.isResolved
+        ) {
+            this.lastProjectId = currentProjectId;
+
+            if (currentProjectId) {
+                this.clearState();
+                this.fetchHistory();
+            }
+        }
+    }
 
     clearState(): void {
         this.billingHistory$.clear();

@@ -11,11 +11,10 @@ export class ApiKeysStore {
 
     constructor(projectsStore: ProjectsStore) {
         this.projectsStore = projectsStore;
-        this.fetchApiKeys();
         makeAutoObservable(this);
 
         const dispose = createImmediateReaction(
-            () => projectsStore.selectedProject?.id,
+            () => this.projectsStore.selectedProject?.id,
             project => {
                 this.clearStore();
 
