@@ -303,5 +303,3 @@ export class JettonStore {
         this.connectedWalletAddress = address;
     }
 }
-
-export const jettonStore = new JettonStore();

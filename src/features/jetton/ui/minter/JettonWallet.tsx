@@ -23,7 +23,7 @@ import {
 import { observer } from 'mobx-react-lite';
 import { Address } from '@ton/core';
 import { CopyPad, Span, isAddressValid, toDecimals, fromDecimals } from 'src/shared';
-import { jettonStore } from 'src/features';
+import { JettonStore } from 'src/features';
 import { JettonInfo } from '@ton-api/client';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { useIMask } from 'react-imask';
@@ -32,7 +32,8 @@ const ModalChnageWallet: FC<{
     isOpen: boolean;
     onClose: (reset?: boolean) => void;
     onCheck: (address: Address) => void;
-}> = ({ isOpen, onClose, onCheck }) => {
+    jettonStore: JettonStore;
+}> = ({ isOpen, onClose, onCheck, jettonStore }) => {
     const [value, setValue] = useState('');
     const [error, setError] = useState<string | null>(null);
 
@@ -185,8 +186,9 @@ const JettonWallet: FC<
     StyleProps & {
         connectedWalletAddress: Address | null;
         jettonInfo: JettonInfo;
+        jettonStore: JettonStore;
     }
-> = observer(({ connectedWalletAddress, jettonInfo, ...rest }) => {
+> = observer(({ connectedWalletAddress, jettonInfo, jettonStore, ...rest }) => {
     const toast = useToast();
     const [tonconnect] = useTonConnectUI();
     const [isModalChnageWalletOpen, setIsModalChnageWalletOpen] = useState(false);
@@ -309,6 +311,7 @@ const JettonWallet: FC<
                 isOpen={isModalChnageWalletOpen}
                 onClose={() => setIsModalChnageWalletOpen(false)}
                 onCheck={walletAddress => jettonStore.setShowWalletAddress(walletAddress)}
+                jettonStore={jettonStore}
             />
             {jettonWallet && (
                 <ModalBurn
