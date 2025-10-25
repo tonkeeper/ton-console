@@ -3,6 +3,7 @@ import { Box } from '@chakra-ui/react';
 import { H4 } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { BillingHistoryTable, BillingStore } from 'src/features/billing';
+import { projectsStore } from 'src/shared/stores';
 
 interface BillingBlockProps {
     billingStore: BillingStore;
@@ -13,6 +14,13 @@ const BillingBlock: FC<BillingBlockProps> = ({ billingStore }) => {
     const [previousRowCount, setPreviousRowCount] = useState(0);
     const hasBillingHistory = billingStore.billingHistory.length > 0;
     const isLoading = billingStore.billingHistoryLoading;
+
+    // Ensure data is loaded when project changes
+    useEffect(() => {
+        if (projectsStore.selectedProject?.id) {
+            billingStore.ensureDataLoaded();
+        }
+    }, [projectsStore.selectedProject?.id, billingStore]);
 
     // Track whether data has ever been loaded and remember the row count
     useEffect(() => {
