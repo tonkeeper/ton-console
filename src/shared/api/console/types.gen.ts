@@ -126,6 +126,7 @@ export type DTOBillingTransaction = {
     amount: string;
     currency: DTOCryptoCurrency;
     info: DTOBillingTxInfo;
+    description: string;
     created_at: number;
 };
 
@@ -146,6 +147,8 @@ export type DTOBillingTxInfo = ({
 } & DTOCnftIndexingPaymentMeta) | ({
     reason: 'MessagePackagePurchaseMeta';
 } & DTOMessagePackagePurchaseMeta) | ({
+    reason: 'ChatGptRequestPaymentMeta';
+} & DTOChatGptRequestPaymentMeta) | ({
     reason: 'PromoCodeActivationMeta';
 } & DTOPromoCodeActivationMeta) | ({
     reason: 'StreamingApiPaymentMeta';
@@ -154,59 +157,63 @@ export type DTOBillingTxInfo = ({
 } & DTOReplenishmentOfDepositMeta) | ({
     reason: 'AnalyticsRequestPaymentMeta';
 } & DTOAnalyticsRequestPaymentMeta) | ({
-    reason: 'EmptyMeta';
-} & DTOEmptyMeta);
+    reason: 'OtherMeta';
+} & DTOOtherMeta);
 
 export type DTOTonapiMonthlyPaymentMeta = {
-    tier: DTOTier;
+    tier?: DTOTier;
 };
 
 export type DTOTonapiInstantPaymentMeta = {
-    tier: DTOTier;
+    tier?: DTOTier;
 };
 
 export type DTOTonapiChangeTierMeta = {
-    new_tier: DTOTier;
+    new_tier?: DTOTier;
 };
 
 export type DTOLiteproxyMonthlyPaymentMeta = {
-    tier: DTOLiteproxyTier;
+    tier?: DTOLiteproxyTier;
 };
 
 export type DTOLiteproxyChangeTierMeta = {
-    new_tier: DTOLiteproxyTier;
+    new_tier?: DTOLiteproxyTier;
 };
 
 export type DTOTestnetTonsPurchaseMeta = {
-    testnet_coins: string;
+    testnet_coins?: string;
 };
 
 export type DTOCnftIndexingPaymentMeta = {
-    collection: string;
-    count: number;
+    collection?: string;
+    count?: number;
 };
 
 export type DTOMessagePackagePurchaseMeta = {
-    count: number;
+    count?: number;
 };
 
 export type DTOPromoCodeActivationMeta = {
-    id: string;
+    promo_code?: string;
 };
 
 export type DTOStreamingApiPaymentMeta = {
-    period: number;
+    period?: number;
 };
 
 export type DTOReplenishmentOfDepositMeta = {
-    tx_hash: string;
+    tx_hash?: string;
 };
 
 export type DTOAnalyticsRequestPaymentMeta = {
-    time: number;
+    time?: number;
 };
 
-export type DTOEmptyMeta = {
+export type DTOChatGptRequestPaymentMeta = {
+    [key: string]: unknown;
+};
+
+export type DTOOtherMeta = {
     [key: string]: unknown;
 };
 
@@ -3552,7 +3559,7 @@ export type ValidChangeTonApiTierError = ValidChangeTonApiTierErrors[keyof Valid
 
 export type ValidChangeTonApiTierResponses = {
     /**
-     * Valid change TonAPI tier for project
+     * Valid change tier for project
      */
     200: {
         /**
@@ -4222,6 +4229,96 @@ export type UpdateLiteproxyTierResponses = {
 };
 
 export type UpdateLiteproxyTierResponse = UpdateLiteproxyTierResponses[keyof UpdateLiteproxyTierResponses];
+
+export type ValidChangeLiteproxyTierData = {
+    body?: never;
+    path: {
+        /**
+         * Tier ID
+         */
+        id: number;
+    };
+    query: {
+        /**
+         * Project ID
+         */
+        project_id: number;
+    };
+    url: '/api/v1/services/tonapi/liteproxy/tier/valid/buy/{id}';
+};
+
+export type ValidChangeLiteproxyTierErrors = {
+    /**
+     * Something went wrong on client side
+     */
+    400: {
+        /**
+         * Error message
+         */
+        error: string;
+        /**
+         * backend error code
+         */
+        code: number;
+    };
+    /**
+     * Access token is missing or invalid
+     */
+    403: {
+        /**
+         * Error message
+         */
+        error: string;
+        /**
+         * backend error code
+         */
+        code: number;
+    };
+    /**
+     * The specified resource was not found
+     */
+    404: {
+        /**
+         * Error message
+         */
+        error: string;
+        /**
+         * backend error code
+         */
+        code: number;
+    };
+    /**
+     * Something went wrong on server side
+     */
+    500: {
+        /**
+         * Error message
+         */
+        error: string;
+        /**
+         * backend error code
+         */
+        code: number;
+    };
+};
+
+export type ValidChangeLiteproxyTierError = ValidChangeLiteproxyTierErrors[keyof ValidChangeLiteproxyTierErrors];
+
+export type ValidChangeLiteproxyTierResponses = {
+    /**
+     * Valid change tier for project
+     */
+    200: {
+        /**
+         * is valid
+         */
+        valid: boolean;
+        unspent_money?: number;
+        details?: string;
+    };
+};
+
+export type ValidChangeLiteproxyTierResponse = ValidChangeLiteproxyTierResponses[keyof ValidChangeLiteproxyTierResponses];
 
 export type GetMessagesPackagesData = {
     body?: never;

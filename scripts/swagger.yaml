@@ -668,7 +668,7 @@ paths:
         - $ref: '#/components/parameters/queryProjectID'
       responses:
         '200':
-          $ref: '#/components/responses/ValidChangeTonApiTier'
+          $ref: '#/components/responses/ValidChangeTier'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -832,6 +832,26 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/InsufficientFunds'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v1/services/tonapi/liteproxy/tier/valid/buy/{id}:
+    get:
+      summary: "Valid change Liteserver tier for project"
+      operationId: validChangeLiteproxyTier
+      tags:
+        - tonapi_service
+      parameters:
+        - $ref: '#/components/parameters/tierID'
+        - $ref: '#/components/parameters/queryProjectID'
+      responses:
+        '200':
+          $ref: '#/components/responses/ValidChangeTier'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
 
@@ -3460,6 +3480,7 @@ components:
         - amount
         - currency
         - info
+        - description
         - created_at
       properties:
         id:
@@ -3480,6 +3501,8 @@ components:
           $ref: '#/components/schemas/CryptoCurrency'
         info:
           $ref: '#/components/schemas/BillingTxInfo'
+        description:
+          type: string
         created_at:
           type: integer
           format: int64
@@ -3494,11 +3517,12 @@ components:
         - $ref: '#/components/schemas/TestnetTonsPurchaseMeta'
         - $ref: '#/components/schemas/CnftIndexingPaymentMeta'
         - $ref: '#/components/schemas/MessagePackagePurchaseMeta'
+        - $ref: '#/components/schemas/ChatGptRequestPaymentMeta'
         - $ref: '#/components/schemas/PromoCodeActivationMeta'
         - $ref: '#/components/schemas/StreamingApiPaymentMeta'
         - $ref: '#/components/schemas/ReplenishmentOfDepositMeta'
         - $ref: '#/components/schemas/AnalyticsRequestPaymentMeta'
-        - $ref: '#/components/schemas/EmptyMeta'
+        - $ref: '#/components/schemas/OtherMeta'
       discriminator:
           propertyName: reason
           mapping:
@@ -3510,101 +3534,82 @@ components:
             testnet_tons_purchase: TestnetTonsPurchaseMeta
             cnft_indexing_payment: CnftIndexingPaymentMeta
             message_package_purchase: MessagePackagePurchaseMeta
-            chatgpt_request_payment: EmptyMeta
+            chatgpt_request_payment: ChatGptRequestPaymentMeta
             promo_code_activation: PromoCodeActivationMeta
             streaming_api_payment: StreamingApiPaymentMeta
             replenishment_of_deposit: ReplenishmentOfDepositMeta
             analytics_request_payment: AnalyticsRequestPaymentMeta
-            other: EmptyMeta
+            other: OtherMeta
     TonapiMonthlyPaymentMeta:
       type: object
-      required:
-        - tier
       properties:
         tier:
           $ref: '#/components/schemas/Tier'
     TonapiInstantPaymentMeta:
       type: object
-      required:
-        - tier
       properties:
         tier:
           $ref: '#/components/schemas/Tier'
     TonapiChangeTierMeta:
       type: object
-      required:
-        - new_tier
       properties:
         new_tier:
           $ref: '#/components/schemas/Tier'
     LiteproxyMonthlyPaymentMeta:
       type: object
-      required:
-        - tier
       properties:
         tier:
           $ref: '#/components/schemas/LiteproxyTier'
     LiteproxyChangeTierMeta:
       type: object
-      required:
-        - new_tier
       properties:
         new_tier:
           $ref: '#/components/schemas/LiteproxyTier'
     TestnetTonsPurchaseMeta:
       type: object
-      required:
-        - testnet_coins
       properties:
         testnet_coins:
           type: string
           x-js-format: bigint
     CnftIndexingPaymentMeta:
       type: object
-      required:
-        - collection
-        - count
       properties:
         collection:
           type: string
         count:
           type: integer
+          format: int32
     MessagePackagePurchaseMeta:
       type: object
-      required:
-        - count
       properties:
         count:
           type: integer
+          format: int32
     PromoCodeActivationMeta:
       type: object
-      required:
-        - id
       properties:
-        id:
+        promo_code:
           type: string
     StreamingApiPaymentMeta:
       type: object
-      required:
-        - period
       properties:
         period:
           type: integer
+          format: int32
     ReplenishmentOfDepositMeta:
       type: object
-      required:
-        - tx_hash
       properties:
         tx_hash:
           type: string
     AnalyticsRequestPaymentMeta:
       type: object
-      required:
-        - time
       properties:
         time:
           type: integer
-    EmptyMeta:
+          format: int32
+    ChatGptRequestPaymentMeta:
+      type: object
+    OtherMeta:
       type: object
     Balance:
       type: object
@@ -4902,8 +4907,8 @@ components:
                 example: 1678275313
               auth_token:
                 type: string
-    ValidChangeTonApiTier:
-      description: "Valid change TonAPI tier for project"
+    ValidChangeTier:
+      description: "Valid change tier for project"
       content:
         application/json:
           schema:
