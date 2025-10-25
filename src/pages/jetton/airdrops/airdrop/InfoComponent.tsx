@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Address, fromNano } from '@ton/core';
 import { Card, Image, Flex, Text, Divider } from '@chakra-ui/react';
 import { ADAirdropData, ADDistributorData } from 'src/shared/api/airdrop-api';
-import { prettifyAmount, sliceString } from './deployUtils';
+import { prettifyAmount, sliceString } from 'src/features/airdrop/lib/deploy-utils';
 import { CopyIcon16, copyToClipboard, IconButton, TickIcon } from 'src/shared';
 
 const TextItem = ({
