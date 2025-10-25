@@ -1,0 +1,10 @@
+# Generated API files
+src/shared/api/**/*.gen.ts
+src/shared/api/console/**
+src/shared/api/airdrop.generated.ts
+src/shared/api/rt.tonapi.generated.ts
+
+# Build output
+dist/
+node_modules/
+.next/

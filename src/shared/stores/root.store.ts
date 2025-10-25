@@ -10,6 +10,11 @@ import { UserStore } from 'src/entities/user/model/user.store';
 import { AppStore } from './app.store';
 import { awaitValueResolved } from 'src/shared';
 import { RestApiTiersStore } from 'src/features/tonapi/pricing/model/rest-api-tiers.store';
+import { client } from 'src/shared/api';
+
+// Initialize API client with base URL from env
+const apiClientBaseURL = import.meta.env.VITE_BASE_URL;
+client.setConfig({ baseUrl: apiClientBaseURL });
 
 export const userStore = new UserStore();
 export const projectsStore = new ProjectsStore();

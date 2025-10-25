@@ -1,13 +1,18 @@
 import { makeAutoObservable } from 'mobx';
 import {
-    apiClient,
-    DTOTier,
     Loadable,
-    DTOAppTier,
     createImmediateReaction,
     UsdCurrencyAmount,
     createAsyncAction
 } from 'src/shared';
+import {
+    DTOTier,
+    DTOAppTier,
+    getTonApiTiers,
+    getProjectTonApiTier,
+    updateProjectTonApiTier,
+    validChangeTonApiTier
+} from 'src/shared/api';
 import { RestApiTier } from './interfaces';
 import { projectsStore } from 'src/shared/stores';
 import { RestApiSelectedTier } from './interfaces';
@@ -35,28 +40,30 @@ export class RestApiTiersStore {
     }
 
     fetchTiers = this.tiers$.createAsyncAction(async () => {
-        const tiers = await apiClient.api.getTonApiTiers();
-        return tiers.data.items.map(mapTierDTOToTier);
+        const { data, error } = await getTonApiTiers();
+        if (error) throw error;
+
+        return data.items.map(mapTierToRestApiTier);
     });
 
     fetchSelectedTier = this.selectedTier$.createAsyncAction(async () => {
-        const response = await apiClient.api.getProjectTonApiTier({
-            project_id: projectsStore.selectedProject!.id
+        const { data, error } = await getProjectTonApiTier({
+            query: { project_id: projectsStore.selectedProject!.id }
         });
+        if (error) throw error;
 
-        return mapAppTierDTOToSelectedTier(response.data.tier);
+        return mapAppTierToSelectedTier(data.tier);
     });
 
     selectTier = this.selectedTier$.createAsyncAction(
         async (tierId: number) => {
-            const result = await apiClient.api.updateProjectTonApiTier(
-                { project_id: projectsStore.selectedProject!.id },
-                {
-                    tier_id: tierId
-                }
-            );
+            const { data, error } = await updateProjectTonApiTier({
+                query: { project_id: projectsStore.selectedProject!.id },
+                body: { tier_id: tierId }
+            });
+            if (error) throw error;
 
-            return mapAppTierDTOToSelectedTier(result.data.tier);
+            return mapAppTierToSelectedTier(data.tier);
         },
         {
             successToast: {
@@ -68,16 +75,19 @@ export class RestApiTiersStore {
         }
     );
 
-    checkValidChangeTier = createAsyncAction((tierId: number) => {
+    checkValidChangeTier = createAsyncAction(async (tierId: number) => {
         if (!projectsStore.selectedProject) {
             throw new Error('Project is not selected');
         }
 
-        return apiClient.api
-            .validChangeTonApiTier(tierId, {
-                project_id: projectsStore.selectedProject.id
-            })
-            .then(result => result.data);
+        const { data, error } = await validChangeTonApiTier({
+            path: { id: tierId },
+            query: { project_id: projectsStore.selectedProject.id }
+        });
+
+        if (error) throw error;
+
+        return data;
     });
 
     clearState(): void {
@@ -86,29 +96,32 @@ export class RestApiTiersStore {
     }
 }
 
-function mapTierDTOToTier(tierDTO: DTOTier): RestApiTier {
+function mapTierToRestApiTier(tier: DTOTier): RestApiTier {
     return {
-        id: tierDTO.id,
-        name: tierDTO.name,
-        price: new UsdCurrencyAmount(tierDTO.usd_price),
-        rps: tierDTO.rpc,
-        type: tierDTO.instant_payment ? 'pay-as-you-go' : 'monthly'
+        id: tier.id,
+        name: tier.name,
+        price: new UsdCurrencyAmount(tier.usd_price),
+        rps: tier.rpc,
+        type: tier.instant_payment ? 'pay-as-you-go' : 'monthly'
     };
 }
 
-function mapAppTierDTOToSelectedTier(tierDTO: DTOAppTier | null): RestApiSelectedTier | null {
-    if (!tierDTO) {
+function mapAppTierToSelectedTier(tier: DTOAppTier | null): RestApiSelectedTier | null {
+    if (!tier) {
         return null;
     }
 
+    const nextPayment = tier.next_payment;
+    const usdPrice = tier.usd_price;
+    const renewsDate = nextPayment && usdPrice ? new Date(nextPayment) : undefined;
+
     return {
-        id: tierDTO.id,
-        name: tierDTO.name,
-        price: new UsdCurrencyAmount(tierDTO.usd_price),
-        rps: tierDTO.rpc,
-        type: tierDTO.instant_payment ? 'pay-as-you-go' : 'monthly',
-        renewsDate:
-            tierDTO.next_payment && tierDTO.usd_price ? new Date(tierDTO.next_payment) : undefined,
+        id: tier.id,
+        name: tier.name,
+        price: new UsdCurrencyAmount(usdPrice),
+        rps: tier.rpc,
+        type: tier.instant_payment ? 'pay-as-you-go' : 'monthly',
+        renewsDate,
         active: true
     };
 }

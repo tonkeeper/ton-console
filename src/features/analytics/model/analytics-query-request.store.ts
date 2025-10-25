@@ -1,13 +1,6 @@
 import { makeAutoObservable } from 'mobx';
-import {
-    apiClient,
-    createReaction,
-    DTOChain,
-    DTOStatsEstimateQuery,
-    Loadable,
-    Network,
-    TonCurrencyAmount
-} from 'src/shared';
+import { createReaction, Loadable, Network, TonCurrencyAmount } from 'src/shared';
+import { estimateStatsQuery, DTOChain, DTOStatsEstimateQuery } from 'src/shared/api';
 import { AnalyticsQueryTemplate } from './interfaces';
 import { projectsStore } from 'src/shared/stores';
 import { DTOChainNetworkMap } from 'src/shared/lib/blockchain/network';
@@ -55,23 +48,21 @@ export class AnalyticsQueryRequestStore {
             try {
                 const chain =
                     (network || this.network) === Network.TESTNET
-                        ? DTOChain.DTOTestnet
-                        : DTOChain.DTOMainnet;
+                        ? DTOChain.TESTNET
+                        : DTOChain.MAINNET;
 
-                const result = await apiClient.api.estimateStatsQuery(
-                    {
+                const { data, error } = await estimateStatsQuery({
+                    body: {
                         project_id: projectsStore.selectedProject!.id,
                         query: request,
                         name
                     },
-                    { chain }
-                );
+                    query: { chain }
+                });
 
-                const analyticsQuery = mapDTOStatsEstimateSQLToAnalyticsQuery(
-                    request,
-                    chain,
-                    result.data
-                );
+                if (error) throw error;
+
+                const analyticsQuery = mapDTOStatsEstimateSQLToAnalyticsQuery(request, chain, data);
 
                 this.request$.value = analyticsQuery;
                 return analyticsQuery;

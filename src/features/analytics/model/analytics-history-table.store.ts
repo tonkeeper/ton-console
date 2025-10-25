@@ -1,12 +1,14 @@
 import { makeAutoObservable, reaction } from 'mobx';
 import {
-    apiClient,
     createImmediateReaction,
-    DTOStatsQueryResult,
-    DTOStatsQueryType,
     Loadable,
     TonCurrencyAmount
 } from 'src/shared';
+import {
+    getSqlHistoryFromStats,
+    DTOStatsQueryResult,
+    DTOStatsQueryType
+} from 'src/shared/api';
 import {
     AnalyticsGraphQuery,
     AnalyticsQuery,
@@ -89,34 +91,40 @@ export class AnalyticsHistoryTableStore {
             this.loadNextPage.cancelAllPendingCalls();
             this.totalQueries = 0;
 
-            const response = await apiClient.api.getSqlHistoryFromStats({
-                project_id: projectsStore.selectedProject!.id,
-                limit: this.pageSize,
-                offset: this.queries$.value.length,
-                ...(this.pagination.filter.onlyRepeating && { is_repetitive: true }),
-                type: mapTypeToTypeDTO(this.pagination.filter.type)
+            const { data, error } = await getSqlHistoryFromStats({
+                query: {
+                    project_id: projectsStore.selectedProject!.id,
+                    limit: this.pageSize,
+                    offset: this.queries$.value.length,
+                    ...(this.pagination.filter.onlyRepeating && { is_repetitive: true }),
+                    type: mapTypeToTypeDTO(this.pagination.filter.type)
+                }
             });
 
-            const queries = response.data.items.map(mapDTOStatsResultToAnalyticsHistoryResult);
+            if (error) throw error;
+            const queries = data.items.map(mapDTOStatsResultToAnalyticsHistoryResult);
 
-            this.totalQueries = response.data.count;
+            this.totalQueries = data.count;
             return queries;
         },
         { resetBeforeExecution: true }
     );
 
     loadNextPage = this.queries$.createAsyncAction(async () => {
-        const response = await apiClient.api.getSqlHistoryFromStats({
-            project_id: projectsStore.selectedProject!.id,
-            limit: this.pageSize,
-            offset: this.queries$.value.length,
-            ...(this.pagination.filter.onlyRepeating && { is_repetitive: true }),
-            type: mapTypeToTypeDTO(this.pagination.filter.type)
+        const { data, error } = await getSqlHistoryFromStats({
+            query: {
+                project_id: projectsStore.selectedProject!.id,
+                limit: this.pageSize,
+                offset: this.queries$.value.length,
+                ...(this.pagination.filter.onlyRepeating && { is_repetitive: true }),
+                type: mapTypeToTypeDTO(this.pagination.filter.type)
+            }
         });
 
-        const queries = response.data.items.map(mapDTOStatsResultToAnalyticsHistoryResult);
+        if (error) throw error;
+        const queries = data.items.map(mapDTOStatsResultToAnalyticsHistoryResult);
 
-        this.totalQueries = response.data.count;
+        this.totalQueries = data.count;
         return this.queries$.value.concat(queries);
     });
 
@@ -145,7 +153,7 @@ export class AnalyticsHistoryTableStore {
 function mapDTOStatsResultToAnalyticsHistoryResult(
     value: DTOStatsQueryResult
 ): AnalyticsQuery | AnalyticsGraphQuery | AnalyticsRepeatingQueryAggregated {
-    if (value.type === DTOStatsQueryType.DTOGraph) {
+    if (value.type === 'graph') {
         return mapDTOStatsGraphResultToAnalyticsGraphQuery(value);
     }
 
@@ -172,10 +180,10 @@ function mapDTOStatsQueryResultToAnalyticsQueryAggregated(
 }
 
 function mapTypeToTypeDTO(type: AnalyticsQueryType[] | undefined): DTOStatsQueryType[] | undefined {
-    const mappingTypeToTypeDTO = {
-        sql: DTOStatsQueryType.DTOBaseQuery,
-        graph: DTOStatsQueryType.DTOGraph,
-        gpt: DTOStatsQueryType.DTOChatGptQuery
+    const mappingTypeToTypeDTO: Record<AnalyticsQueryType, DTOStatsQueryType> = {
+        sql: DTOStatsQueryType.BASE_QUERY,
+        graph: DTOStatsQueryType.GRAPH,
+        gpt: DTOStatsQueryType.CHAT_GPT_QUERY
     };
 
     return type?.length ? type.map(v => mappingTypeToTypeDTO[v]) : undefined;

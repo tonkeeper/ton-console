@@ -1,3 +1,4 @@
-export * from './api.generated';
-export * from './tonapi';
-export * from './tonconsole';
+export { client } from './console/client.gen';
+export * from './console/types.gen';
+export * from './console/sdk.gen';
+export * from './tonapi'

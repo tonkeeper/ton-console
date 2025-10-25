@@ -1,18 +1,25 @@
 import { makeAutoObservable } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
 import {
-    apiClient,
     createImmediateReaction,
     deserializeState,
-    DTOParticipant,
-    DTOProject,
-    DTOProjectCapabilitiesEnum,
     getWindow,
     Loadable,
     replaceIfNotEqual,
     serializeState,
     toColor
 } from 'src/shared';
+import {
+    DTOProject,
+    DTOParticipant,
+    getProjects,
+    createProject,
+    updateProject,
+    deleteProject,
+    getProjectParticipants,
+    addProjectParticipant,
+    deleteProjectParticipant
+} from 'src/shared/api';
 import {
     ProjectFormValues,
     Project,
@@ -72,9 +79,11 @@ export class ProjectsStore {
     }
 
     fetchProjects = this.projects$.createAsyncAction(async () => {
-        const response = await apiClient.api.getProjects();
+        const { data, error } = await getProjects();
 
-        response.data.items.map(mapProjectDtoToProject).forEach(project => {
+        if (error) throw error;
+
+        data.items.map(mapProjectDtoToProject).forEach(project => {
             const existingProject = this.projects$.value.find(item => item.id === project.id);
             if (existingProject) {
                 replaceIfNotEqual(existingProject, 'name', project.name);
@@ -107,17 +116,16 @@ export class ProjectsStore {
 
     createProject = this.projects$.createAsyncAction(
         async (form: ProjectFormValues) => {
-            const request: Parameters<typeof apiClient.api.createProject>[0] = {
-                name: form.name
-            };
+            const { data, error } = await createProject({
+                body: {
+                    name: form.name,
+                    ...(form.icon && { image: form.icon })
+                }
+            });
 
-            if (form.icon) {
-                request.image = form.icon;
-            }
+            if (error) throw error;
 
-            const response = await apiClient.api.createProject(request);
-
-            const project = mapProjectDtoToProject(response.data.project);
+            const project = mapProjectDtoToProject(data.project);
             this.projects$.value = this.projects$.value.concat(project);
             this.selectedProjectId = project.id;
         },
@@ -133,22 +141,32 @@ export class ProjectsStore {
 
     updateProject = this.projects$.createAsyncAction(
         async (form: UpdateProjectFormValues): Promise<void> => {
-            const request: Parameters<typeof apiClient.api.updateProject>[1] = {};
+            const bodyData: {
+                name?: string;
+                image?: File;
+                remove_image?: boolean;
+            } = {};
 
             if ('icon' in form) {
                 if (form.icon) {
-                    request.image = form.icon || null;
+                    bodyData.image = form.icon;
                 } else {
-                    request.remove_image = true;
+                    bodyData.remove_image = true;
                 }
             }
 
             if ('name' in form) {
-                request.name = form.name;
+                bodyData.name = form.name;
             }
 
-            const response = await apiClient.api.updateProject(form.projectId, request);
-            const project = mapProjectDtoToProject(response.data.project);
+            const { data, error } = await updateProject({
+                path: { id: form.projectId },
+                body: bodyData
+            });
+
+            if (error) throw error;
+
+            const project = mapProjectDtoToProject(data.project);
 
             const projectIndex = this.projects$.value.findIndex(item => item.id === project.id);
             if (projectIndex !== -1) {
@@ -169,7 +187,11 @@ export class ProjectsStore {
 
     deleteProject = this.projects$.createAsyncAction(
         async (projectId: number) => {
-            await apiClient.api.deleteProject(projectId);
+            const { error } = await deleteProject({
+                path: { id: projectId }
+            });
+
+            if (error) throw error;
 
             const newSelectedProjectId = this.projects$.value[0]?.id ?? null;
             this.selectProject(newSelectedProjectId);
@@ -192,9 +214,13 @@ export class ProjectsStore {
         }
 
         const currentUserId = userStore.user$.value?.id;
-        const response = await apiClient.api.getProjectParticipants(this.selectedProjectId);
+        const { data, error } = await getProjectParticipants({
+            path: { id: this.selectedProjectId }
+        });
 
-        return response.data.items.filter(item => item.id !== currentUserId);
+        if (error) throw error;
+
+        return data.items.filter(item => item.id !== currentUserId);
     });
 
     addProjectParticipant = this.projectParticipants$.createAsyncAction(
@@ -203,13 +229,14 @@ export class ProjectsStore {
                 return;
             }
 
-            const newParticipant = await apiClient.api.addProjectParticipant(
-                this.selectedProjectId,
-                {
-                    user_id: form.userId
-                }
-            );
-            return this.projectParticipants$.value.concat(newParticipant.data.participant);
+            const { data, error } = await addProjectParticipant({
+                path: { id: this.selectedProjectId },
+                body: { user_id: form.userId }
+            });
+
+            if (error) throw error;
+
+            return this.projectParticipants$.value.concat(data.participant);
         },
         {
             successToast: {
@@ -227,7 +254,15 @@ export class ProjectsStore {
                 return;
             }
 
-            await apiClient.api.deleteProjectParticipant(this.selectedProjectId, participantId);
+            const { error } = await deleteProjectParticipant({
+                path: {
+                    id: this.selectedProjectId,
+                    user_id: participantId
+                }
+            });
+
+            if (error) throw error;
+
             return this.projectParticipants$.value.filter(item => item.id !== participantId);
         },
         {
@@ -249,10 +284,8 @@ function mapProjectDtoToProject(projectDTO: DTOProject): Project {
         creationDate: new Date(projectDTO.date_create),
         fallbackBackground: gradient(toColor(Math.abs(projectDTO.id ^ 255), { min: 30, max: 215 })),
         capabilities: {
-            invoices: projectDTO.capabilities.includes(DTOProjectCapabilitiesEnum.DTOInvoices),
-            stats: {
-                query: projectDTO.capabilities.includes(DTOProjectCapabilitiesEnum.DTOStats)
-            }
+            invoices: projectDTO.capabilities.includes('invoices'),
+            stats: { query: projectDTO.capabilities.includes('stats') }
         }
     };
 }

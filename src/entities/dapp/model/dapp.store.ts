@@ -1,12 +1,12 @@
 import { makeAutoObservable } from 'mobx';
+import { addPath, createAsyncAction, createImmediateReaction, Loadable } from 'src/shared';
 import {
-    addPath,
-    apiClient,
-    createAsyncAction,
-    createImmediateReaction,
     DTOMessagesApp,
-    Loadable
-} from 'src/shared';
+    getProjectMessagesApps,
+    createProjectMessagesApp,
+    verifyProjectMessagesApp,
+    deleteProjectMessagesApp
+} from 'src/shared/api';
 import { ProjectsStore } from '../../project/model/projects.store';
 import { CreateDappForm, Dapp, PendingDapp } from './interfaces';
 import { fetchDappFormByManifestUrl } from './dapp-url-validator';
@@ -50,25 +50,31 @@ export class DappStore {
             }
         }
 
-        const response = await apiClient.api.createProjectMessagesApp(
-            {
+        const { data, error } = await createProjectMessagesApp({
+            query: {
                 project_id: this.projectsStore.selectedProject!.id
             },
-            form as Required<CreateDappForm>
-        );
+            body: form as Required<CreateDappForm>
+        });
+
+        if (error) throw error;
 
         this.pendingDapp = {
             ...form,
-            token: response.data.payload,
-            validUntil: new Date(response.data.valid_until * 1000)
+            token: data.payload,
+            validUntil: new Date(data.valid_until * 1000)
         };
     });
 
     deleteValidatedDapp = this.dapps$.createAsyncAction(
         async (id: Dapp['id']) => {
-            await apiClient.api.deleteProjectMessagesApp({
-                app_id: id
+            const { error } = await deleteProjectMessagesApp({
+                query: {
+                    app_id: id
+                }
             });
+
+            if (error) throw error;
 
             return dappsApiRequest(this.projectsStore.selectedProject!.id);
         },
@@ -89,16 +95,16 @@ export class DappStore {
                 throw new Error('Dapp to validate is not set');
             }
 
-            await apiClient.api.verifyProjectMessagesApp(
-                {
-                    project_id: this.projectsStore.selectedProject!.id
-                },
-                {
-                    payload: token
-                }
-            );
+            const projectId = this.projectsStore.selectedProject!.id;
 
-            const dappsList = await dappsApiRequest(this.projectsStore.selectedProject!.id);
+            const { error } = await verifyProjectMessagesApp({
+                query: { project_id: projectId },
+                body: { payload: token }
+            });
+
+            if (error) throw error;
+
+            const dappsList = await dappsApiRequest(projectId);
             this.pendingDapp = null;
             return dappsList;
         },
@@ -124,11 +130,13 @@ export class DappStore {
 }
 
 async function dappsApiRequest(projectId: number): Promise<Dapp[]> {
-    const response = await apiClient.api.getProjectMessagesApps({
-        project_id: projectId
+    const { data, error } = await getProjectMessagesApps({
+        query: { project_id: projectId }
     });
 
-    return response.data.items.filter(filterVerifiedDapps).map(mapDTODappToDapp);
+    if (error) throw error;
+
+    return data.items.filter(filterVerifiedDapps).map(mapDTODappToDapp);
 }
 
 function filterVerifiedDapps(dtoDapp: DTOMessagesApp): boolean {

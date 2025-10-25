@@ -1,6 +1,5 @@
 import { makeAutoObservable } from 'mobx';
 import {
-    apiClient,
     createAsyncAction,
     createImmediateReaction,
     hasProperty,
@@ -8,6 +7,7 @@ import {
     testnetExplorer,
     TonCurrencyAmount
 } from 'src/shared';
+import { getTestnetAvailable, buyTestnetCoins } from 'src/shared/api';
 import { createStandaloneToast } from '@chakra-ui/react';
 import { projectsStore } from 'src/shared/stores';
 import type { AxiosError } from 'axios';
@@ -37,13 +37,14 @@ class FaucetStore {
     fetchTonSupplyAndRate = this.tonSupply$.createAsyncAction(
         async () => {
             this.tonRate$.setStartLoading();
-            const response = await apiClient.api.getTestnetAvailable();
+            const { data, error } = await getTestnetAvailable();
+            if (error) throw error;
             // TODO: PRICES remove this after backend will be updated
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            this.tonRate$.value = 1 / response.data.price_multiplicator;
+            this.tonRate$.value = 1 / data.price_multiplicator;
             this.tonRate$.setEndLoading();
-            return new TonCurrencyAmount(response.data.balance);
+            return new TonCurrencyAmount(data.balance);
         },
         {
             onError: e => this.tonRate$.setErroredState(e)
@@ -54,13 +55,15 @@ class FaucetStore {
         async (form: RequestFaucetForm) => {
             this.latestPurchase = null;
 
-            const result = await apiClient.api.buyTestnetCoins(
-                { project_id: projectsStore.selectedProject!.id },
-                { address: form.receiverAddress, coins: form.amount.weiAmount.toNumber() }
-            );
+            const { data, error } = await buyTestnetCoins({
+                query: { project_id: projectsStore.selectedProject!.id },
+                body: { address: form.receiverAddress, coins: form.amount.weiAmount.toNumber() }
+            });
+
+            if (error) throw error;
 
             const [hash] = await Promise.all([
-                fetchTxHash(result.data.hash),
+                fetchTxHash(data.hash),
                 this.fetchTonSupplyAndRate()
             ]);
             this.latestPurchase = {

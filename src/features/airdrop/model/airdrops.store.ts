@@ -1,4 +1,5 @@
-import { apiClient, createImmediateReaction, DTOJettonAirdrop, Loadable } from 'src/shared';
+import { createImmediateReaction, Loadable } from 'src/shared';
+import { getJettonAirdrops, DTOJettonAirdrop } from 'src/shared/api';
 import { ADConfig, airdropApiClient } from 'src/shared/api/airdrop-api';
 import { makeAutoObservable } from 'mobx';
 import { projectsStore } from 'src/shared/stores';
@@ -33,11 +34,13 @@ export class AirdropsStore {
         this.fetchAirdrops();
     }
 
-    fetchAirdrops = this.airdrops$.createAsyncAction(() =>
-        apiClient.api
-            .getJettonAirdrops({ project_id: this.projectId })
-            .then(({ data }) => data.airdrops)
-    );
+    fetchAirdrops = this.airdrops$.createAsyncAction(async () => {
+        const { data, error } = await getJettonAirdrops({
+            query: { project_id: this.projectId }
+        });
+        if (error) throw error;
+        return data.airdrops;
+    });
 
     fetchConfig = this.config$.createAsyncAction(() =>
         airdropApiClient.v2.getConfig({ project_id: `${this.projectId}` }).then(({ data }) => data)
