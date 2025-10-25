@@ -1,5 +1,10 @@
 import { makeAutoObservable } from 'mobx';
-import { apiClient, createImmediateReaction, Loadable, TonCurrencyAmount } from 'src/shared';
+import { createImmediateReaction, Loadable, TonCurrencyAmount } from 'src/shared';
+import {
+    getStatsChatGptPrice,
+    statsChatGptRequest,
+    type GetStatsChatGptPriceResponse
+} from 'src/shared/api';
 import { projectsStore } from 'src/shared/stores';
 import { GptGenerationPricing } from 'src/features';
 
@@ -36,24 +41,24 @@ export class AnalyticsGPTGenerationStore {
     }
 
     public fetchPrice = this.gptPricing$.createAsyncAction(async () => {
-        const result = await apiClient.api.getStatsChatGptPrice({
-            project_id: projectsStore.selectedProject!.id
+        const { data, error } = await getStatsChatGptPrice({
+            query: { project_id: projectsStore.selectedProject!.id }
         });
-        return mapStatsChatGptPriceToGptGenerationPricing(result.data);
+        if (error) throw error;
+        return mapStatsChatGptPriceToGptGenerationPricing(data);
     });
 
     public generateSQL = this.generatedSQL$.createAsyncAction(
         async (message: string, context?: string) => {
-            const result = await apiClient.api.statsChatGptRequest(
-                {
-                    project_id: projectsStore.selectedProject!.id
-                },
-                { message, context }
-            );
+            const { data, error } = await statsChatGptRequest({
+                query: { project_id: projectsStore.selectedProject!.id },
+                body: { message, context }
+            });
 
+            if (error) throw error;
             await this.fetchPrice();
 
-            return result.data.message;
+            return data.message;
         }
     );
 
@@ -65,7 +70,7 @@ export class AnalyticsGPTGenerationStore {
 }
 
 function mapStatsChatGptPriceToGptGenerationPricing(
-    value: Awaited<ReturnType<typeof apiClient.api.getStatsChatGptPrice>>['data']
+    value: GetStatsChatGptPriceResponse
 ): GptGenerationPricing {
     return {
         freeRequestsNumber: value.free_requests,

@@ -1,20 +1,19 @@
 import { AxiosError } from 'axios';
 import { makeAutoObservable } from 'mobx';
 import { projectsStore } from 'src/shared/stores';
+import { Loadable, TonCurrencyAmount, createImmediateReaction, isAddressValid } from 'src/shared';
 import {
+    getCNftConfig,
+    getPaidCNftCollections,
+    indexingCNftCollection,
+    getInfoCNftCollectionAccount,
     DTOCnftCollection,
-    Loadable,
-    TonCurrencyAmount,
-    apiClient,
-    createImmediateReaction,
-    isAddressValid
-} from 'src/shared';
+    DTOCnftIndexing
+} from 'src/shared/api';
 import { CnftCollection } from './interfaces/CnftCollection';
 import { Address } from '@ton/core';
 
-export type IndexingCnftCollectionDataT = Parameters<
-    typeof apiClient.api.indexingCNftCollection
->[1];
+export type IndexingCnftCollectionDataT = DTOCnftIndexing;
 
 export class CNFTStore {
     pricePerNFT$ = new Loadable<TonCurrencyAmount | undefined>(undefined);
@@ -43,17 +42,22 @@ export class CNFTStore {
     }
 
     loadConfig = this.pricePerNFT$.createAsyncAction(async () => {
-        const response = await apiClient.api.getCNftConfig();
-        return new TonCurrencyAmount(response.data.usd_price_per_nft);
+        const { data, error } = await getCNftConfig();
+        if (error) throw error;
+        return new TonCurrencyAmount(data.usd_price_per_nft);
     });
 
-    loadHistory = this.history$.createAsyncAction(getPaidCNftCollections);
+    loadHistory = this.history$.createAsyncAction(getPaidCNftCollectionsData);
 
     addCNFT = this.history$.createAsyncAction(
-        async (data: IndexingCnftCollectionDataT) =>
-            apiClient.api
-                .indexingCNftCollection({ project_id: projectsStore.selectedProject!.id }, data)
-                .then(getPaidCNftCollections),
+        async (requestData: IndexingCnftCollectionDataT) => {
+            const { error } = await indexingCNftCollection({
+                query: { project_id: projectsStore.selectedProject!.id },
+                body: requestData
+            });
+            if (error) throw error;
+            return getPaidCNftCollectionsData();
+        },
         {
             successToast: {
                 title: 'cNFT added successfully'
@@ -72,13 +76,14 @@ export class CNFTStore {
 
     checkCNFT = this.currentAddress$.createAsyncAction(async (addressString: string) => {
         const isValid = isAddressValid(addressString, { acceptRaw: true });
+        if (!isValid) return null;
 
-        return isValid
-            ? apiClient.api
-                  .getInfoCNftCollectionAccount(addressString)
-                  .then(({ data }) => (data ? mapDTOCnftCollectionToCnftCollection(data) : null))
-                  .catch(() => null)
-            : null;
+        const { data, error } = await getInfoCNftCollectionAccount({
+            path: { account: addressString }
+        });
+
+        if (error) return null;
+        return data ? mapDTOCnftCollectionToCnftCollection(data) : null;
     });
 
     clearState(): void {
@@ -93,12 +98,13 @@ export class CNFTStore {
     }
 }
 
-async function getPaidCNftCollections() {
-    const res = await apiClient.api.getPaidCNftCollections({
-        project_id: projectsStore.selectedProject!.id
+async function getPaidCNftCollectionsData() {
+    const { data, error } = await getPaidCNftCollections({
+        query: { project_id: projectsStore.selectedProject!.id }
     });
 
-    return res.data.items.map(mapDTOCnftCollectionToCnftCollection);
+    if (error) throw error;
+    return data.items.map(mapDTOCnftCollectionToCnftCollection);
 }
 
 function mapDTOCnftCollectionToCnftCollection(dto: DTOCnftCollection): CnftCollection {

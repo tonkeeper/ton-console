@@ -1,7 +1,7 @@
 import { FC, useContext } from 'react';
 import { Center, Spinner, Td, Tr } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { toDateTime, DTOBillingTransactionTypeEnum } from 'src/shared';
+import { toDateTime, DTOBillingTransaction } from 'src/shared';
 import { toJS } from 'mobx';
 import { BillingHistoryItem } from 'src/features/billing/model/billing.store';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
@@ -23,20 +23,20 @@ const LoadingRaw: FC<{ style: React.CSSProperties }> = ({ style: { top, ...style
         </Tr>
     );
 };
-
-const mapTypeToLabel: Record<DTOBillingTransactionTypeEnum, string> = {
-    [DTOBillingTransactionTypeEnum.DTOCharge]: 'Charge',
-    [DTOBillingTransactionTypeEnum.DTODeposit]: 'Deposit'
+        
+const mapTypeToLabel: Record<DTOBillingTransaction['type'], string> = {
+    charge: 'Charge',
+    deposit: 'Deposit'
 };
 
-const mapTypeToColor: Record<DTOBillingTransactionTypeEnum, string> = {
-    [DTOBillingTransactionTypeEnum.DTOCharge]: 'text.primary',
-    [DTOBillingTransactionTypeEnum.DTODeposit]: 'accent.green'
+const mapTypeToColor: Record<DTOBillingTransaction['type'], string> = {
+    charge: 'text.primary',
+    deposit: 'accent.green'
 };
 
-const mapTypeToSign: Record<DTOBillingTransactionTypeEnum, string> = {
-    [DTOBillingTransactionTypeEnum.DTOCharge]: '-',
-    [DTOBillingTransactionTypeEnum.DTODeposit]: '+'
+const mapTypeToSign: Record<DTOBillingTransaction['type'], string> = {
+    charge: '-',
+    deposit: '+'
 };
 
 const ItemRow: FC<{ historyItem: BillingHistoryItem; style: React.CSSProperties }> = observer(

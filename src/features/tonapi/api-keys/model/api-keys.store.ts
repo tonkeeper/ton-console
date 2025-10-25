@@ -1,4 +1,11 @@
-import { apiClient, createImmediateReaction, DTOProjectTonApiToken, Loadable } from 'src/shared';
+import { createImmediateReaction, Loadable } from 'src/shared';
+import {
+    DTOProjectTonApiToken,
+    getProjectTonApiTokens,
+    generateProjectTonApiToken,
+    updateProjectTonApiToken,
+    deleteProjectTonApiToken
+} from 'src/shared/api';
 import { EditApiKeyForm, ApiKey, CreateApiKeyForm } from './interfaces';
 import { makeAutoObservable } from 'mobx';
 import { ProjectsStore } from 'src/entities/project/model/projects.store';
@@ -27,22 +34,31 @@ export class ApiKeysStore {
     }
 
     fetchApiKeys = this.apiKeys$.createAsyncAction(async () => {
-        const response = await apiClient.api.getProjectTonApiTokens({
-            project_id: this.projectsStore.selectedProject!.id
+        const { data, error } = await getProjectTonApiTokens({
+            query: { project_id: this.projectsStore.selectedProject!.id }
         });
 
-        return response.data.items.map(mapApiTokenDTOToApiKey);
+        if (error) throw error
+
+        return data.items.map(mapApiTokenDTOToApiKey);
     });
 
     createApiKey = this.apiKeys$.createAsyncAction(
         async ({ name, limitRps, origins, capabilities }: CreateApiKeyForm) => {
-            const response = await apiClient.api.generateProjectTonApiToken(
-                { project_id: this.projectsStore.selectedProject!.id },
-                { name, limit_rps: limitRps, origins, capabilities }
-            );
+            const { data, error } = await generateProjectTonApiToken({
+                query: { project_id: this.projectsStore.selectedProject!.id },
+                body: {
+                    name,
+                    limit_rps: limitRps,
+                    origins,
+                    capabilities
+                }
+            });
 
-            if (response.data.token) {
-                this.apiKeys$.value.push(mapApiTokenDTOToApiKey(response.data.token));
+            if (error) throw error
+
+            if (data.token) {
+                this.apiKeys$.value.push(mapApiTokenDTOToApiKey(data.token));
             }
         },
         {
@@ -57,11 +73,18 @@ export class ApiKeysStore {
 
     editApiKey = this.apiKeys$.createAsyncAction(
         async ({ id, name, limitRps, origins, capabilities }: EditApiKeyForm) => {
-            await apiClient.api.updateProjectTonApiToken(
-                id,
-                { project_id: this.projectsStore.selectedProject!.id },
-                { name, limit_rps: limitRps, origins, capabilities }
-            );
+            const { error } = await updateProjectTonApiToken({
+                path: { id },
+                query: { project_id: this.projectsStore.selectedProject!.id },
+                body: {
+                    name,
+                    limit_rps: limitRps,
+                    origins,
+                    capabilities
+                }
+            });
+
+            if (error) throw error
 
             const key = this.apiKeys$.value.find(item => item.id === id);
 
@@ -84,9 +107,12 @@ export class ApiKeysStore {
 
     deleteApiKey = this.apiKeys$.createAsyncAction(
         async (id: number) => {
-            await apiClient.api.deleteProjectTonApiToken(id, {
-                project_id: this.projectsStore.selectedProject!.id
+            const { error } = await deleteProjectTonApiToken({
+                path: { id },
+                query: { project_id: this.projectsStore.selectedProject!.id }
             });
+
+            if (error) throw error
 
             return this.apiKeys$.value.filter(item => item.id !== id);
         },

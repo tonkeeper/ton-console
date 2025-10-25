@@ -1,14 +1,24 @@
 import { makeAutoObservable } from 'mobx';
 import {
-    apiClient,
     Loadable,
     createImmediateReaction,
-    DTOInvoicesApp,
     TonAddress,
-    DTOCryptoCurrency,
     CRYPTO_CURRENCY,
     TokenCurrencyAmount
 } from 'src/shared';
+import {
+    getInvoicesApp,
+    createInvoicesApp,
+    updateInvoicesApp,
+    getInvoicesAppToken,
+    createInvoicesAppWebhook,
+    deleteInvoicesAppWebhook,
+    regenerateInvoicesAppToken,
+    getInvoicesStats,
+    DTOInvoicesApp,
+    DTOCryptoCurrency,
+    GetInvoicesStatsResponse
+} from 'src/shared/api';
 import { projectsStore } from 'src/shared/stores';
 import {
     InvoicesAllStatistics,
@@ -58,15 +68,15 @@ export class InvoicesAppStore {
 
     fetchInvoicesApp = this.invoicesApp$.createAsyncAction(async () => {
         try {
-            const response = await apiClient.api.getInvoicesApp({
-                project_id: projectsStore.selectedProject!.id
+            const { data, error } = await getInvoicesApp({
+                query: { project_id: projectsStore.selectedProject!.id }
             });
 
-            if (!response.data.app) {
+            if (error || !data?.app) {
                 return null;
             }
 
-            return mapInvoicesAppDTOToInvoicesApp(response.data.app);
+            return mapInvoicesAppDTOToInvoicesApp(data.app);
         } catch (_e) {
             return null;
         }
@@ -74,17 +84,19 @@ export class InvoicesAppStore {
 
     createInvoicesApp = this.invoicesApp$.createAsyncAction(
         async (form: InvoicesProjectForm) => {
-            const response = await apiClient.api.createInvoicesApp(
-                {
-                    project_id: projectsStore.selectedProject!.id
-                },
-                {
+            const { data, error } = await createInvoicesApp({
+                query: { project_id: projectsStore.selectedProject!.id },
+                body: {
                     name: form.name,
                     recipient_address: form.receiverAddress
                 }
-            );
+            });
 
-            return mapInvoicesAppDTOToInvoicesApp(response.data.app);
+            if (error || !data) {
+                throw error;
+            }
+
+            return mapInvoicesAppDTOToInvoicesApp(data.app);
         },
         {
             successToast: {
@@ -98,12 +110,19 @@ export class InvoicesAppStore {
 
     editInvoicesApp = this.invoicesApp$.createAsyncAction(
         async (form: Partial<InvoicesProjectForm> & { id: number }) => {
-            const response = await apiClient.api.updateInvoicesApp(form.id, {
-                name: form.name,
-                recipient_address: form.receiverAddress
+            const { data, error } = await updateInvoicesApp({
+                path: { id: form.id },
+                body: {
+                    name: form.name,
+                    recipient_address: form.receiverAddress
+                }
             });
 
-            return mapInvoicesAppDTOToInvoicesApp(response.data.app!);
+            if (error || !data?.app) {
+                throw error;
+            }
+
+            return mapInvoicesAppDTOToInvoicesApp(data.app);
         },
         {
             successToast: {
@@ -116,21 +135,29 @@ export class InvoicesAppStore {
     );
 
     fetchAppToken = this.appToken$.createAsyncAction(async () => {
-        const response = await apiClient.api.getInvoicesAppToken({
-            app_id: this.invoicesApp$.value!.id
+        const { data, error } = await getInvoicesAppToken({
+            query: { app_id: this.invoicesApp$.value!.id }
         });
 
-        return response.data.token;
+        if (error || !data) {
+            throw error;
+        }
+
+        return data.token;
     });
 
     addWebhook = this.invoicesApp$.createAsyncAction(
         async (value: string) => {
-            const response = await apiClient.api.createInvoicesAppWebhook(
-                this.invoicesApp$.value!.id,
-                { webhook: value }
-            );
+            const { data, error } = await createInvoicesAppWebhook({
+                path: { id: this.invoicesApp$.value!.id },
+                body: { webhook: value }
+            });
 
-            return mapInvoicesAppDTOToInvoicesApp(response.data.app!);
+            if (error || !data?.app) {
+                throw error;
+            }
+
+            return mapInvoicesAppDTOToInvoicesApp(data.app);
         },
         {
             successToast: {
@@ -144,12 +171,15 @@ export class InvoicesAppStore {
 
     deleteWebhook = this.invoicesApp$.createAsyncAction(
         async (id: string) => {
-            const response = await apiClient.api.deleteInvoicesAppWebhook(
-                this.invoicesApp$.value!.id,
-                id
-            );
+            const { data, error } = await deleteInvoicesAppWebhook({
+                path: { id: this.invoicesApp$.value!.id, webhook_id: id }
+            });
 
-            return mapInvoicesAppDTOToInvoicesApp(response.data.app!);
+            if (error || !data?.app) {
+                throw error;
+            }
+
+            return mapInvoicesAppDTOToInvoicesApp(data.app);
         },
         {
             successToast: {
@@ -163,11 +193,15 @@ export class InvoicesAppStore {
 
     regenerateAppToken = this.appToken$.createAsyncAction(
         async () => {
-            const response = await apiClient.api.regenerateInvoicesAppToken({
-                app_id: this.invoicesApp$.value!.id
+            const { data, error } = await regenerateInvoicesAppToken({
+                query: { app_id: this.invoicesApp$.value!.id }
             });
 
-            return response.data.token;
+            if (error || !data) {
+                throw error;
+            }
+
+            return data.token;
         },
         {
             successToast: {
@@ -180,27 +214,33 @@ export class InvoicesAppStore {
     );
 
     fetchInvoicesStatistics = this.statistics$.createAsyncAction(async () => {
-        const tonRes = await apiClient.api
-            .getInvoicesStats({
+        const tonResult = await getInvoicesStats({
+            query: {
                 app_id: this.invoicesApp$.value!.id,
-                currency: DTOCryptoCurrency.DTO_TON
-            })
-            .then(response =>
-                mapInvoicesStatsDTOToInvoicesStats(response.data.stats, CRYPTO_CURRENCY.TON)
-            );
+                currency: DTOCryptoCurrency.TON
+            }
+        });
 
-        const usdtRes = await apiClient.api
-            .getInvoicesStats({
+        const usdtResult = await getInvoicesStats({
+            query: {
                 app_id: this.invoicesApp$.value!.id,
-                currency: DTOCryptoCurrency.DTO_USDT
-            })
-            .then(response =>
-                mapInvoicesStatsDTOToInvoicesStats(response.data.stats, CRYPTO_CURRENCY.USDT)
-            );
+                currency: DTOCryptoCurrency.USDT
+            }
+        });
+
+        if (tonResult.error || usdtResult.error || !tonResult.data || !usdtResult.data) {
+            throw tonResult.error || usdtResult.error;
+        }
 
         return {
-            [CRYPTO_CURRENCY.TON]: tonRes,
-            [CRYPTO_CURRENCY.USDT]: usdtRes
+            [CRYPTO_CURRENCY.TON]: mapInvoicesStatsDTOToInvoicesStats(
+                tonResult.data.stats,
+                CRYPTO_CURRENCY.TON
+            ),
+            [CRYPTO_CURRENCY.USDT]: mapInvoicesStatsDTOToInvoicesStats(
+                usdtResult.data.stats,
+                CRYPTO_CURRENCY.USDT
+            )
         };
     });
 
@@ -225,7 +265,7 @@ function mapInvoicesAppDTOToInvoicesApp(invoicesAppDTO: DTOInvoicesApp): Invoice
 }
 
 function mapInvoicesStatsDTOToInvoicesStats(
-    invoicesStatsDTO: Awaited<ReturnType<typeof apiClient.api.getInvoicesStats>>['data']['stats'],
+    invoicesStatsDTO: GetInvoicesStatsResponse['stats'],
     currency: CRYPTO_CURRENCY
 ): InvoicesStatistics {
     return {

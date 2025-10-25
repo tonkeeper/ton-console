@@ -1,11 +1,18 @@
 import { makeAutoObservable } from 'mobx';
 import {
-    apiClient,
     createImmediateReaction,
-    DTOMessagesPackage,
     Loadable,
     UsdCurrencyAmount
 } from 'src/shared';
+import {
+    getMessagesPackages,
+    getProjectMessagesBalance,
+    getProjectMessagesStats,
+    buyMessagesPackage,
+    getProjectMessagesAppToken,
+    regenerateProjectMessagesAppToken,
+    DTOMessagesPackage
+} from 'src/shared/api';
 import { dappStore, projectsStore } from 'src/shared/stores';
 import { AppMessagesPackage, AppMessagesStats } from './interfaces';
 
@@ -48,37 +55,41 @@ export class AppMessagesStore {
     }
 
     fetchPackages = this.packages$.createAsyncAction(async () => {
-        const result = await apiClient.api.getMessagesPackages();
-        return result.data.items.map(mapDTOPackageToAppmessagesPackage);
+        const { data, error } = await getMessagesPackages();
+        if (error) throw error;
+        return data.items.map(mapDTOPackageToAppmessagesPackage);
     });
 
     fetchBalance = this.balance$.createAsyncAction(async () => {
-        const result = await apiClient.api.getProjectMessagesBalance({
-            project_id: projectsStore.selectedProject!.id
+        const { data, error } = await getProjectMessagesBalance({
+            query: { project_id: projectsStore.selectedProject!.id }
         });
 
-        return result.data.balance;
+        if (error) throw error;
+        return data.balance;
     });
 
     fetchStats = this.stats$.createAsyncAction(async () => {
-        const result = await apiClient.api.getProjectMessagesStats({
-            app_id: dappStore.dapps$.value[0].id
+        const { data, error } = await getProjectMessagesStats({
+            query: { app_id: dappStore.dapps$.value[0].id }
         });
 
+        if (error) throw error;
         return {
-            totalUsers: result.data.stats.users,
-            usersWithEnabledNotifications: result.data.stats.enable_notifications,
-            sentNotificationsLastWeek: result.data.stats.sent_in_week
+            totalUsers: data.stats.users,
+            usersWithEnabledNotifications: data.stats.enable_notifications,
+            sentNotificationsLastWeek: data.stats.sent_in_week
         };
     });
 
     buyPackage = this.balance$.createAsyncAction(
         async (packageId: AppMessagesPackage['id']) => {
-            await apiClient.api.buyMessagesPackage(
-                { project_id: projectsStore.selectedProject!.id },
-                { id: packageId }
-            );
+            const { error } = await buyMessagesPackage({
+                query: { project_id: projectsStore.selectedProject!.id },
+                body: { id: packageId }
+            });
 
+            if (error) throw error;
             await this.fetchBalance();
         },
         {
@@ -92,20 +103,22 @@ export class AppMessagesStore {
     );
 
     fetchDappToken = this.dappToken$.createAsyncAction(async () => {
-        const response = await apiClient.api.getProjectMessagesAppToken({
-            app_id: dappStore.dapps$.value[0].id
+        const { data, error } = await getProjectMessagesAppToken({
+            query: { app_id: dappStore.dapps$.value[0].id }
         });
 
-        return response.data.token;
+        if (error) throw error;
+        return data.token;
     });
 
     regenerateDappToken = this.dappToken$.createAsyncAction(
         async () => {
-            const response = await apiClient.api.regenerateProjectMessagesAppToken({
-                app_id: dappStore.dapps$.value[0].id
+            const { data, error } = await regenerateProjectMessagesAppToken({
+                query: { app_id: dappStore.dapps$.value[0].id }
             });
 
-            return response.data.token;
+            if (error) throw error;
+            return data.token;
         },
         {
             successToast: {

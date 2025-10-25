@@ -5,9 +5,9 @@ export const convertDTOCryptoCurrencyToCryptoCurrency = (
     currency: DTOCryptoCurrency
 ): CRYPTO_CURRENCY => {
     switch (currency) {
-        case DTOCryptoCurrency.DTO_TON:
+        case DTOCryptoCurrency.TON:
             return CRYPTO_CURRENCY.TON;
-        case DTOCryptoCurrency.DTO_USDT:
+        case DTOCryptoCurrency.USDT:
             return CRYPTO_CURRENCY.USDT;
         default:
             throw new Error(`Unknown currency: ${currency}`);
@@ -19,9 +19,9 @@ export const convertCryptoCurrencyToDTOCryptoCurrency = (
 ): DTOCryptoCurrency => {
     switch (currency) {
         case CRYPTO_CURRENCY.TON:
-            return DTOCryptoCurrency.DTO_TON;
+            return DTOCryptoCurrency.TON;
         case CRYPTO_CURRENCY.USDT:
-            return DTOCryptoCurrency.DTO_USDT;
+            return DTOCryptoCurrency.USDT;
         default:
             throw new Error(`Unknown currency: ${currency}`);
     }

@@ -5,6 +5,7 @@ import { FeedbackFromI } from './interfaces/form';
 import { feetbackModalStore } from './model/feedback';
 import { userStore } from 'src/shared/stores';
 import { projectsStore } from 'src/shared/stores';
+import { FeedbackResponse } from 'src/shared/api';
 
 export const FeedbackFrom: FC<{
     formId: string;
@@ -20,9 +21,8 @@ export const FeedbackFrom: FC<{
         }
     });
 
-    const submitMiddleware = async (form: FeedbackFromI): Promise<number> => {
-        const response = await feetbackModalStore.sendForm(form);
-        return response.status;
+    const submitMiddleware = (form: FeedbackFromI): Promise<FeedbackResponse> => {
+        return feetbackModalStore.sendForm(form);
     };
 
     return (

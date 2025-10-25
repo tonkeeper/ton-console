@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file */
 
-import { apiClient, Loadable } from 'src/shared';
+import { Loadable } from 'src/shared';
+import { createJettonAirdrop } from 'src/shared/api';
 import { ADAirdropData, ADDistributorData, airdropApiClient } from 'src/shared/api/airdrop-api';
 import { makeAutoObservable } from 'mobx';
 import { toNano } from '@ton/ton';
@@ -55,7 +56,6 @@ export class AirdropStore {
         vesting,
         name
     }: AirdropMetadata & { adminAddress: string }) => {
-
         if (!isValidVesting(vesting)) {
             throw new Error(
                 'Vesting parameters are invalid: all items must have unlockTime and fraction fields'
@@ -83,12 +83,12 @@ export class AirdropStore {
             )
             .then(({ data }) => data);
 
-        const consoleRes = await apiClient.api
-            .createJettonAirdrop(
-                { project_id: this.projectId },
-                { api_id: airdropRes.id, name: name }
-            )
-            .then(({ data }) => data);
+        const { data: consoleRes, error } = await createJettonAirdrop({
+            query: { project_id: this.projectId },
+            body: { api_id: airdropRes.id, name: name }
+        });
+
+        if (error) throw error;
 
         this.airdrops.push(consoleRes.airdrop);
 
