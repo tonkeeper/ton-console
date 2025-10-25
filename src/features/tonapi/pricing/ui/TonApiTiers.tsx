@@ -149,7 +149,10 @@ const TonApiTiers: FC = () => {
                 </Button>
             </Flex>
             <Flex direction={{ base: 'column', lg: 'row' }} gap={6} mb="4">
-                <SelectRestApiTier onSelectTier={handleSelectTier} currentTier={currentTonApiTier} />
+                <SelectRestApiTier
+                    onSelectTier={handleSelectTier}
+                    currentTier={currentTonApiTier}
+                />
                 {currentTonApiTier === 'custom' ? (
                     <RestApiUnlimitedTierCard w="100%" maxW="497px" />
                 ) : (

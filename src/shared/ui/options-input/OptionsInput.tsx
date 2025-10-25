@@ -9,9 +9,7 @@ const unsetRadioValue = '#unset';
 
 export const OptionsInput = forwardRef<
     HTMLInputElement,
-    PropsWithChildren<
-        BoxProps & UseFormRegisterReturn & { defaultValue?: string }
-    >
+    PropsWithChildren<BoxProps & UseFormRegisterReturn & { defaultValue?: string }>
 >(({ children, defaultValue, ...props }, ref) => {
     const [inputType, setInputType] = useState<'radio' | 'text'>('radio');
     const [value, setValue] = useState(defaultValue);

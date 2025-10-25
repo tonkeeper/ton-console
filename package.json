@@ -92,6 +92,7 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "husky": "^8.0.3",
     "jsdom": "^21.1.0",
+    "knip": "^5.66.2",
     "lint-staged": "^15.2.10",
     "patch-package": "^8.0.0",
     "prettier": "^2.8.3",

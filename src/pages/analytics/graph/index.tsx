@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useState } from 'react';
-import { Box, BoxProps, Center, Spinner } from '@chakra-ui/react';
+import { BoxProps, Center, Spinner } from '@chakra-ui/react';
 import { Overlay, useIntervalUpdate, usePrevious } from 'src/shared';
 import { analyticsGraphQueryStore } from 'src/features';
 import { useNavigate, useSearchParams } from 'react-router-dom';

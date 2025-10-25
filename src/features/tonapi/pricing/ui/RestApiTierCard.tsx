@@ -62,9 +62,9 @@ export const RestApiTierCard: FC<
                                 <>
                                     &nbsp;
                                     <InfoTooltip>
-                                        {tier.rps} request per second
-                                        for requests with free api token, 0.25 requests per second
-                                        for requests without api token
+                                        {tier.rps} request per second for requests with free api
+                                        token, 0.25 requests per second for requests without api
+                                        token
                                     </InfoTooltip>
                                 </>
                             )}

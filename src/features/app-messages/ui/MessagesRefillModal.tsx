@@ -41,7 +41,9 @@ const MessagesRefillModal: FC<{
 
     const balance = balanceStore.balance;
     const notEnoughAmount =
-        balance && selectedPlan && BigInt(balance.ton?.amount || 0) < BigInt(selectedPlan.price.amount.toNumber())
+        balance &&
+        selectedPlan &&
+        BigInt(balance.ton?.amount || 0) < BigInt(selectedPlan.price.amount.toNumber())
             ? BigInt(selectedPlan.price.amount.toNumber()) - BigInt(balance.ton?.amount || 0)
             : 0;
 
@@ -119,7 +121,8 @@ const MessagesRefillModal: FC<{
                 {!!notEnoughAmount && (
                     <Text textStyle="body2" mt="3" color="text.secondary">
                         <FilledWarnIcon16 />
-                        &nbsp;Not enough ${notEnoughAmount.toString()} to buy the plan, fund your account
+                        &nbsp;Not enough ${notEnoughAmount.toString()} to buy the plan, fund your
+                        account
                     </Text>
                 )}
             </ModalBody>

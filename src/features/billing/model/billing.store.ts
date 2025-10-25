@@ -115,9 +115,7 @@ export class BillingStore {
     }
 }
 
-function mapDTOTransactionToBillingHistoryItem(
-    dtoTx: DTOBillingTransaction
-): BillingHistoryItem {
+function mapDTOTransactionToBillingHistoryItem(dtoTx: DTOBillingTransaction): BillingHistoryItem {
     const date = new Date(dtoTx.created_at * 1000);
     const amount = mapDTOCurrencyToAmount(dtoTx.currency, dtoTx.amount);
 
@@ -126,7 +124,7 @@ function mapDTOTransactionToBillingHistoryItem(
         date,
         amount,
         type: dtoTx.type,
-        reason: dtoTx.info.reason,
+        reason: dtoTx.info.reason
         // meta: dtoTx.info.meta,
     };
 }
@@ -136,7 +134,11 @@ function mapDTOCurrencyToAmount(currency: DTOCryptoCurrency, amount: string) {
         case DTOCryptoCurrency.DTO_TON:
             return new TonCurrencyAmount(amount);
         case DTOCryptoCurrency.DTO_USDT:
-            return new TokenCurrencyAmount({ weiAmount: amount, currency: CRYPTO_CURRENCY.USDT, decimals: 6 });
+            return new TokenCurrencyAmount({
+                weiAmount: amount,
+                currency: CRYPTO_CURRENCY.USDT,
+                decimals: 6
+            });
         default:
             throw new Error(`Unknown currency: ${currency}`);
     }

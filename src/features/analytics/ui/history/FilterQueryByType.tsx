@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import {
-    Box,
     BoxProps,
     Button,
     Center,

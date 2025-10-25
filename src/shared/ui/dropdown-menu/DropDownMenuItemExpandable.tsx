@@ -35,9 +35,7 @@ export interface DropDownMenuItemExpandableProps extends PropsWithChildren {
 }
 
 const _hover = { backgroundColor: 'button.secondary.backgroundHover' };
-export const DropDownMenuItemExpandable: FC<
-    DropDownMenuItemExpandableProps
-> = props => {
+export const DropDownMenuItemExpandable: FC<DropDownMenuItemExpandableProps> = props => {
     const [shouldAnimate, setShouldAnimate] = useState(false);
     const path = useMemo(() => {
         let value = props.path;

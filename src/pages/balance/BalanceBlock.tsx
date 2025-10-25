@@ -36,9 +36,9 @@ const BalanceBlock: FC = () => {
         <>
             <Overlay h="100%" p="0" display="flex" flexDirection="column" flex="1" minW="330px">
                 <Box>
-                    <Flex align="center" justify="space-between" py="5" px="6">
+                    <Flex align="center" justify="space-between" px="6" py="5">
                         <Box>
-                            <Text textStyle="body2" color="text.secondary" mb="1">
+                            <Text textStyle="body2" mb="1" color="text.secondary">
                                 Total Balance
                             </Text>
                             <H2 display="flex" alignItems="center" gap="2">
@@ -51,18 +51,18 @@ const BalanceBlock: FC = () => {
                                 )}
                             </H2>
                         </Box>
-                        <Button onClick={onRefillOpen} variant="secondary" size="sm">
+                        <Button onClick={onRefillOpen} size="sm" variant="secondary">
                             Refill
                         </Button>
                     </Flex>
 
                     <Divider />
 
-                    <Flex columnGap="3" rowGap="2" flexWrap="wrap" pt="3" pb="5" px="6">
+                    <Flex wrap="wrap" rowGap="2" columnGap="3" pt="3" pb="5" px="6">
                         {/* Left Column - USDT Balance and Promo */}
                         <Box minW="170px">
                             <Flex>
-                                <Text textStyle="body2" minW="80px" color="text.secondary" mb="1">
+                                <Text textStyle="body2" minW="80px" mb="1" color="text.secondary">
                                     Balance
                                 </Text>
                                 {isLoading ? (
@@ -74,7 +74,7 @@ const BalanceBlock: FC = () => {
                                 )}
                             </Flex>
                             <Flex>
-                                <Flex align="center" minW="80px" gap="1" mb="1">
+                                <Flex align="center" gap="1" minW="80px" mb="1">
                                     <Text textStyle="body2" color="text.secondary">
                                         Promo
                                     </Text>
@@ -94,15 +94,24 @@ const BalanceBlock: FC = () => {
 
                         {/* Right Column - TON Balance and TON Promo (if exists) */}
                         {totalTonAmount > 0 && (
-                            <Box flex="1" >
+                            <Box flex="1">
                                 <Flex>
-                                    <Text textStyle="body2" minW="110px" color="text.secondary" mb="1">
+                                    <Text
+                                        textStyle="body2"
+                                        minW="110px"
+                                        mb="1"
+                                        color="text.secondary"
+                                    >
                                         TON Balance
                                     </Text>
                                     {isLoading ? (
                                         <Skeleton w="150px" h="5" />
                                     ) : (
-                                        <Text textStyle="body2" title={tonAmount.toString()} whiteSpace="nowrap">
+                                        <Text
+                                            textStyle="body2"
+                                            whiteSpace="nowrap"
+                                            title={tonAmount.toString()}
+                                        >
                                             {tonAmount.toFixed(2)} TON{' '}
                                             <Span color="text.secondary">
                                                 ≈ ${tonAmountUsd.toFixed(2)}
@@ -111,7 +120,7 @@ const BalanceBlock: FC = () => {
                                     )}
                                 </Flex>
                                 <Flex>
-                                    <Flex align="center" minW="110px" gap="1" mb="1">
+                                    <Flex align="center" gap="1" minW="110px" mb="1">
                                         <Text textStyle="body2" color="text.secondary">
                                             TON Promo
                                         </Text>
@@ -122,7 +131,11 @@ const BalanceBlock: FC = () => {
                                     {isLoading ? (
                                         <Skeleton w="150px" h="5" />
                                     ) : (
-                                        <Text textStyle="body2" title={tonPromoAmount.toString()} whiteSpace="nowrap">
+                                        <Text
+                                            textStyle="body2"
+                                            whiteSpace="nowrap"
+                                            title={tonPromoAmount.toString()}
+                                        >
                                             {tonPromoAmount.toFixed(2)} TON{' '}
                                             <Span color="text.secondary">
                                                 ≈ ${tonPromoAmountUsd.toFixed(2)}

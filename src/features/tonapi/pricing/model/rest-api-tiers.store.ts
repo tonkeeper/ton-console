@@ -73,9 +73,11 @@ export class RestApiTiersStore {
             throw new Error('Project is not selected');
         }
 
-        return apiClient.api.validChangeTonApiTier(tierId, {
-            project_id: projectsStore.selectedProject.id
-        }).then(result => result.data);
+        return apiClient.api
+            .validChangeTonApiTier(tierId, {
+                project_id: projectsStore.selectedProject.id
+            })
+            .then(result => result.data);
     });
 
     clearState(): void {
@@ -90,7 +92,7 @@ function mapTierDTOToTier(tierDTO: DTOTier): RestApiTier {
         name: tierDTO.name,
         price: new UsdCurrencyAmount(tierDTO.usd_price),
         rps: tierDTO.rpc,
-        type: tierDTO.instant_payment ? 'pay-as-you-go' : 'monthly',
+        type: tierDTO.instant_payment ? 'pay-as-you-go' : 'monthly'
     };
 }
 
@@ -105,7 +107,8 @@ function mapAppTierDTOToSelectedTier(tierDTO: DTOAppTier | null): RestApiSelecte
         price: new UsdCurrencyAmount(tierDTO.usd_price),
         rps: tierDTO.rpc,
         type: tierDTO.instant_payment ? 'pay-as-you-go' : 'monthly',
-        renewsDate: tierDTO.next_payment && tierDTO.usd_price ? new Date(tierDTO.next_payment) : undefined,
+        renewsDate:
+            tierDTO.next_payment && tierDTO.usd_price ? new Date(tierDTO.next_payment) : undefined,
         active: true
     };
 }

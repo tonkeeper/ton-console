@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Box, BoxProps, Divider } from '@chakra-ui/react';
+import { BoxProps, Divider } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { H4, Overlay } from 'src/shared';
 import { InvoicesProjectInfo } from 'src/features';

@@ -31,4 +31,6 @@ const TonApiPricing = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
     );
 });
 
+TonApiPricing.displayName = 'TonApiPricing';
+
 export default observer(TonApiPricing);
