@@ -3,7 +3,6 @@ import { AnalyticsGraphQueryStore } from 'src/features/analytics/model/analytics
 import { AnalyticsHistoryTableStore } from 'src/features/analytics/model/analytics-history-table.store';
 import { AnalyticsQueryStore } from 'src/features/analytics/model/analytics-query.store';
 import { AnalyticsQueryRequestStore } from 'src/features/analytics/model/analytics-query-request.store';
-import { ApiKeysStore } from 'src/features/tonapi/api-keys/model/api-keys.store';
 import { AppMessagesStore } from 'src/features/app-messages/model/app-messages.store';
 import { InvoicesAppStore } from 'src/features/invoices/models/invoices-app.store';
 import { InvoicesTableStore } from 'src/features/invoices/models/invoices-table.store';
@@ -30,7 +29,6 @@ let analyticsQueryStore: AnalyticsQueryStore;
 let analyticsQuerySQLRequestStore: AnalyticsQueryRequestStore;
 let analyticsQueryGPTRequestStore: AnalyticsQueryRequestStore;
 let analyticsGPTGenerationStore: AnalyticsGPTGenerationStore;
-let apiKeysStore: ApiKeysStore;
 let appMessagesStore: AppMessagesStore;
 let invoicesAppStore: InvoicesAppStore;
 let invoicesTableStore: InvoicesTableStore;
@@ -48,7 +46,6 @@ const initializeDependentStores = () => {
     analyticsQuerySQLRequestStore = new AnalyticsQueryRequestStore();
     analyticsQueryGPTRequestStore = new AnalyticsQueryRequestStore();
     analyticsGPTGenerationStore = new AnalyticsGPTGenerationStore();
-    apiKeysStore = new ApiKeysStore();
     appMessagesStore = new AppMessagesStore();
     invoicesAppStore = new InvoicesAppStore();
     invoicesTableStore = new InvoicesTableStore();
@@ -71,7 +68,6 @@ export {
     analyticsQuerySQLRequestStore,
     analyticsQueryGPTRequestStore,
     analyticsGPTGenerationStore,
-    apiKeysStore,
     appMessagesStore,
     invoicesAppStore,
     invoicesTableStore,

@@ -11,16 +11,16 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FormProvider, useForm } from 'react-hook-form';
-import { ApiKey, CreateApiKeyForm } from '../model';
+import { ApiKey, CreateApiKeyForm, ApiKeysStore } from '../model';
 import { ApiKeyForm, ApiKeyFormInternal, toApiKeyFormDefaultValues } from './ApiKeyForm';
 import { restApiTiersStore } from 'src/shared/stores';
-import { apiKeysStore } from 'src/shared/stores';
 
 const EditApiKeyModal: FC<{
+    apiKeysStore: ApiKeysStore;
     isOpen: boolean;
     onClose: () => void;
     apiKey: ApiKey | undefined;
-}> = ({ apiKey, ...rest }) => {
+}> = ({ apiKeysStore, apiKey, ...rest }) => {
     const formId = 'create-api-key-form';
 
     const methods = useForm<ApiKeyFormInternal>({

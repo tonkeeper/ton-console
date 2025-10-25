@@ -10,12 +10,13 @@ import {
     ModalOverlay
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { CreateApiKeyForm } from '../model';
+import { CreateApiKeyForm, ApiKeysStore } from '../model';
 import { ApiKeyForm } from './ApiKeyForm';
 import { FormProvider, useForm } from 'react-hook-form';
-import { apiKeysStore, restApiTiersStore } from 'src/shared/stores';
+import { restApiTiersStore } from 'src/shared/stores';
 
-const CreateApiKeyModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
+const CreateApiKeyModal: FC<{ apiKeysStore: ApiKeysStore; isOpen: boolean; onClose: () => void }> = props => {
+    const { apiKeysStore } = props;
     const formId = 'create-api-key-form';
 
     const methods = useForm<CreateApiKeyForm>();

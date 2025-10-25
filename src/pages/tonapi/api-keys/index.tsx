@@ -1,13 +1,16 @@
 import { FC } from 'react';
 import { EmptyApiKeys } from './EmptyApiKeys';
 import { observer } from 'mobx-react-lite';
+import { useLocalObservable } from 'mobx-react-lite';
 import { ApiKeysTable, CreateApiKeyModal } from 'src/features';
+import { ApiKeysStore } from 'src/features/tonapi/api-keys/model';
 import { Overlay } from 'src/shared';
 import { Button, Center, Spinner, useDisclosure } from '@chakra-ui/react';
 import { SelectPlanFirstly } from 'src/pages/tonapi/api-keys/SelectPlanFirstly';
-import { restApiTiersStore, apiKeysStore } from 'src/shared/stores';
+import { restApiTiersStore } from 'src/shared/stores';
 
 const ApiKeysPage: FC = () => {
+    const apiKeysStore = useLocalObservable(() => new ApiKeysStore());
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     if (!restApiTiersStore.selectedTier$.isResolved || !apiKeysStore.apiKeys$.isResolved) {
@@ -23,7 +26,7 @@ const ApiKeysPage: FC = () => {
     }
 
     if (!apiKeysStore.apiKeys$.value.length) {
-        return <EmptyApiKeys />;
+        return <EmptyApiKeys apiKeysStore={apiKeysStore} />;
     }
 
     return (
@@ -32,9 +35,9 @@ const ApiKeysPage: FC = () => {
                 <Button mb="6" onClick={onOpen} variant="secondary">
                     Create API key
                 </Button>
-                <ApiKeysTable />
+                <ApiKeysTable apiKeysStore={apiKeysStore} />
             </Overlay>
-            <CreateApiKeyModal isOpen={isOpen} onClose={onClose} />
+            <CreateApiKeyModal apiKeysStore={apiKeysStore} isOpen={isOpen} onClose={onClose} />
         </>
     );
 };
