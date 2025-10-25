@@ -216,5 +216,110 @@ export default [
         rules: {
             '@typescript-eslint/no-duplicate-enum-values': 'off'
         }
+    },
+    {
+        files: ['src/features/**/*.{ts,tsx}'],
+        plugins: {
+            import: importPlugin
+        },
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: [
+                        {
+                            group: ['src/pages/**'],
+                            message: 'Features cannot import from pages. Pages should import from features, not the other way around. This prevents circular dependencies.'
+                        },
+                        {
+                            group: ['src/app/**'],
+                            message: 'Features cannot import from app layer.'
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        files: ['src/entities/**/*.{ts,tsx}'],
+        plugins: {
+            import: importPlugin
+        },
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: [
+                        {
+                            group: ['src/features/**'],
+                            message: 'Entities cannot import from features. Entities are low-level domain models and should not depend on business logic.'
+                        },
+                        {
+                            group: ['src/pages/**'],
+                            message: 'Entities cannot import from pages.'
+                        },
+                        {
+                            group: ['src/app/**'],
+                            message: 'Entities cannot import from app layer.'
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        files: ['src/shared/**/*.{ts,tsx}'],
+        plugins: {
+            import: importPlugin
+        },
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: [
+                        {
+                            group: ['src/features/**'],
+                            message: 'Shared utilities cannot import from features. (Exception: root.store.ts for store initialization)'
+                        },
+                        {
+                            group: ['src/pages/**'],
+                            message: 'Shared utilities cannot import from pages.'
+                        },
+                        {
+                            group: ['src/app/**'],
+                            message: 'Shared utilities cannot import from app layer.'
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        files: ['src/shared/stores/root.store.ts'],
+        plugins: {
+            import: importPlugin
+        },
+        rules: {
+            'no-restricted-imports': 'off'
+        }
+    },
+    {
+        files: ['src/pages/**/*.{ts,tsx}'],
+        plugins: {
+            import: importPlugin
+        },
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: [
+                        {
+                            group: ['src/app/**'],
+                            message: 'Pages cannot import from app layer directly.'
+                        }
+                    ]
+                }
+            ]
+        }
     }
 ];
