@@ -819,7 +819,7 @@ export type DTOTonSiteEndpoints = Array<string>;
  */
 export type DTOProjectTonApiTokenReq = {
     name: string;
-    limit_rps?: number | null;
+    limit_rps?: number;
     origins?: Array<string>;
     capabilities?: Array<DTOTokenCapability>;
 };
