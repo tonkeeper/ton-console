@@ -29,6 +29,7 @@
     "@lezer/highlight": "^1.2.2",
     "@loadable/component": "^5.16.7",
     "@react-hook/resize-observer": "^1.2.6",
+    "@tanstack/react-query": "^5.90.5",
     "@ton-api/client": "^0.4.0",
     "@ton/core": "^0.62.0",
     "@ton/crypto": "^3.3.0",
