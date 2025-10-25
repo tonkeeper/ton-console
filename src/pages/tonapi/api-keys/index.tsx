@@ -6,8 +6,7 @@ import { ApiKeysStore } from 'src/features/tonapi/api-keys/model';
 import { Overlay, useLocalObservableWithDestroy } from 'src/shared';
 import { Button, Center, Spinner, useDisclosure } from '@chakra-ui/react';
 import { SelectPlanFirstly } from 'src/pages/tonapi/api-keys/SelectPlanFirstly';
-import { projectsStore } from 'src/shared/stores';
-import { restApiTiersStore } from 'src/shared/stores';
+import { projectsStore, restApiTiersStore } from 'src/shared/stores';
 
 const ApiKeysPage: FC = () => {
     const apiKeysStore = useLocalObservableWithDestroy(() => new ApiKeysStore(projectsStore));

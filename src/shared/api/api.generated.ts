@@ -237,9 +237,49 @@ export interface DTOBillingTransaction {
     created_at: number;
 }
 
-export interface DTOBillingTxInfo {
-    reason: DTOBillingTxInfoReasonEnum;
-}
+export type DTOBillingTxInfo =
+    | ({
+          reason: 'tonapi_monthly_payment';
+      } & any)
+    | ({
+          reason: 'tonapi_instant_payment';
+      } & any)
+    | ({
+          reason: 'tonapi_change_tier';
+      } & any)
+    | ({
+          reason: 'liteproxy_monthly_payment';
+      } & any)
+    | ({
+          reason: 'liteproxy_change_tier';
+      } & any)
+    | ({
+          reason: 'testnet_tons_purchase';
+      } & any)
+    | ({
+          reason: 'cnft_indexing_payment';
+      } & any)
+    | ({
+          reason: 'message_package_purchase';
+      } & any)
+    | ({
+          reason: 'chatgpt_request_payment';
+      } & any)
+    | ({
+          reason: 'promo_code_activation';
+      } & any)
+    | ({
+          reason: 'streaming_api_payment';
+      } & any)
+    | ({
+          reason: 'replenishment_of_deposit';
+      } & any)
+    | ({
+          reason: 'analytics_request_payment';
+      } & any)
+    | ({
+          reason: 'other';
+      } & any);
 
 export interface DTOTonapiMonthlyPaymentMeta {
     tier: DTOTier;
@@ -289,6 +329,8 @@ export interface DTOReplenishmentOfDepositMeta {
 export interface DTOAnalyticsRequestPaymentMeta {
     time: number;
 }
+
+export type DTOEmptyMeta = object;
 
 export interface DTOBalance {
     /**
@@ -957,23 +999,6 @@ export enum DTOErrorCodeEnum {
 export enum DTOBillingTransactionTypeEnum {
     DTODeposit = 'deposit',
     DTOCharge = 'charge'
-}
-
-export enum DTOBillingTxInfoReasonEnum {
-    DTOTonapiMonthlyPayment = 'tonapi_monthly_payment',
-    DTOTonapiInstantPayment = 'tonapi_instant_payment',
-    DTOTonapiChangeTier = 'tonapi_change_tier',
-    DTOLiteproxyMonthlyPayment = 'liteproxy_monthly_payment',
-    DTOLiteproxyChangeTier = 'liteproxy_change_tier',
-    DTOTestnetTonsPurchase = 'testnet_tons_purchase',
-    DTOCnftIndexingPayment = 'cnft_indexing_payment',
-    DTOMessagePackagePurchase = 'message_package_purchase',
-    DTOPromoCodeActivation = 'promo_code_activation',
-    DTOChatgptRequestPayment = 'chatgpt_request_payment',
-    DTOStreamingApiPayment = 'streaming_api_payment',
-    DTOReplenishmentOfDeposit = 'replenishment_of_deposit',
-    DTOAnalyticsRequestPayment = 'analytics_request_payment',
-    DTOOther = 'other'
 }
 
 export enum DTOParticipantPermissionsEnum {

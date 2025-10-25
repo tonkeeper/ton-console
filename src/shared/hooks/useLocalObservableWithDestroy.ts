@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLocalObservable } from 'mobx-react-lite';
 
 interface Destroyable {
@@ -28,12 +28,17 @@ export function useLocalObservableWithDestroy<T extends Destroyable>(
     createStore: () => T
 ): T {
     const store = useLocalObservable(createStore);
+    const storeRef = useRef(store);
+
+    useEffect(() => {
+        storeRef.current = store;
+    }, [store]);
 
     useEffect(() => {
         return () => {
-            store.destroy?.();
+            storeRef.current.destroy?.();
         };
-    }, [store]);
+    }, []);
 
     return store;
 }
