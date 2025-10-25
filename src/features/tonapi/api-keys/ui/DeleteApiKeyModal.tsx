@@ -1,20 +1,24 @@
 import { FC, useCallback } from 'react';
 import { Text } from '@chakra-ui/react';
-import { ApiKey, ApiKeysStore } from '../model';
-import { observer } from 'mobx-react-lite';
+import { ApiKey, useDeleteApiKeyMutation } from '../model';
 import { ConfirmationDialog } from 'src/entities';
 
 const DeleteApiKeyModal: FC<{
-    apiKeysStore: ApiKeysStore;
     isOpen: boolean;
     onClose: () => void;
     apiKey: ApiKey;
-}> = ({ apiKeysStore, apiKey, isOpen, onClose }) => {
+}> = ({ apiKey, isOpen, onClose }) => {
+    const { mutate: deleteApiKey, isPending } = useDeleteApiKeyMutation();
+
     const onConfirm = useCallback(() => {
         if (apiKey) {
-            apiKeysStore.deleteApiKey(apiKey.id).then(onClose);
+            deleteApiKey(apiKey.id, {
+                onSuccess: () => {
+                    onClose();
+                }
+            });
         }
-    }, [apiKey, onClose]);
+    }, [apiKey, onClose, deleteApiKey]);
 
     return (
         <ConfirmationDialog
@@ -32,9 +36,9 @@ const DeleteApiKeyModal: FC<{
             )}
             confirmValue={apiKey.name}
             confirmButtonText="Delete"
-            isLoading={apiKeysStore.deleteApiKey.isLoading}
+            isLoading={isPending}
         />
     );
 };
 
-export default observer(DeleteApiKeyModal);
+export default DeleteApiKeyModal;

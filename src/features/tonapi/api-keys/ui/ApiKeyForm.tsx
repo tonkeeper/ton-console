@@ -45,7 +45,7 @@ export const ApiKeyForm: FC<
     }
 > = ({ id, onSubmit, disableDefaultFocus, maxLimit, ...rest }) => {
     const submitHandler = (form: ApiKeyFormInternal): void => {
-        const limitRps = form.useIPLimit ? Number(form.ipLimitValue) : null;
+        const limitRps = form.useIPLimit ? Number(form.ipLimitValue) : undefined;
         const origins = form.useIPLimit
             ? form.originsValue.split('\n').filter(x => x !== '')
             : undefined;
