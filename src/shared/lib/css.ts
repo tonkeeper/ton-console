@@ -1,4 +1,4 @@
-import { crc32c } from 'ton-core';
+import { crc32c } from '@ton/core';
 import { Buffer } from 'buffer';
 
 export function toColor(value: number, range?: { min?: number; max?: number }): string {
@@ -42,9 +42,10 @@ export function hexToRGBA(hex: string, alpha?: string | number): string {
 
 export function hashString(str: string): number {
     const uintArray = crc32c(Buffer.from(str, 'utf-8'));
-    const length = uintArray.length;
+    const buf = Buffer.from(uintArray.buffer, uintArray.byteOffset, uintArray.byteLength);
+    const byteLength = Math.min(buf.length, 6);
 
-    return Buffer.from(uintArray).readUIntBE(0, length);
+    return buf.readUIntBE(0, byteLength);
 }
 
 export function lightHashString(str: string): number {

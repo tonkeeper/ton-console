@@ -10,7 +10,7 @@ import {
     isAddressValid
 } from 'src/shared';
 import { CnftCollection } from './interfaces/CnftCollection';
-import { Address } from 'ton-core';
+import { Address } from '@ton/core';
 
 export type IndexingCnftCollectionDataT = Parameters<
     typeof apiClient.api.indexingCNftCollection
