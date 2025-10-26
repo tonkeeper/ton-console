@@ -25,12 +25,11 @@ const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
     hasBillingHistory = undefined,
     ...props
 }) => {
-    const actualIsLoading = isLoading;
     const actualHasBillingHistory = hasBillingHistory ?? billingHistory.length > 0;
     const rowHeight = '48px';
 
     // First load - show Spinner (height of header + one row: 48px + 48px = 96px)
-    if (!hasEverLoaded && actualIsLoading) {
+    if (!hasEverLoaded && isLoading) {
         return (
             <Center h="96px">
                 <Spinner />
@@ -39,7 +38,7 @@ const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
     }
 
     // No data and not loading - show Empty message (height of header + one row: 48px + 48px = 96px)
-    if (!actualIsLoading && !actualHasBillingHistory) {
+    if (!isLoading && !actualHasBillingHistory) {
         return (
             <Box h="96px" py="10" color="text.secondary" textAlign="center">
                 No billing history yet
@@ -48,7 +47,7 @@ const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
     }
 
     // Display item count: during refresh show skeleton rows, otherwise show actual data
-    const displayItemCount = actualIsLoading && hasEverLoaded ? skeletonRowCount : billingHistory.length;
+    const displayItemCount = isLoading && hasEverLoaded ? skeletonRowCount : billingHistory.length;
 
     // Table with data or skeleton
     const minH = Math.min(parseInt(rowHeight) * (displayItemCount + 1) + 6, 800) + 'px';
@@ -59,7 +58,7 @@ const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
             value={{
                 billingHistory,
                 rowHeight,
-                isLoading: actualIsLoading,
+                isLoading,
                 hasEverLoaded,
                 skeletonRowCount
             }}
