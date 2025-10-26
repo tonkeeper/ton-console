@@ -2,33 +2,22 @@ import { FC, useEffect, useState } from 'react';
 import { Box } from '@chakra-ui/react';
 import { H4 } from 'src/shared';
 import { observer } from 'mobx-react-lite';
-import { BillingHistoryTable, BillingStore } from 'src/features/billing';
-import { projectsStore } from 'src/shared/stores';
+import { BillingHistoryTable, useBillingHistoryQuery } from 'src/features/billing';
 
-interface BillingBlockProps {
-    billingStore: BillingStore;
-}
-
-const BillingBlock: FC<BillingBlockProps> = ({ billingStore }) => {
+const BillingBlock: FC = () => {
     const [hasEverLoaded, setHasEverLoaded] = useState(false);
     const [previousRowCount, setPreviousRowCount] = useState(0);
-    const hasBillingHistory = billingStore.billingHistory.length > 0;
-    const isLoading = billingStore.billingHistoryLoading;
 
-    // Ensure data is loaded when project changes
-    useEffect(() => {
-        if (projectsStore.selectedProject?.id) {
-            billingStore.ensureDataLoaded();
-        }
-    }, [projectsStore.selectedProject?.id, billingStore]);
+    const { data: billingHistory, isLoading } = useBillingHistoryQuery();
+    const hasBillingHistory = (billingHistory && billingHistory.length > 0) ?? false;
 
     // Track whether data has ever been loaded and remember the row count
     useEffect(() => {
-        if (!isLoading && hasBillingHistory) {
+        if (!isLoading && hasBillingHistory && billingHistory) {
             setHasEverLoaded(true);
-            setPreviousRowCount(billingStore.billingHistory.length);
+            setPreviousRowCount(billingHistory.length);
         }
-    }, [isLoading, hasBillingHistory, billingStore.billingHistory.length]);
+    }, [isLoading, hasBillingHistory, billingHistory?.length]);
 
     // Calculate skeleton row count
     const skeletonRowCount = Math.min(Math.max(previousRowCount, 1), 20);
@@ -37,7 +26,7 @@ const BillingBlock: FC<BillingBlockProps> = ({ billingStore }) => {
         <Box px="6" py="5">
             <H4 mb="5">Billing History</H4>
             <BillingHistoryTable
-                billingStore={billingStore}
+                billingHistory={billingHistory || []}
                 isLoading={isLoading}
                 hasEverLoaded={hasEverLoaded}
                 skeletonRowCount={skeletonRowCount}
@@ -47,4 +36,5 @@ const BillingBlock: FC<BillingBlockProps> = ({ billingStore }) => {
     );
 };
 
+// observer() to react to projectsStore.selectedProject changes
 export default observer(BillingBlock);

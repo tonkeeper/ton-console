@@ -16,18 +16,25 @@ import { CURRENCY, H4, InfoTooltip, Pad, UsdCurrencyAmount } from 'src/shared';
 import { RestApiTier } from '../model';
 import { observer } from 'mobx-react-lite';
 import { CurrencyRate } from 'src/entities';
-import { restApiTiersStore, balanceStore } from 'src/shared/stores';
+import { projectsStore, restApiTiersStore } from 'src/shared/stores';
+import { useQueryClient } from '@tanstack/react-query';
 
 const RestApiPaymentDetailsModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     tier: RestApiTier;
 }> = ({ tier, ...rest }) => {
+    const queryClient = useQueryClient();
+    const projectId = projectsStore.selectedProject?.id;
+
     const onConfirm = useCallback(async () => {
         await restApiTiersStore.selectTier(tier!.id);
-        await balanceStore.fetchBalance();
+        // Invalidate balance cache to refetch
+        queryClient.invalidateQueries({
+            queryKey: ['balance', projectId]
+        });
         rest.onClose();
-    }, [tier]);
+    }, [tier, queryClient, projectId]);
 
     const unspentMoney = tier.unspentMoney;
     const isFreeTire = tier.price.amount.eq(0);

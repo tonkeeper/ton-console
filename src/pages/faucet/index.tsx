@@ -12,7 +12,7 @@ import {
 import { FormProvider, useForm } from 'react-hook-form';
 import BigNumber from 'bignumber.js';
 import { RefillModal } from 'src/entities';
-import { balanceStore } from 'src/shared/stores';
+import { useBalanceQuery } from 'src/features/balance';
 
 const FaucetPage: FC = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
@@ -25,6 +25,7 @@ const FaucetPage: FC = () => {
     const formId = useId();
 
     const methods = useForm<FaucetFormInternal>();
+    const { data: balance } = useBalanceQuery();
 
     const { watch } = methods;
     const inputAmount = watch('tonAmount');
@@ -48,8 +49,8 @@ const FaucetPage: FC = () => {
 
         if (
             price &&
-            balanceStore.balance?.ton &&
-            BigInt(balanceStore.balance.ton.amount) >= BigInt(price.amount.toNumber())
+            balance?.ton &&
+            BigInt(balance.ton.amount) >= BigInt(price.amount.toNumber())
         ) {
             return onOpen();
         }

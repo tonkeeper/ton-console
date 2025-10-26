@@ -23,8 +23,9 @@ import {
 import { createTransferLink, fromDecimals, H4, Pad, Span } from 'src/shared';
 import { QRCodeSVG } from 'qrcode.react';
 import { observer } from 'mobx-react-lite';
-import { balanceStore } from 'src/shared/stores';
 import { useForm } from 'react-hook-form';
+// eslint-disable-next-line no-restricted-imports
+import { useDepositAddressQuery, useApplyPromoCodeMutation } from 'src/features/balance';
 
 type Currency = 'USDT' | 'TON';
 type RefillMode = 'USDT' | 'TON' | 'PROMO';
@@ -75,7 +76,8 @@ const RadioCard: FC<{
 const RefillModalContent: FC<{
     onClose: () => void;
 }> = ({ onClose }) => {
-    const depositAddress = balanceStore.depositAddress$.value;
+    const { data: depositAddress, isLoading: isDepositAddressLoading, error: depositAddressError } = useDepositAddressQuery();
+    const { mutate: applyPromoCode, isPending: isPromoLoading } = useApplyPromoCodeMutation();
     const usdtDepositWallet = depositAddress?.usdt_deposit_wallet;
     const tonDepositWallet = depositAddress?.ton_deposit_wallet;
     const amountInputRef = useRef<HTMLInputElement>(null);
@@ -161,16 +163,18 @@ const RefillModalContent: FC<{
         window.open(paymentLink, '_blank');
     };
 
-    const onPromoSubmit = async (form: { promoCode: string }): Promise<void> => {
-        const result = await balanceStore.applyPromoCode(form.promoCode);
-        if (result) {
-            onClose();
-        } else {
-            setError('promoCode', {
-                message: 'Invalid promo code'
-            });
-            setTimeout(() => setFocus('promoCode'));
-        }
+    const onPromoSubmit = (form: { promoCode: string }): void => {
+        applyPromoCode(form.promoCode, {
+            onSuccess: () => {
+                onClose();
+            },
+            onError: () => {
+                setError('promoCode', {
+                    message: 'Invalid promo code'
+                });
+                setTimeout(() => setFocus('promoCode'));
+            }
+        });
     };
 
     useEffect(() => {
@@ -190,7 +194,7 @@ const RefillModalContent: FC<{
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody pt="0" pb="4">
-                {balanceStore.depositAddress$.error ? (
+                {depositAddressError ? (
                     <Box color="accent.orange">
                         <Box>Balance refill is not available right now.</Box>
                         <Box>Please try again later.</Box>
@@ -241,7 +245,7 @@ const RefillModalContent: FC<{
                             >
                                 <FormControl mb="2" isInvalid={!!errors.promoCode}>
                                     <Input
-                                        isDisabled={balanceStore.applyPromoCode.isLoading}
+                                        isDisabled={isPromoLoading}
                                         placeholder="Promo Code"
                                         {...register('promoCode', {
                                             required: 'This is required',
@@ -311,14 +315,13 @@ const RefillModalContent: FC<{
                                 justifyContent="center"
                                 flexDirection="column"
                             >
-                                {paymentLink && balanceStore.depositAddress$.isResolved ? (
+                                {paymentLink && !isDepositAddressLoading && !depositAddressError ? (
                                     <QRCodeSVG
                                         bgColor="transparent"
                                         size={200}
                                         value={paymentLink}
                                     />
-                                ) : !balanceStore.depositAddress$.isResolved &&
-                                  !balanceStore.depositAddress$.isLoading ? (
+                                ) : !isDepositAddressLoading && depositAddressError ? (
                                     <Center h="200px">
                                         <Text textStyle="body2" color="text.secondary">
                                             Error fetching deposit address
@@ -370,7 +373,7 @@ const RefillModalContent: FC<{
                         w="full"
                         form={formId}
                         isDisabled={isPromoCodeEmpty}
-                        isLoading={balanceStore.applyPromoCode.isLoading}
+                        isLoading={isPromoLoading}
                         type="submit"
                         variant="primary"
                     >
@@ -380,14 +383,14 @@ const RefillModalContent: FC<{
                     <>
                         <Button
                             w="full"
-                            isDisabled={!paymentLink || balanceStore.depositAddress$.isLoading}
+                            isDisabled={!paymentLink || isDepositAddressLoading}
                             onClick={handlePayByLink}
                         >
                             Refill by link
                         </Button>
                         <Button
                             w="full"
-                            isDisabled={!paymentLink || balanceStore.depositAddress$.isLoading}
+                            isDisabled={!paymentLink || isDepositAddressLoading}
                             onClick={onCopyLink}
                             variant="secondary"
                         >
