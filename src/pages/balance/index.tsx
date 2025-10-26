@@ -13,17 +13,14 @@ const BalancePage: FC = () => {
 
     // When balance changes, refetch billing history and subscriptions to keep them in sync
     useEffect(() => {
-        queryClient.invalidateQueries({
-            queryKey: ['billing-history'],
-            refetchType: 'active'
+        queryClient.refetchQueries({
+            queryKey: ['billing-history']
         });
-        queryClient.invalidateQueries({
-            queryKey: ['rest-api-selected-tier'],
-            refetchType: 'active'
+        queryClient.refetchQueries({
+            queryKey: ['rest-api-selected-tier']
         });
-        queryClient.invalidateQueries({
-            queryKey: ['liteproxy-selected-tier'],
-            refetchType: 'active'
+        queryClient.refetchQueries({
+            queryKey: ['liteproxy-selected-tier']
         });
     }, [balance?.total, queryClient]);
 
