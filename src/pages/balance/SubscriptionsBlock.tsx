@@ -1,11 +1,10 @@
 import { FC } from 'react';
 import { Box, Text } from '@chakra-ui/react';
-import { Overlay, useLocalObservableWithDestroy } from 'src/shared';
-import { observer } from 'mobx-react-lite';
-import { SubscriptionsStore, SubscriptionList } from 'src/features/billing';
+import { Overlay } from 'src/shared';
+import { SubscriptionList, useSubscriptionsQuery } from 'src/features/billing';
 
 const SubscriptionsBlock: FC = () => {
-    const subscriptionsStore = useLocalObservableWithDestroy(() => new SubscriptionsStore());
+    const { data: subscriptions, isLoading } = useSubscriptionsQuery();
 
     return (
         <Overlay height="auto" p="0" display="flex" flexDirection="column" flex="1" minW="330px">
@@ -13,10 +12,10 @@ const SubscriptionsBlock: FC = () => {
                 <Text mb="2" fontSize="lg" fontWeight="semibold">
                     Active Plans
                 </Text>
-                <SubscriptionList subscriptionsStore={subscriptionsStore} />
+                <SubscriptionList subscriptions={subscriptions} isLoading={isLoading} />
             </Box>
         </Overlay>
     );
 };
 
-export default observer(SubscriptionsBlock);
+export default SubscriptionsBlock;

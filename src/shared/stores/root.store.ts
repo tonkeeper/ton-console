@@ -4,7 +4,6 @@ import { InvoicesAppStore } from 'src/features/invoices/models/invoices-app.stor
 import { InvoicesTableStore } from 'src/features/invoices/models/invoices-table.store';
 import { LiteproxysStore } from 'src/features/tonapi/liteproxy/model/liteproxy.store';
 import { TonApiStatsStore } from 'src/features/tonapi/statistics/model/ton-api-stats.store';
-import { BalanceStore } from 'src/entities/balance/balance.store';
 import { DappStore } from 'src/entities/dapp/model/dapp.store';
 import { UserStore } from 'src/entities/user/model/user.store';
 import { AppStore } from './app.store';
@@ -20,7 +19,6 @@ export const userStore = new UserStore();
 export const projectsStore = new ProjectsStore();
 export const appStore = new AppStore({ userStore, projectsStore });
 
-let balanceStore: BalanceStore;
 let dappStore: DappStore;
 let appMessagesStore: AppMessagesStore;
 let invoicesAppStore: InvoicesAppStore;
@@ -30,7 +28,6 @@ let tonApiStatsStore: TonApiStatsStore;
 let restApiTiersStore: RestApiTiersStore;
 
 const initializeDependentStores = () => {
-    balanceStore = new BalanceStore(projectsStore);
     dappStore = new DappStore(projectsStore);
     appMessagesStore = new AppMessagesStore();
     invoicesAppStore = new InvoicesAppStore();
@@ -45,7 +42,6 @@ awaitValueResolved(projectsStore.projects$).then(() => {
 });
 
 export {
-    balanceStore,
     dappStore,
     appMessagesStore,
     invoicesAppStore,

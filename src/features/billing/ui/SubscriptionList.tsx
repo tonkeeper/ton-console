@@ -12,16 +12,12 @@ import {
 } from '@chakra-ui/react';
 import { FC } from 'react';
 import { toDate, VerticalDotsIcon16, MenuButtonIcon } from 'src/shared';
-import { observer } from 'mobx-react-lite';
-import { SubscriptionsStore } from 'src/features/billing';
 import { useNavigate } from 'react-router-dom';
 import { Subscription } from '../model/interfaces/subscription';
 
 interface SubscriptionListProps {
-    subscriptionsStore: SubscriptionsStore;
+    subscriptions?: { restApi: Subscription | null; liteproxy: Subscription | null };
     isLoading?: boolean;
-    hasEverLoaded?: boolean;
-    hasSubscriptions?: boolean;
 }
 
 interface SubscriptionListItemProps {
@@ -82,9 +78,7 @@ const SubscriptionListItem: FC<SubscriptionListItemProps> = ({ subscription }) =
     );
 };
 
-const SubscriptionList: FC<SubscriptionListProps> = ({ subscriptionsStore, ...props }) => {
-    const isLoading = subscriptionsStore.subscriptionsLoading;
-
+const SubscriptionList: FC<SubscriptionListProps> = ({ subscriptions, isLoading = false, ...props }) => {
     // First load - show Spinner
     if (isLoading) {
         return (
@@ -94,7 +88,7 @@ const SubscriptionList: FC<SubscriptionListProps> = ({ subscriptionsStore, ...pr
         );
     }
 
-    const { liteproxy, restApi } = subscriptionsStore.subscriptions;
+    const { restApi, liteproxy } = subscriptions || { restApi: null, liteproxy: null };
     const hasSubscriptions = Boolean(liteproxy || restApi);
 
     // No data and not loading - show Empty message
@@ -106,14 +100,17 @@ const SubscriptionList: FC<SubscriptionListProps> = ({ subscriptionsStore, ...pr
         );
     }
 
+    // Check if both subscriptions exist (to show divider)
+    const shouldShowDivider = !isLoading && restApi && liteproxy;
+
     // Card list with data or skeleton
     return (
         <Box minH="100px" {...props}>
-            <SubscriptionListItem subscription={!isLoading && restApi ? restApi : undefined} />
-            <Divider />
-            <SubscriptionListItem subscription={!isLoading && liteproxy ? liteproxy : undefined} />
+            {restApi && <SubscriptionListItem subscription={restApi} />}
+            {shouldShowDivider && <Divider />}
+            {liteproxy && <SubscriptionListItem subscription={liteproxy} />}
         </Box>
     );
 };
 
-export default observer(SubscriptionList);
+export default SubscriptionList;

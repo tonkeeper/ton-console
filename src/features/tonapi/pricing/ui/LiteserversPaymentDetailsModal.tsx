@@ -15,18 +15,25 @@ import {
 import { CURRENCY, DTOLiteproxyTier, H4, Pad, UsdCurrencyAmount } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { CurrencyRate } from 'src/entities';
-import { liteproxysStore, balanceStore } from 'src/shared/stores';
+import { liteproxysStore, projectsStore } from 'src/shared/stores';
+import { useQueryClient } from '@tanstack/react-query';
 
 const LiteserversPaymentDetailsModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     tier: DTOLiteproxyTier;
 }> = ({ tier, ...rest }) => {
+    const queryClient = useQueryClient();
+    const projectId = projectsStore.selectedProject?.id;
+
     const onConfirm = useCallback(async () => {
         await liteproxysStore.selectTier(tier!.id);
-        await balanceStore.fetchBalance();
+        // Invalidate balance cache to refetch
+        queryClient.invalidateQueries({
+            queryKey: ['balance', projectId]
+        });
         rest.onClose();
-    }, [tier]);
+    }, [tier, queryClient, projectId]);
 
     const price = new UsdCurrencyAmount(tier.usd_price);
 

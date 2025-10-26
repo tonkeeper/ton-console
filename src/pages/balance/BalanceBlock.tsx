@@ -1,22 +1,15 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { H2, Overlay, Span, toDecimals, InfoTooltip } from 'src/shared';
 import { Box, Button, Flex, Skeleton, useDisclosure, Text, Divider } from '@chakra-ui/react';
 import { RefillModal } from 'src/entities';
 import { observer } from 'mobx-react-lite';
-import { balanceStore, projectsStore } from 'src/shared/stores';
+import { useBalanceQuery, useTonRateQuery } from 'src/features/balance';
 
 const BalanceBlock: FC = () => {
     const { isOpen: isRefillOpen, onClose: onRefillClose, onOpen: onRefillOpen } = useDisclosure();
 
-    useEffect(() => {
-        if (projectsStore.selectedProject?.id) {
-            balanceStore.fetchBalance();
-        }
-    }, [projectsStore.selectedProject?.id]);
-
-    const isLoading = balanceStore.currentBalance$.isLoading;
-    const balance = balanceStore.balance;
-    const tonRate = balanceStore.tonRate$.value;
+    const { data: balance, isLoading } = useBalanceQuery();
+    const { data: tonRate } = useTonRateQuery();
 
     const usdtAmount = balance ? Number(toDecimals(balance.usdt.amount, 6)) : 0;
     const usdtPromoAmount = balance ? Number(toDecimals(balance.usdt.promo_amount, 6)) : 0;
@@ -159,4 +152,5 @@ const BalanceBlock: FC = () => {
     );
 };
 
+// observer() to react to projectsStore.selectedProject changes
 export default observer(BalanceBlock);

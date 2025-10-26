@@ -1,16 +1,16 @@
 import { FC } from 'react';
 import { Box, BoxProps, Center, Spinner } from '@chakra-ui/react';
-import { Observer, observer } from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { BillingTableStructure } from './BillingTableStructure';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
-import { BillingStore } from '../model';
+import { BillingHistoryItem } from '../model';
 import BillingTableRow from './BillingTableRow';
 
 interface BillingHistoryTableProps extends BoxProps {
-    billingStore: BillingStore;
+    billingHistory: BillingHistoryItem[];
     isLoading?: boolean;
     hasEverLoaded?: boolean;
     skeletonRowCount?: number;
@@ -18,15 +18,15 @@ interface BillingHistoryTableProps extends BoxProps {
 }
 
 const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
-    billingStore,
-    isLoading = undefined,
+    billingHistory,
+    isLoading = false,
     hasEverLoaded = false,
     skeletonRowCount = 1,
     hasBillingHistory = undefined,
     ...props
 }) => {
-    const actualIsLoading = isLoading ?? billingStore.billingHistoryLoading;
-    const actualHasBillingHistory = hasBillingHistory ?? billingStore.billingHistory.length > 0;
+    const actualIsLoading = isLoading;
+    const actualHasBillingHistory = hasBillingHistory ?? billingHistory.length > 0;
     const rowHeight = '48px';
 
     // First load - show Spinner (height of header + one row: 48px + 48px = 96px)
@@ -47,16 +47,17 @@ const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
         );
     }
 
+    // Display item count: during refresh show skeleton rows, otherwise show actual data
+    const displayItemCount = actualIsLoading && hasEverLoaded ? skeletonRowCount : billingHistory.length;
+
     // Table with data or skeleton
-    const minH = billingStore.isResolved
-        ? Math.min(parseInt(rowHeight) * (billingStore.billingHistory.length + 1) + 6, 800) + 'px'
-        : '102px';
+    const minH = Math.min(parseInt(rowHeight) * (displayItemCount + 1) + 6, 800) + 'px';
 
     // Table with data or skeleton
     return (
         <BillingHistoryTableContext.Provider
             value={{
-                billingStore,
+                billingHistory,
                 rowHeight,
                 isLoading: actualIsLoading,
                 hasEverLoaded,
@@ -65,32 +66,24 @@ const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
         >
             <Box minH={minH} {...props}>
                 <InfiniteLoader
-                    isItemLoaded={billingStore.isItemLoaded}
-                    itemCount={billingStore.totalItems}
-                    loadMoreItems={
-                        billingStore.isPageLoading || !billingStore.isResolved
-                            ? () => {}
-                            : () => billingStore.loadNextPage()
-                    }
+                    isItemLoaded={(index) => index < billingHistory.length}
+                    itemCount={displayItemCount}
+                    loadMoreItems={() => {}}
                 >
                     {({ onItemsRendered, ref }) => (
                         <AutoSizer>
                             {({ height, width }) => (
-                                <Observer>
-                                    {() => (
-                                        <FixedSizeList
-                                            height={height!}
-                                            width={width!}
-                                            itemCount={billingStore.tableContentLength}
-                                            onItemsRendered={onItemsRendered}
-                                            itemSize={parseInt(rowHeight)}
-                                            innerElementType={BillingTableStructure}
-                                            ref={ref}
-                                        >
-                                            {BillingTableRow}
-                                        </FixedSizeList>
-                                    )}
-                                </Observer>
+                                <FixedSizeList
+                                    height={height!}
+                                    width={width!}
+                                    itemCount={displayItemCount}
+                                    onItemsRendered={onItemsRendered}
+                                    itemSize={parseInt(rowHeight)}
+                                    innerElementType={BillingTableStructure}
+                                    ref={ref}
+                                >
+                                    {BillingTableRow}
+                                </FixedSizeList>
                             )}
                         </AutoSizer>
                     )}

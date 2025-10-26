@@ -358,6 +358,10 @@ Before implementing a new feature:
   - Look at `model/queries.ts` structure with hooks
   - Check how `observer()` is used with `useQuery`
   - See how mutations update cache in `onSuccess`
+- **For global data with refetch intervals:** Study `src/features/balance/`
+  - Look at `useBalanceQuery()` with `refetchInterval: 3000` and `refetchIntervalInBackground: true`
+  - See how to combine global hooks accessible everywhere
+  - Check both global (`useBalanceQuery`) and local (`useBillingHistoryQuery`) hook patterns
 - **For legacy features:** Check statistics/liteproxy for MobX store patterns (for reference only)
 - Check how UI components are organized and exported
 - Look at data transformation patterns in mapping functions
@@ -432,7 +436,53 @@ src/features/tonapi/api-keys/
 
 ### 6. Migration Plan: React Query for Existing Features
 
-**Status:** API Keys feature has been fully migrated to React Query as a reference implementation.
+**Status:**
+- ✅ **API Keys** - Fully migrated to React Query (reference implementation)
+- ✅ **Balance Page** - Global hooks with automatic refetch (3-sec interval, background updates, smart refetch without re-renders)
+- ⏳ **Webhooks** - Planned (similar CRUD pattern)
+- ⏳ **Liteproxy** - Planned (more complex)
+- ⏳ **Statistics/Analytics** - Planned (complex time-series)
+
+**Completed Example: BalancePage**
+
+The Balance page demonstrates best practices for global data with complex refetching:
+
+```typescript
+// Global hook with 3-second refetch interval
+export function useBalanceQuery() {
+    const projectId = projectsStore.selectedProject?.id;
+
+    return useQuery({
+        queryKey: ['balance', projectId],
+        queryFn: async () => {
+            const { data, error } = await getProjectBillingHistory({...});
+            if (error) throw error;
+            return mapDTOBalanceToBalance(...);
+        },
+        enabled: !!projectId,
+        refetchInterval: 3000,              // Auto-refresh every 3 seconds
+        refetchIntervalInBackground: true,  // Even when page is hidden
+        staleTime: 0                        // Always consider stale for fresh refetches
+    });
+}
+
+// Local hook - only in BillingPage
+export function useBillingHistoryQuery() {
+    const projectId = projectsStore.selectedProject?.id;
+    return useQuery({
+        queryKey: ['billing-history', projectId],
+        queryFn: async () => { /*...*/ },
+        enabled: !!projectId,
+        staleTime: 30 * 1000  // 30-second cache
+    });
+}
+```
+
+**Key patterns:**
+- `refetchInterval + refetchIntervalInBackground` - No manual interval management
+- `structuralSharing` (built-in) - If balance value hasn't changed, components don't re-render
+- Global hooks accessible from anywhere - Automatic query deduplication
+- Local hooks isolated to pages - Simpler lifecycle management
 
 **Other features to migrate (in priority order):**
 
