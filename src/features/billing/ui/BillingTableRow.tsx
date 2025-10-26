@@ -2,8 +2,7 @@ import { FC, useContext } from 'react';
 import { Center, Spinner, Td, Tr } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { toDateTime, DTOBillingTransaction } from 'src/shared';
-import { toJS } from 'mobx';
-import { BillingHistoryItem } from 'src/features/billing/model/billing.store';
+import { BillingHistoryItem } from '../model';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 
 const LoadingRaw: FC<{ style: React.CSSProperties }> = ({ style: { top, ...style } }) => {
@@ -24,11 +23,6 @@ const LoadingRaw: FC<{ style: React.CSSProperties }> = ({ style: { top, ...style
     );
 };
         
-const mapTypeToLabel: Record<DTOBillingTransaction['type'], string> = {
-    charge: 'Charge',
-    deposit: 'Deposit'
-};
-
 const mapTypeToColor: Record<DTOBillingTransaction['type'], string> = {
     charge: 'text.primary',
     deposit: 'accent.green'
@@ -65,7 +59,7 @@ const ItemRow: FC<{ historyItem: BillingHistoryItem; style: React.CSSProperties 
                     {toDateTime(historyItem.date)}
                 </Td>
                 <Td minW="320px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
-                    {mapTypeToLabel[historyItem.type]}: {historyItem.reason}
+                    {historyItem.description}
                 </Td>
                 <Td
                     w="100%"
@@ -86,18 +80,14 @@ const ItemRow: FC<{ historyItem: BillingHistoryItem; style: React.CSSProperties 
 );
 
 const BillingTableRow: FC<{ index: number; style: React.CSSProperties }> = ({ index, style }) => {
-    const { billingStore } = useContext(BillingHistoryTableContext);
+    const { billingHistory } = useContext(BillingHistoryTableContext);
 
-    if (!billingStore) {
+    if (!billingHistory || !billingHistory[index]) {
         return <LoadingRaw style={style} />;
     }
 
-    if (billingStore.isItemLoaded(index)) {
-        const historyItem = toJS(billingStore.billingHistory[index]);
-        return <ItemRow key={historyItem.id} style={style} historyItem={historyItem} />;
-    }
-
-    return <LoadingRaw style={style} />;
+    const historyItem = billingHistory[index];
+    return <ItemRow key={historyItem.id} style={style} historyItem={historyItem} />;
 };
 
 export default observer(BillingTableRow);

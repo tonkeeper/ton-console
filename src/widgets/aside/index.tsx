@@ -18,10 +18,11 @@ import { observer } from 'mobx-react-lite';
 import { invoicesAppStore } from 'src/features';
 import { NftIcon24 } from 'src/shared';
 import { JettonIcon24 } from 'src/shared/ui/icons/JettonIcon24';
-import { balanceStore } from 'src/shared/stores';
+import { useBalanceQuery } from 'src/features/balance';
 
 const Aside: FC = () => {
-    const totalAmount = balanceStore.balance?.total;
+    const { data: balance, isLoading } = useBalanceQuery();
+    const totalAmount = balance?.total;
     const formattedTotalAmount =
         totalAmount !== undefined
             ? new Intl.NumberFormat('en-US', {
@@ -91,7 +92,7 @@ const Aside: FC = () => {
                         Balance
                     </Text>
                     <TextWithSkeleton
-                        isLoading={!balanceStore.currentBalance$.isResolved}
+                        isLoading={isLoading}
                         textStyle="body3"
                         color="text.secondary"
                         skeletonWidth="45px"

@@ -23,7 +23,7 @@ import { AppMessagesPackage, appMessagesStore } from '../model';
 import { CurrencyRate, RefillModalContent } from 'src/entities';
 import MessagesPaymentConfirmationModalContent from './MessagesPaymentConfirmationModalContent';
 import { observer } from 'mobx-react-lite';
-import { balanceStore } from 'src/shared/stores';
+import { useBalanceQuery } from 'src/features/balance';
 
 const MessagesRefillModal: FC<{
     isOpen: boolean;
@@ -31,6 +31,7 @@ const MessagesRefillModal: FC<{
 }> = ({ isOpen, onClose }) => {
     const options = appMessagesStore.packages$.value;
     const [selectedPlan, setSelectedPlan] = useState<AppMessagesPackage | null>(null);
+    const { data: balance } = useBalanceQuery();
 
     const { getRootProps, getRadioProps } = useRadioGroup({
         name: 'package',
@@ -38,8 +39,6 @@ const MessagesRefillModal: FC<{
         onChange: name => setSelectedPlan(options.find(pkg => pkg.name === name) || null)
     });
     const group = getRootProps();
-
-    const balance = balanceStore.balance;
     const notEnoughAmount =
         balance &&
         selectedPlan &&
