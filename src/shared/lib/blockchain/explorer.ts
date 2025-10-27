@@ -16,6 +16,7 @@ class Explorer {
     }
 }
 
-export const explorer = new Explorer('https://tonviewer.com');
-
 export const testnetExplorer = new Explorer('https://testnet.tonviewer.com');
+
+export const explorer = import.meta.env.VITE_TESTNET ? testnetExplorer : new Explorer('https://tonviewer.com');
+

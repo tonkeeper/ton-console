@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react';
-import { Skeleton, Td, Tr } from '@chakra-ui/react';
-import { toDateTime, DTOBillingTransaction } from 'src/shared';
+import { Link, Skeleton, Td, Tr } from '@chakra-ui/react';
+import { toDateTime, DTOBillingTransaction, explorer } from 'src/shared';
 import { DTOBillingTxInfo } from 'src/shared/api';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 import {
@@ -9,6 +9,7 @@ import {
     DTOLiteproxyMonthlyPaymentMeta,
     DTOMessagePackagePurchaseMeta,
     DTOPromoCodeActivationMeta,
+    DTOReplenishmentOfDepositMeta,
     DTOStreamingApiPaymentMeta,
     DTOTestnetTonsPurchaseMeta,
     DTOTonapiChangeTierMeta,
@@ -192,7 +193,7 @@ const descriptionFormatters: DescriptionFormattersMap = {
         if (!meta.period) {
             return <>Webhooks API payment</>;
         }
-        const minutes = Math.round((meta.period) / 60);
+        const minutes = Math.round(meta.period / 60);
         const hours = Math.round(minutes / 60);
         const timeStr = minutes >= 60 ? `${hours}h` : `${minutes}m`;
         return (
@@ -201,7 +202,16 @@ const descriptionFormatters: DescriptionFormattersMap = {
             </>
         );
     },
-    replenishment_of_deposit: () => <>Refill balance</>,
+    replenishment_of_deposit: info => {
+        const { tx_hash } = info as DTOReplenishmentOfDepositMeta;
+
+        return (
+            <>
+                Refill {' '}
+                {tx_hash && <Link href={explorer.transactionLink(tx_hash)} isExternal>{tx_hash.slice(-8)}</Link>}
+            </>
+        );
+    },
     analytics_request_payment: () => <>Analytics query</>,
     Default: (_info, fallbackDescription) => <>{fallbackDescription}</>
 };
@@ -209,9 +219,7 @@ const descriptionFormatters: DescriptionFormattersMap = {
 function formatBillingDescription(historyItem: BillingHistoryItem): React.ReactNode {
     const { info, description } = historyItem;
     const formatterKey = (
-        (info.reason) in descriptionFormatters
-            ? (info.reason)
-            : 'Default'
+        info.reason in descriptionFormatters ? info.reason : 'Default'
     ) as keyof typeof descriptionFormatters;
 
     const formatter = descriptionFormatters[formatterKey];
