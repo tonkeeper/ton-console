@@ -2,8 +2,6 @@ import { FC } from 'react';
 import { Box, BoxProps, Center, Spinner } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { FixedSizeList } from 'react-window';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import InfiniteLoader from 'react-window-infinite-loader';
 import { BillingTableStructure } from './BillingTableStructure';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 import BillingTableRow from './BillingTableRow';
@@ -52,6 +50,9 @@ const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
     // Table with data or skeleton
     const minH = Math.min(parseInt(rowHeight) * (displayItemCount + 1) + 6, 800) + 'px';
 
+    // Calculate list height based on item count
+    const listHeight = Math.min(parseInt(rowHeight) * (displayItemCount + 1) + 6, 800);
+
     // Table with data or skeleton
     return (
         <BillingHistoryTableContext.Provider
@@ -64,29 +65,15 @@ const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
             }}
         >
             <Box minH={minH} {...props}>
-                <InfiniteLoader
-                    isItemLoaded={(index) => index < billingHistory.length}
+                <FixedSizeList
+                    height={listHeight}
+                    width="100%"
                     itemCount={displayItemCount}
-                    loadMoreItems={() => {}}
+                    itemSize={parseInt(rowHeight)}
+                    innerElementType={BillingTableStructure}
                 >
-                    {({ onItemsRendered, ref }) => (
-                        <AutoSizer>
-                            {({ height, width }) => (
-                                <FixedSizeList
-                                    height={height!}
-                                    width={width!}
-                                    itemCount={displayItemCount}
-                                    onItemsRendered={onItemsRendered}
-                                    itemSize={parseInt(rowHeight)}
-                                    innerElementType={BillingTableStructure}
-                                    ref={ref}
-                                >
-                                    {BillingTableRow}
-                                </FixedSizeList>
-                            )}
-                        </AutoSizer>
-                    )}
-                </InfiniteLoader>
+                    {BillingTableRow}
+                </FixedSizeList>
             </Box>
         </BillingHistoryTableContext.Provider>
     );
