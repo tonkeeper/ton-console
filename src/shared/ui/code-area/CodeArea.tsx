@@ -64,7 +64,7 @@ export const CodeArea: FC<
             w="100%"
             h={height}
         >
-            <AutoSizer forceRender>
+            <AutoSizer>
                 {({ width }) => (
                     <CodeMirror
                         readOnly={isDisabled || isLoading}

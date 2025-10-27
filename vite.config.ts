@@ -106,15 +106,6 @@ export default ({ mode }) => {
                 }
             }
         }
-
-        // test: {
-        //     globals: true,
-        //     environment: 'jsdom',
-        //     setupFiles: './tests/setup.ts',
-        //     typecheck: {
-        //         tsconfig: './tsconfig.test.json'
-        //     }
-        // }
     });
 };
 
