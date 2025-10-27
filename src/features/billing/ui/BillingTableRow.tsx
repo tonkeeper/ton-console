@@ -2,7 +2,220 @@ import { FC, useContext } from 'react';
 import { Skeleton, Td, Tr } from '@chakra-ui/react';
 import { toDateTime, DTOBillingTransaction } from 'src/shared';
 import { BillingHistoryItem } from '../model';
+import { DTOBillingTxInfo } from 'src/shared/api';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
+import {
+    DTOCnftIndexingPaymentMeta,
+    DTOLiteproxyChangeTierMeta,
+    DTOLiteproxyMonthlyPaymentMeta,
+    DTOMessagePackagePurchaseMeta,
+    DTOPromoCodeActivationMeta,
+    DTOStreamingApiPaymentMeta,
+    DTOTestnetTonsPurchaseMeta,
+    DTOTonapiChangeTierMeta,
+    DTOTonapiInstantPaymentMeta,
+    DTOTonapiMonthlyPaymentMeta
+} from 'src/shared/api/console/types.gen';
+
+// TODO: Remove this mapping after fixing the sdk generator
+const reasonMapping = {
+    TonapiMonthlyPaymentMeta: 'tonapi_monthly_payment',
+    TonapiInstantPaymentMeta: 'tonapi_instant_payment',
+    TonapiChangeTierMeta: 'tonapi_change_tier',
+    LiteproxyMonthlyPaymentMeta: 'liteproxy_monthly_payment',
+    LiteproxyChangeTierMeta: 'liteproxy_change_tier',
+    TestnetTonsPurchaseMeta: 'testnet_tons_purchase',
+    CnftIndexingPaymentMeta: 'cnft_indexing_payment',
+    MessagePackagePurchaseMeta: 'message_package_purchase',
+    ChatGptRequestPaymentMeta: 'chatgpt_request_payment',
+    PromoCodeActivationMeta: 'promo_code_activation',
+    StreamingApiPaymentMeta: 'streaming_api_payment',
+    ReplenishmentOfDepositMeta: 'replenishment_of_deposit',
+    AnalyticsRequestPaymentMeta: 'analytics_request_payment',
+    OtherMeta: 'Default'
+} as const satisfies Record<DTOBillingTxInfo['reason'], string>;
+
+type ReasonMeta = keyof typeof reasonMapping; // DTOBillingTxInfo['reason']
+type ReasonSnake = (typeof reasonMapping)[ReasonMeta];
+
+const reverseReasonMapping: Record<ReasonSnake, ReasonMeta> = Object.fromEntries(
+    Object.entries(reasonMapping).map(([meta, snake]) => [snake, meta as ReasonMeta])
+) as Record<ReasonSnake, ReasonMeta>;
+
+type DescriptionFormattersMap = {
+    [K in ReasonSnake]: (
+        info: Extract<DTOBillingTxInfo, { reason: (typeof reverseReasonMapping)[K] }>,
+        fallbackDescription: string
+    ) => React.ReactNode;
+} & {
+    default: (info: DTOBillingTxInfo, fallbackDescription: string) => React.ReactNode;
+};
+
+const descriptionFormatters: DescriptionFormattersMap = {
+    tonapi_monthly_payment: info => {
+        const meta = info as DTOTonapiMonthlyPaymentMeta;
+        return (
+            <>
+                REST API monthly payment
+                {meta.tier?.name && (
+                    <>
+                        — <strong>{meta.tier!.name}</strong>
+                    </>
+                )}
+            </>
+        );
+    },
+    tonapi_instant_payment: info => {
+        const meta = info as DTOTonapiInstantPaymentMeta;
+        return (
+            <>
+                REST API payment
+                {meta.tier?.name && (
+                    <>
+                        {' '}
+                        — <strong>{meta.tier!.name}</strong>
+                    </>
+                )}
+            </>
+        );
+    },
+    tonapi_change_tier: info => {
+        const meta = info as DTOTonapiChangeTierMeta;
+        return (
+            <>
+                REST API monthly payment change
+                {meta.new_tier?.name && (
+                    <>
+                        {' '}
+                        <strong>{meta.new_tier!.name}</strong>
+                    </>
+                )}
+            </>
+        );
+    },
+    liteproxy_monthly_payment: info => {
+        const meta = info as DTOLiteproxyMonthlyPaymentMeta;
+        return (
+            <>
+                Liteservers monthly payment
+                {meta.tier?.name && (
+                    <>
+                        {' '}
+                        — <strong>{meta.tier!.name}</strong>
+                    </>
+                )}
+            </>
+        );
+    },
+    liteproxy_change_tier: info => {
+        const meta = info as DTOLiteproxyChangeTierMeta;
+        return (
+            <>
+                Liteservers tier change
+                {meta.new_tier?.name && (
+                    <>
+                        {' '}
+                        → <strong>{meta.new_tier!.name}</strong>
+                    </>
+                )}
+            </>
+        );
+    },
+    testnet_tons_purchase: info => {
+        const meta = info as DTOTestnetTonsPurchaseMeta;
+        return (
+            <>
+                Testnet coins purchase
+                {meta.testnet_coins && (
+                    <>
+                        {' '}
+                        — <strong>{meta.testnet_coins} coins</strong>
+                    </>
+                )}
+            </>
+        );
+    },
+    cnft_indexing_payment: info => {
+        const meta = info as DTOCnftIndexingPaymentMeta;
+        return (
+            <>
+                NFT indexing
+                {meta.collection && (
+                    <>
+                        {' '}
+                        — <strong>{meta.collection}</strong>
+                    </>
+                )}
+                {meta.count && (
+                    <>
+                        {' '}
+                        <strong>({meta.count} items)</strong>
+                    </>
+                )}
+            </>
+        );
+    },
+    message_package_purchase: info => {
+        const meta = info as DTOMessagePackagePurchaseMeta;
+        return (
+            <>
+                Message package
+                {meta.count && (
+                    <>
+                        {' '}
+                        — <strong>{meta.count} messages</strong>
+                    </>
+                )}
+            </>
+        );
+    },
+    chatgpt_request_payment: () => <>ChatGPT API request</>,
+    promo_code_activation: info => {
+        const meta = info as DTOPromoCodeActivationMeta;
+        return (
+            <>
+                Promo code activation
+                {meta.promo_code && (
+                    <>
+                        {' '}
+                        — <strong>{meta.promo_code}</strong>
+                    </>
+                )}
+            </>
+        );
+    },
+    streaming_api_payment: info => {
+        const meta = info as DTOStreamingApiPaymentMeta;
+        if (!meta.period) {
+            return <>Webhooks API payment</>;
+        }
+        const minutes = Math.round((meta.period ?? 0) / 60);
+        const hours = Math.round(minutes / 60);
+        const timeStr = minutes >= 60 ? `${hours}h` : `${minutes}m`;
+        return (
+            <>
+                Webhooks API payment — <strong>{timeStr}</strong>
+            </>
+        );
+    },
+    replenishment_of_deposit: () => <>Refill balance</>,
+    analytics_request_payment: () => <>Analytics query</>,
+    Default: () => <>Other transaction</>,
+    default: (_info, fallbackDescription) => <>{fallbackDescription}</>
+};
+
+function formatBillingDescription(historyItem: BillingHistoryItem): React.ReactNode {
+    const { info, description } = historyItem;
+    const formatterKey = (
+        (info.reason) in descriptionFormatters
+            ? (info.reason)
+            : 'Default'
+    ) as keyof typeof descriptionFormatters;
+
+    const formatter = descriptionFormatters[formatterKey];
+    const descriptionNode = formatter(info, description);
+    return descriptionNode;
+}
 
 const SkeletonRow: FC<{ style: React.CSSProperties }> = ({ style: { top, ...style } }) => {
     const { rowHeight } = useContext(BillingHistoryTableContext);
@@ -28,23 +241,26 @@ const SkeletonRow: FC<{ style: React.CSSProperties }> = ({ style: { top, ...styl
             >
                 <Skeleton w="120px" h="4" />
             </Td>
-            <Td minW="320px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
+            <Td w="100%" minW="320px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
                 <Skeleton w="200px" h="4" />
             </Td>
             <Td
-                w="100%"
-                minW="300px"
+                w="180px"
+                minW="180px"
                 h={rowHeight}
                 maxH={rowHeight}
                 borderRight="1px"
                 borderRightColor="background.contentTint"
+                // textAlign="right"
+                // alignContent="right"
+                // alignItems="right"
             >
                 <Skeleton w="100px" h="4" />
             </Td>
         </Tr>
     );
 };
-        
+
 const mapTypeToColor: Record<DTOBillingTransaction['type'], string> = {
     charge: 'text.primary',
     deposit: 'accent.green'
@@ -82,18 +298,19 @@ const ItemRow: FC<{ historyItem: BillingHistoryItem; style: React.CSSProperties 
             >
                 {toDateTime(historyItem.date)}
             </Td>
-            <Td minW="320px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
-                {historyItem.description}
+            <Td w="100%" minW="320px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
+                {formatBillingDescription(historyItem)}
             </Td>
             <Td
-                w="100%"
-                minW="300px"
+                w="180px"
+                minW="180px"
                 h={rowHeight}
                 maxH={rowHeight}
                 color={mapTypeToColor[historyItem.type] ?? 'text.accent'}
                 borderRight="1px"
                 borderRightColor="background.contentTint"
                 title={historyItem.amount.stringAmountWithoutRound}
+                // textAlign="right"
             >
                 {mapTypeToSign[historyItem.type]}
                 {historyItem.amount.stringCurrencyAmount}
