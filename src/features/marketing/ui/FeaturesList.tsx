@@ -192,7 +192,7 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                 imgHeight="142px"
                 src="/assets/images/tonviewer-pages.webp"
                 heading="Custom Pages"
-                description="Promote your own project through most convenient blockchain explorer in the TON ecosystem."
+                description="Promote your own project through most convenient blockchain&nbsp;explorer in the TON ecosystem."
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button

@@ -1,5 +1,3 @@
-import { FC } from 'react';
-
 import { withProviders } from './providers';
 import Routing from 'src/pages';
 import { AppInitialization, ApplyQueryParams } from 'src/processes';
