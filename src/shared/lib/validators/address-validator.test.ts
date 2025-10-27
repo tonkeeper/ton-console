@@ -1,5 +1,6 @@
 import { Address } from '@ton/core';
 import { isAddressValid } from './address-validator';
+import { describe, it, expect } from 'vitest';
 
 describe('isAddressValid', () => {
     const address = Address.parse(

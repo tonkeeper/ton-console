@@ -1,8 +1,8 @@
-import { Box, BoxProps, Center, Fade, Flex, useRadio } from '@chakra-ui/react';
+import { Box, BoxProps, Center, Fade, Flex, useRadio, UseRadioProps } from '@chakra-ui/react';
 import { FC } from 'react';
 import { FilledTickIcon18, ejectRadioProps } from 'src/shared';
 
-export const RadioCard: FC<Parameters<typeof useRadio>[0] & BoxProps> = props => {
+export const RadioCard: FC<UseRadioProps & BoxProps> = props => {
     const { radioProps, rest } = ejectRadioProps<BoxProps>(props);
     const { getInputProps, getRadioProps } = useRadio(radioProps);
 
