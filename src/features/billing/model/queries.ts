@@ -3,7 +3,8 @@ import {
     getProjectBillingHistory,
     DTOBillingTransaction,
     DTOCryptoCurrency,
-    DTOProjectLiteproxyTierDetail
+    DTOProjectLiteproxyTierDetail,
+    DTOBillingTxInfo
 } from 'src/shared/api';
 import { projectsStore } from 'src/shared/stores';
 import {
@@ -23,7 +24,7 @@ export type BillingHistoryItem = {
     amount: TonCurrencyAmount | TokenCurrencyAmount;
     description: string;
     type: 'deposit' | 'charge';
-    reason: string;
+    info: DTOBillingTxInfo;
 };
 
 const BILLING_HISTORY_QUERY_KEY = ['billing-history'] as const;
@@ -41,7 +42,7 @@ function mapDTOTransactionToBillingHistoryItem(dtoTx: DTOBillingTransaction): Bi
         amount,
         description: dtoTx.description,
         type: dtoTx.type,
-        reason: dtoTx.info.reason
+        info: dtoTx.info
     };
 }
 

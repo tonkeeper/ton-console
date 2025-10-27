@@ -60,6 +60,7 @@ export const BillingTableStructure = observer(
                         <Th
                             pos="relative"
                             zIndex={1}
+                            w="100%"
                             minW="320px"
                             bg="background.contentTint"
                             boxSizing="content-box"
@@ -69,15 +70,15 @@ export const BillingTableStructure = observer(
                         <Th
                             pos="relative"
                             zIndex={1}
-                            w="100%"
-                            minW="300px"
+                            w="180px"
+                            minW="180px"
                             bg="background.contentTint"
                             borderTop="1px"
                             borderTopColor="background.contentTint"
                             borderRight="1px"
                             borderRightColor="background.contentTint"
                             borderTopRightRadius="sm"
-                            boxSizing="content-box"
+                            // textAlign="right"
                         >
                             Amount
                         </Th>
