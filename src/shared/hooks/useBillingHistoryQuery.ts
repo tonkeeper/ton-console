@@ -15,23 +15,27 @@ export type BillingHistoryItem = {
     info: DTOBillingTxInfo;
 };
 
+interface UseBillingHistoryQueryOptions {
+    before_tx?: string;
+    limit?: number;
+}
+
 /**
- * Hook for fetching raw billing history (transaction list)
- * Used to detect new deposits in real-time
- * Returns raw DTOBillingTransaction without complex transformations
- * Auto-refetches every 3 seconds with background updates
+ * Hook for fetching billing history (transaction list)
+ * Supports cursor-based pagination with before_tx cursor
  */
-export function useBillingHistoryQuery() {
+export function useBillingHistoryQuery(options: UseBillingHistoryQueryOptions = {}) {
+    const { before_tx, limit = PAGE_SIZE } = options;
     const projectId = projectsStore.selectedProject?.id;
 
     return useQuery({
-        queryKey: [BILLING_HISTORY_QUERY_KEY, projectId] as const,
+        queryKey: [BILLING_HISTORY_QUERY_KEY, projectId, before_tx, limit] as const,
         queryFn: async () => {
             if (!projectId) throw new Error('No project selected');
 
             const { data, error } = await getProjectBillingHistory({
                 path: { id: projectId },
-                query: { limit: PAGE_SIZE } // Fetch last 20 transactions
+                query: { before_tx, limit }
             });
 
             if (error) throw error;

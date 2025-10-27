@@ -323,7 +323,7 @@ const RefillModalContent: FC<{
                     </Button>
                 )}
 
-                <Button w="full" onClick={onClose} variant="primary" mt={mode === 'TON' ? 3 : 0}>
+                <Button w="full" mt={mode === 'TON' ? 3 : 0} onClick={onClose} variant="primary">
                     Done
                 </Button>
             </ModalFooter>
