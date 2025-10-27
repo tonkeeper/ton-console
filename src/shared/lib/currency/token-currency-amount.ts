@@ -7,7 +7,7 @@ import { formatNumber } from 'src/shared';
 
 export type TokenCurrencyAmountStruct = {
     weiAmount: string;
-    currency: CURRENCY;
+    currency: keyof typeof CURRENCY;
     decimals: number;
 };
 
@@ -60,7 +60,7 @@ export class TokenCurrencyAmount extends BasicCurrencyAmount implements Currency
 
     static fromDecimals(
         amount: number | string | bigint,
-        currency: CURRENCY,
+        currency: keyof typeof CURRENCY,
         decimals: number
     ): TokenCurrencyAmount {
         return new TokenCurrencyAmount({

@@ -3,7 +3,6 @@ import { useContext, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 
- 
 export const BillingTableStructure = observer(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     forwardRef<any, any>(({ children, ...rest }: any, ref: any) => {

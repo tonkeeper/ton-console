@@ -3335,9 +3335,6 @@ components:
         - name
         - rpc
         - usd_price
-        - long_polling_sub
-        - entity_per_conn
-        - capabilities
         - instant_payment
       properties:
         id:
@@ -3347,17 +3344,6 @@ components:
         name:
           type: string
           example: "Test tier"
-        long_polling_sub:
-          type: integer
-          example: 5
-        entity_per_conn:
-          type: integer
-          example: 5
-        capabilities:
-          type: array
-          items:
-            type: string
-            example: [ "mempool" ]
         rpc:
           type: number
           example: 5

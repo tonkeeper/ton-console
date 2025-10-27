@@ -1,7 +1,6 @@
 import { FC, useContext } from 'react';
 import { Skeleton, Td, Tr } from '@chakra-ui/react';
 import { toDateTime, DTOBillingTransaction } from 'src/shared';
-import { BillingHistoryItem } from '../model';
 import { DTOBillingTxInfo } from 'src/shared/api';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 import {
@@ -16,6 +15,7 @@ import {
     DTOTonapiInstantPaymentMeta,
     DTOTonapiMonthlyPaymentMeta
 } from 'src/shared/api/console/types.gen';
+import { BillingHistoryItem } from 'src/shared/hooks/useBillingHistoryQuery';
 
 // TODO: Remove this mapping after fixing the sdk generator
 const reasonMapping = {
