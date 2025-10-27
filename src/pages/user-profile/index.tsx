@@ -55,7 +55,7 @@ const UserProfilePage: FC = () => {
                 </Text>
                 <Text textStyle="body2" textColor="text.secondary">
                     As an affiliate, you can earn _____ on all payments coming from users you
-                    brought to TonConsole. In return, your referrals will get a 10% discount.
+                    brought to TonConsole. In&nbsp;return, your referrals will get a 10% discount.
                 </Text> */}
 
                 <Text textStyle="label2" mt={5} mb={2} fontSize={16}>

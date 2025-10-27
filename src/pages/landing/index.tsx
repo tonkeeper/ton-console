@@ -34,10 +34,10 @@ const LandingPage: FC = () => {
                     pb={{ base: 12, md: 14 }}
                     textAlign={{ base: 'start', md: 'center' }}
                 >
-                    <Heading mb="5">Connecting businesses to the TON ecosystem</Heading>
+                    <Heading mb="5">Connecting businesses to&nbsp;the&nbsp;TON ecosystem</Heading>
                     <Text textStyle="body1" mb={{ base: 8, md: 10 }} color="text.secondary">
                         Launch a successful business with the TON blockchain: manage Dapps, tokens,
-                        and payments in just one place with a deeply integrated commercial API
+                        and&nbsp;payments in just one place with a deeply integrated commercial API
                     </Text>
                     <Flex
                         direction={{ base: 'column', md: 'row' }}
