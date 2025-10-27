@@ -2,17 +2,16 @@ import { FC, useMemo, useState, useId, useEffect } from 'react';
 import {
     Box,
     Button,
-    Divider,
     ModalBody,
     ModalCloseButton,
     ModalContent,
     ModalFooter,
     ModalHeader,
     Stack,
-    VStack,
     useRadio,
     useRadioGroup,
-    useClipboard
+    useClipboard,
+    useToast
 } from '@chakra-ui/react';
 import { createTransferLink, fromDecimals, H4 } from 'src/shared';
 import { observer } from 'mobx-react-lite';
@@ -21,7 +20,6 @@ import { useBillingHistoryQuery } from 'src/shared/hooks';
 import { UsdtRefillTab } from './UsdtRefillTab';
 import { TonDeprecatedTab } from './TonDeprecatedTab';
 import { PromoCodeTab } from './PromoCodeTab';
-import { SuccessRefillMessage } from './SuccessRefillMessage';
 import { useDepositAddressQuery, useApplyPromoCodeMutation } from '../queries';
 
 type Currency = 'USDT' | 'TON';
@@ -34,12 +32,6 @@ const CURRENCY_DECIMALS: Record<Currency, number> = {
     USDT: USDT_DECIMALS,
     TON: TON_DECIMALS
 } as const;
-
-interface DetectedRefill {
-    id: string;
-    amount: string;
-    date: Date;
-}
 
 const RadioCard: FC<{
     children: React.ReactNode;
@@ -97,8 +89,9 @@ const RefillModalContent: FC<{
 
     const [mode, setMode] = useState<RefillMode>('USDT');
     const [amount, setAmount] = useState<string>('');
-    const [detectedRefills, setDetectedRefills] = useState<DetectedRefill[]>([]);
+    const [shownRefillIds, setShownRefillIds] = useState<Set<string>>(new Set());
     const [baselineTransactionId, setBaselineTransactionId] = useState<string | null>(null);
+    const toast = useToast();
 
     const {
         handleSubmit,
@@ -186,27 +179,33 @@ const RefillModalContent: FC<{
         const baselineIndex = billingHistory.findIndex(item => item.id === baselineTransactionId);
         if (baselineIndex === -1) return;
 
-        const existsRefills = detectedRefills.map(item => item.id);
-
-        const newRefills: DetectedRefill[] = billingHistory
+        // Найти новые пополнения которые еще не были показаны в toast
+        billingHistory
             .slice(0, baselineIndex)
-            .filter(item => item.type === 'deposit')
-            .map(item => ({
-                id: item.id,
-                amount: item.amount.stringCurrencyAmount,
-                currency: item.amount.currency,
-                date: item.date
-            }))
-            .filter(item => !existsRefills.includes(item.id));
-        
-        const refills = [...detectedRefills, ...newRefills].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 2);
+            .filter(item => item.type === 'deposit' && !shownRefillIds.has(item.id))
+            .forEach(item => {
+                // Показать toast уведомление
+                toast({
+                    title: 'Refill detected',
+                    description: `${item.amount.stringCurrencyAmount} received at ${item.date.toLocaleTimeString(
+                        'en-US',
+                        {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: false
+                        }
+                    )}`,
+                    status: 'success',
+                    position: 'bottom-left',
+                    isClosable: true,
+                    duration: 5000
+                });
 
-        setDetectedRefills(refills);
-    }, [billingHistory, baselineTransactionId]);
-
-    const handleRemoveRefill = (id: string) => {
-        setDetectedRefills(prev => prev.filter(refill => refill.id !== id));
-    };
+                // Отметить как показанное
+                setShownRefillIds(prev => new Set([...prev, item.id]));
+            });
+    }, [billingHistory, baselineTransactionId, shownRefillIds, toast]);
 
     return (
         <ModalContent maxW="400px">
@@ -292,8 +291,8 @@ const RefillModalContent: FC<{
                 {mode === 'USDT' && (
                     <>
                         <Button
-                            mt="2"
                             w="full"
+                            mt="2"
                             isDisabled={!paymentLink || isDepositAddressLoading}
                             onClick={handlePayByLink}
                         >
@@ -324,24 +323,9 @@ const RefillModalContent: FC<{
                     </Button>
                 )}
 
-                {detectedRefills.length > 0 && (
-                    <>
-                        <Divider />
-                        <VStack align="stretch" w="full" spacing="1">
-                            {detectedRefills.map(refill => (
-                                <SuccessRefillMessage
-                                    key={refill.id}
-                                    amount={refill.amount}
-                                    date={refill.date}
-                                    onClose={() => handleRemoveRefill(refill.id)}
-                                />
-                            ))}
-                        </VStack>
-                        <Button w="full" onClick={onClose} variant="primary">
-                            Done
-                        </Button>
-                    </>
-                )}
+                <Button w="full" onClick={onClose} variant="primary" mt={mode === 'TON' ? 3 : 0}>
+                    Done
+                </Button>
             </ModalFooter>
         </ModalContent>
     );
