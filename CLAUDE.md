@@ -1,620 +1,458 @@
-# TON Console - Developer Guide
+---
 
-## Overview
+title: TON Console — AI Project Guide
+version: 1.0.0
+last_verified: 2025-10-27
+owners:
 
-TON Console is a web application for managing TON blockchain API access, providing dashboards for API metrics, managing liteproxy servers, webhooks, and API key administration.
+* <fill in: owner GitHub handle/email>
+  ai_maintained: true
 
-## Tech Stack
+# Sections that AI MAY edit directly (see §12)
 
-- **React 19.2.0** with TypeScript 5.9.3 (strict mode)
-- **Vite 5.4.6** for build tooling
-- **MobX 6.15.0** for global state management (legacy, migrating away)
-- **@tanstack/react-query 5.90.5** for server state (**RECOMMENDED** for CRUD operations)
-- **Chakra UI 2.10.9** for UI components
-- **Recharts 2.5.0** for data visualization
-- **React Router DOM 6.9.0** for routing
-- **Vitest** for unit tests
-- **ESLint 9.38.0** with TypeScript support for code quality
-- **Prettier 3.6.2** for code formatting
+ai_editable_blocks:
 
-## Project Architecture
-
-### Folder Structure
-
-```
-src/
-├── app/              # Application entry, providers, routing
-├── pages/            # Route pages (import and compose features)
-│   └── tonapi/
-│       ├── api-keys/     # Just render the feature
-│       ├── liteservers/
-│       ├── webhooks/
-│       └── pricing/
-├── features/         # Business logic grouped by domain
-│   └── tonapi/
-│       ├── api-keys/            # {model/, ui/, index.ts}
-│       │   ├── model/
-│       │   │   ├── queries.ts   # (NEW) React Query hooks
-│       │   │   └── interfaces/  # Type definitions
-│       │   ├── ui/              # Components (dumb UI)
-│       │   └── index.ts         # Public exports
-│       ├── webhooks/            # Similar structure (to be migrated)
-│       ├── statistics/          # MobX store (legacy, reference)
-│       └── liteproxy/           # MobX store (legacy, reference)
-├── entities/         # Domain models and entity stores
-├── shared/           # Reusable utilities, hooks, components
-│   ├── api/
-│   │   └── console/  # Auto-generated from swagger.yaml
-│   ├── stores/       # Global stores only (projectsStore, userStore, etc)
-│   ├── lib/          # Utilities (Loadable - legacy)
-│   ├── ui/           # Shared UI components
-│   └── hooks/        # Custom hooks (useLocalObservableWithDestroy - legacy)
-└── processes/        # Side effects initialization
-```
-
-**Key principle:** Features are self-contained modules with their own model (data/queries) and UI (components). Pages are thin - they just compose features together without business logic.
-
-**Modern approach (React Query):** Features manage server state via hooks, not stores. Components are pure UI.
-
-### State Management Pattern
-
-#### ✅ RECOMMENDED: React Query for CRUD/Server State
-
-Use `@tanstack/react-query` for CRUD operations and fetching data from the server. This is the **preferred approach** for features with simple data management (like API Keys, Webhooks, etc).
-
-**Benefits:**
-- Automatic cache management
-- Deduplication of requests
-- Automatic refetch on dependency changes
-- Built-in loading/error/success states
-- No boilerplate with disposers
-- Standard React hooks API
-
-**Example structure (`src/features/tonapi/api-keys/`):**
-
-```typescript
-// model/queries.ts - React Query hooks
-export function useApiKeysQuery() {
-    const projectId = projectsStore.selectedProject?.id;
-
-    return useQuery({
-        queryKey: ['api-keys', projectId],  // Refetch when projectId changes
-        queryFn: async () => {
-            const { data, error } = await getProjectTonApiTokens({
-                query: { project_id: projectId! }
-            });
-            if (error) throw error;
-            return data.items.map(mapDTOToApiKey);
-        },
-        enabled: !!projectId
-    });
-}
-
-export function useCreateApiKeyMutation() {
-    const queryClient = useQueryClient();
-    const projectId = projectsStore.selectedProject?.id;
-
-    return useMutation({
-        mutationFn: async (form: CreateApiKeyForm) => {
-            const { data, error } = await generateProjectTonApiToken({
-                query: { project_id: projectId! },
-                body: { ...form }
-            });
-            if (error) throw error;
-            return data.token;
-        },
-        onSuccess: (newKey) => {
-            queryClient.setQueryData(['api-keys', projectId],
-                (old: ApiKey[] | undefined) => [...(old || []), newKey]
-            );
-        }
-    });
-}
-```
-
-```typescript
-// ui/ApiKeys.tsx - Component with observer() for projectId changes
-const ApiKeys: FC = observer(() => {
-    const { data: apiKeys, isLoading, error } = useApiKeysQuery();
-
-    if (isLoading) return <Spinner />;
-    if (error) return <ErrorMessage />;
-    if (!apiKeys?.length) return <EmptyState />;
-
-    return (
-        <Overlay h="fit-content">
-            <Button>Create</Button>
-            <Table data={apiKeys} />
-        </Overlay>
-    );
-});
-```
-
-**Key points:**
-- Queries automatically invalidate when `queryKey` dependencies change (no disposers needed!)
-- Mutations auto-update cache via `onSuccess`
-- Component wrapped with `observer()` only to react to `projectsStore` changes, not for data states
-- UI stays simple - just conditional rendering based on query states
+* CHANGELOG
+* TODO
+* MIGRATIONS
+* OPEN_QUESTIONS
 
 ---
 
-#### ⚠️ DEPRECATED: MobX Store with Loadable (Legacy Pattern)
+# 0) Purpose of this file
 
-**Do not use for NEW features.** This pattern is kept only for existing features like statistics and liteproxy. Migrate to React Query when refactoring.
+This file is a source of truth for AI assistants and developers:
 
-```typescript
-// ❌ DEPRECATED - Use React Query instead
-export class MyFeatureStore {
-    data$ = new Loadable<MyData[]>([]);
-    private disposers: Array<() => void> = [];
+* describes the project's architecture, conventions, and patterns;
+* sets unambiguous do's and don'ts;
+* contains **safe blocks for AI auto‑updates** without clutter.
 
-    constructor(private projectsStore: ProjectsStore) {
-        makeAutoObservable(this);
-        const dispose = createImmediateReaction(
-            () => this.projectsStore.selectedProject?.id,
-            (projectId) => {
-                this.clearStore();
-                if (projectId) this.fetchData();
-            }
-        );
-        this.disposers.push(dispose);
-    }
+> Rule #1: **For new CRUD/server data we use React Query.** MobX is allowed only in inherited/complex areas and is gradually phased out.
 
-    fetchData = this.data$.createAsyncAction(async () => {
-        const { data, error } = await getProjectData({...});
-        if (error) throw error;
-        return data.items.map(mapDTOToData);
+---
+
+# 1) Project overview
+
+**TON Console** is a web application for managing access to TON blockchain APIs:
+
+* metrics and dashboards;
+* API keys;
+* webhooks;
+* management of liteproxy servers.
+
+**Out of scope:** no server-side rendering, no Redux, no manual caching on top of React Query.
+
+---
+
+# 2) Tech stack (quick reference)
+
+| Area         | Choice / Version                                | Rules                             |
+| ------------ | ----------------------------------------------- | --------------------------------- |
+| Core         | React **19.2.0**, TypeScript **5.9.3** (strict) | **Only** functional components    |
+| Build        | Vite **5.4.6**                                  | Code-splitting by routes/features |
+| Server state | **@tanstack/react-query 5.90.5**                | Mandatory for CRUD/fetching       |
+| Local/legacy | MobX **6.15.0**                                 | ❗️legacy only; migrating away     |
+| UI           | Chakra UI **2.10.9**                            | Single theme/tokens               |
+| Charts       | Recharts **2.5.0**                              | Time series, see §7               |
+| Routing      | React Router DOM **6.9.0**                      | Pages are thin, composition only  |
+| Quality      | ESLint **9.38.0**, Prettier **3.6.2**, Vitest   | Zero errors/warnings in CI        |
+
+> When bumping versions: **AI must not edit this section directly**. Instead, add a note to CHANGELOG and create a TODO to update documentation. See §12.
+
+---
+
+# 3) Architecture and folder structure
+
+```
+src/
+├─ app/                  # entry, providers, routing
+├─ pages/                # pages (compose features; no business logic)
+│  └─ tonapi/
+│     ├─ api-keys/
+│     ├─ liteservers/
+│     ├─ webhooks/
+│     └─ pricing/
+├─ features/             # features (grouped by domain)
+│  └─ tonapi/
+│     ├─ api-keys/       # {model/, ui/, index.ts}
+│     │  ├─ model/
+│     │  │  ├─ queries.ts        # React Query hooks (new standard)
+│     │  │  └─ interfaces/       # domain types
+│     │  └─ ui/                  # "dumb" UI components
+│     ├─ webhooks/               # to migrate to React Query
+│     ├─ statistics/             # MobX (legacy)
+│     └─ liteproxy/              # MobX (legacy)
+├─ entities/             # domain models/entities (if shared)
+├─ shared/
+│  ├─ api/
+│  │  └─ console/        # ⚙️ auto-generated from swagger.yaml
+│  ├─ stores/            # global stores: projectsStore, userStore, appStore
+│  ├─ lib/               # utilities (Loadable — legacy)
+│  ├─ ui/                # reusable UI components
+│  └─ hooks/             # shared hooks (legacy helpers)
+└─ processes/            # side-effects initialization
+```
+
+**Principles**
+
+* **Thin pages:** composition only.
+* **Feature = isolated module:** `model/` (data/queries) + `ui/` (presentation).
+* **Do not touch generated files manually** (see §6.2).
+
+---
+
+# 4) Code conventions
+
+**TypeScript**
+
+* strict mode required; **no `any`**.
+* Explicit types for public functions and after `map/filter/reduce`.
+* Domain types in `features/<domain>/<feature>/model/interfaces`.
+
+**Naming**
+
+* Components: `PascalCase`. Hooks: `useXxx`.
+* Feature folders: `kebab-case`. Files: no suffixes like `.component.tsx`.
+* Export feature through its root `index.ts` inside the feature folder.
+
+**Imports**
+
+* Pages import **only** from `features/*/ui` and/or the feature's public `index.ts`.
+* Shared items — from `shared/*`.
+
+**UI**
+
+* Chakra UI: centralized theme and tokens.
+* Modals: `useDisclosure`; live in `features/*/ui`.
+* States: `Spinner` → `ErrorMessage` → `EmptyState` → content.
+
+**Do not**
+
+* ❌ Write new MobX code for server data.
+* ❌ Create global stores for feature-local concerns.
+* ❌ Mix several unrelated API calls in a single `queryFn`.
+
+---
+
+# 5) State management
+
+## 5.1 React Query (mandatory pattern for CRUD/fetching)
+
+**Query keys** must include `projectId`:
+
+```ts
+const projectId = projectsStore.selectedProject?.id;
+
+return useQuery({
+  queryKey: ['api-keys', projectId],
+  queryFn: async () => {
+    const { data, error } = await getProjectTonApiTokens({
+      query: { project_id: projectId! }
     });
+    if (error) throw error;
+    return data.items.map(mapDTOToApiKey);
+  },
+  enabled: !!projectId,
+});
+```
 
-    destroy(): void {
-        this.disposers.forEach(dispose => dispose?.());
-    }
+**Mutations & cache**
+
+* Simple add: `queryClient.setQueryData(['api-keys', projectId], updater)`.
+* Complex cases: `queryClient.invalidateQueries({ queryKey: ['api-keys', projectId] })`.
+
+**observer()**
+
+* Wrap a component with `observer()` **only** if it reads a MobX store (e.g., `projectsStore`).
+
+## 5.2 MobX (legacy)
+
+* Allowed only in existing complex features (`statistics`, `liteproxy`).
+* No new MobX code; see migration plan — §10.
+
+---
+
+# 6) Working with the API and models
+
+## 6.1 DTO → Domain models
+
+1. Define domain interfaces in `model/interfaces/`.
+2. Create mappers from SDK DTO → domain model.
+3. Return **domain models** from `queryFn` (not DTOs).
+
+```ts
+// model/interfaces/api-key.ts
+export interface ApiKey {
+  id: string;
+  label: string;
+  createdAt: number; // unix sec
 }
-```
 
-**Loadable properties (for reference):**
-- `isResolved`: true when loaded or error
-- `isLoading`: true during fetch
-- `value`: the data
-- `error`: error object
-- `state`: enum (unresolved, pending, ready, refreshing, resolveErrored, refetchErrored)
-
-### Component Pattern
-
-**✅ RECOMMENDED: React Query Pattern (for CRUD operations)**
-
-```typescript
-const ApiKeys: FC = observer(() => {
-    // observer() only needed to react to projectsStore changes
-    const { data: apiKeys, isLoading, error } = useApiKeysQuery();
-    const { mutate: deleteKey } = useDeleteApiKeyMutation();
-
-    if (isLoading) return <Spinner />;
-    if (error) return <ErrorMessage error={error} />;
-
-    return (
-        <Overlay h="fit-content">
-            {apiKeys?.length === 0 ? (
-                <EmptyState onAction={() => {}} />
-            ) : (
-                <Table data={apiKeys} onDelete={deleteKey} />
-            )}
-        </Overlay>
-    );
+// model/queries.ts
+const mapDTOToApiKey = (dto: DTO_TonApiToken): ApiKey => ({
+  id: dto.id,
+  label: dto.label,
+  createdAt: dto.created_at,
 });
 ```
 
-**Key points:**
-- Wrap with `observer()` ONLY if accessing MobX stores (like `projectsStore`)
-- Use query/mutation hooks for data fetching
-- No props drilling - hooks provide state directly
-- UI logic stays simple: render based on loading/error/data states
-- Mutations handle cache updates automatically
+## 6.2 SDK generation
 
-**❌ DEPRECATED: MobX Store Pattern (Legacy)**
+* Files in `src/shared/api/console/*` are generated from `scripts/swagger.yaml`.
+* **Never edit them manually.**
+* Regenerate via: `npm run api:generate` (only when swagger changed).
+* Additional generators: `generate-webhooks`, `generate-airdrop`, `generate-airdrop2` — **leave untouched** unless required by a task.
 
-```typescript
-// Do NOT use for new features
-const MyComponent = observer(() => {
-    const { isResolved, value, error } = someStore.data$;
+---
 
-    if (!isResolved) return <Spinner />;
-    if (error) return <ErrorMessage error={error} />;
-    if (!value) return <EmptyState />;
+# 7) Time series and charts (Recharts)
 
-    return <DataDisplay data={value} />;
-});
+* Unified data shape: `{ time: number; value: number | undefined }[]`, where `time` is unix seconds.
+* X axis: `domain={['dataMin', 'dataMax']}`.
+* Pre-filter `undefined` values (avoid holes during render).
+* Default margin: `{ left: 0, right: 0 }`.
+* Example transformation:
+
+```ts
+const toLiteproxySeries = (data: TonApiStats) =>
+  data.chart
+    .filter(i => i.liteproxyRequests !== undefined)
+    .map(i => ({ time: i.time, value: i.liteproxyRequests }));
 ```
 
-### Data Transformation
+---
 
-API responses come from auto-generated SDK (`src/shared/api/console/sdk.gen.ts`). Always:
-1. Create domain model interfaces in `features/*/model/interfaces/`
-2. Create mapping functions to transform DTOs to domain models
-3. Use proper TypeScript typing (never use `any`)
+# 8) Routing
 
-**For React Query patterns:** Add mapping functions to `model/queries.ts` (see API Keys for example)
+* Pages in `src/pages/*` **do not** contain business logic — composition only.
+* Code-splitting by pages.
+* 404/NotFound is mandatory.
 
-Example from liteproxy statistics:
-```typescript
-// Transform API response to chart data
-const getLiteproxyRequestsData = (
-    data: TonApiStats
-): Array<{ time: number; value: number | undefined }> => {
-    return data.chart
-        .filter(item => item.liteproxyRequests !== undefined)
-        .map(item => ({
-            time: item.time,
-            value: item.liteproxyRequests
-        }));
-};
-```
+---
 
-## Code Style & TypeScript
+# 9) Testing, quality, Definition of Done
 
-### Requirements
-
-- **TypeScript strict mode enabled** - always provide explicit types
-- **No `any` types** - if you see `any`, find the root cause and fix the type
-- **Explicit return types** for functions, especially after filter/map operations
-- **Import from features** - pages should import UI components from `features/*/ui`, not local files
-
-### Common Patterns
-
-**For async operations (CRUD):**
-- ✅ **NEW:** Use React Query hooks (`useQuery`, `useMutation`) in `model/queries.ts`
-- Always make separate API calls for different data (don't mix concerns)
-- Filter and map API responses with explicit return types before returning from `queryFn`
-- ❌ **DEPRECATED:** `createAsyncAction()` is legacy MobX pattern - don't use for new features
-
-**For charts/time-series data:**
-- Transform data to `{ time: number, value: number }[]` format
-- Use Recharts with `margin={{ left: 0, right: 0 }}` for full width
-- Set XAxis domain to `['dataMin', 'dataMax']` for proper scaling
-- Note: May still use MobX store for complex time-series logic (see statistics for reference)
-
-**For modals:**
-- Use Chakra UI `useDisclosure()` hook for modal state
-- Place modal components in `features/*/ui/` (not pages)
-- Pass callbacks via props: `onClick={onOpen}`, `onClose={onClose}`
-- Export from feature's `index.ts`
-
-## Common Commands
+**Commands**
 
 ```bash
-# Development
-npm run dev              # Start dev server (http://localhost:5173)
-npm run dev-host        # Start dev server accessible from network
+npm run dev
+npm run dev-host
 
-# Type checking & linting
-npm run typecheck       # TypeScript type checking
-npm run lint            # ESLint code quality check
+npm run typecheck
+npm run lint
+npm run test
 
-# Testing
-npm run test            # Run Vitest unit tests
+npm run build
+npm run build:staging
+npm run preview
 
-# Building
-npm run build           # Production build (with type checking)
-npm run build:staging   # Staging build (for pre-production testing)
-npm run preview         # Preview production build locally
-
-# API code generation (SDK from Swagger)
-npm run api:generate    # Regenerate SDK from swagger.yaml (using @hey-api/openapi-ts)
-
-# Other API generators (don't touch unless you know what you're doing)
+npm run api:generate
+# (other generators only when required)
 npm run generate-webhooks
 npm run generate-airdrop
 npm run generate-airdrop2
 ```
 
-## Testing & Verification Checklist
+**Definition of Done (required)**
 
-Before declaring work complete:
+* ✅ `npm run typecheck` — 0 errors
+* ✅ `npm run lint` — 0 errors (at least in changed files)
+* ✅ Tests (where applicable) are green
+* ✅ No `any` and no implicit types in the changes
+* ✅ UI states covered (loading/error/empty)
+* ✅ Mutations update cache correctly
 
-```bash
-# Run type check - must have ZERO errors
-npm run typecheck 2>&1
+---
 
-# Run lint - must have ZERO errors (for your changes)
-npm run lint 2>&1
+# 10) Migration plan (MobX → React Query)
 
-# Run unit tests (if applicable)
-npm run test 2>&1
+**Status**
 
-# Review changes
-git diff
-git status
-```
+* ✅ API Keys — migrated (reference)
+* ✅ Balance — global hook with `refetchInterval: 3000`, `refetchIntervalInBackground: true`
+* ⏳ Webhooks — high priority
+* ⏳ Liteproxy — after Webhooks
+* ⏳ Statistics/Analytics — most complex (last)
 
-**Important:** Never claim work is ready if TypeScript, lint, or test errors exist. Always verify the full output.
+**Steps**
 
-**Reminder - Use React Query for NEW CRUD features:**
-- ✅ Create `model/queries.ts` with `useQuery` and `useMutation` hooks
-- ✅ Wrap component with `observer()` only if it uses MobX stores (like `projectsStore`)
-- ✅ Let React Query handle caching and refetching automatically
-- ❌ Don't create MobX Store classes for simple CRUD
-- ❌ Don't use `useLocalObservableWithDestroy()` for server state
+1. Create `model/queries.ts` with domain types in the feature.
+2. Move fetching from Store to `useQuery`/`useMutation`.
+3. Add DTO → domain mappers.
+4. Update UI to use hooks instead of store.
+5. Keep `observer()` only where `projectsStore` is read.
+6. Remove the legacy store and `useLocalObservableWithDestroy`.
+7. Verify refetch on `projectId` change.
+8. Add entries to MIGRATIONS and CHANGELOG (see §12).
 
-## Git Workflow
+---
 
-- Create feature branches from `master`
-- Keep commits atomic and focused
-- Include only necessary files in commits (no auto-generated files unless API changed)
-- Write clear commit messages
-- Ensure all tests pass before committing
+# 11) Global stores (rare exceptions)
 
-**IMPORTANT:** Do NOT interact with git (commit, add, push, etc.) unless explicitly asked by the user. Only make git operations when the user specifically requests it. This includes:
-- Do NOT run `git add`, `git commit`, `git push`
-- Do NOT use git hooks or auto-commit features
-- Only run `git diff`, `git status` for information purposes when needed
-- Wait for explicit user instructions before any git modifications
+Allowed:
 
-## Key Best Practices
+* `projectsStore` — current project selection (often needed for `project_id`)
+* `userStore` — auth/profile
+* `appStore` — global UI state
 
-### 1. Study Patterns BEFORE Coding
+**Prohibited:** adding feature stores into `root.store.ts`. That indicates an incorrect responsibility boundary.
 
-Before implementing a new feature:
-- **For CRUD features:** Study `src/features/tonapi/api-keys/` as the reference React Query implementation
-  - Look at `model/queries.ts` structure with hooks
-  - Check how `observer()` is used with `useQuery`
-  - See how mutations update cache in `onSuccess`
-- **For global data with refetch intervals:** Study `src/features/balance/`
-  - Look at `useBalanceQuery()` with `refetchInterval: 3000` and `refetchIntervalInBackground: true`
-  - See how to combine global hooks accessible everywhere
-  - Check both global (`useBalanceQuery`) and local (`useBillingHistoryQuery`) hook patterns
-- **For legacy features:** Check statistics/liteproxy for MobX store patterns (for reference only)
-- Check how UI components are organized and exported
-- Look at data transformation patterns in mapping functions
+---
 
-### 2. Respect Auto-Generated Files
+# 12) Self‑update protocol (for AI)
 
-SDK files generated from OpenAPI spec (`src/shared/api/console/`):
-- `sdk.gen.ts` - SDK functions with operationId
-- `types.gen.ts` - TypeScript types (DTO prefix)
-- `client.gen.ts` - HTTP client config
+**Goal:** keep this file up-to-date and compact, without clutter.
 
-**Rules:**
-- Do NOT modify them manually
-- Do NOT revert them without checking Swagger API changes
-- Regenerate with `npm run api:generate` after swagger.yaml updates
-- ESLint automatically ignores these files
-- They contain essential types and SDK methods for API integration
+**Golden rules**
 
-Other generators remain untouched:
-- `src/shared/api/airdrop.generated.ts` (from `generate-airdrop`)
-- `src/shared/api/rt.tonapi.generated.ts` (from other generators)
+1. **Edit ONLY** blocks listed in `ai_editable_blocks`: `CHANGELOG`, `TODO`, `MIGRATIONS`, `OPEN_QUESTIONS`.
+2. If other sections must change — **create a TODO** and a brief note in CHANGELOG.
+3. Keep only the latest 10 items in CHANGELOG; collapse older ones into an "archive" (keep the link).
+4. Do not duplicate rules; if there is a conflict, link to the existing point and refine the wording in a single place.
+5. Mark every update with a date in the `YYYY-MM-DD` format.
 
-### 3. Analyze Root Cause, Don't Mask Errors
+**Edit formats**
 
-- TypeScript error? Identify what's wrongly typed
-- Lint error? Understand why the rule triggered
-- API error? Check which method/parameter is missing
-- Never use `any` to bypass type errors
+* **CHANGELOG:** concise entries — "date — what changed — why".
+* **TODO:** checklists with context and a link to ticket/PR.
+* **MIGRATIONS:** step-by-step plans and per-feature status.
+* **OPEN_QUESTIONS:** items that require the owner's decision.
 
-### 4. Feature Modularity
+**Before writing changes AI must:**
 
-Each feature should:
-- Live in `src/features/domain/featureName/`
-- Have `model/` folder:
-  - **For CRUD (new):** `queries.ts` with React Query hooks, `interfaces.ts` for types
-  - **For legacy:** Store classes (being migrated to React Query)
-- Have `ui/` folder for components (never contain business logic)
-- Export publicly from `index.ts`
-- Be importable as `import { Component } from 'src/features/domain/featureName'`
+* make sure the changes reflect the actual state of the code/repo;
+* not change versions in §2 directly — use TODO + CHANGELOG instead;
+* not add new sections unless truly necessary.
 
-**Example structure (API Keys - reference implementation):**
-```
-src/features/tonapi/api-keys/
-├── model/
-│   ├── queries.ts          # React Query hooks
-│   ├── interfaces/
-│   │   ├── api-key.ts
-│   │   ├── create-api-key-form.ts
-│   │   └── index.ts
-│   └── index.ts            # Export queries and types
-├── ui/
-│   ├── ApiKeys.tsx         # Main component with observer()
-│   ├── ApiKeysTable.tsx
-│   ├── CreateApiKeyModal.tsx
-│   ├── EditApiKeyModal.tsx
-│   ├── DeleteApiKeyModal.tsx
-│   ├── EmptyApiKeys.tsx
-│   └── index.ts            # Export all components
-└── index.ts                # Export everything
-```
+---
 
-### 5. Separate Concerns
+# 13) Security and secrets
 
-- **Pages:** Compose features together, no business logic
-- **Features (model):**
-  - ✅ **NEW (React Query):** `queries.ts` manages data fetching via hooks
-  - ❌ **DEPRECATED (MobX Store):** Used to manage fetching but being phased out
-  - **Always:** Contains type definitions and transformations
-- **Features (ui):** Display data, call mutations, emit events - never fetch data
-- **Components:** Pure UI, receive data/callbacks as props
-- **Imports flow:** pages → features (ui/model) → shared → base types
+* Do not log secrets/API keys/tokens.
+* Environment configuration via **ENV**, no hardcoding.
+* TON API permissions — only via backend proxies where applicable.
 
-### 6. Migration Plan: React Query for Existing Features
+---
 
-**Status:**
-- ✅ **API Keys** - Fully migrated to React Query (reference implementation)
-- ✅ **Balance Page** - Global hooks with automatic refetch (3-sec interval, background updates, smart refetch without re-renders)
-- ⏳ **Webhooks** - Planned (similar CRUD pattern)
-- ⏳ **Liteproxy** - Planned (more complex)
-- ⏳ **Statistics/Analytics** - Planned (complex time-series)
+# 14) Performance
 
-**Completed Example: BalancePage**
+* Real-time: use `refetchInterval` only where needed (see Balance).
+* Use `staleTime` consciously; by default treat data as "stale" for freshness.
+* Avoid unnecessary re-renders: memoize props for heavy tables/lists.
+* Lazy-load pages/features.
 
-The Balance page demonstrates best practices for global data with complex refetching:
+---
 
-```typescript
-// Global hook with 3-second refetch interval
-export function useBalanceQuery() {
-    const projectId = projectsStore.selectedProject?.id;
+# 15) UX, accessibility
 
-    return useQuery({
-        queryKey: ['balance', projectId],
-        queryFn: async () => {
-            const { data, error } = await getProjectBillingHistory({...});
-            if (error) throw error;
-            return mapDTOBalanceToBalance(...);
-        },
-        enabled: !!projectId,
-        refetchInterval: 3000,              // Auto-refresh every 3 seconds
-        refetchIntervalInBackground: true,  // Even when page is hidden
-        staleTime: 0                        // Always consider stale for fresh refetches
-    });
-}
+* States (loading/error/empty) are mandatory.
+* Keyboard accessibility for modals and focus — Chakra is fine by default, do not break it.
+* All text is in English.
 
-// Local hook - only in BillingPage
-export function useBillingHistoryQuery() {
-    const projectId = projectsStore.selectedProject?.id;
-    return useQuery({
-        queryKey: ['billing-history', projectId],
-        queryFn: async () => { /*...*/ },
-        enabled: !!projectId,
-        staleTime: 30 * 1000  // 30-second cache
-    });
-}
-```
+---
 
-**Key patterns:**
-- `refetchInterval + refetchIntervalInBackground` - No manual interval management
-- `structuralSharing` (built-in) - If balance value hasn't changed, components don't re-render
-- Global hooks accessible from anywhere - Automatic query deduplication
-- Local hooks isolated to pages - Simpler lifecycle management
+# 16) Time series and periods (TON metrics)
 
-**Other features to migrate (in priority order):**
+* Time units in API: unix (seconds).
+* Common case: last 7 days with 30-minute intervals.
+* Centralize date formatting utilities.
+* Example: `const weekAgo = Math.round(Date.now() / 1000 - 3600 * 24 * 7)`.
 
-1. **Webhooks** (`src/features/tonapi/webhooks/`)
-   - Similar CRUD pattern to API Keys
-   - Already has store, should be straightforward migration
+---
 
-2. **Liteproxy** (`src/features/tonapi/liteproxy/`)
-   - More complex (has server management operations)
-   - Start after webhooks is done
+# 17) Git and workflow
 
-3. **Statistics/Analytics**
-   - Complex time-series data
-   - Doesn't fit simple CRUD pattern
-   - May need custom React Query setup
-   - Consider last for migration
+* Branch from `master`. Commits are atomic.
+* Commit messages are meaningful.
+* **Important:** tools/assistants **must not** run `git add/commit/push` without an explicit request.
+* Before PR: pass DoD (§9).
+* Review checklist:
 
-**How to migrate a feature:**
+  * [ ] Matches React Query patterns
+  * [ ] No `any`/implicit types
+  * [ ] React Query cache updates are correct
+  * [ ] UI states covered
+  * [ ] Generated files unchanged manually
 
-1. Create `model/queries.ts` with `useQuery` and `useMutation` hooks
-2. Move data fetching logic from Store to query/mutation functions
-3. Create DTO mapping functions
-4. Update UI component to use hooks instead of store
-5. Wrap component with `observer()` only for MobX store dependencies
-6. Remove old store class and `useLocalObservableWithDestroy` calls
-7. Test that data loads on mount and refetches when project changes
-8. Update CLAUDE.md with pattern if there are special cases
+---
 
-**Reference:** See `src/features/tonapi/api-keys/` for the complete implementation.
+# 19) Examples (reference snippets)
 
-## Project-Specific Notes
+## 19.1 CRUD component (pattern)
 
-### API Client
+```tsx
+// features/tonapi/api-keys/ui/ApiKeys.tsx
+export const ApiKeys: FC = observer(() => {
+  const { data: apiKeys, isLoading, error } = useApiKeysQuery();
+  const { mutate: deleteKey, isPending } = useDeleteApiKeyMutation();
 
-**SDK-based API (using @hey-api/openapi-ts)**
-- Generated from OpenAPI/Swagger spec (`scripts/swagger.yaml`)
-- Located in `src/shared/api/console/`
-  - `sdk.gen.ts` - operationId-based SDK functions (flat imports)
-  - `types.gen.ts` - Generated TypeScript types with `DTO` prefix
-  - `client.gen.ts` - HTTP client configuration
-- Usage: Import functions directly: `import { getProjectData } from 'src/shared/api'`
-- Response format: `const { data, error, response } = await getProjectData({ ... })`
-- All API calls require `project_id` from `projectsStore.selectedProject`
+  if (isLoading) return <Spinner />;
+  if (error)     return <ErrorMessage error={error} />;
 
-**Other generators (not migrated):**
-- `generate-webhooks` - uses `swagger-typescript-api`
-- `generate-airdrop` - uses `swagger-typescript-api`
-- `generate-airdrop2` - uses `swagger-typescript-api`
-
-### Store Initialization & Data Fetching Strategy
-
-**Core Principle:**
-- **Data requests should only run on the page where they are needed**
-- **Don't initialize stores globally without justified necessity**
-- **Prefer local state management close to where it's used**
-
-#### ✅ RECOMMENDED: React Query Hooks (for CRUD operations)
-
-No initialization needed! Use hooks directly in components:
-
-```typescript
-// model/queries.ts
-export function useApiKeysQuery() {
-    const projectId = projectsStore.selectedProject?.id;
-
-    return useQuery({
-        queryKey: ['api-keys', projectId],
-        queryFn: async () => {
-            // Automatically refetches when projectId changes
-            const { data, error } = await getProjectTonApiTokens({
-                query: { project_id: projectId! }
-            });
-            if (error) throw error;
-            return data.items.map(mapDTOToApiKey);
-        },
-        enabled: !!projectId
-    });
-}
-
-// ui/ApiKeys.tsx
-const ApiKeys: FC = observer(() => {
-    const { data, isLoading, error } = useApiKeysQuery();
-    // No store initialization - just use the hook!
-    return <div>...</div>;
+  return (
+    <Overlay h="fit-content">
+      {apiKeys?.length ? (
+        <ApiKeysTable data={apiKeys} onDelete={id => deleteKey({ id })} isBusy={isPending} />
+      ) : (
+        <EmptyState onAction={() => {/* open create modal */}} />
+      )}
+    </Overlay>
+  );
 });
 ```
 
-**Why this is better:**
-- ✅ No disposers or cleanup logic needed
-- ✅ Automatic invalidation when `queryKey` changes
-- ✅ Component lifecycle-aware caching
-- ✅ Less boilerplate, more readable
+## 19.2 Query hook (pattern)
 
-#### ⚠️ DEPRECATED: Local MobX Store Pattern
-
-**Only use if refactoring existing legacy code. Don't use for new features.**
-
-```typescript
-// ❌ DEPRECATED
-const MyPage: FC = () => {
-    const myStore = useLocalObservableWithDestroy(
-        () => new MyFeatureStore(projectsStore)
-    );
-    return <MyPageContent />;
-};
+```ts
+// features/tonapi/api-keys/model/queries.ts
+export function useApiKeysQuery() {
+  const projectId = projectsStore.selectedProject?.id;
+  return useQuery({
+    queryKey: ['api-keys', projectId],
+    queryFn: async () => {
+      const { data, error } = await getProjectTonApiTokens({ query: { project_id: projectId! }});
+      if (error) throw error;
+      return data.items.map(mapDTOToApiKey);
+    },
+    enabled: !!projectId,
+  });
+}
 ```
 
-This pattern required:
-- `useLocalObservableWithDestroy` wrapper
-- `createImmediateReaction` setup
-- `dispose()` cleanup logic
-- Complex boilerplate
+---
 
-#### Global Stores (Rare Exception)
+# 20) Resources
 
-**Only use for truly global state needed across multiple unrelated pages:**
-- `projectsStore` - core project management
-- `userStore` - user authentication/info
-- `appStore` - global UI state
+* Repository: `ton-console`
+* Main branch: `master`
+* Liteservers documentation: link available in the UI
 
-**Do NOT add feature-specific stores to `root.store.ts`**. It's a smell that your state management is wrong.
+---
 
-### Time Series Data
+# 21) Command reference (for convenience)
 
-When working with metrics/statistics:
-- Use Unix timestamps (seconds) for API calls
-- Common period: last 7 days with 30-min intervals
-- Calculate: `weekAgo = Math.round(Date.now() / 1000 - 3600 * 24 * 7)`
-- Format dates for display with `toLocaleDateString()` and `toLocaleTimeString()`
+```bash
+# Dev
+npm run dev
+npm run dev-host
 
-## Resources
+# Quality
+npm run typecheck
+npm run lint
+npm run test
 
-- Project repository: `ton-console`
-- Main branch: `master`
-- Documentation on liteservers is linked in the UI
+# Build/preview
+npm run build
+npm run build:staging
+npm run preview
+
+# API generation
+npm run api:generate
+
+# Other generators (only when required)
+npm run generate-webhooks
+npm run generate-airdrop
+npm run generate-airdrop2
+```
+
+---
