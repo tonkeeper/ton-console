@@ -25,7 +25,7 @@ export const UsdtRefillTab: FC<UsdtRefillTabProps> = ({
 
     return (
         <>
-            <InputGroup mb="4">
+            <InputGroup>
                 <Input
                     ref={amountInputRef}
                     pr="60px"

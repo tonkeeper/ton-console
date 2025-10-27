@@ -1,13 +1,15 @@
-import { FC, useMemo, useState, useId } from 'react';
+import { FC, useMemo, useState, useId, useEffect } from 'react';
 import {
     Box,
     Button,
+    Divider,
     ModalBody,
     ModalCloseButton,
     ModalContent,
     ModalFooter,
     ModalHeader,
     Stack,
+    VStack,
     useRadio,
     useRadioGroup,
     useClipboard
@@ -15,11 +17,12 @@ import {
 import { createTransferLink, fromDecimals, H4 } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
-// eslint-disable-next-line no-restricted-imports
-import { useDepositAddressQuery, useApplyPromoCodeMutation } from 'src/features/balance';
+import { useBillingHistoryQuery } from 'src/shared/hooks';
 import { UsdtRefillTab } from './UsdtRefillTab';
 import { TonDeprecatedTab } from './TonDeprecatedTab';
 import { PromoCodeTab } from './PromoCodeTab';
+import { SuccessRefillMessage } from './SuccessRefillMessage';
+import { useDepositAddressQuery, useApplyPromoCodeMutation } from '../queries';
 
 type Currency = 'USDT' | 'TON';
 type RefillMode = 'USDT' | 'TON' | 'PROMO';
@@ -31,6 +34,12 @@ const CURRENCY_DECIMALS: Record<Currency, number> = {
     USDT: USDT_DECIMALS,
     TON: TON_DECIMALS
 } as const;
+
+interface DetectedRefill {
+    id: string;
+    amount: string;
+    date: Date;
+}
 
 const RadioCard: FC<{
     children: React.ReactNode;
@@ -70,8 +79,14 @@ const RadioCard: FC<{
 const RefillModalContent: FC<{
     onClose: () => void;
 }> = ({ onClose }) => {
-    const { data: depositAddress, isLoading: isDepositAddressLoading, error: depositAddressError } = useDepositAddressQuery();
+    const {
+        data: depositAddress,
+        isLoading: isDepositAddressLoading,
+        error: depositAddressError
+    } = useDepositAddressQuery();
     const { mutate: applyPromoCode, isPending: isPromoLoading } = useApplyPromoCodeMutation();
+    const { data: billingHistory = [] } = useBillingHistoryQuery();
+
     const usdtDepositWallet = depositAddress?.usdt_deposit_wallet;
     const tonDepositWallet = depositAddress?.ton_deposit_wallet;
 
@@ -82,6 +97,8 @@ const RefillModalContent: FC<{
 
     const [mode, setMode] = useState<RefillMode>('USDT');
     const [amount, setAmount] = useState<string>('');
+    const [detectedRefills, setDetectedRefills] = useState<DetectedRefill[]>([]);
+    const [baselineTransactionId, setBaselineTransactionId] = useState<string | null>(null);
 
     const {
         handleSubmit,
@@ -157,6 +174,40 @@ const RefillModalContent: FC<{
 
     const showCurrencyTabs = !!tonDepositWallet;
 
+    useEffect(() => {
+        if (baselineTransactionId === null && billingHistory.length > 0) {
+            setBaselineTransactionId(billingHistory[0].id);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (baselineTransactionId === null || billingHistory.length === 0) return;
+
+        const baselineIndex = billingHistory.findIndex(item => item.id === baselineTransactionId);
+        if (baselineIndex === -1) return;
+
+        const existsRefills = detectedRefills.map(item => item.id);
+
+        const newRefills: DetectedRefill[] = billingHistory
+            .slice(0, baselineIndex)
+            .filter(item => item.type === 'deposit')
+            .map(item => ({
+                id: item.id,
+                amount: item.amount.stringCurrencyAmount,
+                currency: item.amount.currency,
+                date: item.date
+            }))
+            .filter(item => !existsRefills.includes(item.id));
+        
+        const refills = [...detectedRefills, ...newRefills].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 2);
+
+        setDetectedRefills(refills);
+    }, [billingHistory, baselineTransactionId]);
+
+    const handleRemoveRefill = (id: string) => {
+        setDetectedRefills(prev => prev.filter(refill => refill.id !== id));
+    };
+
     return (
         <ModalContent maxW="400px">
             <ModalHeader>
@@ -217,9 +268,7 @@ const RefillModalContent: FC<{
                             />
                         )}
 
-                        {mode === 'TON' && (
-                            <TonDeprecatedTab tonDepositWallet={tonDepositWallet} />
-                        )}
+                        {mode === 'TON' && <TonDeprecatedTab tonDepositWallet={tonDepositWallet} />}
 
                         {mode === 'PROMO' && (
                             <PromoCodeTab
@@ -239,10 +288,11 @@ const RefillModalContent: FC<{
                 )}
             </ModalBody>
 
-            <ModalFooter flexDir="column" gap="3" pt="0">
+            <ModalFooter flexDir="column" gap="2" pt="0">
                 {mode === 'USDT' && (
                     <>
                         <Button
+                            mt="2"
                             w="full"
                             isDisabled={!paymentLink || isDepositAddressLoading}
                             onClick={handlePayByLink}
@@ -272,6 +322,25 @@ const RefillModalContent: FC<{
                     >
                         Apply Promo Code
                     </Button>
+                )}
+
+                {detectedRefills.length > 0 && (
+                    <>
+                        <Divider />
+                        <VStack align="stretch" w="full" spacing="1">
+                            {detectedRefills.map(refill => (
+                                <SuccessRefillMessage
+                                    key={refill.id}
+                                    amount={refill.amount}
+                                    date={refill.date}
+                                    onClose={() => handleRemoveRefill(refill.id)}
+                                />
+                            ))}
+                        </VStack>
+                        <Button w="full" onClick={onClose} variant="primary">
+                            Done
+                        </Button>
+                    </>
                 )}
             </ModalFooter>
         </ModalContent>

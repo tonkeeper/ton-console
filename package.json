@@ -12,6 +12,7 @@
     "test": "vitest",
     "typecheck": "tsc -p tsconfig.json --noemit",
     "lint": "eslint ./",
+    "lint:fix": "eslint ./ --fix",
     "prepare": "husky install",
     "api:generate": "openapi-ts",
     "generate-webhooks": "npx tsx ./scripts/webhooks.ts",

@@ -109,6 +109,12 @@ src/
 * Explicit types for public functions and after `map/filter/reduce`.
 * Domain types in `features/<domain>/<feature>/model/interfaces`.
 
+**Linting**
+
+* Run `npm run lint:fix` to fix linting errors.
+* Do **not use `// eslint-disable`** to disable linting errors.
+* ESLint error should be fixed, instead of disabled
+
 **Naming**
 
 * Components: `PascalCase`. Hooks: `useXxx`.
@@ -240,6 +246,7 @@ npm run dev-host
 
 npm run typecheck
 npm run lint
+npm run lint:fix
 npm run test
 
 npm run build
@@ -439,6 +446,7 @@ npm run dev-host
 # Quality
 npm run typecheck
 npm run lint
+npm run lint:fix
 npm run test
 
 # Build/preview
