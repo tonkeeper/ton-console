@@ -15,6 +15,7 @@ import {
     Text,
     useDisclosure,
     useRadioGroup,
+    UseRadioProps,
     VStack
 } from '@chakra-ui/react';
 import { CURRENCY, FilledWarnIcon16, formatWithSuffix, H4 } from 'src/shared';
@@ -84,7 +85,7 @@ const MessagesRefillModal: FC<{
                             <RadioCard
                                 w="100%"
                                 key={pkg.id}
-                                {...getRadioProps({ value: pkg.name })}
+                                {...(getRadioProps({ value: pkg.name }) as UseRadioProps)}
                             >
                                 <Box w="100%">
                                     <Flex justify="space-between">
