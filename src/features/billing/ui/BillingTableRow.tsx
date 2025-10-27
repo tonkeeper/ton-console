@@ -261,9 +261,6 @@ const SkeletonRow: FC<{ style: React.CSSProperties }> = ({ style: { top, ...styl
                 maxH={rowHeight}
                 borderRight="1px"
                 borderRightColor="background.contentTint"
-                // textAlign="right"
-                // alignContent="right"
-                // alignItems="right"
             >
                 <Skeleton w="100px" h="4" />
             </Td>
@@ -320,7 +317,6 @@ const ItemRow: FC<{ historyItem: BillingHistoryItem; style: React.CSSProperties 
                 borderRight="1px"
                 borderRightColor="background.contentTint"
                 title={historyItem.amount.stringAmountWithoutRound}
-                // textAlign="right"
             >
                 {mapTypeToSign[historyItem.type]}
                 {historyItem.amount.stringCurrencyAmount}
