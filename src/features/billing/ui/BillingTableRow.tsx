@@ -47,19 +47,18 @@ type DescriptionFormattersMap = {
         info: Extract<DTOBillingTxInfo, { reason: (typeof reverseReasonMapping)[K] }>,
         fallbackDescription: string
     ) => React.ReactNode;
-} & {
-    default: (info: DTOBillingTxInfo, fallbackDescription: string) => React.ReactNode;
 };
 
 const descriptionFormatters: DescriptionFormattersMap = {
     tonapi_monthly_payment: info => {
         const meta = info as DTOTonapiMonthlyPaymentMeta;
+        const tierName = meta.tier?.name;
         return (
             <>
                 REST API monthly payment
-                {meta.tier?.name && (
+                {tierName && (
                     <>
-                        — <strong>{meta.tier!.name}</strong>
+                        — <strong>{tierName}</strong>
                     </>
                 )}
             </>
@@ -67,13 +66,14 @@ const descriptionFormatters: DescriptionFormattersMap = {
     },
     tonapi_instant_payment: info => {
         const meta = info as DTOTonapiInstantPaymentMeta;
+        const tierName = meta.tier?.name;
         return (
             <>
                 REST API payment
-                {meta.tier?.name && (
+                {tierName && (
                     <>
                         {' '}
-                        — <strong>{meta.tier!.name}</strong>
+                        — <strong>{tierName}</strong>
                     </>
                 )}
             </>
@@ -81,13 +81,14 @@ const descriptionFormatters: DescriptionFormattersMap = {
     },
     tonapi_change_tier: info => {
         const meta = info as DTOTonapiChangeTierMeta;
+        const newTierName = meta.new_tier?.name;
         return (
             <>
-                REST API monthly payment change
-                {meta.new_tier?.name && (
+                REST API tier change
+                {newTierName && (
                     <>
                         {' '}
-                        <strong>{meta.new_tier!.name}</strong>
+                        <strong>{newTierName}</strong>
                     </>
                 )}
             </>
@@ -95,13 +96,14 @@ const descriptionFormatters: DescriptionFormattersMap = {
     },
     liteproxy_monthly_payment: info => {
         const meta = info as DTOLiteproxyMonthlyPaymentMeta;
+        const tierName = meta.tier?.name;
         return (
             <>
                 Liteservers monthly payment
-                {meta.tier?.name && (
+                {tierName && (
                     <>
                         {' '}
-                        — <strong>{meta.tier!.name}</strong>
+                        — <strong>{tierName}</strong>
                     </>
                 )}
             </>
@@ -109,13 +111,14 @@ const descriptionFormatters: DescriptionFormattersMap = {
     },
     liteproxy_change_tier: info => {
         const meta = info as DTOLiteproxyChangeTierMeta;
+        const newTierName = meta.new_tier?.name;
         return (
             <>
                 Liteservers tier change
-                {meta.new_tier?.name && (
+                {newTierName && (
                     <>
                         {' '}
-                        → <strong>{meta.new_tier!.name}</strong>
+                        → <strong>{newTierName}</strong>
                     </>
                 )}
             </>
@@ -189,7 +192,7 @@ const descriptionFormatters: DescriptionFormattersMap = {
         if (!meta.period) {
             return <>Webhooks API payment</>;
         }
-        const minutes = Math.round((meta.period ?? 0) / 60);
+        const minutes = Math.round((meta.period) / 60);
         const hours = Math.round(minutes / 60);
         const timeStr = minutes >= 60 ? `${hours}h` : `${minutes}m`;
         return (
@@ -200,8 +203,7 @@ const descriptionFormatters: DescriptionFormattersMap = {
     },
     replenishment_of_deposit: () => <>Refill balance</>,
     analytics_request_payment: () => <>Analytics query</>,
-    Default: () => <>Other transaction</>,
-    default: (_info, fallbackDescription) => <>{fallbackDescription}</>
+    Default: (_info, fallbackDescription) => <>{fallbackDescription}</>
 };
 
 function formatBillingDescription(historyItem: BillingHistoryItem): React.ReactNode {
