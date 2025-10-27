@@ -7,4 +7,5 @@ export { useIntervalUpdate } from './useIntervalUpdate';
 export { useLocalObservableWithDestroy } from './useLocalObservableWithDestroy';
 export { useLocalStorage } from './useLocalStorage';
 export { useSearchParams } from './useSearchParams';
+export { useBillingHistoryQuery } from './useBillingHistoryQuery';
 export * from './useIsTextTruncated';

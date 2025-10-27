@@ -6,8 +6,8 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { BillingTableStructure } from './BillingTableStructure';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
-import { BillingHistoryItem } from '../model';
 import BillingTableRow from './BillingTableRow';
+import { BillingHistoryItem } from 'src/shared/hooks/useBillingHistoryQuery';
 
 interface BillingHistoryTableProps extends BoxProps {
     billingHistory: BillingHistoryItem[];

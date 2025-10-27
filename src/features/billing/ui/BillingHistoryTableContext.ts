@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { BillingHistoryItem } from '../model';
+import { BillingHistoryItem } from 'src/shared/hooks/useBillingHistoryQuery';
 
 interface BillingHistoryTableContextType {
     billingHistory: BillingHistoryItem[];
