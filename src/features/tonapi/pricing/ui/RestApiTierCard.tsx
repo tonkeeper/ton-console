@@ -12,9 +12,8 @@ import {
     Text,
     TextProps
 } from '@chakra-ui/react';
-import { CURRENCY, H2, InfoTooltip, DoneIconCircle24, toDate } from 'src/shared';
+import { H2, InfoTooltip, DoneIconCircle24, toDate } from 'src/shared';
 import { RestApiSelectedTier, RestApiTier } from '../model';
-import { CurrencyRate } from 'src/entities';
 
 export const RestApiTierCard: FC<
     CardProps & {
@@ -39,17 +38,10 @@ export const RestApiTierCard: FC<
             </Text>
 
             <H2>{tier.price.stringCurrencyAmount}</H2>
-            <CurrencyRate
-                textStyle="body2"
-                color="text.secondary"
-                mb="4"
-                currency={CURRENCY.TON}
-                amount={tier.price.amount}
-                reverse
-                {...tonPriceStyles}
-            >
-                &nbsp;TON monthly
-            </CurrencyRate>
+            <Text textStyle="body2" color="text.secondary">
+                {/* TODO count requests need fix */}
+                {tier.type === 'monthly' ? 'Monthly' : 'By 1000 requests'}{' '}
+            </Text>
         </Flex>
         <Stack spacing={0}>
             <Flex direction="column">
