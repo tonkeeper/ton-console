@@ -42,7 +42,7 @@ export const FileInfoComponent = () => {
                     (example: 1000000 for 1 USDT, decimals=6). The value must be positive, and
                     decimal points are not allowed;
                     <br />
-                    4. Recipient wallet addresses in user-friendly or raw format, with no duplicate
+                    4. Recipient wallet addresses in user-friendly or raw format, with no&nbsp;duplicate
                     addresses allowed. More information in{' '}
                     <Link
                         color="accent.blue"

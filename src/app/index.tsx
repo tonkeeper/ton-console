@@ -1,11 +1,9 @@
-import { FC } from 'react';
-
 import { withProviders } from './providers';
 import Routing from 'src/pages';
 import { AppInitialization, ApplyQueryParams } from 'src/processes';
 import FeedbackModal from 'src/features/feedback/FeedbackModal';
 
-const App: FC<void> = () => {
+const App = () => {
     return (
         <AppInitialization>
             <ApplyQueryParams>

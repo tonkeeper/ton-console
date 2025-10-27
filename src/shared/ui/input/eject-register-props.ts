@@ -1,10 +1,15 @@
 import { UseFormRegisterReturn } from 'react-hook-form';
 
-export function ejectRegisterProps<T extends object>(
-    props: UseFormRegisterReturn
+type RegisterFieldProps = Pick<
+    UseFormRegisterReturn,
+    'onChange' | 'onBlur' | 'name' | 'min' | 'max' | 'maxLength' | 'minLength' | 'pattern' | 'required' | 'disabled'
+>;
+
+export function ejectRegisterProps<T extends Record<string, any>>(
+    props: T
 ): {
-    register: Omit<UseFormRegisterReturn, 'ref'>;
-    rest?: T;
+    register: RegisterFieldProps;
+    rest: Omit<T, keyof RegisterFieldProps>;
 } {
     const {
         onChange,
@@ -33,6 +38,6 @@ export function ejectRegisterProps<T extends object>(
             required,
             disabled
         },
-        rest: rest as T
+        rest: rest as Omit<T, keyof RegisterFieldProps>
     };
 }
