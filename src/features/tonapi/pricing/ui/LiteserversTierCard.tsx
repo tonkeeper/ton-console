@@ -13,7 +13,6 @@ import {
     TextProps
 } from '@chakra-ui/react';
 import {
-    CURRENCY,
     H2,
     DoneIconCircle24,
     toDate,
@@ -21,7 +20,6 @@ import {
     UsdCurrencyAmount,
     DTOProjectLiteproxyTierDetail
 } from 'src/shared';
-import { CurrencyRate } from 'src/entities';
 
 export const LiteserversTierCard: FC<
     CardProps & {
@@ -48,16 +46,9 @@ export const LiteserversTierCard: FC<
                 </Text>
 
                 <H2>{price.stringCurrencyAmount}</H2>
-                <CurrencyRate
-                    textStyle="body2"
-                    color="text.secondary"
-                    currency={CURRENCY.TON}
-                    amount={price.amount}
-                    reverse
-                    {...tonPriceStyles}
-                >
-                    &nbsp;TON monthly
-                </CurrencyRate>
+                <Text textStyle="body2" color="text.secondary">
+                    Monthly
+                </Text>
             </Flex>
             <Stack spacing={0}>
                 <Flex direction="column">
