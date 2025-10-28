@@ -1,10 +1,8 @@
 import { FC, useId, useState } from 'react';
-import { observer } from 'mobx-react-lite';
 import { H4, isNumber, Overlay, Span, TonCurrencyAmount, useIntervalUpdate } from 'src/shared';
 import { Button, Divider, Flex, Link, useDisclosure } from '@chakra-ui/react';
 import {
     FaucetForm,
-    faucetStore,
     RequestFaucetForm,
     FaucetFormInternal,
     FaucetPaymentDetailsModal
@@ -13,14 +11,20 @@ import { FormProvider, useForm } from 'react-hook-form';
 import BigNumber from 'bignumber.js';
 import { RefillModal } from 'src/entities';
 import { useBalanceQuery } from 'src/features/balance';
+import { useFaucetSupplyAndRate, useBuyTestnetCoinsMutation } from 'src/features/faucet/model/queries';
 
 const FaucetPage: FC = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { isOpen: isRefillOpen, onClose: onRefillClose, onOpen: onRefillOpen } = useDisclosure();
     const [receiverAddress, setReceiverAddress] = useState('');
     const [amount, setAmount] = useState<TonCurrencyAmount | undefined>(undefined);
+    const [latestPurchase, setLatestPurchase] = useState<{ amount: TonCurrencyAmount; link: string } | null>(null);
 
-    useIntervalUpdate(faucetStore.fetchTonSupplyAndRate);
+    const { data: supplyAndRate, refetch: refetchSupplyAndRate } = useFaucetSupplyAndRate();
+    const { mutate: buyTestnetCoins, isPending: isBuyingAssets } = useBuyTestnetCoinsMutation();
+
+    // Setup interval update for supply and rate
+    useIntervalUpdate(refetchSupplyAndRate);
 
     const formId = useId();
 
@@ -29,11 +33,11 @@ const FaucetPage: FC = () => {
 
     const { watch } = methods;
     const inputAmount = watch('tonAmount');
-    const rate = faucetStore.tonRate$.value;
+    const rate = supplyAndRate?.tonRate ?? 0;
 
     let price: TonCurrencyAmount | undefined;
     if (
-        faucetStore.tonRate$.isResolved &&
+        supplyAndRate &&
         isNumber(inputAmount) &&
         Number(inputAmount) &&
         Number(inputAmount) >= 0.01
@@ -58,6 +62,18 @@ const FaucetPage: FC = () => {
         onRefillOpen();
     };
 
+    const handlePaymentConfirm = (form: RequestFaucetForm): void => {
+        buyTestnetCoins(form, {
+            onSuccess: (data) => {
+                setLatestPurchase({
+                    amount: data.amount,
+                    link: data.link
+                });
+                onClose();
+            }
+        });
+    };
+
     return (
         <Overlay h="fit-content">
             <H4 mb="5">Testnet Assets</H4>
@@ -65,24 +81,24 @@ const FaucetPage: FC = () => {
             <FormProvider {...methods}>
                 <FaucetForm
                     id={formId}
-                    tonLimit={faucetStore.tonSupply$.value || undefined}
+                    tonLimit={supplyAndRate?.tonSupply || undefined}
                     onSubmit={onSubmit}
-                    isDisabled={faucetStore.buyAssets.isLoading}
+                    isDisabled={isBuyingAssets}
                     mb="6"
                     w="512px"
                 />
             </FormProvider>
             <Flex align="center" gap="4">
-                <Button form={formId} isLoading={faucetStore.buyAssets.isLoading} type="submit">
+                <Button form={formId} isLoading={isBuyingAssets} type="submit">
                     {price ? `Buy for ${price.stringCurrencyAmount}` : 'Buy Testnet Assets'}
                 </Button>
-                {faucetStore.latestPurchase && (
+                {latestPurchase && (
                     <Span textStyle="label2" color="text.secondary">
-                        Bought {faucetStore.latestPurchase.amount.stringAmount} testnet TON.{' '}
+                        Bought {latestPurchase.amount.stringAmount} testnet TON.{' '}
                         <Link
                             textStyle="label2"
                             color="text.accent"
-                            href={faucetStore.latestPurchase.link}
+                            href={latestPurchase.link}
                             isExternal
                         >
                             View in explorer
@@ -96,10 +112,12 @@ const FaucetPage: FC = () => {
                 price={price}
                 amount={amount}
                 receiverAddress={receiverAddress}
+                onConfirm={handlePaymentConfirm}
+                isLoading={isBuyingAssets}
             />
             <RefillModal isOpen={isRefillOpen} onClose={onRefillClose} />
         </Overlay>
     );
 };
 
-export default observer(FaucetPage);
+export default FaucetPage;
