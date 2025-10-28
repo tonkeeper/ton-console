@@ -1,16 +1,16 @@
 import { Button, Flex, useDisclosure, BoxProps, Spinner, Text } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
 import { EmptyPage } from 'src/entities';
-import { CNFTAddModal, CNFTTable, CNFTStore } from 'src/features';
-import { EXTERNAL_LINKS, H4, Overlay, useLocalObservableWithDestroy } from 'src/shared';
+import { CNFTAddModal, CNFTTable } from 'src/features';
+import { EXTERNAL_LINKS, H4, Overlay } from 'src/shared';
+import { useCNftHistory } from 'src/features/nft/model/queries';
 
 const CnftPage: FC<BoxProps> = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const cnftStore = useLocalObservableWithDestroy(() => new CNFTStore());
-    const isSitesEmpty = cnftStore.history$.value.length === 0;
+    const { data: cnftHistory = [], isLoading } = useCNftHistory();
+    const isSitesEmpty = cnftHistory.length === 0;
 
-    if (isSitesEmpty && cnftStore.history$.isLoading) {
+    if (isSitesEmpty && isLoading) {
         return (
             <Overlay display="flex" justifyContent="center" alignItems="center">
                 <Spinner />
@@ -18,7 +18,7 @@ const CnftPage: FC<BoxProps> = () => {
         );
     }
 
-    if (cnftStore.history$.value.length === 0) {
+    if (cnftHistory.length === 0) {
         return (
             <>
                 <EmptyPage
@@ -36,7 +36,7 @@ const CnftPage: FC<BoxProps> = () => {
                         minting.
                     </Text>
                 </EmptyPage>
-                <CNFTAddModal cnftStore={cnftStore} isOpen={isOpen} onClose={onClose} />
+                <CNFTAddModal isOpen={isOpen} onClose={onClose} />
             </>
         );
     }
@@ -49,10 +49,10 @@ const CnftPage: FC<BoxProps> = () => {
                     Add cNFT
                 </Button>
             </Flex>
-            <CNFTAddModal cnftStore={cnftStore} isOpen={isOpen} onClose={onClose} />
-            <CNFTTable cnftStore={cnftStore} />
+            <CNFTAddModal isOpen={isOpen} onClose={onClose} />
+            <CNFTTable cnftHistory={cnftHistory} isLoading={isLoading} />
         </Overlay>
     );
 };
 
-export default observer(CnftPage);
+export default CnftPage;
