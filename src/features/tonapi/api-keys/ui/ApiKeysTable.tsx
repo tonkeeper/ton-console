@@ -119,7 +119,7 @@ const ApiKeysTable: FC<ApiKeysTableProps> = ({ apiKeys, ...props }) => {
                                 </Td>
                                 <Td>{apiKey.capabilities.join(', ') || '-'}</Td>
                                 <Td>
-                                    {apiKey.limitRps === null
+                                    {apiKey.limitRps === undefined
                                         ? 'Unlimited'
                                         : `IP - ${apiKey.limitRps} RPS`}
                                 </Td>
