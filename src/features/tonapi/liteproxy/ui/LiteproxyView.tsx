@@ -1,8 +1,7 @@
 import { Text, Flex, Button } from '@chakra-ui/react';
 import { FC } from 'react';
 import { CopyPad } from 'src/shared';
-import { liteproxysStore } from 'src/shared/stores';
-import { observer } from 'mobx-react-lite';
+import { useLiteproxyList } from 'src/features/tonapi/liteproxy/model/queries';
 import DownloadConfigButton from './DownloadConfigButton';
 
 interface LiteproxyViewProps {
@@ -10,7 +9,7 @@ interface LiteproxyViewProps {
 }
 
 const LiteproxyView: FC<LiteproxyViewProps> = ({ onStatisticsClick }) => {
-    const liteproxyList = liteproxysStore.liteproxyList$.value;
+    const { data: liteproxyList = [] } = useLiteproxyList();
 
     return (
         <>
@@ -42,4 +41,4 @@ const LiteproxyView: FC<LiteproxyViewProps> = ({ onStatisticsClick }) => {
     );
 };
 
-export default observer(LiteproxyView);
+export default LiteproxyView;

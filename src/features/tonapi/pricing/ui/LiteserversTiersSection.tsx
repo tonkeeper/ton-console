@@ -1,8 +1,11 @@
 import { FC, useState } from 'react';
-import { observer } from 'mobx-react-lite';
-import { Box, Text, Grid, Link, Flex, useDisclosure } from '@chakra-ui/react';
+import { Box, Text, Grid, Link, Flex, useDisclosure, Spinner, Center } from '@chakra-ui/react';
 import { SimpleTierCard } from './SimpleTierCard';
-import { liteproxysStore } from 'src/shared/stores';
+import {
+    useLiteproxyTiers,
+    useSelectedLiteproxyTier,
+    useCheckValidChangeLiteproxyTierMutation
+} from 'src/features/tonapi/liteproxy/model/queries';
 import { DTOLiteproxyTier, UsdCurrencyAmount } from 'src/shared';
 import LiteserversPurchaseDialog from './LiteserversPurchaseDialog';
 import { RefillModal } from 'src/entities';
@@ -12,10 +15,13 @@ interface LiteserverTierWithUnspent extends DTOLiteproxyTier {
     unspentMoney?: UsdCurrencyAmount;
 }
 
-export const LiteserversTiersSection: FC = observer(() => {
-    const [selectedLiteserverTier, setSelectedLiteserverTier] = useState<LiteserverTierWithUnspent | null>(
-        null
-    );
+export const LiteserversTiersSection: FC = () => {
+    const [selectedLiteserverTier, setSelectedLiteserverTier] =
+        useState<LiteserverTierWithUnspent | null>(null);
+
+    const { data: liteserverTiers, isLoading: isLiteserversLoading } = useLiteproxyTiers();
+    const { data: currentLiteserverTier } = useSelectedLiteproxyTier();
+    const { mutateAsync: checkValidChangeTier } = useCheckValidChangeLiteproxyTierMutation();
 
     const {
         isOpen: isLiteserversPurchaseDialogOpen,
@@ -30,34 +36,33 @@ export const LiteserversTiersSection: FC = observer(() => {
     } = useDisclosure();
 
     const handleSelectLiteserverTier = async (tier: DTOLiteproxyTier) => {
-        const selectedLiteserverDetail = liteproxysStore?.selectedTier$.value;
+        const isCurrentSubscription = currentLiteserverTier?.id === tier.id;
 
-        const isCurrentSubscription = selectedLiteserverDetail?.id === tier.id;
+        if (isCurrentSubscription) return;
 
-        if (!isCurrentSubscription) {
-            const { valid, unspent_money } = await liteproxysStore.checkValidChangeTier(tier.id);
+        const { valid, unspent_money } = await checkValidChangeTier(tier.id);
 
-            if (!valid) {
-                onRefillModalOpen();
-                return;
-            }
-
-            const unspentMoney = unspent_money ? new UsdCurrencyAmount(unspent_money) : undefined;
-
-            setSelectedLiteserverTier({
-                ...tier,
-                unspentMoney
-            });
-            onLiteserversPurchaseDialogOpen();
+        if (!valid) {
+            onRefillModalOpen();
+            return;
         }
+
+        const unspentMoney = unspent_money ? new UsdCurrencyAmount(unspent_money) : undefined;
+
+        setSelectedLiteserverTier({
+            ...tier,
+            unspentMoney
+        });
+        onLiteserversPurchaseDialogOpen();
     };
 
-    if (!liteproxysStore?.liteproxyTiers$.isResolved) {
-        return null;
+    if (isLiteserversLoading || !liteserverTiers) {
+        return (
+            <Center py="8">
+                <Spinner />
+            </Center>
+        );
     }
-
-    const liteserverTiers = liteproxysStore.liteproxyTiers$.value;
-    const currentLiteserverTier = liteproxysStore.selectedTier$.value;
 
     return (
         <>
@@ -123,4 +128,4 @@ export const LiteserversTiersSection: FC = observer(() => {
             <RefillModal isOpen={isRefillModalOpen} onClose={onRefillModalClose} />
         </>
     );
-});
+};
