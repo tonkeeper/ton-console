@@ -30,7 +30,7 @@ export const SimpleTierCard: FC<SimpleTierCardProps> = ({
         <Card
             pos="relative"
             direction="column"
-            p="4"
+            p="2"
             border={isCurrent ? '2px solid' : '1px solid'}
             borderColor={isCurrent ? 'text.secondary' : 'gray.200'}
             transition="all 0.2s"
@@ -59,11 +59,11 @@ export const SimpleTierCard: FC<SimpleTierCardProps> = ({
             )}
 
             <Flex justify="space-between" gap="4">
-                <Flex direction="column" flex="1" gap="1">
+                <Flex direction="column" flex="1">
                     <Text textStyle="label2" color="text.secondary">
                         {name}
                     </Text>
-                    <H2>{price}</H2>
+                    <H2 fontSize={24}>{price}</H2>
                     {priceDescription && (
                         <Text textStyle="body2" color="text.secondary">
                             {priceDescription}
@@ -82,11 +82,11 @@ export const SimpleTierCard: FC<SimpleTierCardProps> = ({
                             {buttonText}
                         </Button>
                     ) : (
-                        <Flex align="flex-end" direction="column" gap="1">
+                        <Flex align="flex-end" direction="column">
                             <Text textStyle="label2" color="text.secondary">
                                 RPS
                             </Text>
-                            <H2>{rps}</H2>
+                            <H2 fontSize={24}>{rps}</H2>
                         </Flex>
                     )}
                 </Flex>

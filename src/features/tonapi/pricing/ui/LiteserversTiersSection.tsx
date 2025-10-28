@@ -78,7 +78,7 @@ export const LiteserversTiersSection: FC = observer(() => {
                     </Text>
                 </Flex>
 
-                <Grid gap="4" templateColumns="repeat(auto-fit, minmax(290px, 1fr))">
+                <Grid gap="4" templateColumns="repeat(auto-fit, minmax(230px, 1fr))">
                     {liteserverTiers?.map(tier => {
                         const price = new UsdCurrencyAmount(tier.usd_price);
                         const isCurrent = currentLiteserverTier?.id === tier.id;
@@ -105,7 +105,7 @@ export const LiteserversTiersSection: FC = observer(() => {
                         rps="∞"
                         priceDescription="Contact us"
                         onSelect={openFeedbackModal('unlimited-liteservers')}
-                        buttonText="Make request"
+                        buttonText="Request"
                         buttonVariant="contrast"
                     />
                 </Grid>

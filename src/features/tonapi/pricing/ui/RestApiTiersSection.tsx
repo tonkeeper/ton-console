@@ -84,7 +84,7 @@ export const RestApiTiersSection: FC = observer(() => {
                     </Text>
                 </Flex>
 
-                <Grid gap="4" templateColumns="repeat(auto-fit, minmax(290px, 1fr))">
+                <Grid gap="4" templateColumns="repeat(auto-fit, minmax(230px, 1fr))">
                     {sortedTiers.map(tier => {
                         const isCurrent = currentRestApiTier?.id === tier.id;
                         const isFree = tier.price.amount.eq(0);
@@ -117,7 +117,7 @@ export const RestApiTiersSection: FC = observer(() => {
                         rps="∞"
                         priceDescription="Contact us"
                         onSelect={openFeedbackModal('unlimited-tonapi')}
-                        buttonText="Make request"
+                        buttonText="Request"
                         buttonVariant="contrast"
                     />
                 </Grid>
