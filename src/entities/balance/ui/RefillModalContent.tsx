@@ -322,10 +322,6 @@ const RefillModalContent: FC<{
                         Apply Promo Code
                     </Button>
                 )}
-
-                <Button w="full" mt={mode === 'TON' ? 3 : 0} onClick={onClose} variant="primary">
-                    Done
-                </Button>
             </ModalFooter>
         </ModalContent>
     );
