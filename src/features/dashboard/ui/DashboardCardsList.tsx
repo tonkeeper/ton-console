@@ -1,11 +1,12 @@
 import { FC } from 'react';
 import { BoxProps, Center, Grid, GridItem, Spinner } from '@chakra-ui/react';
 import { DashboardTierCard } from '../../tonapi';
-import { restApiTiersStore } from 'src/shared/stores';
-import { observer } from 'mobx-react-lite';
+import { useSelectedRestApiTier } from 'src/features/tonapi/pricing/model/queries';
 
 const DashboardCardsList: FC<BoxProps> = props => {
-    if (!restApiTiersStore.selectedTier$.isResolved) {
+    const { data: selectedTier, isLoading } = useSelectedRestApiTier();
+
+    if (isLoading) {
         return (
             <Center h="78px" {...props}>
                 <Spinner />
@@ -15,19 +16,19 @@ const DashboardCardsList: FC<BoxProps> = props => {
 
     return (
         <Grid gridTemplate="1fr / repeat(4, 1fr)" {...props}>
-            {restApiTiersStore.selectedTier$.value && (
+            {selectedTier && (
                 <GridItem
                     gridColumn={
-                        restApiTiersStore.selectedTier$.value?.price.amount.isZero()
+                        selectedTier.price.amount.isZero()
                             ? 'unset'
                             : 'span 2'
                     }
                 >
-                    <DashboardTierCard tier={restApiTiersStore.selectedTier$.value} />
+                    <DashboardTierCard tier={selectedTier} />
                 </GridItem>
             )}
         </Grid>
     );
 };
 
-export default observer(DashboardCardsList);
+export default DashboardCardsList;

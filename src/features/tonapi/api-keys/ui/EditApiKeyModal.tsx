@@ -12,7 +12,7 @@ import {
 import { FormProvider, useForm } from 'react-hook-form';
 import { ApiKey, CreateApiKeyForm, useEditApiKeyMutation } from '../model';
 import { ApiKeyForm, ApiKeyFormInternal, toApiKeyFormDefaultValues } from './ApiKeyForm';
-import { restApiTiersStore } from 'src/shared/stores';
+import { useSelectedRestApiTier } from 'src/features/tonapi/pricing/model/queries';
 
 const EditApiKeyModal: FC<{
     isOpen: boolean;
@@ -55,7 +55,8 @@ const EditApiKeyModal: FC<{
         [apiKey, editApiKey, onClose, reset]
     );
 
-    const maxLimit = restApiTiersStore.selectedTier$.value?.rps ?? 1;
+    const { data: selectedTier } = useSelectedRestApiTier();
+    const maxLimit = selectedTier?.rps ?? 1;
 
     return (
         <Modal onClose={onClose} scrollBehavior="inside" {...rest}>

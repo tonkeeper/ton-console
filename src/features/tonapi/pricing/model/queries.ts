@@ -1,37 +1,26 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useToast } from '@chakra-ui/react';
 import {
+    DTOTier,
+    DTOAppTier,
+    getTonApiTiers,
     getProjectTonApiTier,
-    DTOAppTier
+    updateProjectTonApiTier,
+    validChangeTonApiTier
 } from 'src/shared/api';
-import { projectsStore } from 'src/shared/stores';
 import { UsdCurrencyAmount } from 'src/shared';
-import { RestApiSelectedTier } from './interfaces';
+import { RestApiTier, RestApiSelectedTier } from './interfaces';
 
-const REST_API_SELECTED_TIER_QUERY_KEY = ['rest-api-selected-tier'] as const;
-
-/**
- * Hook for fetching the selected REST API tier for the current project
- * Uses project change as a dependency for automatic refetch
- */
-export function useRestApiSelectedTierQuery() {
-    const projectId = projectsStore.selectedProject?.id;
-
-    return useQuery<RestApiSelectedTier | null>({
-        queryKey: [...REST_API_SELECTED_TIER_QUERY_KEY, projectId] as const,
-        queryFn: async () => {
-            if (!projectId) throw new Error('No project selected');
-
-            const { data, error } = await getProjectTonApiTier({
-                query: { project_id: projectId }
-            });
-
-            if (error) throw error;
-
-            return mapAppTierToSelectedTier(data.tier);
-        },
-        enabled: !!projectId,
-        staleTime: 5 * 60 * 1000 // Cache for 5 minutes
-    });
+// Mappers
+function mapTierToRestApiTier(tier: DTOTier): RestApiTier {
+    return {
+        id: tier.id,
+        name: tier.name,
+        price: new UsdCurrencyAmount(tier.usd_price),
+        rps: tier.rpc,
+        type: tier.instant_payment ? 'pay-as-you-go' : 'monthly'
+    };
 }
 
 function mapAppTierToSelectedTier(tier: DTOAppTier | null): RestApiSelectedTier | null {
@@ -52,4 +41,103 @@ function mapAppTierToSelectedTier(tier: DTOAppTier | null): RestApiSelectedTier 
         renewsDate,
         active: true
     };
+}
+
+// Query Hooks
+export function useRestApiTiers() {
+    return useQuery({
+        queryKey: ['rest-api-tiers'],
+        queryFn: async () => {
+            const { data, error } = await getTonApiTiers();
+            if (error) throw error;
+            return data.items.map(mapTierToRestApiTier);
+        },
+        staleTime: 5 * 60 * 1000 // Tiers don't change often
+    });
+}
+
+export function useSelectedRestApiTier() {
+    const projectId = useProjectId();
+
+    return useQuery({
+        queryKey: ['selected-rest-api-tier', projectId || undefined],
+        queryFn: async () => {
+            if (!projectId) return null;
+
+            const { data, error } = await getProjectTonApiTier({
+                query: { project_id: projectId }
+            });
+            if (error) throw error;
+
+            return mapAppTierToSelectedTier(data.tier);
+        },
+        enabled: !!projectId,
+        staleTime: 30 * 1000
+    });
+}
+
+// Legacy export for backward compatibility
+export function useRestApiSelectedTierQuery() {
+    return useSelectedRestApiTier();
+}
+
+// Mutation Hooks
+export function useSelectRestApiTierMutation() {
+    const queryClient = useQueryClient();
+    const projectId = useProjectId();
+    const toast = useToast();
+
+    return useMutation({
+        mutationFn: async (tierId: number) => {
+            const currentProjectId = projectId;
+            if (!currentProjectId) throw new Error('Project not selected');
+
+            const { data, error } = await updateProjectTonApiTier({
+                query: { project_id: currentProjectId },
+                body: { tier_id: tierId }
+            });
+            if (error) throw error;
+
+            return { tier: mapAppTierToSelectedTier(data.tier), _projectId: currentProjectId };
+        },
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({
+                queryKey: ['selected-rest-api-tier', data._projectId]
+            });
+            toast({
+                title: 'Successful purchase',
+                status: 'success',
+                duration: 3000,
+                isClosable: true
+            });
+        },
+        onError: () => {
+            toast({
+                title: 'Unsuccessful purchase',
+                status: 'error',
+                duration: 3000,
+                isClosable: true
+            });
+        }
+    });
+}
+
+export function useCheckValidChangeRestApiTierMutation() {
+    const projectId = useProjectId();
+
+    return useMutation({
+        mutationFn: async (tierId: number) => {
+            const currentProjectId = projectId;
+            if (!currentProjectId) throw new Error('Project not selected');
+
+            const { data, error } = await validChangeTonApiTier({
+                path: { id: tierId },
+                query: { project_id: currentProjectId }
+            });
+
+            if (error) throw error;
+
+            return data;
+        }
+    });
 }
