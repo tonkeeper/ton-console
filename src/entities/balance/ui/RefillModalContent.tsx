@@ -288,7 +288,7 @@ const RefillModalContent: FC<{
                 )}
             </ModalBody>
 
-            <ModalFooter flexDir="column" gap="2" pt="0" mt="2">
+            <ModalFooter flexDir="column" gap="2" mt="2" pt="0">
                 {mode === 'USDT' && (
                     <Flex gap="2" w="full">
                         <Button
@@ -323,7 +323,7 @@ const RefillModalContent: FC<{
                     </Button>
                 )}
 
-                <Button onClick={onClose} variant="secondary" w="full">
+                <Button w="full" onClick={onClose} variant="secondary">
                     Close
                 </Button>
             </ModalFooter>
