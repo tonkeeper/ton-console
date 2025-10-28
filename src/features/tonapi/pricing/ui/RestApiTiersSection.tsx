@@ -1,8 +1,11 @@
 import { FC, useState } from 'react';
-import { observer } from 'mobx-react-lite';
-import { Box, Text, Grid, Link, Flex, useDisclosure } from '@chakra-ui/react';
+import { Box, Text, Grid, Link, Flex, useDisclosure, Spinner, Center } from '@chakra-ui/react';
 import { SimpleTierCard } from './SimpleTierCard';
-import { restApiTiersStore } from 'src/shared/stores';
+import {
+    useRestApiTiers,
+    useSelectedRestApiTier,
+    useCheckValidChangeRestApiTierMutation
+} from '../model/queries';
 import { RestApiTier } from '../model';
 import { UsdCurrencyAmount } from 'src/shared';
 import RestApiPurchaseDialog from './RestApiPurchaseDialog';
@@ -10,9 +13,11 @@ import { RefillModal } from 'src/entities';
 import { Link as RouterLink } from 'react-router-dom';
 import { openFeedbackModal } from 'src/features/feedback/model/feedback';
 
-export const RestApiTiersSection: FC = observer(() => {
-    const storeSelectedTonApiTier = restApiTiersStore?.selectedTier$;
+export const RestApiTiersSection: FC = () => {
     const [selectedTier, setSelectedTier] = useState<RestApiTier | null>(null);
+    const { data: tiers, isLoading: isRestApiTiersLoading } = useRestApiTiers();
+    const { data: currentRestApiTier } = useSelectedRestApiTier();
+    const { mutateAsync: checkValidChangeTier } = useCheckValidChangeRestApiTierMutation();
 
     const {
         isOpen: isRestApiPurchaseDialogOpen,
@@ -27,35 +32,36 @@ export const RestApiTiersSection: FC = observer(() => {
     } = useDisclosure();
 
     const handleSelectRestApiTier = async (tier: RestApiTier) => {
-        const isCurrentSubscription =
-            storeSelectedTonApiTier.value && storeSelectedTonApiTier.value.id === tier.id;
+        const isCurrentSubscription = currentRestApiTier?.id === tier.id;
 
-        if (!isCurrentSubscription) {
-            const { valid, unspent_money } = await restApiTiersStore.checkValidChangeTier(tier.id);
+        if (isCurrentSubscription) return;
 
-            if (!valid) {
-                onRefillModalOpen();
-                return;
-            }
+        const { valid, unspent_money } = await checkValidChangeTier(tier.id);
 
-            const unspentMoney = unspent_money ? new UsdCurrencyAmount(unspent_money) : undefined;
-
-            setSelectedTier({
-                ...tier,
-                unspentMoney
-            });
-            onRestApiPurchaseDialogOpen();
+        if (!valid) {
+            onRefillModalOpen();
+            return;
         }
+
+        const unspentMoney = unspent_money ? new UsdCurrencyAmount(unspent_money) : undefined;
+
+        setSelectedTier({
+            ...tier,
+            unspentMoney
+        });
+        onRestApiPurchaseDialogOpen();
     };
 
-    if (!restApiTiersStore?.tiers$.isResolved || !storeSelectedTonApiTier) {
-        return null;
+    if (isRestApiTiersLoading || !tiers || !currentRestApiTier) {
+        return (
+            <Center py="8">
+                <Spinner />
+            </Center>
+        );
     }
 
-    const currentRestApiTier = storeSelectedTonApiTier.value;
-
     // Sort tiers: monthly → pay-as-you-go → others
-    const sortedTiers = [...restApiTiersStore.tiers$.value].sort((a, b) => {
+    const sortedTiers = [...tiers].sort((a, b) => {
         if (a.type === 'monthly' && b.type === 'pay-as-you-go') return -1;
         if (a.type === 'pay-as-you-go' && b.type === 'monthly') return 1;
         return 0;
@@ -86,7 +92,7 @@ export const RestApiTiersSection: FC = observer(() => {
 
                 <Grid gap="4" templateColumns="repeat(auto-fit, minmax(230px, 1fr))">
                     {sortedTiers.map(tier => {
-                        const isCurrent = currentRestApiTier?.id === tier.id;
+                        const isCurrent = currentRestApiTier.id === tier.id;
                         const isFree = tier.price.amount.eq(0);
                         const isPayAsYouGo = tier.type === 'pay-as-you-go';
 
@@ -135,4 +141,4 @@ export const RestApiTiersSection: FC = observer(() => {
             <RefillModal isOpen={isRefillModalOpen} onClose={onRefillModalClose} />
         </>
     );
-});
+};

@@ -1,26 +1,30 @@
 import { FC, useCallback } from 'react';
 import { RestApiTier } from '../model';
-import { observer } from 'mobx-react-lite';
-import { projectsStore, restApiTiersStore } from 'src/shared/stores';
+import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
 import { useQueryClient } from '@tanstack/react-query';
+import { useSelectRestApiTierMutation } from '../model/queries';
 import PurchaseDialog from './PurchaseDialog';
 
 const RestApiPurchaseDialog: FC<{
     isOpen: boolean;
     onClose: () => void;
     selectedTier: RestApiTier;
-}> = observer(({ isOpen, onClose, selectedTier: tier }) => {
+}> = ({ isOpen, onClose, selectedTier: tier }) => {
     const queryClient = useQueryClient();
-    const projectId = projectsStore.selectedProject?.id;
+    const projectId = useProjectId();
+    const { mutate: selectTier, isPending } = useSelectRestApiTierMutation();
 
     const onConfirm = useCallback(async () => {
-        await restApiTiersStore.selectTier(tier!.id);
-        // Invalidate balance cache to refetch
-        queryClient.invalidateQueries({
-            queryKey: ['balance', projectId]
+        selectTier(tier.id, {
+            onSuccess: () => {
+                // Invalidate balance cache to refetch
+                queryClient.invalidateQueries({
+                    queryKey: ['balance', projectId]
+                });
+                onClose();
+            }
         });
-        onClose();
-    }, [tier, queryClient, projectId, onClose]);
+    }, [tier, queryClient, projectId, onClose, selectTier]);
 
     return (
         <PurchaseDialog
@@ -28,11 +32,11 @@ const RestApiPurchaseDialog: FC<{
             onClose={onClose}
             tier={tier}
             title={`Upgrade to TON API ${tier.name} Plan`}
-            isLoading={restApiTiersStore.selectTier.isLoading}
+            isLoading={isPending}
             onConfirm={onConfirm}
         />
     );
-});
+};
 
 RestApiPurchaseDialog.displayName = 'RestApiPurchaseDialog';
 

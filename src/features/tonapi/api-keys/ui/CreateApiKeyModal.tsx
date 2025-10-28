@@ -12,7 +12,7 @@ import {
 import { CreateApiKeyForm, useCreateApiKeyMutation } from '../model';
 import { ApiKeyForm } from './ApiKeyForm';
 import { FormProvider, useForm } from 'react-hook-form';
-import { restApiTiersStore } from 'src/shared/stores';
+import { useSelectedRestApiTier } from 'src/features/tonapi/pricing/model/queries';
 
 interface CreateApiKeyModalProps {
     isOpen: boolean;
@@ -48,7 +48,8 @@ const CreateApiKeyModal: FC<CreateApiKeyModalProps> = ({ isOpen, onClose }) => {
         }
     }, [reset, isOpen]);
 
-    const maxLimit = restApiTiersStore.selectedTier$.value?.rps ?? 1;
+    const { data: selectedTier } = useSelectedRestApiTier();
+    const maxLimit = selectedTier?.rps ?? 1;
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside">

@@ -11,14 +11,14 @@ import {
     Legend,
     ReferenceLine
 } from 'recharts';
-import { restApiTiersStore } from 'src/shared/stores';
 import { useRestStats } from 'src/features/tonapi/statistics/model/queries';
+import { useSelectedRestApiTier } from 'src/features/tonapi/pricing/model/queries';
 import { toDate, toDateTime } from 'src/shared';
 
 const DashboardChart: FC<BoxProps> = props => {
     const { colors } = useTheme();
     const { data, isLoading } = useRestStats();
-    const selectedTier = restApiTiersStore.selectedTier$.value;
+    const { data: selectedTier, isLoading: isTierLoading } = useSelectedRestApiTier();
 
     const ticks = useMemo(() => {
         if (!data?.length) {
@@ -45,7 +45,7 @@ const DashboardChart: FC<BoxProps> = props => {
         return Math.max(...requests) >= selectedTier.rps * 0.67;
     }, [data, selectedTier]);
 
-    if (isLoading || !restApiTiersStore.selectedTier$.isResolved) {
+    if (isLoading || isTierLoading) {
         return (
             <Center h="200px" {...props}>
                 <Spinner />
