@@ -1,12 +1,7 @@
 import { FC, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { useNavigate } from 'react-router-dom';
 import {
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    ModalOverlay,
     Text,
     Box,
     Card,
@@ -14,13 +9,14 @@ import {
     CardBody,
     Input,
     Flex,
-    Grid
+    Grid,
+    Button,
+    Badge
 } from '@chakra-ui/react';
-import { H4, UsdCurrencyAmount } from 'src/shared';
-import { observer } from 'mobx-react-lite';
+import { UsdCurrencyAmount } from 'src/shared';
 import { WebhookTiers, calculateExpectedPrice } from '../utils/calculating';
 
-const PricingDiagram = () => {
+export const PricingDiagram = () => {
     return (
         <Grid gap={3}>
             <Box>
@@ -125,7 +121,7 @@ const PricingDiagram = () => {
     );
 };
 
-const WebhooksPricingCalculator = () => {
+export const WebhooksPricingCalculator = () => {
     const [accounts, setAccounts] = useState<number | null>(null);
     const [messages, setMessages] = useState<number | null>(null);
 
@@ -141,12 +137,7 @@ const WebhooksPricingCalculator = () => {
 
     const currentPrice = new UsdCurrencyAmount(calculateExpectedPrice(accounts, messages));
     return (
-        <Card
-            w={{
-                base: '100%',
-                md: '308px'
-            }}
-        >
+        <Card w="100%">
             <CardHeader>
                 <Text textStyle="text.label2" fontWeight={600}>
                     Pricing Calculator
@@ -180,45 +171,39 @@ const WebhooksPricingCalculator = () => {
     );
 };
 
-const WebhooksPricingModal: FC<{
-    isOpen: boolean;
-    onClose: () => void;
-}> = ({ onClose, isOpen }) => {
+export const WebhooksPricingSection: FC = observer(() => {
+    const navigate = useNavigate();
+
+    const handleActivateWebhooks = () => {
+        navigate('../webhooks');
+    };
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside" size="4xl">
-            <ModalOverlay />
-            <ModalContent maxW="930px">
-                <ModalHeader>
-                    <H4 mb="0">Webhooks pricing</H4>
-                </ModalHeader>
-                <ModalCloseButton />
-                <ModalBody
-                    flexDir={{
-                        base: 'column',
-                        md: 'row'
-                    }}
-                    gap={5}
-                    display="flex"
-                    py="0"
-                >
-                    <Box>
-                        <Text textStyle="body2" mb="3" color="text.secondary" fontSize={12}>
-                            Accounts can be connected and disconnected dynamically, so we charge
-                            hourly based on the number of connected accounts. Thus, a million
-                            accounts per month becomes 720 million hours. For convenience in
-                            estimating costs, the rate is displayed based on accounts per month.
-                        </Text>
-                        <PricingDiagram />
-                    </Box>
-                    <Box>
-                        <WebhooksPricingCalculator />
-                    </Box>
-                </ModalBody>
+        <Box>
+            <Flex align="baseline" gap="3" mb="4">
+                <Text textStyle="h4" fontWeight={600}>
+                    Webhooks
+                </Text>
+                <Badge fontSize="xs" colorScheme="gray">
+                    Inactive
+                </Badge>
+            </Flex>
 
-                <ModalFooter pt="0"></ModalFooter>
-            </ModalContent>
-        </Modal>
+            <Flex align="flex-start" direction={{ base: 'column', lg: 'row' }} gap="6">
+                <Box flex="1" w={{ base: '100%', lg: '50%' }}>
+                    <Text textStyle="body2" mb="3" color="text.secondary">
+                        Usage-based pricing. Charged hourly for connected accounts and per message
+                        sent. Use the calculator to estimate your monthly costs.
+                    </Text>
+                    <PricingDiagram />
+                </Box>
+                <Box w={{ base: '100%', lg: '308px' }}>
+                    <WebhooksPricingCalculator />
+                    <Button w="100%" mt="4" onClick={handleActivateWebhooks} variant="primary">
+                        Activate Webhooks
+                    </Button>
+                </Box>
+            </Flex>
+        </Box>
     );
-};
-
-export default observer(WebhooksPricingModal);
+});
