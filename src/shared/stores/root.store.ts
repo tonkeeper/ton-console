@@ -2,7 +2,6 @@ import { ProjectsStore } from 'src/entities/project/model/projects.store';
 import { AppMessagesStore } from 'src/features/app-messages/model/app-messages.store';
 import { InvoicesAppStore } from 'src/features/invoices/models/invoices-app.store';
 import { InvoicesTableStore } from 'src/features/invoices/models/invoices-table.store';
-import { LiteproxysStore } from 'src/features/tonapi/liteproxy/model/liteproxy.store';
 import { DappStore } from 'src/entities/dapp/model/dapp.store';
 import { UserStore } from 'src/entities/user/model/user.store';
 import { AppStore } from './app.store';
@@ -22,7 +21,6 @@ let dappStore: DappStore;
 let appMessagesStore: AppMessagesStore;
 let invoicesAppStore: InvoicesAppStore;
 let invoicesTableStore: InvoicesTableStore;
-let liteproxysStore: LiteproxysStore;
 let restApiTiersStore: RestApiTiersStore;
 
 const initializeDependentStores = () => {
@@ -30,7 +28,6 @@ const initializeDependentStores = () => {
     appMessagesStore = new AppMessagesStore();
     invoicesAppStore = new InvoicesAppStore();
     invoicesTableStore = new InvoicesTableStore();
-    liteproxysStore = new LiteproxysStore();
     restApiTiersStore = new RestApiTiersStore();
 };
 
@@ -43,6 +40,5 @@ export {
     appMessagesStore,
     invoicesAppStore,
     invoicesTableStore,
-    liteproxysStore,
     restApiTiersStore
 };
