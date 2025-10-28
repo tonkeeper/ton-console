@@ -2,18 +2,19 @@ import { FC } from 'react';
 import { chakra, FormControl, FormLabel, Input, Textarea } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { FeedbackFromI } from './interfaces/form';
-import { feetbackModalStore } from './model/feedback';
 import { userStore } from 'src/shared/stores';
 import { useProjectName } from 'src/shared/contexts/ProjectIdContext';
-import { FeedbackResponse } from 'src/shared/api';
+import { useFeedbackModal } from './contexts/FeedbackModalContext';
+import { useSendFeedbackMutation } from './model/queries';
 
 export const FeedbackFrom: FC<{
     formId: string;
 }> = ({ formId }) => {
     const projectName = useProjectName();
-    // TODO: Migrate feetbackModalStore to React Query in Phase 2
+    const { source, close } = useFeedbackModal();
+    const { mutate: sendFeedback } = useSendFeedbackMutation();
 
-    const { handleSubmit, register } = useForm<FeedbackFromI>({
+    const { handleSubmit, register, reset } = useForm<FeedbackFromI>({
         defaultValues: {
             name: userStore.user$.value
                 ? `${userStore.user$.value?.firstName} ${userStore.user$.value?.lastName}`
@@ -24,12 +25,20 @@ export const FeedbackFrom: FC<{
         }
     });
 
-    const submitMiddleware = (form: FeedbackFromI): Promise<FeedbackResponse> => {
-        return feetbackModalStore.sendForm(form);
+    const onSubmit = (form: FeedbackFromI) => {
+        sendFeedback(
+            { ...form, source: source ?? '' },
+            {
+                onSuccess: () => {
+                    reset();
+                    close();
+                }
+            }
+        );
     };
 
     return (
-        <chakra.form w="100%" onSubmit={handleSubmit(submitMiddleware)} noValidate id={formId}>
+        <chakra.form w="100%" onSubmit={handleSubmit(onSubmit)} noValidate id={formId}>
             <FormControl isRequired>
                 <FormLabel htmlFor="name">Name</FormLabel>
                 <Input
