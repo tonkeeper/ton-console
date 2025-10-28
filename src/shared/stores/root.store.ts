@@ -3,7 +3,6 @@ import { AppMessagesStore } from 'src/features/app-messages/model/app-messages.s
 import { InvoicesAppStore } from 'src/features/invoices/models/invoices-app.store';
 import { InvoicesTableStore } from 'src/features/invoices/models/invoices-table.store';
 import { LiteproxysStore } from 'src/features/tonapi/liteproxy/model/liteproxy.store';
-import { TonApiStatsStore } from 'src/features/tonapi/statistics/model/ton-api-stats.store';
 import { DappStore } from 'src/entities/dapp/model/dapp.store';
 import { UserStore } from 'src/entities/user/model/user.store';
 import { AppStore } from './app.store';
@@ -24,7 +23,6 @@ let appMessagesStore: AppMessagesStore;
 let invoicesAppStore: InvoicesAppStore;
 let invoicesTableStore: InvoicesTableStore;
 let liteproxysStore: LiteproxysStore;
-let tonApiStatsStore: TonApiStatsStore;
 let restApiTiersStore: RestApiTiersStore;
 
 const initializeDependentStores = () => {
@@ -33,7 +31,6 @@ const initializeDependentStores = () => {
     invoicesAppStore = new InvoicesAppStore();
     invoicesTableStore = new InvoicesTableStore();
     liteproxysStore = new LiteproxysStore();
-    tonApiStatsStore = new TonApiStatsStore();
     restApiTiersStore = new RestApiTiersStore();
 };
 
@@ -47,6 +44,5 @@ export {
     invoicesAppStore,
     invoicesTableStore,
     liteproxysStore,
-    tonApiStatsStore,
     restApiTiersStore
 };
