@@ -12,23 +12,22 @@ import {
     Flex,
     Box
 } from '@chakra-ui/react';
-import { CURRENCY, H4, InfoTooltip, Pad, UsdCurrencyAmount } from 'src/shared';
-import { RestApiTier } from '../model';
+import { CURRENCY, DTOLiteproxyTier, H4, Pad, UsdCurrencyAmount } from 'src/shared';
 import { observer } from 'mobx-react-lite';
 import { CurrencyRate } from 'src/entities';
-import { projectsStore, restApiTiersStore } from 'src/shared/stores';
+import { liteproxysStore, projectsStore } from 'src/shared/stores';
 import { useQueryClient } from '@tanstack/react-query';
 
-const RestApiPaymentDetailsModal: FC<{
+const LiteserversPurchaseDialog: FC<{
     isOpen: boolean;
     onClose: () => void;
-    tier: RestApiTier;
-}> = ({ tier, ...rest }) => {
+    selectedTier: DTOLiteproxyTier;
+}> = ({ selectedTier: tier, ...rest }) => {
     const queryClient = useQueryClient();
     const projectId = projectsStore.selectedProject?.id;
 
     const onConfirm = useCallback(async () => {
-        await restApiTiersStore.selectTier(tier!.id);
+        await liteproxysStore.selectTier(tier!.id);
         // Invalidate balance cache to refetch
         queryClient.invalidateQueries({
             queryKey: ['balance', projectId]
@@ -36,19 +35,7 @@ const RestApiPaymentDetailsModal: FC<{
         rest.onClose();
     }, [tier, queryClient, projectId]);
 
-    const unspentMoney = tier.unspentMoney;
-    const isFreeTire = tier.price.amount.eq(0);
-    const isFreePriceAfterUnspentMoney = unspentMoney && unspentMoney.isGTE(tier.price);
-    const isFree = isFreeTire || isFreePriceAfterUnspentMoney;
-
-    const priceAfterUnspentMoney = !unspentMoney
-        ? tier.price
-        : new UsdCurrencyAmount(tier.price.amount.minus(unspentMoney.amount));
-
-    const correctPrice =
-        isFreeTire || isFreePriceAfterUnspentMoney
-            ? new UsdCurrencyAmount(0)
-            : priceAfterUnspentMoney;
+    const price = new UsdCurrencyAmount(tier.usd_price);
 
     return (
         <Modal scrollBehavior="inside" size="md" {...rest}>
@@ -57,7 +44,7 @@ const RestApiPaymentDetailsModal: FC<{
                 <ModalHeader>
                     <H4 mb="1">Payment Details</H4>
                     <Text textStyle="body2" color="text.secondary">
-                        Upgrade to TON API {tier.name} Plan
+                        Upgrade Liteservers to {tier.name} Plan
                     </Text>
                 </ModalHeader>
                 <ModalCloseButton />
@@ -87,57 +74,15 @@ const RestApiPaymentDetailsModal: FC<{
                                 Monthly
                             </Text>
                         </Flex>
-                        {unspentMoney && (
-                            <Flex justify="space-between" gap="10" mb="3">
-                                <Text textStyle="body2" color="text.secondary">
-                                    Price
-                                </Text>
-                                <Box>
-                                    <Text
-                                        textStyle="body2"
-                                        color="text.primary"
-                                        textAlign="right"
-                                        title={tier.price.stringAmountWithoutRound}
-                                    >
-                                        {tier.price.amount.eq(0)
-                                            ? 'Free'
-                                            : tier.price.stringCurrencyAmount}
-                                    </Text>
-                                </Box>
-                            </Flex>
-                        )}
-                        {!isFree && unspentMoney && (
-                            <Flex justify="space-between" gap="10" mb="3">
-                                <Text textStyle="body2" color="text.secondary">
-                                    Unspent funds
-                                </Text>
-                                <Text
-                                    textStyle="body2"
-                                    color="text.secondary"
-                                    textAlign="right"
-                                    title={unspentMoney.stringAmountWithoutRound}
-                                >
-                                    {unspentMoney.stringCurrencyAmount}
-                                </Text>
-                            </Flex>
-                        )}
                         <Flex justify="space-between" gap="10" mb="3">
                             <Text textStyle="body2" color="text.secondary">
-                                {unspentMoney ? 'Total' : 'Price'}
+                                Price
                             </Text>
-                            {correctPrice.amount.eq(0) ? (
+                            {price.amount.eq(0) ? (
                                 <Flex align="center" gap={1}>
                                     <Text textStyle="body2" textAlign="right">
                                         Free
                                     </Text>
-                                    {isFreePriceAfterUnspentMoney && !isFreeTire && (
-                                        <InfoTooltip>
-                                            <Box textStyle="body2" maxW="200px">
-                                                Your unspent money is enough to cover the cost of
-                                                the plan
-                                            </Box>
-                                        </InfoTooltip>
-                                    )}
                                 </Flex>
                             ) : (
                                 <Box>
@@ -145,15 +90,15 @@ const RestApiPaymentDetailsModal: FC<{
                                         textStyle="body2"
                                         color="text.primary"
                                         textAlign="right"
-                                        title={correctPrice.stringAmountWithoutRound}
+                                        title={price.stringAmountWithoutRound}
                                     >
-                                        {correctPrice.stringCurrencyAmount}
+                                        {price.stringCurrencyAmount}
                                     </Text>
                                     <CurrencyRate
                                         textStyle="body2"
                                         color="text.secondary"
                                         textAlign="right"
-                                        amount={correctPrice.amount}
+                                        amount={price.amount}
                                         currency={CURRENCY.TON}
                                         leftSign=""
                                         reverse
@@ -166,8 +111,7 @@ const RestApiPaymentDetailsModal: FC<{
                     </Pad>
                     <Text textStyle="body3" color="text.secondary">
                         Your plan will renew automatically every month until cancelled. When you
-                        switch to a different tariff plan, any payment you&apos;ve already made for
-                        the current month will be forfeited.
+                        switch to a different tariff plan
                     </Text>
                 </ModalBody>
 
@@ -177,7 +121,7 @@ const RestApiPaymentDetailsModal: FC<{
                     </Button>
                     <Button
                         flex={1}
-                        isLoading={restApiTiersStore.selectTier.isLoading}
+                        isLoading={liteproxysStore.selectedTier$.isLoading}
                         onClick={onConfirm}
                         variant="primary"
                     >
@@ -189,4 +133,4 @@ const RestApiPaymentDetailsModal: FC<{
     );
 };
 
-export default observer(RestApiPaymentDetailsModal);
+export default observer(LiteserversPurchaseDialog);
