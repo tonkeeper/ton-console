@@ -1,9 +1,7 @@
 import { FC, useCallback } from 'react';
 import { Text } from '@chakra-ui/react';
-import { webhooksStore } from '../model';
-import { observer } from 'mobx-react-lite';
+import { useUnsubscribeWebhookMutation, useWebhooksUI, Subscription } from '../model';
 import { ConfirmationDialog } from 'src/entities';
-import { Subscription } from '../model/webhooks.store';
 import { Address } from '@ton/core';
 
 const DeleteSubscriptionsModal: FC<{
@@ -11,13 +9,19 @@ const DeleteSubscriptionsModal: FC<{
     onClose: () => void;
     subscription: Subscription;
 }> = ({ subscription, isOpen, onClose }) => {
+    const { selectedWebhookId, network } = useWebhooksUI();
+    const { mutate: unsubscribe, isPending } = useUnsubscribeWebhookMutation(
+        selectedWebhookId || 0,
+        network
+    );
+
     const onConfirm = useCallback(() => {
-        if (subscription) {
-            webhooksStore
-                .unsubscribeWebhook([Address.parse(subscription.account_id)])
-                .then(onClose);
+        if (subscription && selectedWebhookId) {
+            unsubscribe([Address.parse(subscription.account_id)], {
+                onSuccess: onClose
+            });
         }
-    }, [subscription]);
+    }, [subscription, selectedWebhookId, unsubscribe, onClose]);
 
     return (
         <ConfirmationDialog
@@ -35,9 +39,9 @@ const DeleteSubscriptionsModal: FC<{
             )}
             confirmValue={subscription.account_id}
             confirmButtonText="Delete"
-            isLoading={webhooksStore.deleteWebhook.isLoading}
+            isLoading={isPending}
         />
     );
 };
 
-export default observer(DeleteSubscriptionsModal);
+export default DeleteSubscriptionsModal;

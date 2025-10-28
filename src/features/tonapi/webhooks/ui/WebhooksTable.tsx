@@ -14,7 +14,8 @@ import {
     Box,
     TableContainerProps,
     Link as ChakraLink,
-    chakra
+    chakra,
+    Spinner
 } from '@chakra-ui/react';
 import { FC, useCallback, useEffect, useState } from 'react';
 import {
@@ -28,14 +29,16 @@ import {
     copyToClipboard,
     IconButton
 } from 'src/shared';
-import { Webhook, webhooksStore } from '../model';
-import { observer } from 'mobx-react-lite';
+import { useWebhooksQuery, useWebhooksUI } from '../model';
+import { Webhook } from '../model/interfaces/webhooks';
 import DeleteWebhookModal from './DeleteWebhookModal';
 import { useNavigate, Link as ReactRouterLink } from 'react-router-dom';
 import { RTWebhookListStatusEnum } from 'src/shared/api/streaming-api';
 
 const WebhooksTable: FC<TableContainerProps> = props => {
     const navigate = useNavigate();
+    const { network, setSelectedWebhookId } = useWebhooksUI();
+    const { data: webhooks = [], isLoading } = useWebhooksQuery(network);
     const [modal, setModal] = useState<{ key: Webhook; action: 'edit' | 'delete' } | null>();
     const [copiedToken, setCopiedToken] = useState<number | undefined>();
 
@@ -47,8 +50,9 @@ const WebhooksTable: FC<TableContainerProps> = props => {
     }, [copiedToken]);
 
     const goToWebhookPage = useCallback((key: Webhook) => {
+        setSelectedWebhookId(key.id);
         navigate(`./view?webhookId=${key.id}`);
-    }, []);
+    }, [navigate, setSelectedWebhookId]);
 
     const openDeleteModal = useCallback((key: Webhook) => {
         setModal({ key, action: 'delete' });
@@ -57,6 +61,10 @@ const WebhooksTable: FC<TableContainerProps> = props => {
     const closeModal = useCallback(() => {
         setModal(null);
     }, []);
+
+    if (isLoading) {
+        return <Spinner />;
+    }
 
     return (
         <>
@@ -80,7 +88,7 @@ const WebhooksTable: FC<TableContainerProps> = props => {
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {webhooksStore.webhooks$.value.map(webhook => (
+                        {webhooks.map((webhook: Webhook) => (
                             <ChakraLink
                                 key={webhook.id}
                                 as={ReactRouterLink}
@@ -205,4 +213,4 @@ const WebhooksTable: FC<TableContainerProps> = props => {
     );
 };
 
-export default observer(WebhooksTable);
+export default WebhooksTable;
