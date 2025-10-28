@@ -1,19 +1,24 @@
 import { FC, useCallback } from 'react';
 import { Text } from '@chakra-ui/react';
-import { Webhook, webhooksStore } from '../model';
-import { observer } from 'mobx-react-lite';
+import { useDeleteWebhookMutation, useWebhooksUI } from '../model';
 import { ConfirmationDialog } from 'src/entities';
+import { Webhook } from '../model/interfaces/webhooks';
 
 const DeleteWebhooksModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     webhook: Webhook;
 }> = ({ webhook, isOpen, onClose }) => {
+    const { network } = useWebhooksUI();
+    const { mutate: deleteWebhook, isPending } = useDeleteWebhookMutation(network);
+
     const onConfirm = useCallback(() => {
         if (webhook) {
-            webhooksStore.deleteWebhook(webhook.id).then(onClose);
+            deleteWebhook(webhook.id, {
+                onSuccess: onClose
+            });
         }
-    }, [webhook]);
+    }, [webhook, deleteWebhook, onClose]);
 
     return (
         <ConfirmationDialog
@@ -31,9 +36,9 @@ const DeleteWebhooksModal: FC<{
             )}
             confirmValue={webhook.endpoint}
             confirmButtonText="Delete"
-            isLoading={webhooksStore.deleteWebhook.isLoading}
+            isLoading={isPending}
         />
     );
 };
 
-export default observer(DeleteWebhooksModal);
+export default DeleteWebhooksModal;

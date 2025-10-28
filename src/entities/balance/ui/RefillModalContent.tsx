@@ -180,12 +180,12 @@ const RefillModalContent: FC<{
         const baselineIndex = billingHistory.findIndex(item => item.id === baselineTransactionId);
         if (baselineIndex === -1) return;
 
-        // Найти новые пополнения которые еще не были показаны в toast
+        // Find new refills that haven't been shown in toast yet
         billingHistory
             .slice(0, baselineIndex)
             .filter(item => item.type === 'deposit' && !shownRefillIds.has(item.id))
             .forEach(item => {
-                // Показать toast уведомление
+                // Show toast notification
                 toast({
                     title: 'Refill detected',
                     description: `${item.amount.stringCurrencyAmount} received at ${item.date.toLocaleTimeString(
@@ -203,7 +203,7 @@ const RefillModalContent: FC<{
                     duration: 5000
                 });
 
-                // Отметить как показанное
+                // Mark as shown
                 setShownRefillIds(prev => new Set([...prev, item.id]));
             });
     }, [billingHistory, baselineTransactionId, shownRefillIds, toast]);
