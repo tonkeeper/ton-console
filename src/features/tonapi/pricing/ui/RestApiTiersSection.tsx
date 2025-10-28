@@ -70,7 +70,7 @@ export const RestApiTiersSection: FC = observer(() => {
                     </Text>
                     <Text textStyle="body2" color="text.secondary">
                         Access TON blockchain data via REST API.{' '}
-                        <Link as={RouterLink} color="accent.blue" to="/tonapi/docs">
+                        <Link as={RouterLink} color="accent.blue" to="/tonapi/api-keys">
                             Get API keys
                         </Link>{' '}
                         or explore the{' '}
