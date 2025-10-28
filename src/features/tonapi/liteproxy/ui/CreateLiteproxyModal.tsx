@@ -9,11 +9,11 @@ import {
     ModalOverlay,
     Text
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
-import { liteproxysStore } from 'src/shared/stores';
+import { useCreateLiteproxyMutation } from 'src/features/tonapi/liteproxy/model/queries';
 
 const CreateLiteproxyModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
-    const onSubmit = () => liteproxysStore.createLiteproxy().then(props.onClose);
+    const { mutate: createLiteproxy, isPending } = useCreateLiteproxyMutation();
+    const onSubmit = () => createLiteproxy(undefined, { onSuccess: props.onClose });
 
     return (
         <Modal scrollBehavior="inside" {...props} size="sm">
@@ -34,7 +34,7 @@ const CreateLiteproxyModal: FC<{ isOpen: boolean; onClose: () => void }> = props
                     </Button>
                     <Button
                         flex={1}
-                        isLoading={liteproxysStore.createLiteproxy.isLoading}
+                        isLoading={isPending}
                         onClick={onSubmit}
                         type="submit"
                         variant="primary"
@@ -47,4 +47,4 @@ const CreateLiteproxyModal: FC<{ isOpen: boolean; onClose: () => void }> = props
     );
 };
 
-export default observer(CreateLiteproxyModal);
+export default CreateLiteproxyModal;

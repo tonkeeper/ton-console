@@ -1,18 +1,23 @@
 import { FC } from 'react';
-import { observer } from 'mobx-react-lite';
 import { ButtonLink, ConsoleDocsIcon32, EXTERNAL_LINKS, H4, Overlay } from 'src/shared';
 import { Badge, Center, Flex, Spinner, useDisclosure, Text, Link } from '@chakra-ui/react';
 import { CreateLiteproxyModal, LiteproxyView } from 'src/features/tonapi/liteproxy';
 import { LiteproxyStatsModal } from 'src/features/tonapi/statistics';
+import {
+    useLiteproxyList,
+    useSelectedLiteproxyTier
+} from 'src/features/tonapi/liteproxy/model/queries';
 import { EmptyLiteservers } from './EmptyLiteservers';
 import { Link as RouterLink } from 'react-router-dom';
-import { liteproxysStore } from 'src/shared/stores';
 
 const LiteserversPage: FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isChartOpen, onOpen: onChartOpen, onClose: onChartClose } = useDisclosure();
 
-    if (!liteproxysStore.liteproxyList$.isResolved) {
+    const { data: liteproxyList = [], isLoading } = useLiteproxyList();
+    const { data: selectedTier } = useSelectedLiteproxyTier();
+
+    if (isLoading) {
         return (
             <Center h="300px">
                 <Spinner />
@@ -20,7 +25,7 @@ const LiteserversPage: FC = () => {
         );
     }
 
-    const isEmpty = liteproxysStore.liteproxyList$.value.length === 0;
+    const isEmpty = liteproxyList.length === 0;
 
     if (isEmpty) {
         return (
@@ -30,8 +35,6 @@ const LiteserversPage: FC = () => {
             </>
         );
     }
-
-    const selectedTier = liteproxysStore.selectedTier$.value;
 
     return (
         <>
@@ -81,4 +84,4 @@ const LiteserversPage: FC = () => {
     );
 };
 
-export default observer(LiteserversPage);
+export default LiteserversPage;
