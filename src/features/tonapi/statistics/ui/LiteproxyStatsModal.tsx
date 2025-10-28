@@ -13,8 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { FC } from 'react';
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { observer } from 'mobx-react-lite';
-import { tonApiStatsStore } from 'src/shared/stores';
+import { useLiteproxyStats } from 'src/features/tonapi/statistics/model/queries';
 
 interface LiteproxyStatsModalProps {
     isOpen: boolean;
@@ -29,10 +28,10 @@ const dateFormatter = (time: number) => {
     })}`;
 };
 
-const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = observer(({ isOpen, onClose }) => {
-    const { isResolved, value } = tonApiStatsStore.liteproxyStats$;
+const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = ({ isOpen, onClose }) => {
+    const { data: value, isLoading } = useLiteproxyStats();
 
-    if (!isResolved) {
+    if (isLoading) {
         return (
             <Modal isOpen={isOpen} onClose={onClose} size="4xl">
                 <ModalOverlay />
@@ -128,6 +127,6 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = observer(({ isOpen, on
             </ModalContent>
         </Modal>
     );
-});
+};
 
 export default LiteproxyStatsModal;
