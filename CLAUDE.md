@@ -297,8 +297,9 @@ npm run generate-airdrop2
 
 **Current Phase: Phase 1 — Simple stores migration**
 
-**Status (2025-10-29)**
+**Status (2025-10-29) — Detailed Migration Plan Created**
 
+**Phase 1 — Simple Leaf Stores (next, 2-3 days)**
 * ✅ API Keys — migrated (reference)
 * ✅ Balance — global hook with `refetchInterval: 3000`, `refetchIntervalInBackground: true`
 * ✅ Rates — migrated to useQuery
@@ -307,11 +308,35 @@ npm run generate-airdrop2
   * Added `with-project-id.tsx` to sync MobX store → React Context
   * Implemented projectId capture in mutations to prevent race conditions
   * Added informational 501 error message with API docs link
-* ⏳ Liteproxy — next (Phase 1)
-* ⏳ Jetton — after Liteproxy (Phase 1)
-* ⏳ Phase 2: Localize feature-specific stores (invoices, analytics, airdrop, etc.)
-* ⏳ Phase 3: Complete projectsStore → useContext migration
-* ⏳ Phase 4: Remaining stores (userStore, appStore, etc.)
+* ⏳ TonApiStatsStore — next after webhooks
+* ⏳ LiteproxysStore, RestApiTiersStore, CNFTStore, FaucetStore
+
+**Phase 1.5 — Replace projectsStore References (0.5-1 day)**
+* ⏳ Remove all `projectsStore.selectedProject?.id` from codebase
+* ⏳ Replace with `useProjectId()` hook from ProjectIdContext
+
+**Phase 2 — Remaining Stores + Localization (2-3 days)**
+* ⏳ JettonStore (wallet-based, no projectId dependency)
+* ⏳ DappStore (enable AppMessagesStore refactoring)
+* ⏳ Localize InvoicesTableStore & AnalyticsHistoryTableStore to component-level hooks
+
+**Phase 2.5 — Complex Store Refactoring (2-3 days)**
+* ⏳ AppMessagesStore → split into 4 hooks
+* ⏳ InvoicesAppStore → split into 2 hooks
+* ⏳ AnalyticsQueryStore → split into 3+ hooks
+
+**Phase 3 — ProjectsStore Removal (1-2 days, CRITICAL)**
+* ⏳ Delete `src/entities/project/model/projects.store.ts`
+* ⏳ Move logic to `shared/queries/projects.ts`
+* ⏳ Requires all 15 dependent stores migrated first
+
+**Phase 4 — Final Stores (1-2 days)**
+* ⏳ UserStore (decision: migrate or keep as exception)
+* ⏳ AppStore (→ `useAppInitialized()` hook)
+* ⏳ Analytics supporting stores (GPT, Graph, Request)
+* ⏳ AirdropsStore
+
+**See:** `MIGRATION_PLAN.md` for detailed phases, checklists, and risk analysis
 
 **Steps**
 
