@@ -2,9 +2,31 @@
 // Replaces MobX ratesStore
 
 import { useQuery } from '@tanstack/react-query';
-import { CRYPTO_CURRENCY } from 'src/shared';
+import { CRYPTO_CURRENCY, tonapiMainnet } from 'src/shared';
 import BigNumber from 'bignumber.js';
-import { fetchRate } from './rates.api';
+
+const backendCurrenciesMapping = {
+    [CRYPTO_CURRENCY.TON]: {
+        request: 'ton',
+        response: 'TON'
+    },
+    [CRYPTO_CURRENCY.USDT]: {
+        request: 'usdt',
+        response: 'USDT'
+    }
+};
+
+async function fetchRate(currency: CRYPTO_CURRENCY): Promise<BigNumber> {
+    const token = backendCurrenciesMapping[currency];
+
+    const data = await tonapiMainnet.rates.getRates({
+        tokens: [token.request],
+        currencies: ['usd']
+    });
+
+    const tokenRate = data.rates[token.response].prices?.USD;
+    return tokenRate ? new BigNumber(tokenRate) : new BigNumber(0);
+}
 
 const RATES_KEYS = {
   ton: ['rates', CRYPTO_CURRENCY.TON],
