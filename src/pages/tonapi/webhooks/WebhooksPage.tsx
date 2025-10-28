@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { CreateWebhookModal, WebhooksTable, useWebhooksUI, useWebhooksQuery, useWebhooksStatsQuery } from 'src/features/tonapi/webhooks';
 import { EmptyWebhooks } from './EmptyWebhooks';
+import { UnavailableWebhooks } from './UnavailableWebhooks';
 import {
     ArrowIcon,
     EXTERNAL_LINKS,
@@ -30,7 +31,7 @@ const WebhooksPage: FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isChartOpen, onOpen: onChartOpen, onClose: onChartClose } = useDisclosure();
     const { network, setNetwork } = useWebhooksUI();
-    const { data: webhooks = [], isLoading } = useWebhooksQuery(network);
+    const { data: webhooks = [], isLoading, error } = useWebhooksQuery(network);
     const { data: WebhooksStats = null } = useWebhooksStatsQuery();
 
     if (isLoading) {
@@ -38,6 +39,30 @@ const WebhooksPage: FC = () => {
             <Center h="300px">
                 <Spinner />
             </Center>
+        );
+    }
+
+    // Check if webhooks feature is unavailable (501 error)
+    if (error && (error as any)?.status === 501) {
+        return (
+            <Overlay h="fit-content">
+                <UnavailableWebhooks />
+            </Overlay>
+        );
+    }
+
+    // Handle other errors
+    if (error) {
+        return (
+            <Overlay h="fit-content">
+                <Flex align="center" justify="center" minH="300px">
+                    <Flex align="center" direction="column" maxW="512px">
+                        <Text textStyle="body2" color="text.secondary" textAlign="center">
+                            Unable to load webhooks at the moment. Please try refreshing the page.
+                        </Text>
+                    </Flex>
+                </Flex>
+            </Overlay>
         );
     }
 

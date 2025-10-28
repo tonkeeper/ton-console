@@ -20,6 +20,7 @@ const WEBHOOKS_KEYS = {
 
 /**
  * Fetch all webhooks for a project
+ * Returns error state if webhooks feature is not available (501 error)
  */
 export function useWebhooksQuery(network: Network) {
   const projectId = useProjectId();
@@ -35,7 +36,15 @@ export function useWebhooksQuery(network: Network) {
       return response.data.webhooks.toSorted((a, b) => b.id - a.id);
     },
     enabled: !!projectId,
-    staleTime: 5 * 60 * 1000 // 5 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: (failureCount, error) => {
+      // Don't retry on 501 - feature is not available
+      if ((error as any)?.status === 501) {
+        return false;
+      }
+      // Retry other errors up to 3 times
+      return failureCount < 3;
+    }
   });
 }
 
