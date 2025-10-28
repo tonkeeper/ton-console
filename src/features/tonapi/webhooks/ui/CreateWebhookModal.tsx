@@ -9,8 +9,7 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
-import { webhooksStore, CreateWebhookForm } from '../model';
+import { useCreateWebhookMutation, CreateWebhookForm, useWebhooksUI } from '../model';
 import { WebhookForm } from './WebhooksForm';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +17,8 @@ import { useNavigate } from 'react-router-dom';
 const CreateWebhookModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
     const navigate = useNavigate();
     const formId = 'create-webhook-form';
+    const { network, setSelectedWebhookId } = useWebhooksUI();
+    const { mutate: createWebhook, isPending } = useCreateWebhookMutation(network);
 
     const methods = useForm<CreateWebhookForm>();
 
@@ -28,15 +29,18 @@ const CreateWebhookModal: FC<{ isOpen: boolean; onClose: () => void }> = props =
 
     const onSubmit = useCallback(
         (form: CreateWebhookForm): void => {
-            webhooksStore.createWebhook(form).then(() => {
-                if (!webhooksStore.selectedWebhook) {
-                    throw new Error('Webhook was not created');
+            createWebhook(form, {
+                onSuccess: (data: { webhook_id?: number; id?: number }) => {
+                    const webhookId = data.webhook_id || data.id;
+                    if (!webhookId) {
+                        throw new Error('Webhook was not created');
+                    }
+                    setSelectedWebhookId(webhookId);
+                    navigate(`./view?webhookId=${webhookId}`);
                 }
-
-                navigate(`./view?webhookId=${webhooksStore.selectedWebhook.id}`);
             });
         },
-        [props.onClose]
+        [createWebhook, navigate, setSelectedWebhookId]
     );
 
     useEffect(() => {
@@ -65,7 +69,7 @@ const CreateWebhookModal: FC<{ isOpen: boolean; onClose: () => void }> = props =
                         flex={1}
                         form={formId}
                         isDisabled={!isDirty}
-                        isLoading={webhooksStore.createWebhook.isLoading}
+                        isLoading={isPending}
                         type="submit"
                         variant="primary"
                     >
@@ -77,4 +81,4 @@ const CreateWebhookModal: FC<{ isOpen: boolean; onClose: () => void }> = props =
     );
 };
 
-export default observer(CreateWebhookModal);
+export default CreateWebhookModal;
