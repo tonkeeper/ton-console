@@ -8,8 +8,12 @@ import LiteserversPurchaseDialog from './LiteserversPurchaseDialog';
 import { RefillModal } from 'src/entities';
 import { openFeedbackModal } from 'src/features/feedback/model/feedback';
 
+interface LiteserverTierWithUnspent extends DTOLiteproxyTier {
+    unspentMoney?: UsdCurrencyAmount;
+}
+
 export const LiteserversTiersSection: FC = observer(() => {
-    const [selectedLiteserverTier, setSelectedLiteserverTier] = useState<DTOLiteproxyTier | null>(
+    const [selectedLiteserverTier, setSelectedLiteserverTier] = useState<LiteserverTierWithUnspent | null>(
         null
     );
 
@@ -31,14 +35,19 @@ export const LiteserversTiersSection: FC = observer(() => {
         const isCurrentSubscription = selectedLiteserverDetail?.id === tier.id;
 
         if (!isCurrentSubscription) {
-            const { valid } = await liteproxysStore.checkValidChangeTier(tier.id);
+            const { valid, unspent_money } = await liteproxysStore.checkValidChangeTier(tier.id);
 
             if (!valid) {
                 onRefillModalOpen();
                 return;
             }
 
-            setSelectedLiteserverTier(tier);
+            const unspentMoney = unspent_money ? new UsdCurrencyAmount(unspent_money) : undefined;
+
+            setSelectedLiteserverTier({
+                ...tier,
+                unspentMoney
+            });
             onLiteserversPurchaseDialogOpen();
         }
     };
