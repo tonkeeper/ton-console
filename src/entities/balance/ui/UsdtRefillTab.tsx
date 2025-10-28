@@ -28,6 +28,7 @@ export const UsdtRefillTab: FC<UsdtRefillTabProps> = ({
             <InputGroup>
                 <Input
                     ref={amountInputRef}
+                    mb="4"
                     pr="60px"
                     fontSize="lg"
                     fontWeight="medium"
@@ -46,11 +47,7 @@ export const UsdtRefillTab: FC<UsdtRefillTabProps> = ({
                     placeholder="Enter amount"
                     value={amount}
                 />
-                <InputRightElement
-                    textStyle="body2"
-                    w="60px"
-                    color="text.secondary"
-                >
+                <InputRightElement textStyle="body2" w="60px" color="text.secondary">
                     <Span>USDT</Span>
                 </InputRightElement>
             </InputGroup>
@@ -63,11 +60,7 @@ export const UsdtRefillTab: FC<UsdtRefillTabProps> = ({
                 flexDirection="column"
             >
                 {paymentLink && !isDepositAddressLoading && !depositAddressError ? (
-                    <QRCodeSVG
-                        bgColor="transparent"
-                        size={200}
-                        value={paymentLink}
-                    />
+                    <QRCodeSVG bgColor="transparent" size={200} value={paymentLink} />
                 ) : !isDepositAddressLoading && depositAddressError ? (
                     <Center h="200px">
                         <Text textStyle="body2" color="text.secondary">
@@ -98,12 +91,7 @@ export const UsdtRefillTab: FC<UsdtRefillTabProps> = ({
                     </svg>
                 )}
 
-                <Text
-                    textStyle="body2"
-                    mt="4"
-                    color="text.secondary"
-                    textAlign="center"
-                >
+                <Text textStyle="body2" mt="4" color="text.secondary" textAlign="center">
                     {paymentLink
                         ? 'Scan QR code for refill'
                         : 'QR code for refill will appear here'}
