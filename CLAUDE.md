@@ -147,13 +147,17 @@ src/
 **Query keys** must include `projectId`:
 
 ```ts
-const projectId = projectsStore.selectedProject?.id;
+// NEW: Use useProjectId() hook (preferred in new features)
+import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+
+const projectId = useProjectId();
 
 return useQuery({
-  queryKey: ['api-keys', projectId],
+  queryKey: ['api-keys', projectId || undefined],
   queryFn: async () => {
+    if (!projectId) return [];
     const { data, error } = await getProjectTonApiTokens({
-      query: { project_id: projectId! }
+      query: { project_id: projectId.toString() }
     });
     if (error) throw error;
     return data.items.map(mapDTOToApiKey);
@@ -162,14 +166,43 @@ return useQuery({
 });
 ```
 
+**Important: projectId in new features (MIGRATION IN PROGRESS)**
+
+* ✅ **NEW CODE**: Use `const projectId = useProjectId()` from `ProjectIdContext`
+* ❌ **LEGACY**: Do NOT use `projectsStore.selectedProject?.id` in new query hooks
+* **Migration Status**: Currently transitioning from MobX `projectsStore` to React Context API
+  * `ProjectIdContext` acts as temporary bridge that syncs values from `projectsStore`
+  * `with-project-id.tsx` translates store changes to context using MobX `reaction()`
+  * When Phase 3 complete: Context will become sole source of truth, bridge will be removed
+* Include `projectId` in all query keys to prevent cross-project cache collisions
+
 **Mutations & cache**
 
+* **Important**: Capture `projectId` in `mutationFn` at mutation time (not hook closure):
+  ```ts
+  mutationFn: async (data) => {
+    const currentProjectId = projectId;  // Capture at mutation start
+    if (!currentProjectId) throw new Error('Project not selected');
+
+    const response = await apiCall(...);
+
+    return { ...response, _projectId: currentProjectId };  // Return for onSuccess
+  },
+  onSuccess: (data) => {
+    // Use projectId from mutation result, not from hook closure
+    queryClient.invalidateQueries({
+      queryKey: ['api-keys', data._projectId]
+    });
+  }
+  ```
+* Prevents race conditions when projectId changes during async operations
 * Simple add: `queryClient.setQueryData(['api-keys', projectId], updater)`.
 * Complex cases: `queryClient.invalidateQueries({ queryKey: ['api-keys', projectId] })`.
 
 **observer()**
 
-* Wrap a component with `observer()` **only** if it reads a MobX store (e.g., `projectsStore`).
+* Wrap a component with `observer()` **only** if it reads a MobX store (e.g., legacy features).
+* Do NOT use in new React Query features.
 
 ## 5.2 MobX (legacy)
 
@@ -273,13 +306,23 @@ npm run generate-airdrop2
 
 # 10) Migration plan (MobX → React Query)
 
-**Status**
+**Current Phase: Phase 1 — Simple stores migration**
+
+**Status (2025-10-29)**
 
 * ✅ API Keys — migrated (reference)
 * ✅ Balance — global hook with `refetchInterval: 3000`, `refetchIntervalInBackground: true`
-* ⏳ Webhooks — high priority
-* ⏳ Liteproxy — after Webhooks
-* ⏳ Statistics/Analytics — most complex (last)
+* ✅ Rates — migrated to useQuery
+* ✅ Webhooks — migrated to useQuery + error handling for 501
+  * Created `ProjectIdContext` as temporary bridge to `projectsStore`
+  * Added `with-project-id.tsx` to sync MobX store → React Context
+  * Implemented projectId capture in mutations to prevent race conditions
+  * Added informational 501 error message with API docs link
+* ⏳ Liteproxy — next (Phase 1)
+* ⏳ Jetton — after Liteproxy (Phase 1)
+* ⏳ Phase 2: Localize feature-specific stores (invoices, analytics, airdrop, etc.)
+* ⏳ Phase 3: Complete projectsStore → useContext migration
+* ⏳ Phase 4: Remaining stores (userStore, appStore, etc.)
 
 **Steps**
 
@@ -412,19 +455,55 @@ export const ApiKeys: FC = observer(() => {
 
 ```ts
 // features/tonapi/api-keys/model/queries.ts
+import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+
 export function useApiKeysQuery() {
-  const projectId = projectsStore.selectedProject?.id;
+  const projectId = useProjectId();  // NEW: Use context hook instead of store
   return useQuery({
-    queryKey: ['api-keys', projectId],
+    queryKey: ['api-keys', projectId || undefined],
     queryFn: async () => {
-      const { data, error } = await getProjectTonApiTokens({ query: { project_id: projectId! }});
+      if (!projectId) return [];
+      const { data, error } = await getProjectTonApiTokens({
+        query: { project_id: projectId.toString() }
+      });
       if (error) throw error;
       return data.items.map(mapDTOToApiKey);
     },
     enabled: !!projectId,
+    staleTime: 5 * 60 * 1000  // 5 minutes
   });
 }
 ```
+
+## 19.3 Mutation with projectId capture (pattern - IMPORTANT)
+
+```ts
+// features/tonapi/api-keys/model/queries.ts
+export function useDeleteApiKeyMutation() {
+  const queryClient = useQueryClient();
+  const projectId = useProjectId();
+
+  return useMutation({
+    mutationFn: async (keyId: string) => {
+      // Capture projectId at mutation time to prevent race conditions
+      const currentProjectId = projectId;
+      if (!currentProjectId) throw new Error('Project not selected');
+
+      await deleteApiKey(keyId, { project_id: currentProjectId.toString() });
+
+      return { keyId, projectId: currentProjectId };
+    },
+    onSuccess: (data) => {
+      // Use projectId from mutation result, not from hook closure
+      queryClient.invalidateQueries({
+        queryKey: ['api-keys', data.projectId]
+      });
+    }
+  });
+}
+```
+
+**Why capture projectId?** If user changes project while request is in flight, `onSuccess` uses stale projectId from closure, invalidating wrong cache. By capturing in `mutationFn` and returning, we ensure correct cache invalidation.
 
 ---
 
