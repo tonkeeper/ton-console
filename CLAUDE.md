@@ -8,15 +8,6 @@ owners:
 * <fill in: owner GitHub handle/email>
   ai_maintained: true
 
-# Sections that AI MAY edit directly (see §12)
-
-ai_editable_blocks:
-
-* CHANGELOG
-* TODO
-* MIGRATIONS
-* OPEN_QUESTIONS
-
 ---
 
 # 0) Purpose of this file
@@ -56,8 +47,6 @@ This file is a source of truth for AI assistants and developers:
 | Charts       | Recharts **2.5.0**                              | Time series, see §7               |
 | Routing      | React Router DOM **6.9.0**                      | Pages are thin, composition only  |
 | Quality      | ESLint **9.38.0**, Prettier **3.6.2**, Vitest   | Zero errors/warnings in CI        |
-
-> When bumping versions: **AI must not edit this section directly**. Instead, add a note to CHANGELOG and create a TODO to update documentation. See §12.
 
 ---
 
@@ -333,7 +322,6 @@ npm run generate-airdrop2
 5. Keep `observer()` only where `projectsStore` is read.
 6. Remove the legacy store and `useLocalObservableWithDestroy`.
 7. Verify refetch on `projectId` change.
-8. Add entries to MIGRATIONS and CHANGELOG (see §12).
 
 ---
 
@@ -355,24 +343,11 @@ Allowed:
 
 **Golden rules**
 
-1. **Edit ONLY** blocks listed in `ai_editable_blocks`: `CHANGELOG`, `TODO`, `MIGRATIONS`, `OPEN_QUESTIONS`.
-2. If other sections must change — **create a TODO** and a brief note in CHANGELOG.
-3. Keep only the latest 10 items in CHANGELOG; collapse older ones into an "archive" (keep the link).
-4. Do not duplicate rules; if there is a conflict, link to the existing point and refine the wording in a single place.
-5. Mark every update with a date in the `YYYY-MM-DD` format.
-
-**Edit formats**
-
-* **CHANGELOG:** concise entries — "date — what changed — why".
-* **TODO:** checklists with context and a link to ticket/PR.
-* **MIGRATIONS:** step-by-step plans and per-feature status.
-* **OPEN_QUESTIONS:** items that require the owner's decision.
+1. Do not duplicate rules; if there is a conflict, link to the existing point and refine the wording in a single place.
 
 **Before writing changes AI must:**
 
 * make sure the changes reflect the actual state of the code/repo;
-* not change versions in §2 directly — use TODO + CHANGELOG instead;
-* not add new sections unless truly necessary.
 
 ---
 
