@@ -1,1 +1,1 @@
-export * from './cnft.store';
+export * from './queries';

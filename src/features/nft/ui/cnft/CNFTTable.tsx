@@ -15,7 +15,6 @@ import {
     Flex
 } from '@chakra-ui/react';
 import { FC, PropsWithChildren, useState } from 'react';
-import { observer } from 'mobx-react-lite';
 import {
     CopyIcon16,
     EmptyFolderIcon48,
@@ -25,7 +24,6 @@ import {
     IconButton
 } from 'src/shared';
 import { CnftCollection } from '../../model/interfaces/CnftCollection';
-import { CNFTStore } from 'src/features';
 
 const EmptyTable: FC<PropsWithChildren<BoxProps>> = ({ children, ...props }) => {
     return (
@@ -90,12 +88,13 @@ const CNFTTableRow: FC<{ row: CnftCollection }> = ({ row }) => {
 };
 
 interface CNFTTableProps {
-    cnftStore: CNFTStore;
+    cnftHistory: CnftCollection[];
+    isLoading: boolean;
 }
 
-const CNFTTable: FC<TableContainerProps & CNFTTableProps> = ({ cnftStore, ...props }) => {
-    const noDataKey = cnftStore.history$.isResolved ? 'empty' : 'loading';
-    const bodyKey = cnftStore.history$.value.length > 0 ? 'data' : noDataKey;
+const CNFTTable: FC<TableContainerProps & CNFTTableProps> = ({ cnftHistory, isLoading, ...props }) => {
+    const noDataKey = !isLoading ? 'empty' : 'loading';
+    const bodyKey = cnftHistory.length > 0 ? 'data' : noDataKey;
 
     return (
         <Box {...props}>
@@ -118,7 +117,7 @@ const CNFTTable: FC<TableContainerProps & CNFTTableProps> = ({ cnftStore, ...pro
                     </Thead>
                     <Tbody>
                         {bodyKey === 'data' &&
-                            cnftStore.history$.value.map(row => (
+                            cnftHistory.map(row => (
                                 <CNFTTableRow key={row.account.toString()} row={row} />
                             ))}
                         {bodyKey === 'loading' && (
@@ -140,4 +139,4 @@ const CNFTTable: FC<TableContainerProps & CNFTTableProps> = ({ cnftStore, ...pro
     );
 };
 
-export default observer(CNFTTable);
+export default CNFTTable;
