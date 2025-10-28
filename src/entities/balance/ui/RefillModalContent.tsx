@@ -11,7 +11,8 @@ import {
     useRadio,
     useRadioGroup,
     useClipboard,
-    useToast
+    useToast,
+    Flex
 } from '@chakra-ui/react';
 import { createTransferLink, fromDecimals, H4 } from 'src/shared';
 import { observer } from 'mobx-react-lite';
@@ -287,26 +288,25 @@ const RefillModalContent: FC<{
                 )}
             </ModalBody>
 
-            <ModalFooter flexDir="column" gap="2" pt="0">
+            <ModalFooter flexDir="column" gap="2" pt="0" mt="2">
                 {mode === 'USDT' && (
-                    <>
+                    <Flex gap="2" w="full">
                         <Button
-                            w="full"
-                            mt="2"
-                            isDisabled={!paymentLink || isDepositAddressLoading}
-                            onClick={handlePayByLink}
-                        >
-                            Refill by link
-                        </Button>
-                        <Button
-                            w="full"
+                            flex={1}
                             isDisabled={!paymentLink || isDepositAddressLoading}
                             onClick={onCopyLink}
                             variant="secondary"
                         >
                             Copy refill link
                         </Button>
-                    </>
+                        <Button
+                            flex={1}
+                            isDisabled={!paymentLink || isDepositAddressLoading}
+                            onClick={handlePayByLink}
+                        >
+                            Refill by link
+                        </Button>
+                    </Flex>
                 )}
 
                 {mode === 'PROMO' && (
@@ -322,6 +322,10 @@ const RefillModalContent: FC<{
                         Apply Promo Code
                     </Button>
                 )}
+
+                <Button onClick={onClose} variant="secondary" w="full">
+                    Close
+                </Button>
             </ModalFooter>
         </ModalContent>
     );
