@@ -1,14 +1,16 @@
 import { withProviders } from './providers';
 import Routing from 'src/pages';
 import { AppInitialization, ApplyQueryParams } from 'src/processes';
-import FeedbackModal from 'src/features/feedback/FeedbackModal';
+import { FeedbackModal, FeedbackModalProvider } from 'src/features/feedback';
 
 const App = () => {
     return (
         <AppInitialization>
             <ApplyQueryParams>
-                <Routing />
-                <FeedbackModal />
+                <FeedbackModalProvider>
+                    <Routing />
+                    <FeedbackModal />
+                </FeedbackModalProvider>
             </ApplyQueryParams>
         </AppInitialization>
     );
