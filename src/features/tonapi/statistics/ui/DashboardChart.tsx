@@ -11,14 +11,13 @@ import {
     Legend,
     ReferenceLine
 } from 'recharts';
-import { observer } from 'mobx-react-lite';
-import { tonApiStatsStore, restApiTiersStore } from 'src/shared/stores';
+import { restApiTiersStore } from 'src/shared/stores';
+import { useRestStats } from 'src/features/tonapi/statistics/model/queries';
 import { toDate, toDateTime } from 'src/shared';
-import { toJS } from 'mobx';
 
 const DashboardChart: FC<BoxProps> = props => {
     const { colors } = useTheme();
-    const data = tonApiStatsStore.restStats$.value;
+    const { data, isLoading } = useRestStats();
     const selectedTier = restApiTiersStore.selectedTier$.value;
 
     const ticks = useMemo(() => {
@@ -46,7 +45,7 @@ const DashboardChart: FC<BoxProps> = props => {
         return Math.max(...requests) >= selectedTier.rps * 0.67;
     }, [data, selectedTier]);
 
-    if (!tonApiStatsStore.restStats$.isResolved || !restApiTiersStore.selectedTier$.isResolved) {
+    if (isLoading || !restApiTiersStore.selectedTier$.isResolved) {
         return (
             <Center h="200px" {...props}>
                 <Spinner />
@@ -73,7 +72,7 @@ const DashboardChart: FC<BoxProps> = props => {
             }}
         >
             <ResponsiveContainer width="99%" height="100%">
-                <LineChart width={400} height={400} data={toJS(data)}>
+                <LineChart width={400} height={400} data={data}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <Line
                         dot={false}
@@ -114,4 +113,4 @@ const DashboardChart: FC<BoxProps> = props => {
     );
 };
 
-export default observer(DashboardChart);
+export default DashboardChart;
