@@ -7,16 +7,18 @@ import { Link } from 'react-router-dom';
 const PricingPage: FC = () => {
     return (
         <Overlay h="fit-content">
-            <Flex align="center" justify="space-between" pb="4">
+            <Flex align="center" justify="space-between" mb="4">
                 <Box>
-                    <H4 mb="1">Pricing</H4>
+                    <H4 mb="2">Pricing</H4>
                     <Text textStyle="body2" color="accent.blue">
-                        <Link to="/balance">All bills</Link>
+                        <Link to="/balance">
+                            View all bills
+                        </Link>
                     </Text>
                 </Box>
                 <TgChannelCardLink />
             </Flex>
-            <Divider mb="4" />
+            <Divider my="4" />
             <TonApiTiers />
         </Overlay>
     );
