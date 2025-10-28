@@ -1,6 +1,7 @@
 import {
     createImmediateReaction,
-    Loadable
+    Loadable,
+    createAsyncAction
 } from 'src/shared';
 import {
     DTOLiteproxyKey,
@@ -10,7 +11,8 @@ import {
     createLiteproxyKeys,
     getLiteproxyTiers,
     getProjectLiteproxyTier,
-    updateLiteproxyTier
+    updateLiteproxyTier,
+    validChangeLiteproxyTier
 } from 'src/shared/api';
 import { projectsStore } from 'src/shared/stores';
 import { makeAutoObservable } from 'mobx';
@@ -109,6 +111,21 @@ export class LiteproxysStore {
             }
         }
     );
+
+    checkValidChangeTier = createAsyncAction(async (tierId: number) => {
+        if (!projectsStore.selectedProject) {
+            throw new Error('Project is not selected');
+        }
+
+        const { data, error } = await validChangeLiteproxyTier({
+            path: { id: tierId },
+            query: { project_id: projectsStore.selectedProject.id }
+        });
+
+        if (error) throw error;
+
+        return data;
+    });
 
     clearStore(): void {
         this.liteproxyList$.clear();

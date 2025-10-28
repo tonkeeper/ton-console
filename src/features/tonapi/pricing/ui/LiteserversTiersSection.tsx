@@ -25,12 +25,19 @@ export const LiteserversTiersSection: FC = observer(() => {
         onClose: onRefillModalClose
     } = useDisclosure();
 
-    const handleSelectLiteserverTier = (tier: DTOLiteproxyTier) => {
+    const handleSelectLiteserverTier = async (tier: DTOLiteproxyTier) => {
         const selectedLiteserverDetail = liteproxysStore?.selectedTier$.value;
 
         const isCurrentSubscription = selectedLiteserverDetail?.id === tier.id;
 
         if (!isCurrentSubscription) {
+            const { valid } = await liteproxysStore.checkValidChangeTier(tier.id);
+
+            if (!valid) {
+                onRefillModalOpen();
+                return;
+            }
+
             setSelectedLiteserverTier(tier);
             onLiteserversPurchaseDialogOpen();
         }
