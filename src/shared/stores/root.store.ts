@@ -6,7 +6,6 @@ import { DappStore } from 'src/entities/dapp/model/dapp.store';
 import { UserStore } from 'src/entities/user/model/user.store';
 import { AppStore } from './app.store';
 import { awaitValueResolved } from 'src/shared';
-import { RestApiTiersStore } from 'src/features/tonapi/pricing/model/rest-api-tiers.store';
 import { client } from 'src/shared/api';
 
 // Initialize API client with base URL from env
@@ -21,14 +20,12 @@ let dappStore: DappStore;
 let appMessagesStore: AppMessagesStore;
 let invoicesAppStore: InvoicesAppStore;
 let invoicesTableStore: InvoicesTableStore;
-let restApiTiersStore: RestApiTiersStore;
 
 const initializeDependentStores = () => {
     dappStore = new DappStore(projectsStore);
     appMessagesStore = new AppMessagesStore();
     invoicesAppStore = new InvoicesAppStore();
     invoicesTableStore = new InvoicesTableStore();
-    restApiTiersStore = new RestApiTiersStore();
 };
 
 awaitValueResolved(projectsStore.projects$).then(() => {
@@ -39,6 +36,5 @@ export {
     dappStore,
     appMessagesStore,
     invoicesAppStore,
-    invoicesTableStore,
-    restApiTiersStore
+    invoicesTableStore
 };
