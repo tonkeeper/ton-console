@@ -1,2 +1,2 @@
-export { faucetStore } from './faucet.store';
+export * from './queries';
 export * from './interfaces';

@@ -3,7 +3,7 @@ import {
     getProjectBillingHistory,
     DTOBalance
 } from 'src/shared/api';
-import { projectsStore } from 'src/shared/stores';
+import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
 import { tonapiMainnet, toDecimals } from 'src/shared';
 import { Balance } from './interfaces';
 
@@ -65,7 +65,7 @@ async function fetchTonRate(): Promise<number | undefined> {
  * Uses structuralSharing to avoid re-renders if balance hasn't changed
  */
 export function useBalanceQuery() {
-    const projectId = projectsStore.selectedProject?.id;
+    const projectId = useProjectId();
 
     return useQuery({
         queryKey: [...BALANCE_QUERY_KEY, projectId] as const,

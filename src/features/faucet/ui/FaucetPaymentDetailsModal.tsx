@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import {
     Box,
     Button,
@@ -22,8 +22,7 @@ import {
     toUserFriendlyAddress
 } from 'src/shared';
 import { CurrencyRate } from 'src/entities';
-import { faucetStore } from 'src/features';
-import { observer } from 'mobx-react-lite';
+import { RequestFaucetForm } from '../model';
 
 const FaucetPaymentDetailsModal: FC<{
     isOpen: boolean;
@@ -31,17 +30,19 @@ const FaucetPaymentDetailsModal: FC<{
     amount?: TonCurrencyAmount;
     receiverAddress?: string;
     price?: TonCurrencyAmount;
-}> = ({ isOpen, onClose, amount, receiverAddress, price }) => {
+    isLoading?: boolean;
+    onConfirm?: (form: RequestFaucetForm) => void;
+}> = ({ isOpen, onClose, amount, receiverAddress, price, isLoading, onConfirm }) => {
     const userFriendlyAddress = receiverAddress ? toUserFriendlyAddress(receiverAddress) : '';
 
-    const onSubmit = async (): Promise<void> => {
-        await faucetStore.buyAssets({
-            amount: amount!,
-            receiverAddress: receiverAddress!
-        });
-
-        onClose();
-    };
+    const handleConfirm = useCallback((): void => {
+        if (onConfirm && amount && receiverAddress) {
+            onConfirm({
+                amount,
+                receiverAddress
+            });
+        }
+    }, [onConfirm, amount, receiverAddress]);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
@@ -99,8 +100,8 @@ const FaucetPaymentDetailsModal: FC<{
                     </Button>
                     <Button
                         flex={1}
-                        isLoading={faucetStore.buyAssets.isLoading}
-                        onClick={onSubmit}
+                        isLoading={isLoading}
+                        onClick={handleConfirm}
                         variant="primary"
                     >
                         Confirm Purchase
@@ -111,4 +112,4 @@ const FaucetPaymentDetailsModal: FC<{
     );
 };
 
-export default observer(FaucetPaymentDetailsModal);
+export default FaucetPaymentDetailsModal;

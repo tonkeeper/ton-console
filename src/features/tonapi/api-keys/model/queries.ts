@@ -5,13 +5,13 @@ import {
     updateProjectTonApiToken,
     deleteProjectTonApiToken
 } from 'src/shared/api';
-import { projectsStore } from 'src/shared/stores';
+import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
 import { ApiKey, CreateApiKeyForm, EditApiKeyForm } from './interfaces';
 import { DTOProjectTonApiToken } from 'src/shared/api';
 
 const API_KEYS_QUERY_KEY = ['api-keys'] as const;
 
-const getApiKeysQueryKey = (projectId: number | undefined) => [...API_KEYS_QUERY_KEY, projectId] as const;
+const getApiKeysQueryKey = (projectId: number | null | undefined) => [...API_KEYS_QUERY_KEY, projectId] as const;
 
 function mapApiTokenDTOToApiKey(apiTokenDTO: DTOProjectTonApiToken): ApiKey {
     return {
@@ -26,7 +26,7 @@ function mapApiTokenDTOToApiKey(apiTokenDTO: DTOProjectTonApiToken): ApiKey {
 }
 
 export function useApiKeysQuery() {
-    const projectId = projectsStore.selectedProject?.id;
+    const projectId = useProjectId();
 
     return useQuery({
         queryKey: getApiKeysQueryKey(projectId),
@@ -47,14 +47,15 @@ export function useApiKeysQuery() {
 
 export function useCreateApiKeyMutation() {
     const queryClient = useQueryClient();
-    const projectId = projectsStore.selectedProject?.id;
+    const projectId = useProjectId();
 
     return useMutation({
         mutationFn: async (form: CreateApiKeyForm) => {
-            if (!projectId) throw new Error('No project selected');
+            const currentProjectId = projectId;
+            if (!currentProjectId) throw new Error('No project selected');
 
             const { data, error } = await generateProjectTonApiToken({
-                query: { project_id: projectId },
+                query: { project_id: currentProjectId },
                 body: {
                     name: form.name,
                     limit_rps: form.limitRps ?? undefined,
@@ -67,28 +68,26 @@ export function useCreateApiKeyMutation() {
 
             return data.token ? mapApiTokenDTOToApiKey(data.token) : null;
         },
-        onSuccess: (newKey) => {
-            if (newKey) {
-                queryClient.setQueryData(
-                    getApiKeysQueryKey(projectId),
-                    (oldData: ApiKey[] | undefined) => [...(oldData || []), newKey]
-                );
-            }
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: getApiKeysQueryKey(projectId)
+            });
         }
     });
 }
 
 export function useEditApiKeyMutation() {
     const queryClient = useQueryClient();
-    const projectId = projectsStore.selectedProject?.id;
+    const projectId = useProjectId();
 
     return useMutation({
         mutationFn: async (form: EditApiKeyForm) => {
-            if (!projectId) throw new Error('No project selected');
+            const currentProjectId = projectId;
+            if (!currentProjectId) throw new Error('No project selected');
 
             const { error } = await updateProjectTonApiToken({
                 path: { id: form.id },
-                query: { project_id: projectId },
+                query: { project_id: currentProjectId },
                 body: {
                     name: form.name,
                     limit_rps: form.limitRps ?? undefined,
@@ -101,48 +100,36 @@ export function useEditApiKeyMutation() {
 
             return form;
         },
-        onSuccess: (form) => {
-            queryClient.setQueryData(
-                getApiKeysQueryKey(projectId),
-                (oldData: ApiKey[] | undefined) =>
-                    oldData?.map(key =>
-                        key.id === form.id
-                            ? {
-                                  ...key,
-                                  name: form.name,
-                                  limitRps: form.limitRps,
-                                  origins: form.origins,
-                                  capabilities: form.capabilities
-                              }
-                            : key
-                    ) || []
-            );
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: getApiKeysQueryKey(projectId)
+            });
         }
     });
 }
 
 export function useDeleteApiKeyMutation() {
     const queryClient = useQueryClient();
-    const projectId = projectsStore.selectedProject?.id;
+    const projectId = useProjectId();
 
     return useMutation({
         mutationFn: async (id: number) => {
-            if (!projectId) throw new Error('No project selected');
+            const currentProjectId = projectId;
+            if (!currentProjectId) throw new Error('No project selected');
 
             const { error } = await deleteProjectTonApiToken({
                 path: { id },
-                query: { project_id: projectId }
+                query: { project_id: currentProjectId }
             });
 
             if (error) throw error;
 
             return id;
         },
-        onSuccess: (deletedId) => {
-            queryClient.setQueryData(
-                getApiKeysQueryKey(projectId),
-                (oldData: ApiKey[] | undefined) => oldData?.filter(key => key.id !== deletedId) || []
-            );
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: getApiKeysQueryKey(projectId)
+            });
         }
     });
 }

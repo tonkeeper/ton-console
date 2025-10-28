@@ -4,18 +4,21 @@ import { useForm } from 'react-hook-form';
 import { FeedbackFromI } from './interfaces/form';
 import { feetbackModalStore } from './model/feedback';
 import { userStore } from 'src/shared/stores';
-import { projectsStore } from 'src/shared/stores';
+import { useProjectName } from 'src/shared/contexts/ProjectIdContext';
 import { FeedbackResponse } from 'src/shared/api';
 
 export const FeedbackFrom: FC<{
     formId: string;
 }> = ({ formId }) => {
+    const projectName = useProjectName();
+    // TODO: Migrate feetbackModalStore to React Query in Phase 2
+
     const { handleSubmit, register } = useForm<FeedbackFromI>({
         defaultValues: {
             name: userStore.user$.value
                 ? `${userStore.user$.value?.firstName} ${userStore.user$.value?.lastName}`
                 : '',
-            company: projectsStore.selectedProject?.name || '',
+            company: projectName || '',
             tg: '',
             information: ''
         }
