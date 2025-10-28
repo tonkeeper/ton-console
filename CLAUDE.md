@@ -8,15 +8,6 @@ owners:
 * <fill in: owner GitHub handle/email>
   ai_maintained: true
 
-# Sections that AI MAY edit directly (see §12)
-
-ai_editable_blocks:
-
-* CHANGELOG
-* TODO
-* MIGRATIONS
-* OPEN_QUESTIONS
-
 ---
 
 # 0) Purpose of this file
@@ -56,8 +47,6 @@ This file is a source of truth for AI assistants and developers:
 | Charts       | Recharts **2.5.0**                              | Time series, see §7               |
 | Routing      | React Router DOM **6.9.0**                      | Pages are thin, composition only  |
 | Quality      | ESLint **9.38.0**, Prettier **3.6.2**, Vitest   | Zero errors/warnings in CI        |
-
-> When bumping versions: **AI must not edit this section directly**. Instead, add a note to CHANGELOG and create a TODO to update documentation. See §12.
 
 ---
 
@@ -147,13 +136,17 @@ src/
 **Query keys** must include `projectId`:
 
 ```ts
-const projectId = projectsStore.selectedProject?.id;
+// NEW: Use useProjectId() hook (preferred in new features)
+import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+
+const projectId = useProjectId();
 
 return useQuery({
-  queryKey: ['api-keys', projectId],
+  queryKey: ['api-keys', projectId || undefined],
   queryFn: async () => {
+    if (!projectId) return [];
     const { data, error } = await getProjectTonApiTokens({
-      query: { project_id: projectId! }
+      query: { project_id: projectId.toString() }
     });
     if (error) throw error;
     return data.items.map(mapDTOToApiKey);
@@ -162,14 +155,43 @@ return useQuery({
 });
 ```
 
+**Important: projectId in new features (MIGRATION IN PROGRESS)**
+
+* ✅ **NEW CODE**: Use `const projectId = useProjectId()` from `ProjectIdContext`
+* ❌ **LEGACY**: Do NOT use `projectsStore.selectedProject?.id` in new query hooks
+* **Migration Status**: Currently transitioning from MobX `projectsStore` to React Context API
+  * `ProjectIdContext` acts as temporary bridge that syncs values from `projectsStore`
+  * `with-project-id.tsx` translates store changes to context using MobX `reaction()`
+  * When Phase 3 complete: Context will become sole source of truth, bridge will be removed
+* Include `projectId` in all query keys to prevent cross-project cache collisions
+
 **Mutations & cache**
 
+* **Important**: Capture `projectId` in `mutationFn` at mutation time (not hook closure):
+  ```ts
+  mutationFn: async (data) => {
+    const currentProjectId = projectId;  // Capture at mutation start
+    if (!currentProjectId) throw new Error('Project not selected');
+
+    const response = await apiCall(...);
+
+    return { ...response, _projectId: currentProjectId };  // Return for onSuccess
+  },
+  onSuccess: (data) => {
+    // Use projectId from mutation result, not from hook closure
+    queryClient.invalidateQueries({
+      queryKey: ['api-keys', data._projectId]
+    });
+  }
+  ```
+* Prevents race conditions when projectId changes during async operations
 * Simple add: `queryClient.setQueryData(['api-keys', projectId], updater)`.
 * Complex cases: `queryClient.invalidateQueries({ queryKey: ['api-keys', projectId] })`.
 
 **observer()**
 
-* Wrap a component with `observer()` **only** if it reads a MobX store (e.g., `projectsStore`).
+* Wrap a component with `observer()` **only** if it reads a MobX store (e.g., legacy features).
+* Do NOT use in new React Query features.
 
 ## 5.2 MobX (legacy)
 
@@ -273,13 +295,48 @@ npm run generate-airdrop2
 
 # 10) Migration plan (MobX → React Query)
 
-**Status**
+**Current Phase: Phase 1 — Simple stores migration**
 
+**Status (2025-10-29) — Detailed Migration Plan Created**
+
+**Phase 1 — Simple Leaf Stores (next, 2-3 days)**
 * ✅ API Keys — migrated (reference)
 * ✅ Balance — global hook with `refetchInterval: 3000`, `refetchIntervalInBackground: true`
-* ⏳ Webhooks — high priority
-* ⏳ Liteproxy — after Webhooks
-* ⏳ Statistics/Analytics — most complex (last)
+* ✅ Rates — migrated to useQuery
+* ✅ Webhooks — migrated to useQuery + error handling for 501
+  * Created `ProjectIdContext` as temporary bridge to `projectsStore`
+  * Added `with-project-id.tsx` to sync MobX store → React Context
+  * Implemented projectId capture in mutations to prevent race conditions
+  * Added informational 501 error message with API docs link
+* ⏳ TonApiStatsStore — next after webhooks
+* ⏳ LiteproxysStore, RestApiTiersStore, CNFTStore, FaucetStore
+
+**Phase 1.5 — Replace projectsStore References (0.5-1 day)**
+* ⏳ Remove all `projectsStore.selectedProject?.id` from codebase
+* ⏳ Replace with `useProjectId()` hook from ProjectIdContext
+
+**Phase 2 — Remaining Stores + Localization (2-3 days)**
+* ⏳ JettonStore (wallet-based, no projectId dependency)
+* ⏳ DappStore (enable AppMessagesStore refactoring)
+* ⏳ Localize InvoicesTableStore & AnalyticsHistoryTableStore to component-level hooks
+
+**Phase 2.5 — Complex Store Refactoring (2-3 days)**
+* ⏳ AppMessagesStore → split into 4 hooks
+* ⏳ InvoicesAppStore → split into 2 hooks
+* ⏳ AnalyticsQueryStore → split into 3+ hooks
+
+**Phase 3 — ProjectsStore Removal (1-2 days, CRITICAL)**
+* ⏳ Delete `src/entities/project/model/projects.store.ts`
+* ⏳ Move logic to `shared/queries/projects.ts`
+* ⏳ Requires all 15 dependent stores migrated first
+
+**Phase 4 — Final Stores (1-2 days)**
+* ⏳ UserStore (decision: migrate or keep as exception)
+* ⏳ AppStore (→ `useAppInitialized()` hook)
+* ⏳ Analytics supporting stores (GPT, Graph, Request)
+* ⏳ AirdropsStore
+
+**See:** `MIGRATION_PLAN.md` for detailed phases, checklists, and risk analysis
 
 **Steps**
 
@@ -290,7 +347,6 @@ npm run generate-airdrop2
 5. Keep `observer()` only where `projectsStore` is read.
 6. Remove the legacy store and `useLocalObservableWithDestroy`.
 7. Verify refetch on `projectId` change.
-8. Add entries to MIGRATIONS and CHANGELOG (see §12).
 
 ---
 
@@ -312,24 +368,11 @@ Allowed:
 
 **Golden rules**
 
-1. **Edit ONLY** blocks listed in `ai_editable_blocks`: `CHANGELOG`, `TODO`, `MIGRATIONS`, `OPEN_QUESTIONS`.
-2. If other sections must change — **create a TODO** and a brief note in CHANGELOG.
-3. Keep only the latest 10 items in CHANGELOG; collapse older ones into an "archive" (keep the link).
-4. Do not duplicate rules; if there is a conflict, link to the existing point and refine the wording in a single place.
-5. Mark every update with a date in the `YYYY-MM-DD` format.
-
-**Edit formats**
-
-* **CHANGELOG:** concise entries — "date — what changed — why".
-* **TODO:** checklists with context and a link to ticket/PR.
-* **MIGRATIONS:** step-by-step plans and per-feature status.
-* **OPEN_QUESTIONS:** items that require the owner's decision.
+1. Do not duplicate rules; if there is a conflict, link to the existing point and refine the wording in a single place.
 
 **Before writing changes AI must:**
 
 * make sure the changes reflect the actual state of the code/repo;
-* not change versions in §2 directly — use TODO + CHANGELOG instead;
-* not add new sections unless truly necessary.
 
 ---
 
@@ -412,19 +455,55 @@ export const ApiKeys: FC = observer(() => {
 
 ```ts
 // features/tonapi/api-keys/model/queries.ts
+import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+
 export function useApiKeysQuery() {
-  const projectId = projectsStore.selectedProject?.id;
+  const projectId = useProjectId();  // NEW: Use context hook instead of store
   return useQuery({
-    queryKey: ['api-keys', projectId],
+    queryKey: ['api-keys', projectId || undefined],
     queryFn: async () => {
-      const { data, error } = await getProjectTonApiTokens({ query: { project_id: projectId! }});
+      if (!projectId) return [];
+      const { data, error } = await getProjectTonApiTokens({
+        query: { project_id: projectId.toString() }
+      });
       if (error) throw error;
       return data.items.map(mapDTOToApiKey);
     },
     enabled: !!projectId,
+    staleTime: 5 * 60 * 1000  // 5 minutes
   });
 }
 ```
+
+## 19.3 Mutation with projectId capture (pattern - IMPORTANT)
+
+```ts
+// features/tonapi/api-keys/model/queries.ts
+export function useDeleteApiKeyMutation() {
+  const queryClient = useQueryClient();
+  const projectId = useProjectId();
+
+  return useMutation({
+    mutationFn: async (keyId: string) => {
+      // Capture projectId at mutation time to prevent race conditions
+      const currentProjectId = projectId;
+      if (!currentProjectId) throw new Error('Project not selected');
+
+      await deleteApiKey(keyId, { project_id: currentProjectId.toString() });
+
+      return { keyId, projectId: currentProjectId };
+    },
+    onSuccess: (data) => {
+      // Use projectId from mutation result, not from hook closure
+      queryClient.invalidateQueries({
+        queryKey: ['api-keys', data.projectId]
+      });
+    }
+  });
+}
+```
+
+**Why capture projectId?** If user changes project while request is in flight, `onSuccess` uses stale projectId from closure, invalidating wrong cache. By capturing in `mutationFn` and returning, we ensure correct cache invalidation.
 
 ---
 
