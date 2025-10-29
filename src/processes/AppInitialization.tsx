@@ -3,7 +3,7 @@ import { Box, Center, Fade, FadeProps } from '@chakra-ui/react';
 import { TonConsoleIcon } from 'src/shared';
 import { appStore, userStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
-import { setupApiInterceptors } from 'src/shared/api/console/interceptors';
+import { setupApiInterceptors } from 'src/shared/api/interceptors';
 
 const FadeAnimation: FC<FadeProps> = props => (
     <Fade
