@@ -1,35 +1,30 @@
 import { Flex, BoxProps, Spinner, Divider } from '@chakra-ui/react';
 import { Address } from '@ton/core';
 import { TonConnectButton, useTonAddress } from '@tonconnect/ui-react';
-import { observer } from 'mobx-react-lite';
-import { FC, useEffect, useMemo } from 'react';
-import { JettonCard, JettonStore } from 'src/features';
+import { FC, useMemo } from 'react';
+import { JettonCard } from 'src/features';
 import { isValidAddress } from 'src/features/jetton/lib/utils';
 import JettonWallet from 'src/features/jetton/ui/minter/JettonWallet';
-import { H4, Overlay, useLocalObservableWithDestroy } from 'src/shared';
+import { H4, Overlay } from 'src/shared';
 import { useParams } from 'react-router-dom';
+import { useJettonInfoQuery, useJettonWalletQuery } from 'src/features/jetton/model/queries';
 
 const JettonViewPage: FC<BoxProps> = () => {
     const { address } = useParams<{ address: string }>();
     const connectedWalletAddressStr = useTonAddress();
+
     const connectedWalletAddress = useMemo(
         () => (connectedWalletAddressStr ? Address.parse(connectedWalletAddressStr) : null),
         [connectedWalletAddressStr]
     );
 
-    const jettonStore = useLocalObservableWithDestroy(() => new JettonStore());
+    const jettonAddress = useMemo(
+        () => (address && isValidAddress(address) ? Address.parse(address) : null),
+        [address]
+    );
 
-    useEffect(() => {
-        const jettonAddress = address && isValidAddress(address) ? Address.parse(address) : null;
-        jettonStore.setJettonAddress(jettonAddress);
-    }, [address, jettonStore]);
-
-    useEffect(() => {
-        jettonStore.setConnectedWalletAddress(connectedWalletAddress);
-    }, [connectedWalletAddress, jettonStore]);
-
-    const jettonInfo = jettonStore.jettonInfo$.value;
-    const jettonInfoLoading = jettonStore.jettonInfo$.isLoading;
+    const { data: jettonInfo, isLoading: jettonInfoLoading } = useJettonInfoQuery(jettonAddress);
+    const { data: jettonWallet } = useJettonWalletQuery(jettonAddress, connectedWalletAddress);
 
     if (jettonInfo === null && jettonInfoLoading) {
         return (
@@ -45,19 +40,24 @@ const JettonViewPage: FC<BoxProps> = () => {
                 <H4>Jetton</H4>
                 <TonConnectButton />
             </Flex>
-            {jettonInfo === null ? (
+            {jettonInfo === null || jettonInfo === undefined ? (
                 <Overlay display="flex" justifyContent="center" alignItems="center">
                     <H4>Jetton not found</H4>
                 </Overlay>
             ) : (
                 <>
-                    <JettonCard data={jettonInfo} jettonStore={jettonStore} />
+                    <JettonCard
+                        data={jettonInfo}
+                        jettonAddress={jettonAddress}
+                        connectedWalletAddress={connectedWalletAddress}
+                    />
                     <Divider mt={6} />
 
                     <JettonWallet
                         connectedWalletAddress={connectedWalletAddress}
                         jettonInfo={jettonInfo}
-                        jettonStore={jettonStore}
+                        jettonAddress={jettonAddress}
+                        jettonWallet={jettonWallet ?? null}
                     />
                 </>
             )}
@@ -65,4 +65,4 @@ const JettonViewPage: FC<BoxProps> = () => {
     );
 };
 
-export default observer(JettonViewPage);
+export default JettonViewPage;
