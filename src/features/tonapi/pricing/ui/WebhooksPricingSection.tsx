@@ -191,15 +191,15 @@ export const WebhooksPricingSection: FC<{ hideActivation?: boolean }> = observer
                 )}
             </Flex>
 
-            <Flex align="flex-start" direction={{ base: 'column', md: 'row' }} gap="6">
-                <Box flex="1" w={{ base: '100%', lg: '50%' }}>
+            <Flex align="flex-start" wrap="wrap" gap="6">
+                <Box flex="3 1 300px" minW="300px">
                     <Text textStyle="body2" mb="3" color="text.secondary">
                         Usage-based pricing. Charged hourly for connected accounts and per message
                         sent. Use the calculator to estimate your monthly costs.
                     </Text>
                     <PricingDiagram />
                 </Box>
-                <Box w={{ base: '100%', md: '308px' }}>
+                <Box flex="1 1 308px" minW="280px">
                     <WebhooksPricingCalculator />
                     {!hideActivation && (
                         <Button w="100%" mt="4" onClick={handleActivateWebhooks} variant="primary">
