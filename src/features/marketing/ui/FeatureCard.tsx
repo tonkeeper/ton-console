@@ -7,7 +7,6 @@ import {
     CardFooter,
     Flex,
     Image,
-    ImageProps,
     Text,
     chakra
 } from '@chakra-ui/react';
@@ -22,14 +21,12 @@ export const FeatureCard: FC<
             heading: string;
             description: string;
             imgBorder?: boolean;
-            imgHeight: ImageProps['height'];
             imgSources?: { media: string; srcSet: string }[];
         }
     >
 > = ({
     imgBorder,
     imgSources,
-    imgHeight,
     background,
     fallback,
     heading,
@@ -40,21 +37,39 @@ export const FeatureCard: FC<
 }) => {
     return (
         <Card
+            flex="1 1 280px"
             overflow="hidden"
+            minW="280px"
+            h="auto"
             borderRadius="lg"
             bgColor="background.contentTint"
             size="xl"
             {...rest}
         >
-            <CardBody h="274px" minH="274px" maxH="274px" px="10px" pb="0" bg={background}>
-                <chakra.picture h="100%" alignItems="center" justifyContent="center" display="flex">
+            <CardBody
+                overflow="hidden"
+                h="274px"
+                minH="274px"
+                maxH="274px"
+                px="10px"
+                pb="0"
+                bg={background}
+                alignContent="center"
+            >
+                <chakra.picture
+                    h="100%"
+                    w="100%"
+                    alignItems="center"
+                    justifyContent="center"
+                    display="flex"
+                >
                     {imgSources?.map(item => (
                         <source key={item.media} media={item.media} srcSet={item.srcSet} />
                     ))}
                     <Image
-                        h={imgHeight}
+                        maxW="100%"
+                        maxH="274px"
                         px={imgBorder ? '1' : '0'}
-                        objectFit="contain"
                         bgColor={imgBorder ? 'rgba(255, 255, 255, 0.24)' : 'transparent'}
                         draggable="false"
                         fallback={fallback || <></>}

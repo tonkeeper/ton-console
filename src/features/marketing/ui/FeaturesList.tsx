@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { BoxProps, Button, SimpleGrid } from '@chakra-ui/react';
+import { BoxProps, Button, Flex } from '@chakra-ui/react';
 import { FeatureCard } from './FeatureCard';
 import { userStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
@@ -28,19 +28,17 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
     const buttonVariant = isContrast ? 'secondary' : 'overlay';
 
     return (
-        <SimpleGrid
-            columns={{ base: 1, sm: 2, lg: 3, xl: 4 }}
-            spacing="3"
+        <Flex
+            wrap="wrap"
+            gap="3"
             {...rest}
         >
             <FeatureCard
-                h="100%"
                 background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
                 src="/assets/images/tonkeeper-on-ramp.webp"
                 heading="On-Ramp"
-                description="Place your exchange, payment solution, or DEX under Tonkeeper’s Buy button and reach 1M+ buyers"
+                description="Place your exchange, payment solution, or DEX under Tonkeeper's Buy button and reach 1M+ buyers"
                 imgBorder
-                imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button onClick={openFeedbackModal('on-ramp')} variant={buttonVariant}>
@@ -49,13 +47,11 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
             </FeatureCard>
 
             <FeatureCard
-                h="100%"
                 background="linear-gradient(104deg, #2EA5FF 0%, #0F97FF 100%)"
                 src="/assets/images/tonkeeper-browser.webp"
                 heading="Tonkeeper Browser"
-                description="Get 500K+ monthly clicks from Tonkeeper’s app catalog and turn subscribers into repeat revenue."
+                description="Get 500K+ monthly clicks from Tonkeeper's app catalog and turn subscribers into repeat revenue."
                 imgBorder
-                imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button onClick={openFeedbackModal('tonkeeper-browser')} variant={buttonVariant}>
@@ -64,13 +60,11 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
             </FeatureCard>
 
             {/* <FeatureCard
-                h="100%"
                 background="linear-gradient(104deg, #5C92FF 0%, #3D7EFF 100%)"
                 src="/assets/images/tonkeeper-NFT.webp"
                 heading="NFT Themes"
                 description="Customize Tonkeeper with your NFTs."
                 imgBorder
-                imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button onClick={openFeedbackModal('nft-themes')} variant={buttonVariant}>
@@ -79,13 +73,11 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
             </FeatureCard> */}
 
             <FeatureCard
-                h="100%"
                 background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
                 src="/assets/images/tonkeeper-swap.webp"
                 heading="Swap"
                 description="Feature your DEX inside Tonkeeper Swap and convert wallet traffic directly into trades"
                 imgBorder
-                imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button onClick={openFeedbackModal('swap')} variant={buttonVariant}>
@@ -94,13 +86,11 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
             </FeatureCard>
 
             {/* <FeatureCard
-                h="100%"
                 background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
                 src="/assets/images/tonkeeper-price-graph.webp"
                 heading="Token Stats & Prices"
                 description="Add a chart for your token on Tonkeeper: unlock exclusive customization for your holders' UX."
                 imgBorder
-                imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button onClick={openFeedbackModal('token-stats')} variant={buttonVariant}>
@@ -109,13 +99,11 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
             </FeatureCard> */}
 
             <FeatureCard
-                h="100%"
                 background="linear-gradient(104deg, #2EA5FF 0%, #0F97FF 100%)"
                 src="/assets/images/tonkeeper-activity.webp"
                 heading="Tonkeeper Messages"
-                description="Send trusted in-wallet messages to Tonkeeper’s high-intent users to boost retention and conversion"
+                description="Send trusted in-wallet messages to Tonkeeper's high-intent users to boost retention and conversion"
                 imgBorder
-                imgHeight="100%"
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button
@@ -128,7 +116,6 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
             </FeatureCard>
 
             <FeatureCard
-                h="100%"
                 background="linear-gradient(104deg, #2EA5FF 0%, #0F97FF 100%)"
                 imgSources={[
                     {
@@ -136,7 +123,6 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                         srcSet: '/assets/images/invoices-m.webp'
                     }
                 ]}
-                imgHeight="194px"
                 src="/assets/images/invoices.webp"
                 heading="TON Payments"
                 description="Track and manage TON transactions with a simple, powerful payments service built for reliability"
@@ -152,7 +138,6 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
             </FeatureCard>
 
             <FeatureCard
-                h="100%"
                 background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
                 imgSources={[
                     {
@@ -160,7 +145,6 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                         srcSet: '/assets/images/tonapi-m.webp'
                     }
                 ]}
-                imgHeight="186px"
                 src="/assets/images/tonapi.webp"
                 heading="TON API"
                 description="Build on TON with a clean, scalable API that’s fast, reliable, and developer-friendly"
@@ -181,7 +165,6 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
             </FeatureCard>
 
             {/* <FeatureCard
-                h="100%"
                 background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
                 imgSources={[
                     {
@@ -189,7 +172,6 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                         srcSet: '/assets/images/tonviewer-pages-m.webp'
                     }
                 ]}
-                imgHeight="142px"
                 src="/assets/images/tonviewer-pages.webp"
                 heading="Custom Pages"
                 description="Promote your own project through most convenient blockchain&nbsp;explorer in the TON ecosystem."
@@ -204,7 +186,6 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
             </FeatureCard> */}
 
             {/* <FeatureCard
-                h="100%"
                 background="linear-gradient(104deg, #2EA5FF 0%, #0F97FF 100%);"
                 imgSources={[
                     {
@@ -212,7 +193,6 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                         srcSet: '/assets/images/tonviewer-widget-m.webp'
                     }
                 ]}
-                imgHeight="194px"
                 src="/assets/images/tonviewer-widget.webp"
                 heading="App Widget on Tonviewer"
                 description="Add a custom widget with stats and actions to your decentralized app."
@@ -224,7 +204,6 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
             </FeatureCard> */}
 
             <FeatureCard
-                h="100%"
                 background="linear-gradient(104deg, #2EA5FF 0%, #0F97FF 100%);"
                 imgSources={[
                     {
@@ -232,7 +211,6 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                         srcSet: '/assets/images/partnerships-m.webp'
                     }
                 ]}
-                imgHeight={{ base: '184px', md: '84px' }}
                 src="/assets/images/partnerships.webp"
                 heading="Premium Partnership"
                 description="Access exclusive terms and co-marketing—Ton Apps supports a limited set of high-potential partners"
@@ -242,7 +220,7 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                     Request Partnership
                 </Button>
             </FeatureCard>
-        </SimpleGrid>
+        </Flex>
     );
 };
 
