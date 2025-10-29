@@ -18,13 +18,19 @@ import {
 import { CopyPad, CardLink } from 'src/shared';
 import {
     APP_MESSAGES_LINKS,
-    appMessagesStore,
     MessagesTokenRegenerateConfirmation
 } from 'src/features';
-import { observer } from 'mobx-react-lite';
+import { useDappsQuery } from 'src/entities/dapp/model/queries';
+import { useTokenQuery, useRegenerateDappTokenMutation } from 'src/features/app-messages/model/queries';
 
 const AppMessagesAuthDocs: FC<BoxProps> = props => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { data: dapps } = useDappsQuery();
+    const dappId = dapps?.[0]?.id;
+
+    const { data: token, isLoading: tokenLoading } = useTokenQuery(dappId ?? null);
+    const regenerateMutation = useRegenerateDappTokenMutation();
+
     return (
         <Box {...props}>
             <Box px="6">
@@ -33,15 +39,15 @@ const AppMessagesAuthDocs: FC<BoxProps> = props => {
                 </Text>
                 <Flex gap="3" mb="2">
                     <CopyPad
-                        isLoading={!appMessagesStore.dappToken$.isResolved}
+                        isLoading={tokenLoading}
                         flex="1"
                         wordBreak="break-all"
-                        text={appMessagesStore.dappToken$.value || ''}
+                        text={token || ''}
                     />
                     <Button
                         h="auto"
-                        isDisabled={!appMessagesStore.dappToken$.isResolved}
-                        isLoading={appMessagesStore.regenerateDappToken.isLoading}
+                        isDisabled={tokenLoading}
+                        isLoading={regenerateMutation.isPending}
                         onClick={onOpen}
                         variant="secondary"
                     >
@@ -69,13 +75,13 @@ const AppMessagesAuthDocs: FC<BoxProps> = props => {
                             Posting a message for user by wallet address with Curl:
                         </Text>
                         <CopyPad
-                            isLoading={!appMessagesStore.dappToken$.isResolved}
+                            isLoading={tokenLoading}
                             whiteSpace="pre-wrap"
-                            text={`curl -X POST 
+                            text={`curl -X POST
     https://tonconsole.com/api/v1/services/messages/push
     -H 'Content-Type: application/json'
-    -H 'Authorization: Bearer ${appMessagesStore.dappToken$.value}'
-    -d 
+    -H 'Authorization: Bearer ${token || ''}'
+    -d
     '{"message": "my_message", "addresses": ["EQ...ER", "EQ...ER"], "link": "http://my_dapp.com/event"}'`}
                             iconAlign="start"
                             mb="3"
@@ -101,13 +107,13 @@ const AppMessagesAuthDocs: FC<BoxProps> = props => {
                             Posting a message for all users with allow notifications with Curl:
                         </Text>
                         <CopyPad
-                            isLoading={!appMessagesStore.dappToken$.isResolved}
+                            isLoading={tokenLoading}
                             whiteSpace="pre-wrap"
-                            text={`curl -X POST 
+                            text={`curl -X POST
     https://tonconsole.com/api/v1/services/messages/push
     -H 'Content-Type: application/json'
-    -H 'Authorization: Bearer ${appMessagesStore.dappToken$.value}'
-    -d 
+    -H 'Authorization: Bearer ${token || ''}'
+    -d
     '{"message": "my_message", "link": "http://my_dapp.com/event"}'`}
                             iconAlign="start"
                             mb="3"
@@ -132,4 +138,4 @@ const AppMessagesAuthDocs: FC<BoxProps> = props => {
     );
 };
 
-export default observer(AppMessagesAuthDocs);
+export default AppMessagesAuthDocs;

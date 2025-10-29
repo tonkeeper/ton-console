@@ -1,23 +1,17 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { Box, BoxProps, Flex, Skeleton } from '@chakra-ui/react';
 import { formatWithSuffix, InfoTooltip, Span } from 'src/shared';
-import { appMessagesStore } from 'src/features';
 import { useDappsQuery } from 'src/entities/dapp/model/queries';
+import { useStatsQuery, useBalanceQuery } from 'src/features/app-messages/model/queries';
 
 const AppMessagesStats: FC<BoxProps> = props => {
     const { data: dapps } = useDappsQuery();
-    const stats = appMessagesStore.stats$.value;
-    const balance = appMessagesStore.balance$.value;
-    const isResolved =
-        appMessagesStore.stats$.isResolved && stats && appMessagesStore.balance$.isResolved;
-
     const dappId = dapps?.[0]?.id;
 
-    useEffect(() => {
-        if (dappId) {
-            appMessagesStore.fetchStats(dappId);
-        }
-    }, [dappId]);
+    const { data: stats, isLoading: statsLoading } = useStatsQuery(dappId ?? null);
+    const { data: balance, isLoading: balanceLoading } = useBalanceQuery();
+
+    const isLoading = statsLoading || balanceLoading;
 
     return (
         <Box {...props}>
@@ -32,7 +26,7 @@ const AppMessagesStats: FC<BoxProps> = props => {
                     </InfoTooltip>
                 </Box>
                 <Span textStyle="body2" textAlign="end">
-                    {isResolved ? stats!.totalUsers : <Skeleton w="100px" h="3" />}
+                    {!isLoading && stats ? stats.totalUsers : <Skeleton w="100px" h="3" />}
                 </Span>
             </Flex>
             <Flex justify="space-between">
@@ -46,8 +40,8 @@ const AppMessagesStats: FC<BoxProps> = props => {
                     </InfoTooltip>
                 </Box>
                 <Span textStyle="body2" textAlign="end">
-                    {isResolved ? (
-                        stats!.usersWithEnabledNotifications
+                    {!isLoading && stats ? (
+                        stats.usersWithEnabledNotifications
                     ) : (
                         <Skeleton w="100px" h="3" />
                     )}
@@ -62,7 +56,7 @@ const AppMessagesStats: FC<BoxProps> = props => {
                     <InfoTooltip>Push messages balance that you can send to your users</InfoTooltip>
                 </Box>
                 <Span textStyle="body2" textAlign="end">
-                    {isResolved ? formatWithSuffix(balance) : <Skeleton w="100px" h="3" />}
+                    {!isLoading && balance !== undefined ? formatWithSuffix(balance) : <Skeleton w="100px" h="3" />}
                 </Span>
             </Flex>
             <Flex justify="space-between">
@@ -74,7 +68,7 @@ const AppMessagesStats: FC<BoxProps> = props => {
                     <InfoTooltip>Messages with delivered to dApp users last 7 days</InfoTooltip>
                 </Box>
                 <Span textStyle="body2" textAlign="end">
-                    {isResolved ? stats!.sentNotificationsLastWeek : <Skeleton w="100px" h="3" />}
+                    {!isLoading && stats ? stats.sentNotificationsLastWeek : <Skeleton w="100px" h="3" />}
                 </Span>
             </Flex>
         </Box>
