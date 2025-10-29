@@ -171,7 +171,7 @@ export const WebhooksPricingCalculator = () => {
     );
 };
 
-export const WebhooksPricingSection: FC = observer(() => {
+export const WebhooksPricingSection: FC<{ hideActivation?: boolean }> = observer(({ hideActivation = false }) => {
     const navigate = useNavigate();
 
     const handleActivateWebhooks = () => {
@@ -184,12 +184,14 @@ export const WebhooksPricingSection: FC = observer(() => {
                 <Text textStyle="h4" fontWeight={600}>
                     Webhooks
                 </Text>
-                <Badge fontSize="xs" colorScheme="gray">
-                    Inactive
-                </Badge>
+                {!hideActivation && (
+                    <Badge fontSize="xs" colorScheme="gray">
+                        Inactive
+                    </Badge>
+                )}
             </Flex>
 
-            <Flex align="flex-start" direction={{ base: 'column', lg: 'row' }} gap="6">
+            <Flex align="flex-start" direction={{ base: 'column', md: 'row' }} gap="6">
                 <Box flex="1" w={{ base: '100%', lg: '50%' }}>
                     <Text textStyle="body2" mb="3" color="text.secondary">
                         Usage-based pricing. Charged hourly for connected accounts and per message
@@ -197,11 +199,13 @@ export const WebhooksPricingSection: FC = observer(() => {
                     </Text>
                     <PricingDiagram />
                 </Box>
-                <Box w={{ base: '100%', lg: '308px' }}>
+                <Box w={{ base: '100%', md: '308px' }}>
                     <WebhooksPricingCalculator />
-                    <Button w="100%" mt="4" onClick={handleActivateWebhooks} variant="primary">
-                        Activate Webhooks
-                    </Button>
+                    {!hideActivation && (
+                        <Button w="100%" mt="4" onClick={handleActivateWebhooks} variant="primary">
+                            Activate Webhooks
+                        </Button>
+                    )}
                 </Box>
             </Flex>
         </Box>
