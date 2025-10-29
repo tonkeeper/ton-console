@@ -20,23 +20,23 @@ import {
 } from '@chakra-ui/react';
 import { CURRENCY, FilledWarnIcon16, formatWithSuffix, H4 } from 'src/shared';
 import { RadioCard } from 'src/shared/ui/checkbox';
-import { AppMessagesPackage, appMessagesStore } from '../model';
+import { AppMessagesPackage } from '../model';
 import { CurrencyRate, RefillModalContent } from 'src/entities';
 import MessagesPaymentConfirmationModalContent from './MessagesPaymentConfirmationModalContent';
-import { observer } from 'mobx-react-lite';
+import { usePackagesQuery } from '../model/queries';
 import { useBalanceQuery } from 'src/features/balance';
 
 const MessagesRefillModal: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ isOpen, onClose }) => {
-    const options = appMessagesStore.packages$.value;
+    const { data: options = [] } = usePackagesQuery();
     const [selectedPlan, setSelectedPlan] = useState<AppMessagesPackage | null>(null);
     const { data: balance } = useBalanceQuery();
 
     const { getRootProps, getRadioProps } = useRadioGroup({
         name: 'package',
-        defaultValue: appMessagesStore.packages$.value[0]?.name || '',
+        defaultValue: options[0]?.name || '',
         onChange: name => setSelectedPlan(options.find(pkg => pkg.name === name) || null)
     });
     const group = getRootProps();
@@ -79,7 +79,7 @@ const MessagesRefillModal: FC<{
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody pt="0" pb="2">
-                {appMessagesStore.packages$.isResolved ? (
+                {options.length > 0 ? (
                     <VStack {...group}>
                         {options.map(pkg => (
                             <RadioCard
@@ -151,4 +151,4 @@ const MessagesRefillModal: FC<{
     );
 };
 
-export default observer(MessagesRefillModal);
+export default MessagesRefillModal;

@@ -11,15 +11,21 @@ import {
     ModalHeader
 } from '@chakra-ui/react';
 import { CURRENCY, formatWithSuffix, Span } from 'src/shared';
-import { AppMessagesPackage, appMessagesStore } from '../model';
+import { AppMessagesPackage } from '../model';
 import { CurrencyRate } from 'src/entities';
-import { observer } from 'mobx-react-lite';
+import { useBuyPackageMutation } from '../model/queries';
 
 const MessagesPaymentConfirmationModalContent: FC<{
     onClose: () => void;
     pkg: AppMessagesPackage;
 }> = ({ onClose, pkg }) => {
-    const onConfirm = (): Promise<void> => appMessagesStore.buyPackage(pkg.id).then(onClose);
+    const buyMutation = useBuyPackageMutation();
+
+    const onConfirm = (): void => {
+        buyMutation.mutate(pkg.id, {
+            onSuccess: onClose
+        });
+    };
 
     return (
         <ModalContent>
@@ -64,7 +70,7 @@ const MessagesPaymentConfirmationModalContent: FC<{
                 </Button>
                 <Button
                     flex={1}
-                    isLoading={appMessagesStore.buyPackage.isLoading}
+                    isLoading={buyMutation.isPending}
                     onClick={onConfirm}
                     variant="primary"
                 >
@@ -75,4 +81,4 @@ const MessagesPaymentConfirmationModalContent: FC<{
     );
 };
 
-export default observer(MessagesPaymentConfirmationModalContent);
+export default MessagesPaymentConfirmationModalContent;
