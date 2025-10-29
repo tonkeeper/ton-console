@@ -86,8 +86,9 @@ export function useCreateDappMutation() {
   const projectId = useProjectId();
 
   return useMutation({
-    mutationFn: async (form: CreateDappForm): Promise<PendingDapp> => {
-      if (!projectId) throw new Error('Project not selected');
+    mutationFn: async (form: CreateDappForm): Promise<PendingDapp & { _projectId: number }> => {
+      const currentProjectId = projectId; // Capture at mutation time
+      if (!currentProjectId) throw new Error('Project not selected');
 
       let finalForm = form;
 
@@ -104,7 +105,7 @@ export function useCreateDappMutation() {
       }
 
       const { data, error } = await createProjectMessagesApp({
-        query: { project_id: projectId },
+        query: { project_id: currentProjectId },
         body: finalForm as Required<CreateDappForm>
       });
 
@@ -113,12 +114,13 @@ export function useCreateDappMutation() {
       return {
         ...finalForm,
         token: data.payload,
-        validUntil: new Date(data.valid_until * 1000)
+        validUntil: new Date(data.valid_until * 1000),
+        _projectId: currentProjectId
       };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: dappKeys.byProject(projectId)
+        queryKey: dappKeys.byProject(data._projectId)
       });
 
       createStandaloneToast().toast({
@@ -149,20 +151,23 @@ export function useValidateDappMutation() {
   const projectId = useProjectId();
 
   return useMutation({
-    mutationFn: async (token: string): Promise<void> => {
-      if (!projectId) throw new Error('Project not selected');
+    mutationFn: async (token: string): Promise<{ _projectId: number }> => {
+      const currentProjectId = projectId; // Capture at mutation time
+      if (!currentProjectId) throw new Error('Project not selected');
 
       const { error } = await verifyProjectMessagesApp({
-        query: { project_id: projectId },
+        query: { project_id: currentProjectId },
         body: { payload: token }
       });
 
       if (error) throw error;
+
+      return { _projectId: currentProjectId };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       // Invalidate dapps list to refetch
       queryClient.invalidateQueries({
-        queryKey: dappKeys.byProject(projectId)
+        queryKey: dappKeys.byProject(data._projectId)
       });
 
       createStandaloneToast().toast({
@@ -190,25 +195,27 @@ export function useValidateDappMutation() {
 export function useDeleteDappMutation() {
   const queryClient = useQueryClient();
   const projectId = useProjectId();
-  const { toast } = createStandaloneToast();
 
   return useMutation({
-    mutationFn: async (dappId: number): Promise<void> => {
-      if (!projectId) throw new Error('Project not selected');
+    mutationFn: async (dappId: number): Promise<{ _projectId: number }> => {
+      const currentProjectId = projectId; // Capture at mutation time
+      if (!currentProjectId) throw new Error('Project not selected');
 
       const { error } = await deleteProjectMessagesApp({
         query: { app_id: dappId }
       });
 
       if (error) throw error;
+
+      return { _projectId: currentProjectId };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       // Invalidate dapps list to refetch
       queryClient.invalidateQueries({
-        queryKey: dappKeys.byProject(projectId)
+        queryKey: dappKeys.byProject(data._projectId)
       });
 
-      toast({
+      createStandaloneToast().toast({
         title: 'Dapp deleted successfully',
         status: 'success',
         duration: 5000,
@@ -216,7 +223,7 @@ export function useDeleteDappMutation() {
       });
     },
     onError: () => {
-      toast({
+      createStandaloneToast().toast({
         title: "Dapp wasn't deleted",
         status: 'error',
         duration: 5000,

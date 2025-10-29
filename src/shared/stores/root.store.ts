@@ -1,5 +1,4 @@
 import { ProjectsStore } from 'src/entities/project/model/projects.store';
-import { AppMessagesStore } from 'src/features/app-messages/model/app-messages.store';
 import { InvoicesAppStore } from 'src/features/invoices/models/invoices-app.store';
 import { InvoicesTableStore } from 'src/features/invoices/models/invoices-table.store';
 import { UserStore } from 'src/entities/user/model/user.store';
@@ -15,12 +14,10 @@ export const userStore = new UserStore();
 export const projectsStore = new ProjectsStore();
 export const appStore = new AppStore({ userStore, projectsStore });
 
-let appMessagesStore: AppMessagesStore;
 let invoicesAppStore: InvoicesAppStore;
 let invoicesTableStore: InvoicesTableStore;
 
 const initializeDependentStores = () => {
-    appMessagesStore = new AppMessagesStore();
     invoicesAppStore = new InvoicesAppStore();
     invoicesTableStore = new InvoicesTableStore();
 };
@@ -30,7 +27,6 @@ awaitValueResolved(projectsStore.projects$).then(() => {
 });
 
 export {
-    appMessagesStore,
     invoicesAppStore,
     invoicesTableStore
 };

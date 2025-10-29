@@ -9,8 +9,8 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { appMessagesStore } from '../model';
 import { useDappsQuery } from 'src/entities/dapp/model/queries';
+import { useRegenerateDappTokenMutation } from '../model/queries';
 
 const MessagesTokenRegenerateConfirmation: FC<{
     isOpen: boolean;
@@ -18,10 +18,13 @@ const MessagesTokenRegenerateConfirmation: FC<{
 }> = ({ isOpen, onClose }) => {
     const { data: dapps } = useDappsQuery();
     const dappId = dapps?.[0]?.id;
+    const regenerateMutation = useRegenerateDappTokenMutation();
 
-    const onConfirm = (): Promise<void> => {
-        if (!dappId) return Promise.reject('No dapp selected');
-        return appMessagesStore.regenerateDappToken(dappId).then(onClose);
+    const onConfirm = (): void => {
+        if (!dappId) return;
+        regenerateMutation.mutate(dappId, {
+            onSuccess: onClose
+        });
     };
 
     return (
@@ -39,7 +42,7 @@ const MessagesTokenRegenerateConfirmation: FC<{
                     </Button>
                     <Button
                         flex={1}
-                        isLoading={appMessagesStore.regenerateDappToken.isLoading}
+                        isLoading={regenerateMutation.isPending}
                         onClick={onConfirm}
                         variant="primary"
                     >
