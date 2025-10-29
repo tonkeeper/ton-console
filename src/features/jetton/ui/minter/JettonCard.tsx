@@ -19,7 +19,7 @@ import {
     FormHelperText,
     useToast
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
+import { Address } from '@ton/core';
 import { JettonInfo } from '@ton-api/client';
 import {
     CopyPad,
@@ -30,11 +30,11 @@ import {
     fromDecimals
 } from 'src/shared';
 import { ConfirmationDialog } from 'src/entities';
-import { JettonStore } from '../../model';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import JettonEditForm, { EditJettonMetadata } from './JettonEditForm';
 import { FormProvider, useForm } from 'react-hook-form';
 import { JettonMetadata } from '../../lib/jetton-minter';
+import { useMintJettonMutation, useBurnAdminMutation, useUpdateJettonMetadataMutation, useJettonInfoQuery } from '../../model/queries';
 
 const Field: FC<{ label: string; value: ReactNode; children?: ReactNode }> = ({
     label,
@@ -158,11 +158,11 @@ const ModalEdit: FC<{
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (value: JettonMetadata) => void;
-    jettonStore: JettonStore;
-}> = ({ isOpen, onClose, onSubmit, jettonStore }) => {
+    jettonInfo: JettonInfo;
+}> = ({ isOpen, onClose, onSubmit, jettonInfo }) => {
     const formId = 'jetton-edit-form';
 
-    const metadata = jettonStore.jettonInfo$.value?.metadata;
+    const metadata = jettonInfo.metadata;
 
     if (!metadata) {
         throw new Error('Jetton metadata is missing');
@@ -215,150 +215,58 @@ const ModalEdit: FC<{
 
 type JettonCardProps = StyleProps & {
     data: JettonInfo;
-    jettonStore: JettonStore;
+    jettonAddress: Address | null;
+    connectedWalletAddress: Address | null;
 };
 
-const JettonCard: FC<JettonCardProps> = observer(
-    ({
-        data: {
-            mintable,
-            metadata: { name, symbol, image, decimals, description, address },
-            totalSupply,
-            admin
-        },
-        jettonStore,
-        ...rest
-    }) => {
-        const toast = useToast();
-        const [tonconnect] = useTonConnectUI();
+const JettonCard: FC<JettonCardProps> = ({
+    data,
+    jettonAddress,
+    connectedWalletAddress,
+    ...rest
+}) => {
+    const {
+        mintable,
+        metadata: { name, symbol, image, decimals, description, address },
+        totalSupply,
+        admin
+    } = data;
+    const jettonInfo = data;
+    const [tonconnect] = useTonConnectUI();
 
-        const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
-        const [isMintModalOpen, setIsMintModalOpen] = useState(false);
-        const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
+    const [isMintModalOpen, setIsMintModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-        const [isMineProgress, setIsMintProgress] = useState(false);
-        const [isRevokeProgress, setIsRevokeProgress] = useState(false);
-        const [isEditProgress, setIsEditProgress] = useState(false);
+    const mintMutation = useMintJettonMutation(jettonAddress);
+    const burnAdminMutation = useBurnAdminMutation(jettonAddress);
+    const updateMetadataMutation = useUpdateJettonMetadataMutation(jettonAddress);
 
-        const handleMint = (count: bigint) => {
-            setIsMintProgress(true);
+    const handleMint = (count: bigint) => {
+        if (!jettonAddress || !connectedWalletAddress) {
+            return;
+        }
 
-            const toastId = toast({
-                title: 'Minting jetton',
-                description: 'Please wait...',
-                position: 'bottom-left',
-                duration: null,
-                status: 'loading',
-                isClosable: false
-            });
+        mintMutation.mutate({
+            amount: count,
+            connectedWalletAddress,
+            tonConnection: tonconnect,
+            jettonWallet: jettonInfo as any // JettonInfo passed as jettonWallet for compatibility
+        });
+    };
 
-            jettonStore
-                .mintJetton(count, tonconnect)
-                .then(() => {
-                    toast.update(toastId, {
-                        title: 'Success',
-                        description: 'Jetton minted successfully',
-                        status: 'success',
-                        duration: 5000,
-                        isClosable: true
-                    });
-                })
-                .catch(() => {
-                    const errorMessage = 'Unknown traking error happened';
-                    toast.update(toastId, {
-                        title: 'Traking lost',
-                        description: errorMessage,
-                        status: 'warning',
-                        duration: 5000,
-                        isClosable: true
-                    });
-                })
-                .finally(() => {
-                    jettonStore.updateJettonInfo();
-                    setIsMintProgress(false);
-                });
-        };
+    const handleRevokeOwnership = () => {
+        burnAdminMutation.mutate({ tonConnection: tonconnect });
+    };
 
-        const handleRevokeOwnership = () => {
-            setIsRevokeProgress(true);
+    const handleUpdateMetadata = (values: JettonMetadata) => {
+        updateMetadataMutation.mutate({
+            metadata: values,
+            tonConnection: tonconnect
+        });
+    };
 
-            const toastId = toast({
-                title: 'Revoking ownership',
-                description: 'Please wait...',
-                position: 'bottom-left',
-                duration: null,
-                status: 'loading',
-                isClosable: false
-            });
-
-            jettonStore
-                .burnAdmin(tonconnect)
-                .then(() => {
-                    toast.update(toastId, {
-                        title: 'Success',
-                        description: 'Ownership revoked successfully',
-                        status: 'success',
-                        duration: 5000,
-                        isClosable: true
-                    });
-                })
-                .catch(() => {
-                    const errorMessage = 'Unknown traking error happened';
-                    toast.update(toastId, {
-                        title: 'Traking lost',
-                        description: errorMessage,
-                        status: 'warning',
-                        duration: 5000,
-                        isClosable: true
-                    });
-                })
-                .finally(() => {
-                    jettonStore.updateJettonInfo();
-                    setIsRevokeProgress(false);
-                });
-        };
-
-        const handleUpdateMetadata = (values: JettonMetadata) => {
-            setIsEditProgress(true);
-
-            const toastId = toast({
-                title: 'Editing jetton',
-                description: 'Please wait...',
-                position: 'bottom-left',
-                duration: null,
-                status: 'loading',
-                isClosable: false
-            });
-
-            jettonStore
-                .updateMetadata(values, tonconnect)
-                .then(() => {
-                    toast.update(toastId, {
-                        title: 'Success',
-                        description: 'Jetton edited successfully',
-                        status: 'success',
-                        duration: 5000,
-                        isClosable: true
-                    });
-                })
-                .catch(() => {
-                    const errorMessage = 'Unknown traking error happened';
-                    toast.update(toastId, {
-                        title: 'Traking lost',
-                        description: errorMessage,
-                        status: 'warning',
-                        duration: 5000,
-                        isClosable: true
-                    });
-                })
-                .finally(() => {
-                    jettonStore.updateJettonInfo();
-                    setIsEditProgress(false);
-                });
-        };
-
-        const connectedWalletAddress = jettonStore.connectedWalletAddress;
-        const isOwner = connectedWalletAddress && admin?.address.equals(connectedWalletAddress);
+    const isOwner = connectedWalletAddress && admin?.address.equals(connectedWalletAddress);
 
         return (
             <Box w={440} bgColor="background.contentTint" {...rest} borderRadius={8}>
@@ -386,7 +294,7 @@ const JettonCard: FC<JettonCardProps> = observer(
                         <IconButton
                             aria-label="Remove"
                             icon={<EditIcon24 />}
-                            isLoading={isEditProgress}
+                            isLoading={updateMetadataMutation.isPending}
                             onClick={() => setIsEditModalOpen(true)}
                             ml="auto"
                         />
@@ -427,9 +335,9 @@ const JettonCard: FC<JettonCardProps> = observer(
                         {isOwner && (
                             <Button
                                 textStyle="body2"
-                                color={isRevokeProgress ? undefined : 'text.accent'}
+                                color={burnAdminMutation.isPending ? undefined : 'text.accent'}
                                 fontWeight={400}
-                                isLoading={isRevokeProgress}
+                                isLoading={burnAdminMutation.isPending}
                                 onClick={() => setIsRevokeModalOpen(true)}
                                 size="sm"
                                 variant="link"
@@ -447,9 +355,9 @@ const JettonCard: FC<JettonCardProps> = observer(
                         {isOwner && mintable && (
                             <Button
                                 textStyle="body2"
-                                color={isMineProgress ? undefined : 'text.accent'}
+                                color={mintMutation.isPending ? undefined : 'text.accent'}
                                 fontWeight={400}
-                                isLoading={isMineProgress}
+                                isLoading={mintMutation.isPending}
                                 onClick={() => setIsMintModalOpen(true)}
                                 size="sm"
                                 variant="link"
@@ -476,11 +384,10 @@ const JettonCard: FC<JettonCardProps> = observer(
                     isOpen={isEditModalOpen}
                     onClose={() => setIsEditModalOpen(false)}
                     onSubmit={handleUpdateMetadata}
-                    jettonStore={jettonStore}
+                    jettonInfo={jettonInfo}
                 />
             </Box>
         );
-    }
-);
+};
 
 export default JettonCard;
