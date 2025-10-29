@@ -31,8 +31,10 @@ export const RestApiTiersSection: FC = () => {
         onClose: onRefillModalClose
     } = useDisclosure();
 
+    const currentTierId = currentRestApiTier?.id;
+
     const handleSelectRestApiTier = async (tier: RestApiTier) => {
-        const isCurrentSubscription = currentRestApiTier?.id === tier.id;
+        const isCurrentSubscription = currentTierId === tier.id;
 
         if (isCurrentSubscription) return;
 
@@ -52,7 +54,7 @@ export const RestApiTiersSection: FC = () => {
         onRestApiPurchaseDialogOpen();
     };
 
-    if (isRestApiTiersLoading || !tiers || !currentRestApiTier) {
+    if (isRestApiTiersLoading || !tiers) {
         return (
             <Center py="8">
                 <Spinner />
@@ -92,7 +94,7 @@ export const RestApiTiersSection: FC = () => {
 
                 <Grid gap="4" templateColumns="repeat(auto-fit, minmax(230px, 1fr))">
                     {sortedTiers.map(tier => {
-                        const isCurrent = currentRestApiTier.id === tier.id;
+                        const isCurrent = currentTierId === tier.id;
                         const isFree = tier.price.amount.eq(0);
                         const isPayAsYouGo = tier.type === 'pay-as-you-go';
 
