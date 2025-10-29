@@ -16,8 +16,7 @@ import {
     ModalOverlay,
     FormControl,
     Input,
-    FormHelperText,
-    useToast
+    FormHelperText
 } from '@chakra-ui/react';
 import { Address } from '@ton/core';
 import { JettonInfo } from '@ton-api/client';
@@ -34,7 +33,7 @@ import { useTonConnectUI } from '@tonconnect/ui-react';
 import JettonEditForm, { EditJettonMetadata } from './JettonEditForm';
 import { FormProvider, useForm } from 'react-hook-form';
 import { JettonMetadata } from '../../lib/jetton-minter';
-import { useMintJettonMutation, useBurnAdminMutation, useUpdateJettonMetadataMutation, useJettonInfoQuery } from '../../model/queries';
+import { useMintJettonMutation, useBurnAdminMutation, useUpdateJettonMetadataMutation } from '../../model/queries';
 
 const Field: FC<{ label: string; value: ReactNode; children?: ReactNode }> = ({
     label,
