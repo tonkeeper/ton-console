@@ -1,11 +1,11 @@
 import { FC } from 'react';
 import { CardProps } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { DappCard } from 'src/entities';
-import { dappStore } from 'src/shared/stores';
+import { useDappsQuery } from '../model/queries';
 
 const CurrentDappCard: FC<CardProps & { withMenu?: boolean }> = props => {
-    const dapp = dappStore.dapps$.value[0];
+    const { data: dapps } = useDappsQuery();
+    const dapp = dapps?.[0];
 
     if (!dapp) {
         return null;
@@ -14,4 +14,4 @@ const CurrentDappCard: FC<CardProps & { withMenu?: boolean }> = props => {
     return <DappCard {...props} dapp={dapp} />;
 };
 
-export default observer(CurrentDappCard);
+export default CurrentDappCard;

@@ -14,8 +14,7 @@ import {
 import { DeleteIcon24, IconButton, Image, VerticalDotsIcon16 } from 'src/shared';
 import { Dapp } from 'src/entities';
 import { ConfirmDappDeleteModal } from './ConfirmDappDeleteModal';
-import { observer } from 'mobx-react-lite';
-import { dappStore } from 'src/shared/stores';
+import { useDeleteDappMutation } from '../model/queries';
 
 const DappCard: FC<
     CardProps & {
@@ -24,11 +23,12 @@ const DappCard: FC<
     }
 > = ({ dapp, withMenu, ...rest }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const deleteMutation = useDeleteDappMutation();
 
     const onDelete = (confirm?: boolean): void => {
         onClose();
-        if (confirm && dapp.id !== undefined) {
-            dappStore.deleteValidatedDapp(dapp.id);
+        if (confirm && dapp.id !== undefined && typeof dapp.id === 'number') {
+            deleteMutation.mutate(dapp.id);
         }
     };
 
@@ -83,4 +83,4 @@ const DappCard: FC<
     );
 };
 
-export default observer(DappCard);
+export default DappCard;
