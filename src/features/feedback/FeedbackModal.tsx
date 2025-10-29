@@ -19,8 +19,8 @@ import { useSendFeedbackMutation } from './model/queries';
 
 const FeedbackModal: FC = () => {
     const formId = 'feedback-form';
-    const { isOpen, source, close } = useFeedbackModal();
-    const { isPending } = useSendFeedbackMutation(source);
+    const { isOpen, close } = useFeedbackModal();
+    const { isPending } = useSendFeedbackMutation();
 
     return (
         <Modal isOpen={isOpen} onClose={close} scrollBehavior="inside" size="2xl">
@@ -33,7 +33,6 @@ const FeedbackModal: FC = () => {
                 <ModalBody>
                     <Flex direction="column">
                         <Box mb="4">
-                            {/* <Text textStyle="label2">Ton Console</Text> */}
                             <Text textStyle="body2">
                                 Your message has been successfully submitted. We will review it
                                 shortly and get back to you using the contact information you

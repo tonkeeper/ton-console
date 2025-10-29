@@ -9,21 +9,37 @@ import { FeedbackFromI } from '../interfaces/form';
 
 /**
  * Hook to send feedback form
- * @param source - Source of the feedback request (e.g., 'unlimited-tonapi', 'on-ramp')
  */
-export function useSendFeedbackMutation(source?: string) {
+export function useSendFeedbackMutation() {
     const projectId = useProjectId();
     const projectName = useProjectName();
 
     return useMutation({
-        mutationFn: async (form: FeedbackFromI): Promise<FeedbackResponse> => {
+        mutationFn: async (form: FeedbackFromI & { source: string }): Promise<FeedbackResponse> => {
+            console.log({
+                name: form.name,
+                tg: form.tg,
+                company: form.company,
+                information: form.information,
+                x_source: form.source,
+                x_project_id: projectId?.toString() ?? '',
+                x_project_name: projectName ?? '',
+                x_tg_user_id: userStore.user$.value?.id.toString() ?? '',
+                x_tg_user_name: userStore.user$.value
+                    ? `${userStore.user$.value?.firstName} ${userStore.user$.value?.lastName}`
+                    : ''
+            });
+            
             const { data, error } = await feedback({
                 body: {
-                    ...form,
-                    x_source: source as string,
-                    x_project_id: projectId?.toString() as string,
-                    x_project_name: projectName as string,
-                    x_tg_user_id: userStore.user$.value?.id.toString() as string,
+                    name: form.name,
+                    tg: form.tg,
+                    company: form.company,
+                    information: form.information,
+                    x_source: form.source,
+                    x_project_id: projectId?.toString() ?? '',
+                    x_project_name: projectName ?? '',
+                    x_tg_user_id: userStore.user$.value?.id.toString() ?? '',
                     x_tg_user_name: userStore.user$.value
                         ? `${userStore.user$.value?.firstName} ${userStore.user$.value?.lastName}`
                         : ''

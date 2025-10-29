@@ -31,12 +31,13 @@ export const FeedbackModalProvider: FC<{ children: ReactNode }> = ({ children })
 
     const value: FeedbackModalContextType = { isOpen, source, open, close };
 
-    // Store reference for global access
+    // Store reference for global access from non-React components
+    // Update whenever state changes
     useEffect(() => {
         globalFeedbackModalRef = value;
-        return () => {
-            globalFeedbackModalRef = null;
-        };
+        // No cleanup: we want to keep the last valid reference
+        // This prevents race conditions where globalFeedbackModalRef becomes null
+        // while an async callback is being executed
     }, [value]);
 
     return (

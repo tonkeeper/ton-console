@@ -122,7 +122,7 @@ export const RestApiTiersSection: FC = () => {
                         price="Custom"
                         rps="∞"
                         priceDescription="Contact us"
-                        onSelect={openFeedbackModal('unlimited-tonapi')}
+                        onSelect={openFeedbackModal('unlimited-restapi')}
                         buttonText="Request"
                         buttonVariant="contrast"
                     />

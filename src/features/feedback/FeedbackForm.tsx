@@ -1,4 +1,4 @@
-import { FC, useCallback } from 'react';
+import { FC } from 'react';
 import { chakra, FormControl, FormLabel, Input, Textarea } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { FeedbackFromI } from './interfaces/form';
@@ -12,7 +12,7 @@ export const FeedbackFrom: FC<{
 }> = ({ formId }) => {
     const projectName = useProjectName();
     const { source, close } = useFeedbackModal();
-    const { mutate: sendFeedback } = useSendFeedbackMutation(source);
+    const { mutate: sendFeedback } = useSendFeedbackMutation();
 
     const { handleSubmit, register, reset } = useForm<FeedbackFromI>({
         defaultValues: {
@@ -25,17 +25,17 @@ export const FeedbackFrom: FC<{
         }
     });
 
-    const onSubmit = useCallback(
-        (form: FeedbackFromI) => {
-            sendFeedback(form, {
+    const onSubmit = (form: FeedbackFromI) => {
+        sendFeedback(
+            { ...form, source: source ?? '' },
+            {
                 onSuccess: () => {
                     reset();
                     close();
                 }
-            });
-        },
-        [sendFeedback, reset, close]
-    );
+            }
+        );
+    };
 
     return (
         <chakra.form w="100%" onSubmit={handleSubmit(onSubmit)} noValidate id={formId}>
