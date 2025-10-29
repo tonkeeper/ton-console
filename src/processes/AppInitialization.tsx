@@ -1,8 +1,9 @@
 import { FC, PropsWithChildren, useEffect, useRef } from 'react';
 import { Box, Center, Fade, FadeProps } from '@chakra-ui/react';
 import { TonConsoleIcon } from 'src/shared';
-import { appStore } from 'src/shared/stores';
+import { appStore, userStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
+import { setupApiInterceptors } from 'src/shared/api/console/interceptors';
 
 const FadeAnimation: FC<FadeProps> = props => (
     <Fade
@@ -15,6 +16,11 @@ const FadeAnimation: FC<FadeProps> = props => (
 
 const AppInitialization: FC<PropsWithChildren> = props => {
     const ref = useRef<SVGSVGElement | null>(null);
+
+    useEffect(() => {
+        // Setup API interceptors once on app initialization
+        setupApiInterceptors(userStore);
+    }, []);
 
     useEffect(() => {
         if (appStore.isInitialized && ref.current) {
