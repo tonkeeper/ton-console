@@ -17,8 +17,7 @@ import {
     FormErrorMessage,
     InputGroup,
     InputRightElement,
-    Text,
-    useToast
+    Text
 } from '@chakra-ui/react';
 import { Address } from '@ton/core';
 import { JettonInfo, JettonBalance } from '@ton-api/client';
