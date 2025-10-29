@@ -1,16 +1,23 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { Box, BoxProps, Flex, Skeleton } from '@chakra-ui/react';
-import { formatWithSuffix, InfoTooltip, Span, useIntervalUpdate } from 'src/shared';
-import { observer } from 'mobx-react-lite';
+import { formatWithSuffix, InfoTooltip, Span } from 'src/shared';
 import { appMessagesStore } from 'src/features';
+import { useDappsQuery } from 'src/entities/dapp/model/queries';
 
 const AppMessagesStats: FC<BoxProps> = props => {
+    const { data: dapps } = useDappsQuery();
     const stats = appMessagesStore.stats$.value;
     const balance = appMessagesStore.balance$.value;
     const isResolved =
         appMessagesStore.stats$.isResolved && stats && appMessagesStore.balance$.isResolved;
 
-    useIntervalUpdate(appMessagesStore.fetchStats);
+    const dappId = dapps?.[0]?.id;
+
+    useEffect(() => {
+        if (dappId) {
+            appMessagesStore.fetchStats(dappId);
+        }
+    }, [dappId]);
 
     return (
         <Box {...props}>
@@ -74,4 +81,4 @@ const AppMessagesStats: FC<BoxProps> = props => {
     );
 };
 
-export default observer(AppMessagesStats);
+export default AppMessagesStats;

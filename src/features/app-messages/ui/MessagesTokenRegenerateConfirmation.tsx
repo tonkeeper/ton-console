@@ -10,13 +10,19 @@ import {
     ModalOverlay
 } from '@chakra-ui/react';
 import { appMessagesStore } from '../model';
-import { observer } from 'mobx-react-lite';
+import { useDappsQuery } from 'src/entities/dapp/model/queries';
 
 const MessagesTokenRegenerateConfirmation: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ isOpen, onClose }) => {
-    const onConfirm = (): Promise<void> => appMessagesStore.regenerateDappToken().then(onClose);
+    const { data: dapps } = useDappsQuery();
+    const dappId = dapps?.[0]?.id;
+
+    const onConfirm = (): Promise<void> => {
+        if (!dappId) return Promise.reject('No dapp selected');
+        return appMessagesStore.regenerateDappToken(dappId).then(onClose);
+    };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside" size="md">
@@ -45,4 +51,4 @@ const MessagesTokenRegenerateConfirmation: FC<{
     );
 };
 
-export default observer(MessagesTokenRegenerateConfirmation);
+export default MessagesTokenRegenerateConfirmation;

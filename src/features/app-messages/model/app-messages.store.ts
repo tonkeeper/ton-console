@@ -13,7 +13,7 @@ import {
     regenerateProjectMessagesAppToken,
     DTOMessagesPackage
 } from 'src/shared/api';
-import { dappStore, projectsStore } from 'src/shared/stores';
+import { projectsStore } from 'src/shared/stores';
 import { AppMessagesPackage, AppMessagesStats } from './interfaces';
 
 export class AppMessagesStore {
@@ -41,17 +41,18 @@ export class AppMessagesStore {
             }
         );
 
-        createImmediateReaction(
-            () => dappStore.dapps$.value,
-            dapps => {
-                this.clearDappRelatedState();
-
-                if (dapps && dapps[0]) {
-                    this.fetchStats();
-                    this.fetchDappToken();
-                }
-            }
-        );
+        // TODO: DappStore migration - handle dapp dependency via React Query in components
+        // createImmediateReaction(
+        //     () => dappStore.dapps$.value,
+        //     dapps => {
+        //         this.clearDappRelatedState();
+        //
+        //         if (dapps && dapps[0]) {
+        //             this.fetchStats();
+        //             this.fetchDappToken();
+        //         }
+        //     }
+        // );
     }
 
     fetchPackages = this.packages$.createAsyncAction(async () => {
@@ -69,9 +70,9 @@ export class AppMessagesStore {
         return data.balance;
     });
 
-    fetchStats = this.stats$.createAsyncAction(async () => {
+    fetchStats = this.stats$.createAsyncAction(async (appId: number) => {
         const { data, error } = await getProjectMessagesStats({
-            query: { app_id: dappStore.dapps$.value[0].id }
+            query: { app_id: appId }
         });
 
         if (error) throw error;
@@ -102,9 +103,9 @@ export class AppMessagesStore {
         }
     );
 
-    fetchDappToken = this.dappToken$.createAsyncAction(async () => {
+    fetchDappToken = this.dappToken$.createAsyncAction(async (appId: number) => {
         const { data, error } = await getProjectMessagesAppToken({
-            query: { app_id: dappStore.dapps$.value[0].id }
+            query: { app_id: appId }
         });
 
         if (error) throw error;
@@ -112,9 +113,9 @@ export class AppMessagesStore {
     });
 
     regenerateDappToken = this.dappToken$.createAsyncAction(
-        async () => {
+        async (appId: number) => {
             const { data, error } = await regenerateProjectMessagesAppToken({
-                query: { app_id: dappStore.dapps$.value[0].id }
+                query: { app_id: appId }
             });
 
             if (error) throw error;
