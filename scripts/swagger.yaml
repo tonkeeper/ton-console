@@ -30,8 +30,6 @@ tags:
     description: 'Endpoints for Stats service management and operations.'
   - name: invoices_service
     description: 'Endpoints for Invoices service management and operations.'
-  - name: pro_service
-    description: 'Endpoints for Pro service management and operations.'
   - name: cnft_service
     description: 'Endpoints for cNFT service management and operations.'
   - name: ton_sites_service
@@ -118,48 +116,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
-  /api/v1/admin/project/{id}/balance:
-    get:
-      summary: "Private method: Get project balance"
-      operationId: adminGetProjectBalance
-      tags:
-        - admin
-      parameters:
-        - $ref: '#/components/parameters/projectID'
-      responses:
-        '200':
-          $ref: '#/components/responses/ProjectBalance'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/admin/project/{id}/charge:
-    post:
-      summary: "Private method: Charge project"
-      description: "Private method"
-      operationId: adminChargeProject
-      tags:
-        - admin
-      parameters:
-        - $ref: '#/components/parameters/projectID'
-      requestBody:
-        $ref: "#/components/requestBodies/ProjectCharge"
-      responses:
-        '200':
-          $ref: '#/components/responses/Ok'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
+
   /api/v1/admin/messages/charge:
     post:
       summary: "Private method: Messages charge project"
@@ -1698,312 +1655,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-  
-  /api/v1/services/pro/auth/proof/payload:
-    post:
-      summary: "Generating payload for TonConnect"
-      operationId: proServiceAuthGeneratePayload
-      tags:
-        - pro_service
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceGeneratedPayload'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/auth/proof/check:
-    post:
-      summary: "Auth via TonConnect"
-      operationId: proServiceTonConnectAuth
-      tags:
-        - pro_service
-      requestBody:
-        description: "Data that is expected"
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TonConnectProof'
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceOk'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/logout:
-    post:
-      summary: "Logout from the system"
-      operationId: proServiceLogout
-      tags:
-        - pro_service
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceOk'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/user/info:
-    get:
-      summary: "Get user info"
-      operationId: proServiceGetUserInfo
-      tags:
-        - pro_service
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceUserInfo'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/tiers:
-    get:
-      summary: "Get active tiers"
-      operationId: getProServiceTiers
-      tags:
-        - pro_service
-      parameters:
-        - $ref: '#/components/parameters/queryLang'
-        - $ref: '#/components/parameters/queryPromoCode'
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceTiers'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/invoice:
-    post:
-      summary: "Creating an invoice for Pro tier payment"
-      operationId: createProServiceInvoice
-      tags:
-        - pro_service
-      requestBody:
-        $ref: "#/components/requestBodies/ProServiceNewTier"
-      responses:
-        '201':
-          $ref: '#/components/responses/ProServiceInvoice'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/invoice/{id}:
-    get:
-      summary: "Get info about the invoice"
-      operationId: getProServiceInvoice
-      tags:
-        - pro_service
-      parameters:
-        - $ref: '#/components/parameters/invoiceID'
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceInvoice'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/invoice/webhook:
-    post:
-      summary: "The invoice webhook"
-      operationId: proServiceInvoiceWebhook
-      tags:
-        - pro_service
-      requestBody:
-        description: "Data that is expected"
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProServiceInvoiceWebhook'
-      responses:
-        '200':
-          $ref: '#/components/responses/Ok'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/verify:
-    get:
-      summary: "Verify Pro tier subscription"
-      operationId: proServiceVerify
-      tags:
-        - pro_service
-      responses:
-        '200':
-          $ref: '#/components/responses/ProjectProVerify'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/trial:
-    post:
-      summary: "Activate pro trial period"
-      operationId: proServiceTrial
-      tags:
-        - pro_service
-      requestBody:
-        $ref: "#/components/requestBodies/TgAuthExpected"
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceOk'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/dashboard/columns:
-    get:
-      summary: "Get dashboard columns"
-      operationId: proServiceDashboardColumns
-      tags:
-        - pro_service
-      parameters:
-        - $ref: '#/components/parameters/queryLang'
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceDashboardColumns'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/dashboard/data:
-    post:
-      summary: "Get dashboard data"
-      operationId: proServiceDashboardData
-      tags:
-        - pro_service
-      parameters:
-        - $ref: '#/components/parameters/queryLang'
-        - $ref: '#/components/parameters/queryCurrency'
-      requestBody:
-        $ref: "#/components/requestBodies/ProServiceNewDashboardData"
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceDashboard'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/state:
-    get:
-      summary: "Get the state"
-      operationId: proServiceGetState
-      tags:
-        - pro_service
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceState'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-    patch:
-      summary: "Update the state"
-      operationId: proServiceUpdateState
-      tags:
-        - pro_service
-      requestBody:
-        $ref: "#/components/requestBodies/NewProServiceState"
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceOk'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-    delete:
-      summary: "Delete the state"
-      operationId: proServiceDeleteState
-      tags:
-        - pro_service
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceOk'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  /api/v1/services/pro/mobile:
-    post:
-      summary: "Activate Pro tier for mobile"
-      operationId: proServiceMobile
-      tags:
-        - pro_service
-      requestBody:
-        description: "Data that is expected"
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TonConnectProof'
-      responses:
-        '200':
-          $ref: '#/components/responses/ProServiceOk'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalError'
-  
+    
   /api/v1/services/cnft/config:
     get:
       summary: "Get cNFT config"
@@ -2539,13 +2191,6 @@ components:
       required: false
       schema:
         $ref: '#/components/schemas/Currencies'
-    queryPromoCode:
-      description: Promo code
-      in: query
-      name: promo_code
-      required: false
-      schema:
-        type: string
     queryStartDateRequired:
       description: Start date
       in: query
@@ -2670,12 +2315,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/TgAuth'
-    NewProServiceState:
-      description: "Data that is expected"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ProServiceState'
     NewTonSiteDomain:
       description: "Data that is expected"
       content:
@@ -2776,21 +2415,6 @@ components:
                 type: integer
                 format: uint32
                 example: 1
-    ProServiceNewTier:
-      description: "Data that is expected"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - tier_id
-            properties:
-              tier_id:
-                type: integer
-                format: uint32
-                example: 1
-              promo_code:
-                type: string
     ProjectMessagesBuyPackage:
       description: "Data that is expected"
       content:
@@ -2919,27 +2543,6 @@ components:
             example:
               key1: "name"
               key2: "test"
-    ProjectCharge:
-      description: "Data that is expected"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - amount
-              - type_of_charge
-              - info
-            properties:
-              amount:
-                type: integer
-                format: int64
-                example: 1000000000
-              type_of_charge:
-                type: string
-                example: ""
-              info:
-                additionalProperties: true
-                example: { "first_key": "1", "second_key": 2 } # map[string]any
     StatsChatGpt:
       description: "Data that is expected"
       content:
@@ -3144,27 +2747,6 @@ components:
               meta:
                 additionalProperties: true
                 example: { }
-    ProServiceNewDashboardData:
-      description: "Data that is expected"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - accounts
-              - columns
-            properties:
-              accounts:
-                type: array
-                maxItems: 1000
-                items:
-                  type: string
-                  example: "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
-              columns:
-                type: array
-                items:
-                  type: string
-                  example: "id"
   
   headers:
     setCookie:
@@ -3353,34 +2935,6 @@ components:
         instant_payment:
           type: boolean
           example: false
-    ProServiceTier:
-      type: object
-      required:
-        - id
-        - name
-        - amount
-      properties:
-        id:
-          type: integer
-          format: uint32
-          example: 1
-        name:
-          type: string
-          example: "Test tier"
-        description:
-          type: string
-          example: "Test tier description"
-        amount:
-          description: "nanoton"
-          type: string
-          example: "1000000000"
-    ProServiceState:
-      type: object
-      required:
-        - state
-      properties:
-        state:
-          type: string
     AppTier:
       type: object
       required:
@@ -3725,28 +3279,6 @@ components:
           type: integer
           format: int64
           example: 1690889913000
-    ProServiceDashboardColumn:
-      type: object
-      required:
-        - id
-        - name
-        - column_type
-        - checked_default
-        - only_pro
-      properties:
-        id:
-          $ref: '#/components/schemas/ProServiceDashboardColumnID'
-        name:
-          type: string
-          example: "Total TON"
-        column_type:
-          $ref: '#/components/schemas/ProServiceDashboardColumnType'
-        checked_default:
-          type: boolean
-          example: false
-        only_pro:
-          type: boolean
-          example: false
     ProjectTonApiToken:
       type: object
       required:
@@ -4037,24 +3569,6 @@ components:
         - cnft
         - liteproxy
         - streaming
-    ProServiceDashboardColumnID:
-      type: string
-      enum:
-        - "address"
-        - "total_balance"
-        - "jettons_balance"
-        - "total_ton"
-        - "send_current_month"
-        - "send_last_month"
-        - "receive_current_month"
-        - "receive_last_month"
-    ProServiceDashboardColumnType:
-      type: string
-      enum:
-        - "string"
-        - "address"
-        - "numeric_fiat"
-        - "numeric_crypto"
     MintlessJetton:
       type: object
       required:
@@ -4163,47 +3677,6 @@ components:
           type: integer
           format: int32
           example: 2
-    ProServiceInvoiceWebhook:
-      type: object
-      required:
-        - id
-        - amount
-        - description
-        - pay_to_address
-        - status
-        - date_expire
-        - date_change
-        - date_create
-      properties:
-        id:
-          type: string
-          example: "60ffb075"
-        amount:
-          type: string
-          example: "1000000000"
-        description:
-          type: string
-          example: "Test description"
-        status:
-          $ref: '#/components/schemas/InvoiceStatus'
-        pay_to_address:
-          type: string
-          example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-        paid_by_address:
-          type: string
-          example: "0:97146a46acc2654y27947f14c4a4b14273e954f78bc017790b41208b0043200b"
-        date_change:
-          type: integer
-          format: int64
-          example: 1690889913000
-        date_expire:
-          type: integer
-          format: int64
-          example: 1690889913000
-        date_create:
-          type: integer
-          format: int64
-          example: 1690889913000
     InvoicesInvoice:
       type: object
       required:
@@ -4336,68 +3809,6 @@ components:
           webhook:
             type: string
             example: "https://mydapp.com/api/handle-invoice-change"
-    ProServiceDashboardCellAddress:
-      type: object
-      required:
-        - column_id
-        - type
-        - raw
-      properties:
-        column_id:
-          $ref: '#/components/schemas/ProServiceDashboardColumnID'
-        type:
-          $ref: '#/components/schemas/ProServiceDashboardColumnType'
-        raw:
-          type: string
-    ProServiceDashboardCellNumericCrypto:
-      type: object
-      required:
-        - column_id
-        - type
-        - value
-        - decimals
-        - symbol
-      properties:
-        column_id:
-          $ref: '#/components/schemas/ProServiceDashboardColumnID'
-        type:
-          $ref: '#/components/schemas/ProServiceDashboardColumnType'
-        value:
-          type: string
-        decimals:
-          type: integer
-          format: int
-        symbol:
-          type: string
-    ProServiceDashboardCellNumericFiat:
-      type: object
-      required:
-        - column_id
-        - type
-        - value
-        - fiat
-      properties:
-        column_id:
-          $ref: '#/components/schemas/ProServiceDashboardColumnID'
-        type:
-          $ref: '#/components/schemas/ProServiceDashboardColumnType'
-        value:
-          type: string
-        fiat:
-          $ref: '#/components/schemas/Currencies'
-    ProServiceDashboardCellString:
-      type: object
-      required:
-        - column_id
-        - type
-        - value
-      properties:
-        column_id:
-          $ref: '#/components/schemas/ProServiceDashboardColumnID'
-        type:
-          $ref: '#/components/schemas/ProServiceDashboardColumnType'
-        value:
-          type: string
     Currencies:
       type: string
       default: USD
@@ -4857,42 +4268,6 @@ components:
             properties:
               tier:
                 $ref: '#/components/schemas/ProServiceAppTier'
-    ProjectProVerify:
-      description: "Verify"
-      headers:
-        Access-Control-Allow-Credentials:
-          $ref: "#/components/headers/accessControlAllowCredentials"
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/accessControlAllowOrigin"
-        Access-Control-Allow-Headers:
-          $ref: "#/components/headers/accessControlAllowHeaders"
-        Set-Cookie:
-          $ref: "#/components/headers/setCookie"
-      content:
-        application/json:
-          schema:
-            required:
-              - valid
-              - is_trial
-              - used_trial
-              - auth_token
-            type: object
-            properties:
-              valid:
-                type: boolean
-                example: true
-              is_trial:
-                type: boolean
-                example: true
-              used_trial:
-                type: boolean
-                example: true
-              next_charge:
-                type: integer
-                format: int64
-                example: 1678275313
-              auth_token:
-                type: string
     ValidChangeTier:
       description: "Valid change tier for project"
       content:
@@ -4972,151 +4347,6 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Tier'
-    ProServiceGeneratedPayload:
-      description: "The generated payload for TonConnect"
-      headers:
-        Access-Control-Allow-Credentials:
-          $ref: "#/components/headers/accessControlAllowCredentials"
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/accessControlAllowOrigin"
-        Access-Control-Allow-Headers:
-          $ref: "#/components/headers/accessControlAllowHeaders"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - payload
-            properties:
-              payload:
-                type: string
-                example: "84jHVNLQmZsAAAAAZB0Zryi2wqVJI-KaKNXOvCijEi46YyYzkaSHyJrMPBMOkVZa"
-    ProServiceOk:
-      description: "Ok"
-      headers:
-        Set-Cookie:
-          $ref: "#/components/headers/setCookie"
-        Access-Control-Allow-Credentials:
-          $ref: "#/components/headers/accessControlAllowCredentials"
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/accessControlAllowOrigin"
-        Access-Control-Allow-Headers:
-          $ref: "#/components/headers/accessControlAllowHeaders"
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - ok
-              - auth_token
-            properties:
-              ok:
-                type: boolean
-              auth_token:
-                type: string
-    ProServiceUserInfo:
-      description: "State"
-      headers:
-        Access-Control-Allow-Credentials:
-          $ref: "#/components/headers/accessControlAllowCredentials"
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/accessControlAllowOrigin"
-        Access-Control-Allow-Headers:
-          $ref: "#/components/headers/accessControlAllowHeaders"
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              pub_key:
-                type: string
-              version:
-                type: string
-              user_id:
-                type: integer
-                format: uint32
-              tg_id:
-                type: integer
-                format: int64
-    ProServiceState:
-      description: "State"
-      headers:
-        Access-Control-Allow-Credentials:
-          $ref: "#/components/headers/accessControlAllowCredentials"
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/accessControlAllowOrigin"
-        Access-Control-Allow-Headers:
-          $ref: "#/components/headers/accessControlAllowHeaders"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ProServiceState'
-    ProServiceTiers:
-      description: "Active tiers"
-      headers:
-        Access-Control-Allow-Credentials:
-          $ref: "#/components/headers/accessControlAllowCredentials"
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/accessControlAllowOrigin"
-        Access-Control-Allow-Headers:
-          $ref: "#/components/headers/accessControlAllowHeaders"
-      content:
-        application/json:
-          schema:
-            required:
-              - items
-            type: object
-            properties:
-              items:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProServiceTier'
-    ProServiceDashboardColumns:
-      description: "Dashboard columns"
-      headers:
-        Access-Control-Allow-Credentials:
-          $ref: "#/components/headers/accessControlAllowCredentials"
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/accessControlAllowOrigin"
-        Access-Control-Allow-Headers:
-          $ref: "#/components/headers/accessControlAllowHeaders"
-      content:
-        application/json:
-          schema:
-            required:
-              - items
-            type: object
-            properties:
-              items:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProServiceDashboardColumn'
-    ProServiceDashboard:
-      description: "Dashboard data"
-      headers:
-        Access-Control-Allow-Credentials:
-          $ref: "#/components/headers/accessControlAllowCredentials"
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/accessControlAllowOrigin"
-        Access-Control-Allow-Headers:
-          $ref: "#/components/headers/accessControlAllowHeaders"
-      content:
-        application/json:
-          schema:
-            required:
-              - items
-            type: object
-            properties:
-              items:
-                type: array
-                items:
-                  type: array
-                  items:
-                    oneOf:
-                      - $ref: '#/components/schemas/ProServiceDashboardCellString'
-                      - $ref: '#/components/schemas/ProServiceDashboardCellAddress'
-                      - $ref: '#/components/schemas/ProServiceDashboardCellNumericCrypto'
-                      - $ref: '#/components/schemas/ProServiceDashboardCellNumericFiat'
     Projects:
       description: "User projects"
       content:
@@ -5273,19 +4503,6 @@ components:
               hash:
                 type: string
                 example: "546e80bd41ff70ecebe22625f7db3ae48e5a24c175697a8e07899de116bec397"
-    ProjectBalance:
-      description: "Project balance"
-      content:
-        application/json:
-          schema:
-            required:
-              - balance
-            type: object
-            properties:
-              balance:
-                type: integer
-                format: int64
-                example: 1000000000
     StatsDDL:
       description: "Stats db ddl"
       content:
@@ -5536,21 +4753,6 @@ components:
             properties:
               airdrop:
                 $ref: '#/components/schemas/JettonAirdrop'
-    ProServiceInvoice:
-      description: "Invoice"
-      headers:
-        Set-Cookie:
-          $ref: "#/components/headers/setCookie"
-        Access-Control-Allow-Credentials:
-          $ref: "#/components/headers/accessControlAllowCredentials"
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/accessControlAllowOrigin"
-        Access-Control-Allow-Headers:
-          $ref: "#/components/headers/accessControlAllowHeaders"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/InvoicesInvoice'
     UserInfo:
       description: "User info"
       content:
