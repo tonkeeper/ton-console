@@ -3,14 +3,14 @@ import { chakra, FormControl, FormLabel, Input, Textarea } from '@chakra-ui/reac
 import { useForm } from 'react-hook-form';
 import { FeedbackFromI } from './interfaces/form';
 import { userStore } from 'src/shared/stores';
-import { useProjectName } from 'src/shared/contexts/ProjectIdContext';
+import { useProject } from 'src/shared/contexts/ProjectIdContext';
 import { useFeedbackModal } from './contexts/FeedbackModalContext';
 import { useSendFeedbackMutation } from './model/queries';
 
 export const FeedbackFrom: FC<{
     formId: string;
 }> = ({ formId }) => {
-    const projectName = useProjectName();
+    const { name: projectName } = useProject();
     const { source, close } = useFeedbackModal();
     const { mutate: sendFeedback } = useSendFeedbackMutation();
 

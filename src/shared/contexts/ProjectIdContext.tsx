@@ -1,27 +1,25 @@
 import { createContext, useContext, ReactNode, FC, useState } from 'react';
+import { Project } from 'src/entities/project/model/interfaces/project';
 
-interface ProjectIdContextType {
-    projectId: number | null;
-    projectName: string | null;
-    setProjectId: (id: number | null) => void;
-    setProjectName: (name: string | null) => void;
+interface ProjectContextType {
+    project: Project | null;
+    setProject: (project: Project | null) => void;
 }
 
-const ProjectIdContext = createContext<ProjectIdContextType | undefined>(undefined);
+const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 /**
  * Provider for managing the selected project ID and name
  * Acts as a bridge to translate projectsStore (MobX) values to React Context
  * Does NOT persist to localStorage - persistence is handled by projectsStore
  */
-export const ProjectIdProvider: FC<{ children: ReactNode }> = ({ children }) => {
-    const [projectId, setProjectId] = useState<number | null>(null);
-    const [projectName, setProjectName] = useState<string | null>(null);
+export const ProjectProvider: FC<{ children: ReactNode }> = ({ children }) => {
+    const [project, setProject] = useState<Project | null>(null);
 
     return (
-        <ProjectIdContext.Provider value={{ projectId, projectName, setProjectId, setProjectName }}>
+        <ProjectContext.Provider value={{ project, setProject }}>
             {children}
-        </ProjectIdContext.Provider>
+        </ProjectContext.Provider>
     );
 };
 
@@ -29,55 +27,37 @@ export const ProjectIdProvider: FC<{ children: ReactNode }> = ({ children }) => 
  * Hook to get the current project ID
  * @returns Project ID or null if not selected
  */
-export function useProjectId(): number | null {
-    const context = useContext(ProjectIdContext);
+export function useProjectId(): number {
+    return useProject().id;
+}
+
+export function useMaybeProject(): Project | null {
+    const context = useContext(ProjectContext);
     if (context === undefined) {
-        throw new Error('useProjectId must be used within ProjectIdProvider');
+        return null;
     }
-    return context.projectId;
+    return context.project;
 }
 
 /**
- * Hook to set the current project ID
+ * Hook to get the current project object
+ * @returns Full Project object or null if not selected
  */
-export function useSetProjectId(): (id: number | null) => void {
-    const context = useContext(ProjectIdContext);
-    if (context === undefined) {
-        throw new Error('useSetProjectId must be used within ProjectIdProvider');
+export function useProject(): Project {
+    const project = useMaybeProject();
+    if (project === null) {
+        throw new Error('Project is not selected');
     }
-    return context.setProjectId;
+    return project;
 }
 
 /**
- * Hook to get and set the project ID simultaneously
+ * Hook to set the current project object
  */
-export function useProjectIdManager(): [number | null, (id: number | null) => void] {
-    const context = useContext(ProjectIdContext);
+export function useSetProject(): (project: Project | null) => void {
+    const context = useContext(ProjectContext);
     if (context === undefined) {
-        throw new Error('useProjectIdManager must be used within ProjectIdProvider');
+        throw new Error('useSetProject must be used within ProjectProvider');
     }
-    return [context.projectId, context.setProjectId];
-}
-
-/**
- * Hook to get the current project name
- * @returns Project name or null if not selected
- */
-export function useProjectName(): string | null {
-    const context = useContext(ProjectIdContext);
-    if (context === undefined) {
-        throw new Error('useProjectName must be used within ProjectIdProvider');
-    }
-    return context.projectName;
-}
-
-/**
- * Hook to set the current project name
- */
-export function useSetProjectName(): (name: string | null) => void {
-    const context = useContext(ProjectIdContext);
-    if (context === undefined) {
-        throw new Error('useSetProjectName must be used within ProjectIdProvider');
-    }
-    return context.setProjectName;
+    return context.setProject;
 }

@@ -2,12 +2,11 @@ import RegisterProject from './RegisterProject';
 import { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Center, Spinner } from '@chakra-ui/react';
-import { Route, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { lazy } from '@loadable/component';
-import JoinInvoices from './JoinInvoices';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { UnavailableInvoices } from 'src/features/invoices/ui';
+import { useProjectId, useProject } from 'src/shared/contexts/ProjectIdContext';
 import { InvoicesAppStore, InvoicesTableStore } from 'src/features/invoices/models';
-import { projectsStore } from 'src/shared/stores';
 
 const InvoiceDashboardPage = lazy(() => import('./dashboard'));
 const ManageInvoicesPage = lazy(() => import('./manage'));
@@ -36,10 +35,11 @@ interface InvoicesPageProps {
 }
 
 const InvoicesPage: FC<InvoicesPageProps> = observer(({ invoicesAppStore }) => {
-    const hasInvoicesCapability = projectsStore.selectedProject?.capabilities.invoices;
+    const project = useProject();
+    const hasInvoicesCapability = project?.capabilities.invoices;
 
     if (!hasInvoicesCapability) {
-        return <JoinInvoices />;
+        return <UnavailableInvoices />;
     }
 
     return <RegisterProject invoicesAppStore={invoicesAppStore} />;
@@ -149,7 +149,7 @@ const InvoicesRouting = observer(() => {
     }
 
     return (
-        <>
+        <Routes>
             <Route
                 path="dashboard"
                 element={
@@ -185,7 +185,7 @@ const InvoicesRouting = observer(() => {
                     </WaitForAppResolving>
                 }
             />
-        </>
+        </Routes>
     );
 });
 
