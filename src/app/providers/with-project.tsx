@@ -1,68 +1,22 @@
-import React, { FC, ReactNode, useEffect } from 'react';
-import { ProjectProvider, useSetProject } from 'src/shared/contexts/ProjectContext';
-import { projectsStore } from 'src/shared/stores';
-import { reaction } from 'mobx';
+import React, { FC, ReactNode } from 'react';
+import { ProjectProvider } from 'src/shared/contexts/ProjectContext';
 
 /**
- * Component to initialize ProjectIdContext from projectsStore (legacy)
+ * Provider for managing the selected project
  *
- * TEMPORARY SOLUTION: Translates projectId and projectName from MobX store to React Context.
- * When all dependencies on projectsStore are migrated,
- * the logic will be moved completely into ProjectProvider.
- */
-const ProjectIdInitializer: FC<{ children: ReactNode }> = ({ children }) => {    
-    const setProject = useSetProject();
-
-    // Single useEffect - initialization and sync with projectsStore
-    // Combined to prevent race conditions
-    useEffect(() => {
-        let isMounted = true;
-
-        // Initialize current values from store
-        const selectedProject = projectsStore.selectedProject;
-        if (isMounted) {
-            if (selectedProject?.id) {
-                setProject(selectedProject);
-            } else {
-                setProject(null);
-            }
-        }
-
-        // Sync changes in store (MobX reaction)
-        // This callback will be called whenever projectsStore.selectedProject changes
-        const dispose = reaction(
-            () => projectsStore.selectedProject,
-            (project) => {
-                // Only update state if component is still mounted
-                if (isMounted) {
-                    if (project?.id) {
-                        setProject(project);
-                    } else {
-                        setProject(null);
-                    }
-                }
-            }
-        );
-
-        return () => {
-            isMounted = false;
-            dispose();
-        };
-    }, []); // Empty - effect runs once on mount and subscribes via reaction
-
-    return children as React.ReactNode;
-};
-
-/**
- * Provider for managing the selected project ID
- * Syncs state between React Context and projectsStore (legacy)
+ * Migration complete: Now uses React Query + ProjectContext
+ * instead of MobX stores.
+ *
+ * Features:
+ * - Fetches projects via React Query
+ * - Manages selected project with localStorage persistence
+ * - Auto-selects first project if none selected
+ * - Provides useProject(), useProjectId(), etc. hooks
  */
 export const withProject = (Component: FC<{ children: ReactNode }>) => (
     children: ReactNode
 ) => (
     <ProjectProvider>
-        <ProjectIdInitializer>
-            <Component>{children}</Component>
-        </ProjectIdInitializer>
+        <Component>{children}</Component>
     </ProjectProvider>
 );

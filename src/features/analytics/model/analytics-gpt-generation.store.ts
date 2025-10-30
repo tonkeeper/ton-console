@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx';
-import { createImmediateReaction, Loadable, TonCurrencyAmount } from 'src/shared';
+import { Loadable, TonCurrencyAmount } from 'src/shared';
 import {
     getStatsChatGptPrice,
     statsChatGptRequest,
@@ -20,19 +20,9 @@ export class AnalyticsGPTGenerationStore {
     constructor(private readonly project: Project) {
         makeAutoObservable(this);
 
-        const dispose = createImmediateReaction(
-            () => project,
-            project => {
-                this.gptPricing$.clear();
-                this.fetchPrice.cancelAllPendingCalls();
-                this.clear();
-
-                if (project.capabilities.stats.query) {
-                    this.fetchPrice();
-                }
-            }
-        );
-        this.disposers.push(dispose);
+        if (project.capabilities.stats.query) {
+            this.fetchPrice();
+        }
     }
 
     destroy(): void {

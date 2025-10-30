@@ -1,34 +1,36 @@
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { Button, Center, Flex, Text } from '@chakra-ui/react';
 import { DeleteProjectConfirmation, ProjectForm, ProjectFormValues } from 'src/entities';
 import { FormProvider, useForm } from 'react-hook-form';
-import { toJS } from 'mobx';
 import { CopyPad, H4, Overlay } from 'src/shared';
-import { observer } from 'mobx-react-lite';
-import { projectsStore } from 'src/shared/stores';
+import { useProject, useProjectId, useSetProject } from 'src/shared/contexts/ProjectContext';
+import {
+    useUpdateProjectMutation,
+    useDeleteProjectMutation,
+    useProjectParticipantsQuery
+} from 'src/shared/queries/projects';
+import { userStore } from 'src/shared/stores';
 
 const availableDeleteProject = import.meta.env.VITE_AVAILABLE_DELETE_PROJECT === 'true';
 
 const EditProjectPage: FC = () => {
     const formId = 'edit-project-form';
-    const selectedProject = projectsStore.selectedProject;
+    const selectedProject = useProject();
+    const projectId = useProjectId();
+    const setProject = useSetProject();
+
+    const updateProject = useUpdateProjectMutation();
+    const deleteProject = useDeleteProjectMutation();
+
+    // Fetch participants (just to load them, they're used by EditProjectParticipan component)
+    const userId = userStore.user$.value?.id;
+    useProjectParticipantsQuery(projectId, userId);
 
     const methods = useForm();
     const [deleteConfirmationIsOpen, setDeleteConfirmationIsOpen] = useState(false);
     const { formState } = methods;
 
-    const defaultValues = useMemo(() => toJS(selectedProject) || undefined, [selectedProject]);
-
-    if (selectedProject === null) {
-        throw new Error('Selected project is not defined');
-    }
-
-    useEffect(() => {
-        projectsStore.fetchProjectParticipants();
-        return () => {
-            projectsStore.projectParticipants$.clear();
-        };
-    });
+    const defaultValues = useMemo(() => selectedProject || undefined, [selectedProject]);
 
     const onSubmit = useCallback(
         (values: ProjectFormValues) => {
@@ -43,12 +45,12 @@ const EditProjectPage: FC = () => {
                 ])
             );
 
-            projectsStore.updateProject({
+            updateProject.mutate({
                 projectId: selectedProject.id,
                 ...modifiedFields
             });
         },
-        [formState.dirtyFields, projectsStore.selectedProject]
+        [formState.dirtyFields, selectedProject, updateProject]
     );
 
     return (
@@ -82,8 +84,8 @@ const EditProjectPage: FC = () => {
                         w="100%"
                         mb="4"
                         form={formId}
-                        isDisabled={!formState?.isDirty || projectsStore.deleteProject.isLoading}
-                        isLoading={projectsStore.createProject.isLoading}
+                        isDisabled={!formState?.isDirty || deleteProject.isPending}
+                        isLoading={updateProject.isPending}
                         type="submit"
                     >
                         Save
@@ -94,7 +96,7 @@ const EditProjectPage: FC = () => {
                             <Button
                                 w="100%"
                                 colorScheme="red"
-                                isLoading={projectsStore.deleteProject.isLoading}
+                                isLoading={deleteProject.isPending}
                                 onClick={() => setDeleteConfirmationIsOpen(true)}
                             >
                                 Delete project
@@ -103,11 +105,15 @@ const EditProjectPage: FC = () => {
                                 isOpen={deleteConfirmationIsOpen}
                                 onClose={() => setDeleteConfirmationIsOpen(false)}
                                 projectName={selectedProject.name}
-                                onConfirm={() =>
-                                    projectsStore
-                                        .deleteProject(selectedProject.id)
-                                        .then(() => setDeleteConfirmationIsOpen(false))
-                                }
+                                onConfirm={() => {
+                                    deleteProject.mutate(selectedProject.id, {
+                                        onSuccess: () => {
+                                            setDeleteConfirmationIsOpen(false);
+                                            // Select first available project after deletion
+                                            setProject(null);
+                                        }
+                                    });
+                                }}
                             />
                         </>
                     )}
@@ -117,4 +123,4 @@ const EditProjectPage: FC = () => {
     );
 };
 
-export default observer(EditProjectPage);
+export default EditProjectPage;
