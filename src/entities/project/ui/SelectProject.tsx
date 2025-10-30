@@ -21,18 +21,20 @@ import {
     useIsTextTruncated
 } from 'src/shared';
 import { FC } from 'react';
-import { observer } from 'mobx-react-lite';
 import { Project } from 'src/entities/project';
-import { projectsStore } from 'src/shared/stores';
+import { useMaybeProject, useSetProject } from 'src/shared/contexts/ProjectContext';
+import { useProjectsQuery } from 'src/shared/queries/projects';
 import { CreateProjectModal } from './CreateProjectModal';
 
-const SelectProject_: FC<BoxProps> = props => {
+const SelectProject: FC<BoxProps> = props => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const selectedProject = useMaybeProject();
+    const { data: projects = [] } = useProjectsQuery();
 
-    if (!projectsStore.selectedProject) {
+    if (!selectedProject) {
         return null;
     }
-    const isLimitReached = projectsStore.projects$.value.length >= 10;
+    const isLimitReached = projects.length >= 10;
 
     const createProjectMenuItem = ({ isDisabled }: { isDisabled: boolean }) => (
         <MenuItem isDisabled={isDisabled} onClick={() => !isDisabled && onOpen()}>
@@ -50,13 +52,13 @@ const SelectProject_: FC<BoxProps> = props => {
             <Menu placement="bottom">
                 <MenuButtonDefault w="240px" rightIcon={<ArrowIcon />}>
                     <HStack spacing="2">
-                        {projectsStore.selectedProject.imgUrl ? (
+                        {selectedProject.imgUrl ? (
                             <Image
                                 w="7"
                                 minW="7"
                                 h="7"
                                 borderRadius="sm"
-                                src={projectsStore.selectedProject.imgUrl}
+                                src={selectedProject.imgUrl}
                             />
                         ) : (
                             <Center
@@ -65,20 +67,24 @@ const SelectProject_: FC<BoxProps> = props => {
                                 h="7"
                                 mr="2"
                                 color="constant.white"
-                                bg={projectsStore.selectedProject.fallbackBackground}
+                                bg={selectedProject.fallbackBackground}
                                 borderRadius="sm"
                             >
-                                {projectsStore.selectedProject.name[0]}
+                                {selectedProject.name[0]}
                             </Center>
                         )}
                         <Text textStyle="label2" noOfLines={1}>
-                            {projectsStore.selectedProject.name}
+                            {selectedProject.name}
                         </Text>
                     </HStack>
                 </MenuButtonDefault>
                 <MenuList zIndex={100} w="256px">
-                    {projectsStore.projects$.value.map(project => (
-                        <SelectProjectItem project={project} key={project.id} />
+                    {projects.map(project => (
+                        <SelectProjectItem
+                            project={project}
+                            key={project.id}
+                            isSelected={project.id === selectedProject.id}
+                        />
                     ))}
 
                     {isLimitReached ? (
@@ -95,15 +101,20 @@ const SelectProject_: FC<BoxProps> = props => {
     );
 };
 
-const SelectProjectItem = observer<{ project: Project }>(({ project }) => {
+const SelectProjectItem: FC<{ project: Project; isSelected: boolean }> = ({
+    project,
+    isSelected
+}) => {
     const { ref, isTruncated } = useIsTextTruncated();
+    const setProject = useSetProject();
+
     return (
         <TooltipHoverable
             key={project.id}
             placement="right"
             canBeShown={isTruncated}
             host={
-                <MenuItem onClick={() => projectsStore.selectProject(project.id)}>
+                <MenuItem onClick={() => setProject(project.id)}>
                     {project.imgUrl ? (
                         <Image w="7" minW="7" h="7" mr="2" borderRadius="sm" src={project.imgUrl} />
                     ) : (
@@ -128,13 +139,13 @@ const SelectProjectItem = observer<{ project: Project }>(({ project }) => {
                     >
                         {project.name}
                     </Span>
-                    {project.id === projectsStore.selectedProject!.id && <TickIcon ml="auto" />}
+                    {isSelected && <TickIcon ml="auto" />}
                 </MenuItem>
             }
         >
             {project.name}
         </TooltipHoverable>
     );
-});
+};
 
-export const SelectProject = observer(SelectProject_);
+export { SelectProject };

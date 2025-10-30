@@ -3,7 +3,6 @@ import { loginViaTG } from './telegram-oauth';
 import { User } from './interfaces/user';
 import { Loadable } from 'src/shared';
 import { DTOUser, getUserInfo, authViaTg, accountLogout } from 'src/shared/api';
-import { projectsStore } from 'src/shared/stores';
 import { AxiosError } from 'axios';
 
 export class UserStore {
@@ -53,11 +52,8 @@ export class UserStore {
 
         if (error) throw error
 
-        await projectsStore.fetchProjects();
-        if (projectsStore.projects$.value.length && !projectsStore.selectedProject) {
-            projectsStore.selectProject(projectsStore.projects$.value[0].id);
-        }
-
+        // Projects are now loaded via React Query (ProjectContext)
+        // Auto-selection is handled by ProjectContext's useEffect
         return this.fetchMe();
     });
 
@@ -84,7 +80,8 @@ export class UserStore {
 
     logoutIfSessionExpired = this.user$.createAsyncAction(async () => {
         try {
-            await projectsStore.fetchProjects();
+            // Use getUserInfo as health check instead of fetchProjects
+            await this.fetchMe();
         } catch (e) {
             if (e instanceof AxiosError && e.response?.status === 401) {
                 await this.logout();

@@ -1,11 +1,9 @@
 import { makeAutoObservable } from 'mobx';
 import { awaitValueResolved } from 'src/shared';
-import { ProjectsStore } from 'src/entities/project/model/projects.store';
 import { UserStore } from 'src/entities/user/model/user.store';
 
 interface AppStoreDependencies {
     userStore: UserStore;
-    projectsStore: ProjectsStore;
 }
 
 export class AppStore {
@@ -16,13 +14,11 @@ export class AppStore {
         this.waitForInitialization(dependencies);
     }
 
-    private async waitForInitialization({ userStore, projectsStore }: AppStoreDependencies) {
+    private async waitForInitialization({ userStore }: AppStoreDependencies) {
         await awaitValueResolved(userStore.user$);
 
-        if (userStore.user$.value) {
-            await awaitValueResolved(projectsStore.projects$);
-        }
-
+        // Projects are now loaded via React Query (ProjectContext)
+        // No need to wait for projects here
         this.isInitialized = true;
     }
 }
