@@ -1,14 +1,6 @@
 import { makeAutoObservable, reaction } from 'mobx';
-import {
-    createImmediateReaction,
-    Loadable,
-    TonCurrencyAmount
-} from 'src/shared';
-import {
-    getSqlHistoryFromStats,
-    DTOStatsQueryResult,
-    DTOStatsQueryType
-} from 'src/shared/api';
+import { Loadable, TonCurrencyAmount } from 'src/shared';
+import { getSqlHistoryFromStats, DTOStatsQueryResult, DTOStatsQueryType } from 'src/shared/api';
 import {
     AnalyticsGraphQuery,
     AnalyticsQuery,
@@ -47,35 +39,15 @@ export class AnalyticsHistoryTableStore {
 
     constructor(private readonly project: Project) {
         makeAutoObservable(this);
-        let paginationDispose: (() => void) | undefined;
+        this.loadFirstPage();
 
-        const projectDispose = createImmediateReaction(
-            () => this.project,
-            project => {
-                paginationDispose?.();
-                this.clearState();
-                this.pagination = {
-                    filter: {
-                        onlyRepeating: false
-                    }
-                };
-                this.loadFirstPage.cancelAllPendingCalls();
-                this.loadNextPage.cancelAllPendingCalls();
-
-                if (project) {
-                    this.loadFirstPage();
-
-                    paginationDispose = reaction(
-                        () => JSON.stringify(this.pagination),
-                        () => {
-                            this.loadFirstPage({ cancelPreviousCall: true });
-                        }
-                    );
-                    this.disposers.push(paginationDispose);
-                }
+        const paginationDispose = reaction(
+            () => JSON.stringify(this.pagination),
+            () => {
+                this.loadFirstPage({ cancelPreviousCall: true });
             }
         );
-        this.disposers.push(projectDispose);
+        this.disposers.push(paginationDispose);
     }
 
     destroy(): void {

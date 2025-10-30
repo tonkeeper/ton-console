@@ -12,9 +12,12 @@ import {
 import { FC } from 'react';
 import { PlusIcon16, IconButton, DTOParticipant, Span } from 'src/shared';
 import { TrashIcon16 } from 'src/shared';
-import { observer } from 'mobx-react-lite';
 import { ConfirmationDialog } from 'src/entities';
-import { projectsStore } from 'src/shared/stores';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
+import {
+    useProjectParticipantsQuery,
+    useDeleteProjectParticipantMutation
+} from 'src/shared/queries/projects';
 
 const getParticipantName = (participant: DTOParticipant) => {
     return [participant.first_name, participant.last_name].join(' ');
@@ -24,10 +27,14 @@ const DeleteConfirmationModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     participant: DTOParticipant;
-}> = ({ isOpen, onClose, participant }) => {
+    projectId: number;
+}> = ({ isOpen, onClose, participant, projectId }) => {
+    const deleteParticipant = useDeleteProjectParticipantMutation(projectId);
+
     const handleDelete = () => {
-        projectsStore.deleteProjectParticipant(participant.id);
-        onClose();
+        deleteParticipant.mutate(participant.id, {
+            onSuccess: onClose
+        });
     };
 
     return (
@@ -47,7 +54,11 @@ const DeleteConfirmationModal: FC<{
     );
 };
 
-const Participant: FC<FlexProps & { participant: DTOParticipant }> = ({ participant, ...rest }) => {
+const Participant: FC<FlexProps & { participant: DTOParticipant; projectId: number }> = ({
+    participant,
+    projectId,
+    ...rest
+}) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const name = [participant.first_name, participant.last_name].join(' ');
@@ -78,7 +89,12 @@ const Participant: FC<FlexProps & { participant: DTOParticipant }> = ({ particip
                 p={3}
             />
 
-            <DeleteConfirmationModal isOpen={isOpen} onClose={onClose} participant={participant} />
+            <DeleteConfirmationModal
+                isOpen={isOpen}
+                onClose={onClose}
+                participant={participant}
+                projectId={projectId}
+            />
         </Flex>
     );
 };
@@ -87,8 +103,9 @@ export const EditProjectParticipan: FC<
     BoxProps & {
         onAddParticipan: () => void;
     }
-> = observer(({ onAddParticipan, ...rest }) => {
-    const participans = projectsStore.projectParticipants$.value;
+> = ({ onAddParticipan, ...rest }) => {
+    const projectId = useProjectId();
+    const { data: participans = [] } = useProjectParticipantsQuery(projectId, undefined);
     const isParticipantsEmpty = participans.length === 0;
 
     return (
@@ -102,9 +119,13 @@ export const EditProjectParticipan: FC<
 
             <Box>
                 {participans.map(participant => (
-                    <Participant key={participant.id} participant={participant} />
+                    <Participant
+                        key={participant.id}
+                        participant={participant}
+                        projectId={projectId}
+                    />
                 ))}
             </Box>
         </Box>
     );
-});
+};

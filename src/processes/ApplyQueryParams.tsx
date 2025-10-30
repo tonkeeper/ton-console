@@ -1,11 +1,11 @@
 import { FC, PropsWithChildren, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { projectsStore } from 'src/shared/stores';
-import { observer } from 'mobx-react-lite';
+import { useSetProject } from 'src/shared/contexts/ProjectContext';
 
 const ApplyQueryParams: FC<PropsWithChildren> = ({ children }) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
+    const selectProject = useSetProject();
 
     useEffect(() => {
         // Handle GitHub Pages 404 redirect for SPA routing
@@ -23,11 +23,11 @@ const ApplyQueryParams: FC<PropsWithChildren> = ({ children }) => {
         if (projectId !== null) {
             searchParams.delete('project_id');
             setSearchParams(searchParams);
-            setTimeout(() => projectsStore.selectProject(Number(projectId)));
+            setTimeout(() => selectProject(Number(projectId)));
         }
     }, []);
 
     return <>{children}</>;
 };
 
-export default observer(ApplyQueryParams);
+export default ApplyQueryParams;
