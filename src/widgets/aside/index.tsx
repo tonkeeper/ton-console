@@ -17,11 +17,12 @@ import { Flex, Text } from '@chakra-ui/react';
 import { NftIcon24 } from 'src/shared';
 import { JettonIcon24 } from 'src/shared/ui/icons/JettonIcon24';
 import { useBalanceQuery } from 'src/features/balance';
-import { useInvoicesAppStatusQuery } from 'src/features/invoices/models';
+import { useProject } from 'src/shared/contexts/ProjectIdContext';
 
 const Aside: FC = () => {
     const { data: balance, isLoading } = useBalanceQuery();
-    const { data: invoicesApp } = useInvoicesAppStatusQuery();
+    const project = useProject();
+
     const totalAmount = balance?.total;
     const formattedTotalAmount =
         totalAmount !== undefined
@@ -46,7 +47,7 @@ const Aside: FC = () => {
             <DropDownMenuItem linkTo="tonkeeper-messages" leftIcon={<MessageIcon24 />}>
                 Tonkeeper Messages
             </DropDownMenuItem>
-            {invoicesApp ? (
+            {project?.capabilities.invoices ? (
                 <DropDownMenuItemExpandable
                     leftIcon={<InvoicesIcon24 />}
                     content="Payment Tracker"

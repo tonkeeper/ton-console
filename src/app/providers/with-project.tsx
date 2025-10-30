@@ -1,5 +1,5 @@
 import React, { FC, ReactNode, useEffect } from 'react';
-import { ProjectIdProvider, useSetProjectId, useSetProjectName } from 'src/shared/contexts/ProjectIdContext';
+import { ProjectProvider, useSetProject } from 'src/shared/contexts/ProjectIdContext';
 import { projectsStore } from 'src/shared/stores';
 import { reaction } from 'mobx';
 
@@ -8,11 +8,10 @@ import { reaction } from 'mobx';
  *
  * TEMPORARY SOLUTION: Translates projectId and projectName from MobX store to React Context.
  * When all dependencies on projectsStore are migrated,
- * the logic will be moved completely into ProjectIdProvider.
+ * the logic will be moved completely into ProjectProvider.
  */
-const ProjectIdInitializer: FC<{ children: ReactNode }> = ({ children }) => {
-    const setProjectId = useSetProjectId();
-    const setProjectName = useSetProjectName();
+const ProjectIdInitializer: FC<{ children: ReactNode }> = ({ children }) => {    
+    const setProject = useSetProject();
 
     // Single useEffect - initialization and sync with projectsStore
     // Combined to prevent race conditions
@@ -23,11 +22,9 @@ const ProjectIdInitializer: FC<{ children: ReactNode }> = ({ children }) => {
         const selectedProject = projectsStore.selectedProject;
         if (isMounted) {
             if (selectedProject?.id) {
-                setProjectId(selectedProject.id);
-                setProjectName(selectedProject.name);
+                setProject(selectedProject);
             } else {
-                setProjectId(null);
-                setProjectName(null);
+                setProject(null);
             }
         }
 
@@ -39,11 +36,9 @@ const ProjectIdInitializer: FC<{ children: ReactNode }> = ({ children }) => {
                 // Only update state if component is still mounted
                 if (isMounted) {
                     if (project?.id) {
-                        setProjectId(project.id);
-                        setProjectName(project.name);
+                        setProject(project);
                     } else {
-                        setProjectId(null);
-                        setProjectName(null);
+                        setProject(null);
                     }
                 }
             }
@@ -62,12 +57,12 @@ const ProjectIdInitializer: FC<{ children: ReactNode }> = ({ children }) => {
  * Provider for managing the selected project ID
  * Syncs state between React Context and projectsStore (legacy)
  */
-export const withProjectId = (Component: FC<{ children: ReactNode }>) => (
+export const withProject = (Component: FC<{ children: ReactNode }>) => (
     children: ReactNode
 ) => (
-    <ProjectIdProvider>
+    <ProjectProvider>
         <ProjectIdInitializer>
             <Component>{children}</Component>
         </ProjectIdInitializer>
-    </ProjectIdProvider>
+    </ProjectProvider>
 );

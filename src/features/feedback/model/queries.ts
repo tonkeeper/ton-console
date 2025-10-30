@@ -1,8 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { feedback, FeedbackResponse } from 'src/shared/api';
 import { createStandaloneToast } from '@chakra-ui/react';
-import { useProjectName } from 'src/shared/contexts/ProjectIdContext';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useMaybeProject } from 'src/shared/contexts/ProjectIdContext';
 import { userStore } from 'src/shared/stores';
 import type { AxiosError } from 'axios';
 import { FeedbackFromI } from '../interfaces/form';
@@ -11,11 +10,12 @@ import { FeedbackFromI } from '../interfaces/form';
  * Hook to send feedback form
  */
 export function useSendFeedbackMutation() {
-    const projectId = useProjectId();
-    const projectName = useProjectName();
+    const project = useMaybeProject();
+    const projectId = project?.id;
+    const projectName = project?.name;
 
     return useMutation({
-        mutationFn: async (form: FeedbackFromI & { source: string }): Promise<FeedbackResponse> => {            
+        mutationFn: async (form: FeedbackFromI & { source: string }): Promise<FeedbackResponse> => {
             const { data, error } = await feedback({
                 body: {
                     name: form.name,
@@ -45,7 +45,7 @@ export function useSendFeedbackMutation() {
                 duration: 3000
             });
         },
-        onError: (error) => {
+        onError: error => {
             const { toast } = createStandaloneToast();
             let title = 'Unknown error';
             let description = 'Unknown api error happened. Try again later';
