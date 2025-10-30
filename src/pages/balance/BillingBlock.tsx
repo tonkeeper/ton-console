@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { Box, Button, HStack, Select } from '@chakra-ui/react';
 import { H4, useBillingHistoryQuery } from 'src/shared';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 import { BillingHistoryTable } from 'src/features/billing';
 
 const DEFAULT_PAGE_SIZE = 10;

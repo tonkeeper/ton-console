@@ -14,7 +14,7 @@ import NftRouting from 'src/pages/nft';
 import JettonRouting from 'src/pages/jetton';
 import { isDevelopmentMode } from 'src/shared';
 import { useLocation } from 'react-router-dom';
-import { useMaybeProject } from 'src/shared/contexts/ProjectIdContext';
+import { useMaybeProject } from 'src/shared/contexts/ProjectContext';
 
 const LandingPage = lazy(() => import('./landing'));
 const LoginPage = lazy(() => import('./login'));

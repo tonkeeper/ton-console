@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 import { useToast } from '@chakra-ui/react';
 import { AxiosError } from 'axios';
 import { getTestnetAvailable, buyTestnetCoins } from 'src/shared/api';

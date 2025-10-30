@@ -6,7 +6,7 @@ import {
     verifyProjectMessagesApp,
     DTOMessagesApp
 } from 'src/shared/api';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 import { CreateDappForm, Dapp, PendingDapp } from './interfaces';
 import { fetchDappFormByManifestUrl } from './dapp-url-validator';
 import { addPath } from 'src/shared';

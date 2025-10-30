@@ -28,7 +28,7 @@ import { useNavigate } from 'react-router-dom';
 import { InfoComponent } from './InfoComponent';
 import { AirdropStore } from 'src/features/airdrop/model/airdrop.store';
 import { AirdropsStore } from 'src/features/airdrop/model/airdrops.store';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 
 interface CreatePageProps extends BoxProps {
     airdropsStore: AirdropsStore;

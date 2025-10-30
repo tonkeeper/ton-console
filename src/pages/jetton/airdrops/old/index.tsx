@@ -18,7 +18,7 @@ import { UploadComponent } from './UploadComponent';
 import { DeployComponent } from './DeployComponent';
 import { StatisticComponent } from './StatisticComponent';
 import { useParams } from 'react-router-dom';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 
 const AirdropPage: FC<BoxProps> = () => {
     const { id } = useParams<{ id: string }>();

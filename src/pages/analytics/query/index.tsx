@@ -39,7 +39,7 @@ import {
     AnalyticsQueryStore
 } from 'src/features';
 import { useNavigate } from 'react-router-dom';
-import { useProject } from 'src/shared/contexts/ProjectIdContext';
+import { useProject } from 'src/shared/contexts/ProjectContext';
 
 const QueryPage: FC<BoxProps> = () => {
     const navigate = useNavigate();

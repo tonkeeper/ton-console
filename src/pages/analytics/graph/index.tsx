@@ -7,7 +7,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GraphSuccess } from './GraphSuccess';
 import { GraphError } from './GraphError';
 import { GraphHome } from './GraphHome';
-import { useProject } from 'src/shared/contexts/ProjectIdContext';
+import { useProject } from 'src/shared/contexts/ProjectContext';
 
 const GraphPage: FC<BoxProps> = () => {
     const navigate = useNavigate();

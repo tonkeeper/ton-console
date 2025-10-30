@@ -1,6 +1,6 @@
 import { FC, useCallback } from 'react';
 import { RestApiTier } from '../model';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSelectRestApiTierMutation } from '../model/queries';
 import PurchaseDialog from './PurchaseDialog';
