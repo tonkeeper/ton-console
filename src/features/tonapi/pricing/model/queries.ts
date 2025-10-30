@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useProjectId } from 'src/shared/contexts/ProjectContext';
+import { useMaybeProject, useProjectId } from 'src/shared/contexts/ProjectContext';
 import { useToast } from '@chakra-ui/react';
 import {
     DTOTier,
@@ -57,21 +57,21 @@ export function useRestApiTiers() {
 }
 
 export function useSelectedRestApiTier() {
-    const projectId = useProjectId();
-
+    const project = useMaybeProject();
+    
     return useQuery({
-        queryKey: ['selected-rest-api-tier', projectId || undefined],
+        queryKey: ['selected-rest-api-tier', project?.id || undefined],
         queryFn: async () => {
-            if (!projectId) return null;
+            if (!project) return null;
 
             const { data, error } = await getProjectTonApiTier({
-                query: { project_id: projectId }
+                query: { project_id: project.id }
             });
             if (error) throw error;
 
             return mapAppTierToSelectedTier(data.tier);
         },
-        enabled: !!projectId,
+        enabled: !!project,
         staleTime: 30 * 1000
     });
 }
@@ -123,11 +123,11 @@ export function useSelectRestApiTierMutation() {
 }
 
 export function useCheckValidChangeRestApiTierMutation() {
-    const projectId = useProjectId();
+    const project = useMaybeProject();
 
     return useMutation({
         mutationFn: async (tierId: number) => {
-            const currentProjectId = projectId;
+            const currentProjectId = project?.id;
             if (!currentProjectId) throw new Error('Project not selected');
 
             const { data, error } = await validChangeTonApiTier({

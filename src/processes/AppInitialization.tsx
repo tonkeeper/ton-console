@@ -1,7 +1,7 @@
 import { FC, PropsWithChildren, useEffect, useRef } from 'react';
 import { Box, Center, Fade, FadeProps } from '@chakra-ui/react';
 import { TonConsoleIcon } from 'src/shared';
-import { appStore, userStore } from 'src/shared/stores';
+import { appStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 import { setupApiInterceptors } from 'src/shared/api/interceptors';
 
@@ -19,7 +19,7 @@ const AppInitialization: FC<PropsWithChildren> = props => {
 
     useEffect(() => {
         // Setup API interceptors once on app initialization
-        setupApiInterceptors(userStore);
+        setupApiInterceptors();
     }, []);
 
     useEffect(() => {

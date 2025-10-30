@@ -1,16 +1,16 @@
 import { FC, useEffect } from 'react';
 import { Box, Divider, Flex, Text, Image } from '@chakra-ui/react';
 import { CopyPad, H4, Overlay } from 'src/shared';
-import { observer } from 'mobx-react-lite';
-import { userStore } from 'src/shared/stores';
 import { StatsCard } from 'src/entities/stats/Card';
+import { useUserQuery, useUpdateUserMutation } from 'src/entities/user/queries';
 
 const UserProfilePage: FC = () => {
-    useEffect(() => {
-        userStore.updateMe();
-    }, []);
+    const { data: user } = useUserQuery();
+    const updateUser = useUpdateUserMutation();
 
-    const user = userStore.user$.value;
+    useEffect(() => {
+        updateUser.mutate();
+    }, []);
 
     if (!user) {
         throw new Error('Missing user for show profile');
@@ -68,4 +68,4 @@ const UserProfilePage: FC = () => {
     );
 };
 
-export default observer(UserProfilePage);
+export default UserProfilePage;

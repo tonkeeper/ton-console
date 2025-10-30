@@ -9,7 +9,7 @@ import {
     useDeleteProjectMutation,
     useProjectParticipantsQuery
 } from 'src/shared/queries/projects';
-import { userStore } from 'src/shared/stores';
+import { useUserQuery } from 'src/entities/user/queries';
 
 const availableDeleteProject = import.meta.env.VITE_AVAILABLE_DELETE_PROJECT === 'true';
 
@@ -23,8 +23,8 @@ const EditProjectPage: FC = () => {
     const deleteProject = useDeleteProjectMutation();
 
     // Fetch participants (just to load them, they're used by EditProjectParticipan component)
-    const userId = userStore.user$.value?.id;
-    useProjectParticipantsQuery(projectId, userId);
+    const { data: user } = useUserQuery();
+    useProjectParticipantsQuery(projectId, user?.id);
 
     const methods = useForm();
     const [deleteConfirmationIsOpen, setDeleteConfirmationIsOpen] = useState(false);
