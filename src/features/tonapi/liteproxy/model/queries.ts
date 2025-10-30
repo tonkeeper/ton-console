@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useProjectId } from 'src/shared/contexts/ProjectContext';
+import { useMaybeProject, useProjectId } from 'src/shared/contexts/ProjectContext';
 import {
     getLiteproxyKeys,
     createLiteproxyKeys,
@@ -48,21 +48,21 @@ export function useLiteproxyTiers() {
 }
 
 export function useSelectedLiteproxyTier() {
-    const projectId = useProjectId();
+    const project = useMaybeProject();
 
     return useQuery({
-        queryKey: ['selected-liteproxy-tier', projectId || undefined],
+        queryKey: ['selected-liteproxy-tier', project?.id || undefined],
         queryFn: async () => {
-            if (!projectId) return null;
+            if (!project) return null;
 
             const { data, error } = await getProjectLiteproxyTier({
-                query: { project_id: projectId }
+                query: { project_id: project.id }
             });
 
             if (error) throw error;
             return data.tier;
         },
-        enabled: !!projectId,
+        enabled: !!project,
         staleTime: 30 * 1000
     });
 }
@@ -90,7 +90,7 @@ export function useCreateLiteproxyMutation() {
             if (error) throw error;
             return { keys: data.keys, _projectId: currentProjectId };
         },
-        onSuccess: (data) => {
+        onSuccess: data => {
             queryClient.invalidateQueries({
                 queryKey: ['liteproxy-list', data._projectId]
             });
@@ -130,7 +130,7 @@ export function useSelectLiteproxyTierMutation() {
             if (error) throw error;
             return { tierId, _projectId: currentProjectId };
         },
-        onSuccess: (data) => {
+        onSuccess: data => {
             queryClient.invalidateQueries({
                 queryKey: ['selected-liteproxy-tier', data._projectId]
             });
@@ -153,11 +153,11 @@ export function useSelectLiteproxyTierMutation() {
 }
 
 export function useCheckValidChangeLiteproxyTierMutation() {
-    const projectId = useProjectId();
+    const project = useMaybeProject();
 
     return useMutation({
         mutationFn: async (tierId: number) => {
-            const currentProjectId = projectId;
+            const currentProjectId = project?.id;
             if (!currentProjectId) throw new Error('Project not selected');
 
             const { data, error } = await validChangeLiteproxyTier({

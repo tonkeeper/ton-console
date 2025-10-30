@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { observer } from 'mobx-react-lite';
 import { User } from 'src/entities';
 import {
     Button,
@@ -15,10 +14,11 @@ import {
 import { ArrowIcon, CopyPad, DisconnectIcon, MenuButtonDefault, TgIcon } from 'src/shared';
 import { ProfileIcon24 } from 'src/shared/ui/icons/ProfileIcon24';
 import { useNavigate } from 'react-router-dom';
-import { userStore } from 'src/shared/stores';
+import { useUserQuery, useLoginMutation, useLogoutMutation } from 'src/entities/user/queries';
 
-const ExistUserMenu: FC<{ user: User }> = observer(({ user }) => {
+const ExistUserMenu: FC<{ user: User }> = ({ user }) => {
     const navigate = useNavigate();
+    const logout = useLogoutMutation();
 
     return (
         <Menu placement="bottom">
@@ -45,31 +45,34 @@ const ExistUserMenu: FC<{ user: User }> = observer(({ user }) => {
                     <ProfileIcon24 mr="2" />
                     <Text textStyle="label2">Profile</Text>
                 </MenuItem>
-                <MenuItem onClick={() => userStore.logout()}>
+                <MenuItem onClick={() => logout.mutate()}>
                     <DisconnectIcon mr="2" />
                     <Text textStyle="label2">Disconnect</Text>
                 </MenuItem>
             </MenuList>
         </Menu>
     );
-});
+};
 
-export const TgUserButton: FC = observer(() => {
+export const TgUserButton: FC = () => {
+    const { data: user, isLoading } = useUserQuery();
+    const login = useLoginMutation();
+
     const buttonText = useBreakpointValue({
         base: 'Connect',
         md: 'Connect via Telegram'
     });
 
-    return userStore.isAuthorized() ? (
-        <ExistUserMenu user={userStore.user$.value} />
+    return user ? (
+        <ExistUserMenu user={user} />
     ) : (
         <Button
-            isLoading={userStore.user$.isLoading}
+            isLoading={isLoading || login.isPending}
             leftIcon={<TgIcon />}
-            onClick={() => userStore.login()}
+            onClick={() => login.mutate()}
             variant="secondary"
         >
             {buttonText}
         </Button>
     );
-});
+};

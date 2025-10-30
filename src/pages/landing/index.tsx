@@ -1,14 +1,14 @@
 import { FC, useRef } from 'react';
 import { ButtonLink, DocsIcon16, EXTERNAL_LINKS, H1, H2, H3, Overlay, TgIcon } from 'src/shared';
 import { Button, Flex, Text, useBreakpointValue } from '@chakra-ui/react';
-import { userStore } from 'src/shared/stores';
-import { observer } from 'mobx-react-lite';
+import { useLoginMutation } from 'src/entities/user/queries';
 import TonApiPricing from './TonApiPricing';
 import { Footer } from 'src/widgets';
 import { FeaturesList } from 'src/features';
 
 const LandingPage: FC = () => {
     const tonapiRef = useRef<HTMLDivElement | null>(null);
+    const login = useLoginMutation();
 
     const onTonapiClick = (): void => {
         tonapiRef?.current?.scrollIntoView({ behavior: 'smooth' });
@@ -45,9 +45,9 @@ const LandingPage: FC = () => {
                         w={{ base: '100%', md: 'auto' }}
                     >
                         <Button
-                            isLoading={userStore.user$.isLoading}
+                            isLoading={login.isPending}
                             leftIcon={<TgIcon color="constant.white" />}
-                            onClick={() => userStore.login()}
+                            onClick={() => login.mutate()}
                             variant="primary"
                         >
                             Connect and Try
@@ -73,4 +73,4 @@ const LandingPage: FC = () => {
     );
 };
 
-export default observer(LandingPage);
+export default LandingPage;

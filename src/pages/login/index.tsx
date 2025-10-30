@@ -1,15 +1,15 @@
 import { FC } from 'react';
 import { H2, H3, Overlay, TgIcon } from 'src/shared';
 import { Button, Flex, Text, useBreakpointValue } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { Footer } from 'src/widgets';
 import { useLocation } from 'react-router-dom';
 import { SERVICE_NAMES, SERVICE } from 'src/entities/service/SERVICES';
-import { userStore } from 'src/shared/stores';
+import { useLoginMutation } from 'src/entities/user/queries';
 
 const LoginPage: FC = () => {
     const location = useLocation();
     const firstSegment = location.pathname.split('/')[1];
+    const login = useLoginMutation();
 
     const serviceName = SERVICE_NAMES[firstSegment as SERVICE] as string | undefined;
 
@@ -44,9 +44,9 @@ const LoginPage: FC = () => {
                         w={{ base: '100%', md: 'auto' }}
                     >
                         <Button
-                            isLoading={userStore.user$.isLoading}
+                            isLoading={login.isPending}
                             leftIcon={<TgIcon color="constant.white" />}
-                            onClick={() => userStore.login()}
+                            onClick={() => login.mutate()}
                             size="lg"
                             variant="primary"
                         >
@@ -67,4 +67,4 @@ const LoginPage: FC = () => {
     );
 };
 
-export default observer(LoginPage);
+export default LoginPage;

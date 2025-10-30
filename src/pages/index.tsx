@@ -3,8 +3,6 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import TonapiRouting from 'src/pages/tonapi';
 import { lazy } from '@loadable/component';
 import { Layout } from './layouts';
-import { userStore } from 'src/shared/stores';
-import { observer } from 'mobx-react-lite';
 import SettingsRouting from 'src/pages/settings';
 import InvoicesRouting from './invoices';
 import { LayoutSolid } from 'src/pages/layouts/LayoutSolid';
@@ -15,6 +13,7 @@ import JettonRouting from 'src/pages/jetton';
 import { isDevelopmentMode } from 'src/shared';
 import { useLocation } from 'react-router-dom';
 import { useMaybeProject } from 'src/shared/contexts/ProjectContext';
+import { useUserQuery } from 'src/entities/user/queries';
 
 const LandingPage = lazy(() => import('./landing'));
 const LoginPage = lazy(() => import('./login'));
@@ -30,6 +29,12 @@ const Routing: FC = () => {
     const params = new URLSearchParams(location.search);
     const queryBackUrl = params.get('backUrl');
     const project = useMaybeProject();
+    const { data: user, isLoading, isFetching, status } = useUserQuery();
+
+    // Debug: log user query state
+    useEffect(() => {
+        console.log('[Routing] User query state:', { user, isLoading, isFetching, status });
+    }, [user, isLoading, isFetching, status]);
 
     useEffect(() => {
         /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
@@ -52,18 +57,21 @@ const Routing: FC = () => {
             return;
         }
 
-        if (!userStore.user$.value) {
+        if (!user) {
             metatag.content = 'width=device-width, initial-scale=1.0';
         } else {
             metatag.content = 'width=1350px';
         }
-    }, [userStore.user$.value]);
+    }, [user]);
 
-    if (!userStore.user$.isResolved) {
+    // Show loading only if user data is being fetched for the first time
+    // Check both isLoading (no data in cache) and isFetching (request in progress)
+    if (isLoading) {
+        console.log('[Routing] Showing loader, isLoading:', isLoading);
         return null;
     }
 
-    if (!userStore.user$.value) {
+    if (!user) {
         return (
             <Routes>
                 <Route path="/" element={<LayoutSolid />}>
@@ -184,4 +192,4 @@ const Routing: FC = () => {
     );
 };
 
-export default observer(Routing);
+export default Routing;
