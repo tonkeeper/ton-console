@@ -9,9 +9,13 @@ import {
 import { observer } from 'mobx-react-lite';
 import { IconButton, SearchIcon24, useDebounce, XMarkCircleIcon16 } from 'src/shared';
 import { useIMask } from 'react-imask';
-import { invoicesTableStore } from 'src/features';
+import { InvoicesTableStore } from '../../models';
 
-const InvoicesSearchInput: FC<InputGroupProps> = props => {
+interface Props extends InputGroupProps {
+    invoicesTableStore: InvoicesTableStore;
+}
+
+const InvoicesSearchInput: FC<Props> = ({ invoicesTableStore, ...props }) => {
     const { ref, value, setValue } = useIMask({
         mask: /^[a-zA-Z\d]{1,6}$/
     });

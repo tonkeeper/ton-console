@@ -2,9 +2,13 @@ import { FC } from 'react';
 import { ButtonProps } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { IconButton, RefreshIcon16 } from 'src/shared';
-import { invoicesTableStore } from 'src/features';
+import { InvoicesTableStore } from '../../models';
 
-const RefreshInvoicesTableButton: FC<ButtonProps> = props => {
+interface Props extends ButtonProps {
+    invoicesTableStore: InvoicesTableStore;
+}
+
+const RefreshInvoicesTableButton: FC<Props> = ({ invoicesTableStore, ...props }) => {
     return (
         <IconButton
             onClick={() =>

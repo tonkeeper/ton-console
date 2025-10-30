@@ -1,16 +1,25 @@
 import RegisterProject from './RegisterProject';
-import { FC, PropsWithChildren, Suspense, useEffect } from 'react';
+import { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
-import { invoicesAppStore } from 'src/features';
 import { Center, Spinner } from '@chakra-ui/react';
 import { Route, useLocation, useNavigate } from 'react-router-dom';
 import { lazy } from '@loadable/component';
 import JoinInvoices from './JoinInvoices';
+import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { InvoicesAppStore, InvoicesTableStore } from 'src/features/invoices/models';
+import { projectsStore } from 'src/shared/stores';
 
 const InvoiceDashboardPage = lazy(() => import('./dashboard'));
 const ManageInvoicesPage = lazy(() => import('./manage'));
 
-const WaitForAppResolving: FC<PropsWithChildren> = observer(({ children }) => {
+interface WaitForAppResolvingProps extends PropsWithChildren {
+    invoicesAppStore: InvoicesAppStore;
+}
+
+const WaitForAppResolving: FC<WaitForAppResolvingProps> = observer(({
+    invoicesAppStore,
+    children
+}) => {
     if (!invoicesAppStore.invoicesApp$.isResolved) {
         return (
             <Center h="200px">
@@ -22,15 +31,25 @@ const WaitForAppResolving: FC<PropsWithChildren> = observer(({ children }) => {
     return <>{children}</>;
 });
 
-const InvoicesPage = observer(() => {
-    if (invoicesAppStore.invoicesServiceAvailable) {
-        return <RegisterProject />;
+interface InvoicesPageProps {
+    invoicesAppStore: InvoicesAppStore;
+}
+
+const InvoicesPage: FC<InvoicesPageProps> = observer(({ invoicesAppStore }) => {
+    const hasInvoicesCapability = projectsStore.selectedProject?.capabilities.invoices;
+
+    if (!hasInvoicesCapability) {
+        return <JoinInvoices />;
     }
 
-    return <JoinInvoices />;
+    return <RegisterProject invoicesAppStore={invoicesAppStore} />;
 });
 
-const Index = observer(() => {
+interface IndexProps {
+    invoicesAppStore: InvoicesAppStore;
+}
+
+const Index: FC<IndexProps> = observer(({ invoicesAppStore }) => {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -42,10 +61,14 @@ const Index = observer(() => {
         }
     }, [id]);
 
-    return <InvoicesPage />;
+    return <InvoicesPage invoicesAppStore={invoicesAppStore} />;
 });
 
-const ApiDescription = observer(() => {
+interface ApiDescriptionProps {
+    invoicesAppStore: InvoicesAppStore;
+}
+
+const ApiDescription: FC<ApiDescriptionProps> = observer(({ invoicesAppStore }) => {
     const navigate = useNavigate();
     const id = invoicesAppStore.invoicesApp$.value?.id;
 
@@ -61,12 +84,17 @@ const ApiDescription = observer(() => {
 
     return (
         <Suspense>
-            <InvoiceDashboardPage />
+            <InvoiceDashboardPage invoicesAppStore={invoicesAppStore} />
         </Suspense>
     );
 });
 
-const Manage = observer(() => {
+interface ManageProps {
+    invoicesAppStore: InvoicesAppStore;
+    invoicesTableStore: InvoicesTableStore;
+}
+
+const Manage: FC<ManageProps> = observer(({ invoicesAppStore, invoicesTableStore }) => {
     const navigate = useNavigate();
     const id = invoicesAppStore.invoicesApp$.value?.id;
 
@@ -82,46 +110,83 @@ const Manage = observer(() => {
 
     return (
         <Suspense>
-            <ManageInvoicesPage />
+            <ManageInvoicesPage
+                invoicesAppStore={invoicesAppStore}
+                invoicesTableStore={invoicesTableStore}
+            />
         </Suspense>
     );
 });
 
-const InvoicesRouting = (
-    <>
-        <Route
-            path="dashboard"
-            element={
-                <WaitForAppResolving>
-                    <ApiDescription />
-                </WaitForAppResolving>
-            }
-        />
-        <Route
-            path="manage"
-            element={
-                <WaitForAppResolving>
-                    <Manage />
-                </WaitForAppResolving>
-            }
-        />
-        <Route
-            index
-            element={
-                <WaitForAppResolving>
-                    <Index />
-                </WaitForAppResolving>
-            }
-        />
-        <Route
-            path="*"
-            element={
-                <WaitForAppResolving>
-                    <Index />
-                </WaitForAppResolving>
-            }
-        />
-    </>
-);
+const InvoicesRouting = observer(() => {
+    const projectId = useProjectId();
+
+    // Use useMemo for synchronous store creation to avoid unnecessary loading states
+    const invoicesAppStore = useMemo(
+        () => (projectId ? new InvoicesAppStore({ projectId }) : null),
+        [projectId]
+    );
+
+    const invoicesTableStore = useMemo(
+        () => (invoicesAppStore ? new InvoicesTableStore({ invoicesAppStore }) : null),
+        [invoicesAppStore]
+    );
+
+    // Cleanup reactions when stores change
+    useEffect(() => {
+        return () => {
+            invoicesAppStore?.dispose();
+            invoicesTableStore?.dispose();
+        };
+    }, [invoicesAppStore, invoicesTableStore]);
+
+    if (!invoicesAppStore || !invoicesTableStore) {
+        return (
+            <Center h="200px">
+                <Spinner />
+            </Center>
+        );
+    }
+
+    return (
+        <>
+            <Route
+                path="dashboard"
+                element={
+                    <WaitForAppResolving invoicesAppStore={invoicesAppStore}>
+                        <ApiDescription invoicesAppStore={invoicesAppStore} />
+                    </WaitForAppResolving>
+                }
+            />
+            <Route
+                path="manage"
+                element={
+                    <WaitForAppResolving invoicesAppStore={invoicesAppStore}>
+                        <Manage
+                            invoicesAppStore={invoicesAppStore}
+                            invoicesTableStore={invoicesTableStore}
+                        />
+                    </WaitForAppResolving>
+                }
+            />
+            <Route
+                index
+                element={
+                    <WaitForAppResolving invoicesAppStore={invoicesAppStore}>
+                        <Index invoicesAppStore={invoicesAppStore} />
+                    </WaitForAppResolving>
+                }
+            />
+            <Route
+                path="*"
+                element={
+                    <WaitForAppResolving invoicesAppStore={invoicesAppStore}>
+                        <Index invoicesAppStore={invoicesAppStore} />
+                    </WaitForAppResolving>
+                }
+            />
+        </>
+    );
+});
 
 export default InvoicesRouting;

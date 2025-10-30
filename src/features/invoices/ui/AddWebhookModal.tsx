@@ -14,13 +14,16 @@ import {
 } from '@chakra-ui/react';
 import { H4 } from 'src/shared';
 import { useForm } from 'react-hook-form';
-import { invoicesAppStore } from 'src/features';
+import { InvoicesAppStore } from 'src/features/invoices/models';
 import { observer } from 'mobx-react-lite';
 
-const AddWebhookModal: FC<{
+interface Props {
+    invoicesAppStore: InvoicesAppStore;
     isOpen: boolean;
     onClose: () => void;
-}> = ({ isOpen, onClose }) => {
+}
+
+const AddWebhookModal: FC<Props> = ({ invoicesAppStore, isOpen, onClose }) => {
     const { formState, register, handleSubmit, reset, watch, setFocus } = useForm<{
         value: string;
     }>();

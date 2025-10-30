@@ -19,7 +19,6 @@ import {
     DTOCryptoCurrency,
     GetInvoicesStatsResponse
 } from 'src/shared/api';
-import { projectsStore } from 'src/shared/stores';
 import {
     InvoicesAllStatistics,
     InvoicesApp,
@@ -35,25 +34,19 @@ export class InvoicesAppStore {
 
     statistics$ = new Loadable<InvoicesAllStatistics | null>(null);
 
-    get invoicesServiceAvailable(): boolean {
-        return !!projectsStore.selectedProject?.capabilities.invoices;
-    }
+    private readonly projectId: number;
 
-    constructor() {
+    private disposeAppReaction?: () => void;
+
+    constructor({ projectId }: { projectId: number }) {
         makeAutoObservable(this);
+        this.projectId = projectId;
 
-        createImmediateReaction(
-            () => projectsStore.selectedProject?.id,
-            project => {
-                this.clearState();
+        // Auto-fetch on initialization
+        this.fetchInvoicesApp();
 
-                if (project) {
-                    this.fetchInvoicesApp();
-                }
-            }
-        );
-
-        createImmediateReaction(
+        // Cascade: when app loads, fetch related data
+        this.disposeAppReaction = createImmediateReaction(
             () => this.invoicesApp$.value?.id,
             app => {
                 this.clearAppRelatedState();
@@ -66,10 +59,18 @@ export class InvoicesAppStore {
         );
     }
 
+    dispose(): void {
+        this.disposeAppReaction?.();
+    }
+
     fetchInvoicesApp = this.invoicesApp$.createAsyncAction(async () => {
         try {
+            if (!this.projectId) {
+                return null;
+            }
+
             const { data, error } = await getInvoicesApp({
-                query: { project_id: projectsStore.selectedProject!.id }
+                query: { project_id: this.projectId }
             });
 
             if (error || !data?.app) {
@@ -84,8 +85,12 @@ export class InvoicesAppStore {
 
     createInvoicesApp = this.invoicesApp$.createAsyncAction(
         async (form: InvoicesProjectForm) => {
+            if (!this.projectId) {
+                throw new Error('Project ID is not available');
+            }
+
             const { data, error } = await createInvoicesApp({
-                query: { project_id: projectsStore.selectedProject!.id },
+                query: { project_id: this.projectId },
                 body: {
                     name: form.name,
                     recipient_address: form.receiverAddress
@@ -110,6 +115,10 @@ export class InvoicesAppStore {
 
     editInvoicesApp = this.invoicesApp$.createAsyncAction(
         async (form: Partial<InvoicesProjectForm> & { id: number }) => {
+            if (!this.projectId) {
+                throw new Error('Project ID is not available');
+            }
+
             const { data, error } = await updateInvoicesApp({
                 path: { id: form.id },
                 body: {
@@ -135,8 +144,13 @@ export class InvoicesAppStore {
     );
 
     fetchAppToken = this.appToken$.createAsyncAction(async () => {
+        const appId = this.invoicesApp$.value?.id;
+        if (!appId) {
+            throw new Error('Invoices app is not loaded');
+        }
+
         const { data, error } = await getInvoicesAppToken({
-            query: { app_id: this.invoicesApp$.value!.id }
+            query: { app_id: appId }
         });
 
         if (error || !data) {
@@ -148,8 +162,13 @@ export class InvoicesAppStore {
 
     addWebhook = this.invoicesApp$.createAsyncAction(
         async (value: string) => {
+            const appId = this.invoicesApp$.value?.id;
+            if (!appId) {
+                throw new Error('Invoices app is not loaded');
+            }
+
             const { data, error } = await createInvoicesAppWebhook({
-                path: { id: this.invoicesApp$.value!.id },
+                path: { id: appId },
                 body: { webhook: value }
             });
 
@@ -171,8 +190,13 @@ export class InvoicesAppStore {
 
     deleteWebhook = this.invoicesApp$.createAsyncAction(
         async (id: string) => {
+            const appId = this.invoicesApp$.value?.id;
+            if (!appId) {
+                throw new Error('Invoices app is not loaded');
+            }
+
             const { data, error } = await deleteInvoicesAppWebhook({
-                path: { id: this.invoicesApp$.value!.id, webhook_id: id }
+                path: { id: appId, webhook_id: id }
             });
 
             if (error || !data?.app) {
@@ -193,8 +217,13 @@ export class InvoicesAppStore {
 
     regenerateAppToken = this.appToken$.createAsyncAction(
         async () => {
+            const appId = this.invoicesApp$.value?.id;
+            if (!appId) {
+                throw new Error('Invoices app is not loaded');
+            }
+
             const { data, error } = await regenerateInvoicesAppToken({
-                query: { app_id: this.invoicesApp$.value!.id }
+                query: { app_id: appId }
             });
 
             if (error || !data) {
@@ -214,16 +243,21 @@ export class InvoicesAppStore {
     );
 
     fetchInvoicesStatistics = this.statistics$.createAsyncAction(async () => {
+        const appId = this.invoicesApp$.value?.id;
+        if (!appId) {
+            throw new Error('Invoices app is not loaded');
+        }
+
         const tonResult = await getInvoicesStats({
             query: {
-                app_id: this.invoicesApp$.value!.id,
+                app_id: appId,
                 currency: DTOCryptoCurrency.TON
             }
         });
 
         const usdtResult = await getInvoicesStats({
             query: {
-                app_id: this.invoicesApp$.value!.id,
+                app_id: appId,
                 currency: DTOCryptoCurrency.USDT
             }
         });

@@ -123,7 +123,7 @@ const Routing: FC = () => {
                         </Suspense>
                     }
                 />
-                <Route path="invoices">{InvoicesRouting}</Route>
+                <Route path="invoices/*" element={<InvoicesRouting />} />
                 <Route path="tonapi">{TonapiRouting}</Route>
                 <Route
                     path="tonkeeper-messages"

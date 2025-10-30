@@ -30,7 +30,7 @@ import {
     InvoiceTableSortColumn,
     isCustomFiltrationPeriod
 } from './interfaces';
-import { invoicesAppStore } from 'src/shared/stores';
+import type { InvoicesAppStore } from './invoices-app.store';
 import {
     convertCryptoCurrencyToDTOCryptoCurrency,
     convertDTOCryptoCurrencyToCryptoCurrency,
@@ -42,6 +42,8 @@ export const backendBaseURL =
     apiClientBaseURL === '/' ? import.meta.env.VITE_BASE_PROXY_URL : apiClientBaseURL;
 export class InvoicesTableStore {
     invoices$ = new Loadable<Invoice[]>([]);
+
+    private readonly invoicesAppStore: InvoicesAppStore;
 
     private totalInvoices = 0;
 
@@ -58,6 +60,10 @@ export class InvoicesTableStore {
     };
 
     sortDirectionTouched = false;
+
+    private disposeAppReaction?: () => void;
+
+    private disposePaginationReaction?: () => void;
 
     get hasNextPage(): boolean {
         return this.invoices$.value.length < this.totalInvoices;
@@ -77,9 +83,14 @@ export class InvoicesTableStore {
     }
 
     get downloadInvoicesLink(): string {
+        const appId = this.invoicesAppStore.invoicesApp$.value?.id;
+        if (!appId) {
+            throw new Error('Invoices app is not loaded');
+        }
+
         const path = '/api/v1/services/invoices/export';
         const url = new URL(path, backendBaseURL);
-        url.searchParams.append('app_id', invoicesAppStore.invoicesApp$.value!.id.toString());
+        url.searchParams.append('app_id', appId.toString());
 
         if (this.pagination.filter.id !== undefined) {
             url.searchParams.append('search_id', this.pagination.filter.id);
@@ -115,15 +126,16 @@ export class InvoicesTableStore {
         return url.toString();
     }
 
-    constructor() {
+    constructor({ invoicesAppStore }: { invoicesAppStore: InvoicesAppStore }) {
         makeAutoObservable(this);
+        this.invoicesAppStore = invoicesAppStore;
 
-        let dispose: (() => void) | undefined;
+        let disposePagination: (() => void) | undefined;
 
-        createImmediateReaction(
-            () => invoicesAppStore.invoicesApp$.value,
+        this.disposeAppReaction = createImmediateReaction(
+            () => this.invoicesAppStore.invoicesApp$.value,
             app => {
-                dispose?.();
+                disposePagination?.();
                 this.clearState();
                 this.loadFirstPageWithNewParams.cancelAllPendingCalls();
                 this.loadNextPage.cancelAllPendingCalls();
@@ -131,15 +143,21 @@ export class InvoicesTableStore {
                 if (app) {
                     this.loadFirstPageWithNewParams();
 
-                    dispose = reaction(
+                    disposePagination = reaction(
                         () => JSON.stringify(this.pagination),
                         () => {
                             this.loadFirstPageWithNewParams({ cancelPreviousCall: true });
                         }
                     );
+                    this.disposePaginationReaction = disposePagination;
                 }
             }
         );
+    }
+
+    dispose(): void {
+        this.disposeAppReaction?.();
+        this.disposePaginationReaction?.();
     }
 
     isItemLoaded = (index: number): boolean =>
@@ -178,6 +196,11 @@ export class InvoicesTableStore {
         offset?: number;
         pageSize?: number;
     }): Promise<GetInvoicesResponse> {
+        const appId = this.invoicesAppStore.invoicesApp$.value?.id;
+        if (!appId) {
+            throw new Error('Invoices app is not loaded');
+        }
+
         const searchId = this.pagination.filter.id;
         let filterByStatus = undefined;
 
@@ -195,7 +218,7 @@ export class InvoicesTableStore {
 
         const { data, error } = await getInvoices({
             query: {
-                app_id: invoicesAppStore.invoicesApp$.value!.id,
+                app_id: appId,
                 ...(options?.offset !== undefined && { offset: options.offset }),
                 limit: options?.pageSize || this.pageSize,
                 ...(searchId && { search_id: searchId }),
@@ -218,9 +241,14 @@ export class InvoicesTableStore {
 
     createInvoice = this.invoices$.createAsyncAction(
         async (form: InvoiceForm) => {
+            const appId = this.invoicesAppStore.invoicesApp$.value?.id;
+            if (!appId) {
+                throw new Error('Invoices app is not loaded');
+            }
+
             const { data, error } = await createInvoicesInvoice({
                 query: {
-                    app_id: invoicesAppStore.invoicesApp$.value!.id
+                    app_id: appId
                 },
                 body: {
                     amount: form.amount.stringWeiAmount,
@@ -251,9 +279,14 @@ export class InvoicesTableStore {
 
     cancelInvoice = this.invoices$.createAsyncAction(
         async (id: Invoice['id']) => {
+            const appId = this.invoicesAppStore.invoicesApp$.value?.id;
+            if (!appId) {
+                throw new Error('Invoices app is not loaded');
+            }
+
             const { error } = await cancelInvoicesInvoice({
                 path: { id },
-                query: { app_id: invoicesAppStore.invoicesApp$.value!.id }
+                query: { app_id: appId }
             });
 
             if (error) throw error;

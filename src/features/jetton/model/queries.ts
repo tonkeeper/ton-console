@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Address, Cell, toNano } from '@ton/core';
-import { JettonInfo, JettonBalance } from '@ton-api/client';
+import { JettonInfo, JettonBalance, JettonMetadata } from '@ton-api/client';
+import { TonConnectUI } from '@tonconnect/ui-react';
 import { tonapiClient } from 'src/shared';
 import { readJettonMetadata } from '../lib/jetton-minter';
 import { createStandaloneToast } from '@chakra-ui/react';
@@ -42,7 +43,7 @@ async function fetchJettonInfo(jettonAddress: Address): Promise<JettonInfo | nul
     .then((v) => v?.metadata)
     .catch(() => null); // If blockchain fetch fails, use API data
 
-  const preparedMetadataFromBlockchainContent: Partial<any> = {
+  const preparedMetadataFromBlockchainContent: Partial<JettonMetadata> = {
     name: jettonMetadataFromBlockchainContent?.name,
     symbol: jettonMetadataFromBlockchainContent?.symbol,
     decimals: jettonMetadataFromBlockchainContent?.decimals,
@@ -140,12 +141,12 @@ export function useMintJettonMutation(jettonAddress: Address | null) {
       amount,
       connectedWalletAddress,
       tonConnection,
-      jettonWallet
+      jettonWallet: _jettonWallet
     }: {
       amount: bigint;
       connectedWalletAddress: Address;
-      tonConnection: any; // TonConnectUI type
-      jettonWallet: any; // JettonBalance type
+      tonConnection: TonConnectUI;
+      jettonWallet: JettonBalance | JettonInfo;
     }) => {
       if (!jettonAddress) throw new Error('Jetton address is not set');
 
@@ -157,7 +158,7 @@ export function useMintJettonMutation(jettonAddress: Address | null) {
       const beforeTotalSupply = await supplyFetcher();
 
       if (!beforeTotalSupply) {
-        throw new Error('Jetton cannot be existed');
+        throw new Error('Jetton does not exist');
       }
 
       const tx = {
@@ -228,8 +229,8 @@ export function useBurnJettonMutation(jettonAddress: Address | null) {
     }: {
       amount: bigint;
       connectedWalletAddress: Address;
-      tonConnection: any; // TonConnectUI type
-      jettonWallet: any; // JettonBalance type
+      tonConnection: TonConnectUI;
+      jettonWallet: JettonBalance;
     }) => {
       if (!jettonAddress) throw new Error('Jetton address is not set');
 
@@ -241,7 +242,7 @@ export function useBurnJettonMutation(jettonAddress: Address | null) {
       const beforeTotalSupply = await supplyFetcher();
 
       if (!beforeTotalSupply) {
-        throw new Error('Jetton cannot be existed');
+        throw new Error('Jetton does not exist');
       }
 
       const jettonWalletAddress = jettonWallet.walletAddress.address;
@@ -306,7 +307,7 @@ export function useBurnAdminMutation(jettonAddress: Address | null) {
   const { toast } = createStandaloneToast();
 
   return useMutation({
-    mutationFn: async ({ tonConnection }: { tonConnection: any }) => {
+    mutationFn: async ({ tonConnection }: { tonConnection: TonConnectUI }) => {
       if (!jettonAddress) throw new Error('Jetton address is not set');
 
       const { changeAdminBody } = await import('../lib/jetton-minter');
@@ -377,8 +378,8 @@ export function useUpdateJettonMetadataMutation(jettonAddress: Address | null) {
       metadata,
       tonConnection
     }: {
-      metadata: any; // JettonMetadata type
-      tonConnection: any; // TonConnectUI type
+      metadata: Partial<JettonMetadata>;
+      tonConnection: TonConnectUI;
     }) => {
       if (!jettonAddress) throw new Error('Jetton address is not set');
 

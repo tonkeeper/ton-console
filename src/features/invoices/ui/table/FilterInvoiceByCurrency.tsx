@@ -12,9 +12,13 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { ArrowIcon, MenuButtonDefault, Span, TickIcon } from 'src/shared';
-import { invoicesTableStore, InvoiceCurrency } from '../../models';
+import { InvoicesTableStore, InvoiceCurrency } from '../../models';
 
-const FilterInvoiceByCurrency: FC<BoxProps> = props => {
+interface Props extends BoxProps {
+    invoicesTableStore: InvoicesTableStore;
+}
+
+const FilterInvoiceByCurrency: FC<Props> = ({ invoicesTableStore, ...props }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (

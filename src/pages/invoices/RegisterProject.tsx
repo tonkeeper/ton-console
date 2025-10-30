@@ -1,10 +1,14 @@
 import { FC } from 'react';
 import { ButtonLink, FolderIcon40, H4, Overlay } from 'src/shared';
 import { Button, Divider, Flex, Text, useDisclosure } from '@chakra-ui/react';
-import { CreateInvoicesProjectModal, INVOICES_LINKS, invoicesAppStore } from 'src/features';
+import { CreateInvoicesProjectModal, INVOICES_LINKS, InvoicesAppStore } from 'src/features';
 import { observer } from 'mobx-react-lite';
 
-const RegisterProject: FC = () => {
+interface RegisterProjectProps {
+    invoicesAppStore: InvoicesAppStore;
+}
+
+const RegisterProject: FC<RegisterProjectProps> = ({ invoicesAppStore }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (
@@ -36,7 +40,11 @@ const RegisterProject: FC = () => {
                     </Button>
                 </Flex>
             </Flex>
-            <CreateInvoicesProjectModal isOpen={isOpen} onClose={onClose} />
+            <CreateInvoicesProjectModal
+                isOpen={isOpen}
+                onClose={onClose}
+                invoicesAppStore={invoicesAppStore}
+            />
         </Overlay>
     );
 };
