@@ -1,6 +1,7 @@
 import { createContext, useContext, ReactNode, FC, useState, useEffect } from 'react';
 import { useProjectsQuery } from 'src/shared/queries/projects';
 import { Project } from 'src/entities/project/model/interfaces/project';
+import { useUserQuery } from 'src/entities/user/queries';
 
 interface ProjectContextType {
     selectedProjectId: number | null;
@@ -21,9 +22,14 @@ const STORAGE_KEY = 'SelectedProject:selectedProjectId';
  * - Auto-selects first project if none selected
  * - Provides selectedProject from projects list
  * - Integrates with React Query for projects data
+ * - Only fetches projects when user is authenticated
  */
 export const ProjectProvider: FC<{ children: ReactNode }> = ({ children }) => {
-    const { data: projects = [] } = useProjectsQuery();
+    // Check if user is authenticated
+    const { data: user } = useUserQuery();
+    
+    // Only fetch projects if user is logged in
+    const { data: projects = [] } = useProjectsQuery({ enabled: !!user });
 
     // Initialize from localStorage
     const [selectedProjectId, setSelectedProjectIdState] = useState<number | null>(() => {

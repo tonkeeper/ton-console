@@ -44,8 +44,11 @@ function gradient(color: string): string {
 
 /**
  * Query hook to fetch all user projects
+ * 
+ * Note: This query should only run when user is authenticated.
+ * Pass enabled: false when user is not logged in.
  */
-export function useProjectsQuery() {
+export function useProjectsQuery(options?: { enabled?: boolean }) {
     return useQuery({
         queryKey: ['projects'],
         queryFn: async (): Promise<Project[]> => {
@@ -55,6 +58,8 @@ export function useProjectsQuery() {
 
             return data.items.map(mapProjectDtoToProject);
         },
+        // Only fetch when explicitly enabled (controlled by caller based on auth state)
+        enabled: options?.enabled ?? true,
         staleTime: 5 * 60 * 1000, // 5 minutes
         // Keep previous data while refetching
         placeholderData: (previousData: Project[] | undefined) => previousData

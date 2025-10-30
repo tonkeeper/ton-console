@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { feedback, FeedbackResponse } from 'src/shared/api';
 import { createStandaloneToast } from '@chakra-ui/react';
 import { useMaybeProject } from 'src/shared/contexts/ProjectContext';
-import { userStore } from 'src/shared/stores';
+import { useUserQuery } from 'src/entities/user/queries';
 import type { AxiosError } from 'axios';
 import { FeedbackFromI } from '../interfaces/form';
 
@@ -13,6 +13,7 @@ export function useSendFeedbackMutation() {
     const project = useMaybeProject();
     const projectId = project?.id;
     const projectName = project?.name;
+    const { data: user } = useUserQuery();
 
     return useMutation({
         mutationFn: async (form: FeedbackFromI & { source: string }): Promise<FeedbackResponse> => {
@@ -25,9 +26,8 @@ export function useSendFeedbackMutation() {
                     x_source: form.source,
                     x_project_id: projectId?.toString() ?? '',
                     x_project_name: projectName ?? '',
-                    x_tg_user_id: userStore.user$.value?.id.toString() ?? '',
-                    x_tg_user_name: userStore.user$.value
-                        ? `${userStore.user$.value?.firstName} ${userStore.user$.value?.lastName}`
+                    x_tg_user_id: user?.id.toString() ?? '',
+                    x_tg_user_name: user ? `${user.firstName} ${user.lastName}`
                         : ''
                 }
             });

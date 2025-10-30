@@ -1,10 +1,9 @@
 import { FC } from 'react';
 import { BoxProps, Button, Flex } from '@chakra-ui/react';
 import { FeatureCard } from './FeatureCard';
-import { userStore } from 'src/shared/stores';
-import { observer } from 'mobx-react-lite';
 import { useNavigate } from 'react-router-dom';
 import { openFeedbackModal } from 'src/features/feedback/model/feedback';
+import { useUserQuery, useLoginMutation } from 'src/entities/user/queries';
 
 const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boolean }> = ({
     onTonapiClick,
@@ -12,17 +11,19 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
     ...rest
 }) => {
     const navigate = useNavigate();
+    const { data: user, isLoading } = useUserQuery();
+    const login = useLoginMutation();
 
     const loginAndNavigateTo = async (path: string): Promise<void> => {
-        if (userStore.user$.value) {
+        if (user) {
             return navigate(path);
         }
 
-        const result = await userStore.login();
-
-        if (result) {
-            navigate(path);
-        }
+        login.mutate(undefined, {
+            onSuccess: () => {
+                navigate(path);
+            }
+        });
     };
 
     const buttonVariant = isContrast ? 'secondary' : 'overlay';
@@ -107,11 +108,11 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button
-                    isLoading={userStore.user$.isLoading}
+                    isLoading={isLoading || login.isPending}
                     onClick={() => loginAndNavigateTo('/tonkeeper-messages')}
                     variant={buttonVariant}
                 >
-                    {userStore.user$.value ? 'Open' : 'Connect and Try'}
+                    {user ? 'Open' : 'Connect and Try'}
                 </Button>
             </FeatureCard>
 
@@ -129,11 +130,11 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button
-                    isLoading={userStore.user$.isLoading}
+                    isLoading={isLoading || login.isPending}
                     onClick={() => loginAndNavigateTo('/invoices')}
                     variant={buttonVariant}
                 >
-                    {userStore.user$.value ? 'Open' : 'Connect and Try'}
+                    {user ? 'Open' : 'Connect and Try'}
                 </Button>
             </FeatureCard>
 
@@ -151,13 +152,13 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                 {...(isContrast && { backgroundColor: 'background.content' })}
             >
                 <Button
-                    isLoading={userStore.user$.isLoading}
+                    isLoading={isLoading || login.isPending}
                     onClick={() => loginAndNavigateTo('/tonapi')}
                     variant={buttonVariant}
                 >
-                    {userStore.user$.value ? 'Open' : 'Connect and Try'}
+                    {user ? 'Open' : 'Connect and Try'}
                 </Button>
-                {!userStore.user$.value && (
+                {!user && (
                     <Button onClick={onTonapiClick} variant={buttonVariant}>
                         See Prices
                     </Button>
@@ -224,4 +225,4 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
     );
 };
 
-export default observer(FeaturesList);
+export default FeaturesList;
