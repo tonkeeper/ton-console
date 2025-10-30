@@ -5,15 +5,6 @@ import { Navigate, Route } from 'react-router-dom';
 const GraphPage = lazy(() => import('./graph'));
 const HistoryPage = lazy(() => import('./history'));
 const QueryPage = lazy(() => import('./query'));
-// const DashboardPage = lazy(() => import('./dashboard'));
-
-/*const DashboardGuard = observer(() => {
-    if (!projectsStore.selectedProject?.capabilities.stats.query) {
-        return <Navigate to=".." replace />;
-    }
-
-    return <DashboardPage />;
-});*/
 
 const AnalyticsRouting = (
     <>
