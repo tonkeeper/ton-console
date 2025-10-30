@@ -16,9 +16,9 @@ import {
     AnalyticsRepeatingQueryAggregated,
     AnalyticsTablePagination
 } from './interfaces';
-import { projectsStore } from 'src/shared/stores';
 import { mapDTOStatsSqlResultToAnalyticsQuery } from './analytics-query.store';
 import { mapDTOStatsGraphResultToAnalyticsGraphQuery } from './analytics-graph-query.store';
+import { Project } from 'src/entities';
 
 export class AnalyticsHistoryTableStore {
     queries$ = new Loadable<
@@ -45,12 +45,12 @@ export class AnalyticsHistoryTableStore {
         return this.hasNextPage ? this.queries$.value.length + 1 : this.queries$.value.length;
     }
 
-    constructor() {
+    constructor(private readonly project: Project) {
         makeAutoObservable(this);
         let paginationDispose: (() => void) | undefined;
 
         const projectDispose = createImmediateReaction(
-            () => projectsStore.selectedProject,
+            () => this.project,
             project => {
                 paginationDispose?.();
                 this.clearState();
@@ -93,7 +93,7 @@ export class AnalyticsHistoryTableStore {
 
             const { data, error } = await getSqlHistoryFromStats({
                 query: {
-                    project_id: projectsStore.selectedProject!.id,
+                    project_id: this.project.id,
                     limit: this.pageSize,
                     offset: this.queries$.value.length,
                     ...(this.pagination.filter.onlyRepeating && { is_repetitive: true }),
@@ -113,7 +113,7 @@ export class AnalyticsHistoryTableStore {
     loadNextPage = this.queries$.createAsyncAction(async () => {
         const { data, error } = await getSqlHistoryFromStats({
             query: {
-                project_id: projectsStore.selectedProject!.id,
+                project_id: this.project.id,
                 limit: this.pageSize,
                 offset: this.queries$.value.length,
                 ...(this.pagination.filter.onlyRepeating && { is_repetitive: true }),

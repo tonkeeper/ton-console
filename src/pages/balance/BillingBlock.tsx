@@ -1,8 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { Box, Button, HStack, Select } from '@chakra-ui/react';
 import { H4, useBillingHistoryQuery } from 'src/shared';
-import { projectsStore } from 'src/shared/stores';
-import { observer } from 'mobx-react-lite';
+import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
 import { BillingHistoryTable } from 'src/features/billing';
 
 const DEFAULT_PAGE_SIZE = 10;
@@ -14,6 +13,7 @@ const BillingBlock: FC = () => {
     const [pageNumber, setPageNumber] = useState(1);
     const [cursorStack, setCursorStack] = useState<string[]>([]);
     const [currentCursor, setCurrentCursor] = useState<string | undefined>(undefined);
+    const projectId = useProjectId();
 
     const { data: billingHistory = [], isLoading } = useBillingHistoryQuery({
         before_tx: currentCursor,
@@ -26,7 +26,7 @@ const BillingBlock: FC = () => {
         setCursorStack([]);
         setCurrentCursor(undefined);
         setPageNumber(1);
-    }, [projectsStore.selectedProject?.id]);
+    }, [projectId]);
 
     // Track whether data has ever been loaded
     useEffect(() => {
@@ -78,19 +78,16 @@ const BillingBlock: FC = () => {
                 hasBillingHistory={hasBillingHistory}
             />
             {hasEverLoaded && (
-                <HStack
-                    justify="space-between"
-                    gap="4"
-                    mt="2">
+                <HStack justify="space-between" gap="4" mt="2">
                     <Select
                         w="auto"
                         maxW="100px"
                         isDisabled={isLoading}
-                        onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                        onChange={e => handlePageSizeChange(Number(e.target.value))}
                         size="sm"
                         value={pageSize}
                     >
-                        {PAGE_SIZE_OPTIONS.map((size) => (
+                        {PAGE_SIZE_OPTIONS.map(size => (
                             <option key={size} value={size}>
                                 {size} rows
                             </option>
@@ -123,5 +120,4 @@ const BillingBlock: FC = () => {
     );
 };
 
-// observer() to react to projectsStore.selectedProject changes
-export default observer(BillingBlock);
+export default BillingBlock;

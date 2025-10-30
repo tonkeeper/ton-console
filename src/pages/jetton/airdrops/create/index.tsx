@@ -1,6 +1,5 @@
 import { Address, Cell } from '@ton/core';
 import { FC, useEffect, useState } from 'react';
-import { observer } from 'mobx-react-lite';
 import { H4, Overlay, tonapiClient } from 'src/shared';
 import { FormProvider, useForm } from 'react-hook-form';
 import {
@@ -27,9 +26,9 @@ import AirdropForm from 'src/features/airdrop/ui/AirdropForm';
 import { AirdropMetadata } from 'src/features/airdrop/model/interfaces/AirdropMetadata';
 import { useNavigate } from 'react-router-dom';
 import { InfoComponent } from './InfoComponent';
-import { projectsStore } from 'src/shared/stores';
 import { AirdropStore } from 'src/features/airdrop/model/airdrop.store';
 import { AirdropsStore } from 'src/features/airdrop/model/airdrops.store';
+import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
 
 interface CreatePageProps extends BoxProps {
     airdropsStore: AirdropsStore;
@@ -52,6 +51,7 @@ const checkIsWalletW5 = (stateInit: string) => {
 
 const CreateAirdropPage: FC<CreatePageProps> = ({ airdropsStore, ...props }) => {
     const navigate = useNavigate();
+    const projectId = useProjectId();
     const connectionRestored = useIsConnectionRestored();
     const wallet = useTonWallet();
     const toast = useToast();
@@ -105,7 +105,7 @@ const CreateAirdropPage: FC<CreatePageProps> = ({ airdropsStore, ...props }) => 
         }
 
         const airdropStore = new AirdropStore({
-            projectId: projectsStore.selectedProject!.id,
+            projectId: projectId,
             airdrops: airdropsStore.airdrops$.value
         });
 
@@ -209,4 +209,4 @@ const CreateAirdropPage: FC<CreatePageProps> = ({ airdropsStore, ...props }) => 
     );
 };
 
-export default observer(CreateAirdropPage);
+export default CreateAirdropPage;

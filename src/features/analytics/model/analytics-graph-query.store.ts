@@ -11,18 +11,18 @@ import {
     DTOStatsQueryResult
 } from 'src/shared/api';
 import { AnalyticsGraphQuery, AnalyticsGraphQueryBasic } from './interfaces';
-import { projectsStore } from 'src/shared/stores';
+import { Project } from 'src/entities/project';
 
 export class AnalyticsGraphQueryStore {
     query$ = new Loadable<AnalyticsGraphQuery | null>(null);
 
     private disposers: Array<() => void> = [];
 
-    constructor() {
+    constructor(private readonly project: Project) {
         makeAutoObservable(this);
 
         const dispose = createReaction(
-            () => projectsStore.selectedProject?.id,
+            () => project,
             (_, prevId) => {
                 if (prevId) {
                     this.clear();
@@ -41,7 +41,7 @@ export class AnalyticsGraphQueryStore {
         async (form: { addresses: string[]; isBetweenSelectedOnly: boolean }) => {
             const { data, error } = await getGraphFromStats({
                 query: {
-                    project_id: projectsStore.selectedProject!.id,
+                    project_id: this.project.id,
                     addresses: form.addresses.join(','),
                     only_between: form.isBetweenSelectedOnly
                 }

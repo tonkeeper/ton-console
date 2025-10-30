@@ -17,9 +17,9 @@ import {
     AnalyticsTablesSchema,
     isAnalyticsQuerySuccessful
 } from './interfaces';
-import { projectsStore } from 'src/shared/stores';
 import { AnalyticsGPTGenerationStore } from './analytics-gpt-generation.store';
 import { parse } from 'csv-parse/sync';
+import { Project } from 'src/entities';
 
 export class AnalyticsQueryStore {
     query$ = new Loadable<AnalyticsQuery | null>(null);
@@ -36,12 +36,12 @@ export class AnalyticsQueryStore {
         return this.setRepeatOnQuery.isLoading || this.removeRepeatOnQuery.isLoading;
     }
 
-    constructor(analyticsGPTGenerationStore: AnalyticsGPTGenerationStore) {
+    constructor(analyticsGPTGenerationStore: AnalyticsGPTGenerationStore, private readonly project: Project) {
         this.analyticsGPTGenerationStore = analyticsGPTGenerationStore;
         makeAutoObservable(this);
 
         const dispose1 = createReaction(
-            () => projectsStore.selectedProject?.id,
+            () => this.project,
             (_, prevId) => {
                 if (prevId) {
                     this.clear();
@@ -107,7 +107,7 @@ export class AnalyticsQueryStore {
         async (query: string, network: 'mainnet' | 'testnet') => {
             const { data, error } = await sendQueryToStats({
                 body: {
-                    project_id: projectsStore.selectedProject!.id,
+                    project_id: this.project.id,
                     query,
                     ...(query.trim() ===
                         this.analyticsGPTGenerationStore.generatedSQL$.value?.trim() && {
@@ -134,7 +134,7 @@ export class AnalyticsQueryStore {
         async (repeatIntervalS: number) => {
             const { data, error } = await updateStatsQuery({
                 path: { id: this.query$.value!.id },
-                query: { project_id: projectsStore.selectedProject!.id },
+                query: { project_id: this.project.id },
                 body: { repeat_interval: repeatIntervalS }
             });
             if (error) throw error;
@@ -161,7 +161,7 @@ export class AnalyticsQueryStore {
         async (name: string) => {
             const { error } = await updateStatsQuery({
                 path: { id: this.query$.value!.id },
-                query: { project_id: projectsStore.selectedProject!.id },
+                query: { project_id: this.project.id },
                 body: { name }
             });
 
@@ -189,7 +189,7 @@ export class AnalyticsQueryStore {
         async () => {
             const { error } = await updateStatsQuery({
                 path: { id: this.query$.value!.id },
-                query: { project_id: projectsStore.selectedProject!.id },
+                query: { project_id: this.project.id },
                 body: { repeat_interval: 0 }
             });
 

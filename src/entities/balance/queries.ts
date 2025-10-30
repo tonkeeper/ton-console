@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getDepositAddress, GetDepositAddressResponse, promoCodeDepositProject } from "src/shared/api";
-import { projectsStore } from "src/shared/stores";
+import { useProjectId } from "src/shared/contexts/ProjectIdContext";
 
 const DEPOSIT_ADDRESS_QUERY_KEY = 'deposit-address';
 const BALANCE_QUERY_KEY = 'balance';
@@ -10,7 +10,7 @@ const BALANCE_QUERY_KEY = 'balance';
  * Used in refill modals
  */
 export function useDepositAddressQuery() {
-    const projectId = projectsStore.selectedProject?.id;
+    const projectId = useProjectId();
 
     return useQuery({
         queryKey: [DEPOSIT_ADDRESS_QUERY_KEY, projectId] as const,
@@ -37,7 +37,7 @@ export function useDepositAddressQuery() {
  */
 export function useApplyPromoCodeMutation() {
     const queryClient = useQueryClient();
-    const projectId = projectsStore.selectedProject?.id;
+    const projectId = useProjectId();
 
     return useMutation({
         mutationFn: async (promoCode: string) => {
