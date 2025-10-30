@@ -2,10 +2,14 @@ import { FC } from 'react';
 import { Box, Button, Flex, FlexProps, Text, useDisclosure } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { sliceAddress, Span, TooltipHoverable } from 'src/shared';
-import { invoicesAppStore } from '../models';
+import { InvoicesAppStore } from '../models';
 import EditInvoicesProjectModal from './EditInvoicesProjectModal';
 
-const InvoicesProjectInfo: FC<FlexProps> = props => {
+interface Props extends FlexProps {
+    invoicesAppStore: InvoicesAppStore;
+}
+
+const InvoicesProjectInfo: FC<Props> = ({ invoicesAppStore, ...props }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const app = invoicesAppStore.invoicesApp$.value;
     if (!app) {
@@ -38,7 +42,7 @@ const InvoicesProjectInfo: FC<FlexProps> = props => {
             >
                 Edit
             </Button>
-            <EditInvoicesProjectModal isOpen={isOpen} onClose={onClose} />
+            <EditInvoicesProjectModal invoicesAppStore={invoicesAppStore} isOpen={isOpen} onClose={onClose} />
         </Flex>
     );
 };

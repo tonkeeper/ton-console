@@ -29,7 +29,7 @@ import {
     toDate,
     XMarkCircleIcon16
 } from 'src/shared';
-import { invoicesTableStore, InvoiceTableFiltration, isCustomFiltrationPeriod } from '../../models';
+import { InvoicesTableStore, InvoiceTableFiltration, isCustomFiltrationPeriod } from '../../models';
 import { IMask, useIMask } from 'react-imask';
 
 const useFormattedPeriod = (period: InvoiceTableFiltration['period']): string => {
@@ -65,7 +65,11 @@ const months = [
     { month: monthsNames[mod(currentMonthIndex - 1, 12)], year: prevMonthYear }
 ];
 
-const FilterInvoiceByPeriod: FC<BoxProps> = props => {
+interface Props extends BoxProps {
+    invoicesTableStore: InvoicesTableStore;
+}
+
+const FilterInvoiceByPeriod: FC<Props> = ({ invoicesTableStore, ...props }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const period = invoicesTableStore.pagination.filter.period;
 
@@ -120,17 +124,17 @@ const FilterInvoiceByPeriod: FC<BoxProps> = props => {
                         )}
                     </MenuItem>
                 ))}
-                <MenuInput onClose={onClose} />
+                <MenuInput invoicesTableStore={invoicesTableStore} onClose={onClose} />
             </MenuList>
         </Menu>
     );
 };
 
-const MenuInput: FC<MenuListProps & { onClose: () => void }> = props => {
+const MenuInput: FC<MenuListProps & { invoicesTableStore: InvoicesTableStore; onClose: () => void }> = props => {
     const toast = useToast();
     const [lockFocus, setLockFocus] = useState(false);
 
-    const { onClose, ...restProps } = props;
+    const { invoicesTableStore, onClose, ...restProps } = props;
     const {
         role,
         ref: menuRef,

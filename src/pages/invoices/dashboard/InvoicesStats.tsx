@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Box, BoxProps, Grid, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { CRYPTO_CURRENCY, formatNumber, useIntervalUpdate } from 'src/shared';
-import { invoicesAppStore, InvoicesStatistics } from 'src/features';
+import { InvoicesAppStore, InvoicesStatistics } from 'src/features';
 import BigNumber from 'bignumber.js';
 import { StatsCard as StatsCardEntity } from 'src/entities/stats/Card';
 
@@ -10,7 +10,8 @@ const StatsCard: FC<{
     header: string;
     stats?: InvoicesStatistics;
     getValue: (value: InvoicesStatistics) => string;
-}> = observer(({ header, stats, getValue }) => {
+    invoicesAppStore: InvoicesAppStore;
+}> = observer(({ header, stats, getValue, invoicesAppStore }) => {
     const isResolved = invoicesAppStore.statistics$.isResolved;
     const canShow = isResolved && stats;
 
@@ -27,9 +28,10 @@ const StatsCard: FC<{
     );
 });
 
-const StatsCurentcy: FC<{ stats?: InvoicesStatistics; currency: CRYPTO_CURRENCY }> = ({
+const StatsCurentcy: FC<{ stats?: InvoicesStatistics; currency: CRYPTO_CURRENCY; invoicesAppStore: InvoicesAppStore }> = ({
     stats,
-    currency
+    currency,
+    invoicesAppStore
 }) => {
     return (
         <>
@@ -40,6 +42,7 @@ const StatsCurentcy: FC<{ stats?: InvoicesStatistics; currency: CRYPTO_CURRENCY 
                 <StatsCard
                     header="Total Number of Invoices"
                     stats={stats}
+                    invoicesAppStore={invoicesAppStore}
                     getValue={st =>
                         formatNumber(st.totalInvoices, {
                             roundingMode: BigNumber.ROUND_DOWN
@@ -49,6 +52,7 @@ const StatsCurentcy: FC<{ stats?: InvoicesStatistics; currency: CRYPTO_CURRENCY 
                 <StatsCard
                     header="Active Invoices"
                     stats={stats}
+                    invoicesAppStore={invoicesAppStore}
                     getValue={st =>
                         formatNumber(st.invoicesInProgress, {
                             roundingMode: BigNumber.ROUND_DOWN
@@ -58,16 +62,19 @@ const StatsCurentcy: FC<{ stats?: InvoicesStatistics; currency: CRYPTO_CURRENCY 
                 <StatsCard
                     header="Earned Total"
                     stats={stats}
+                    invoicesAppStore={invoicesAppStore}
                     getValue={st => st.earnedTotal.stringCurrencyAmount}
                 />
                 <StatsCard
                     header="Earned Last 7 Days"
                     stats={stats}
+                    invoicesAppStore={invoicesAppStore}
                     getValue={st => st.earnedLastWeek.stringCurrencyAmount}
                 />
                 <StatsCard
                     header="Pending Payment"
                     stats={stats}
+                    invoicesAppStore={invoicesAppStore}
                     getValue={st => st.awaitingForPaymentAmount.stringCurrencyAmount}
                 />
             </Grid>
@@ -75,7 +82,11 @@ const StatsCurentcy: FC<{ stats?: InvoicesStatistics; currency: CRYPTO_CURRENCY 
     );
 };
 
-const InvoicesStats: FC<BoxProps> = props => {
+interface InvoicesStatsProps extends BoxProps {
+    invoicesAppStore: InvoicesAppStore;
+}
+
+const InvoicesStats: FC<InvoicesStatsProps> = ({ invoicesAppStore, ...props }) => {
     useIntervalUpdate(invoicesAppStore.fetchInvoicesStatistics);
 
     return (
@@ -86,10 +97,12 @@ const InvoicesStats: FC<BoxProps> = props => {
             <StatsCurentcy
                 stats={invoicesAppStore.statistics$.value?.TON}
                 currency={CRYPTO_CURRENCY.TON}
+                invoicesAppStore={invoicesAppStore}
             />
             <StatsCurentcy
                 stats={invoicesAppStore.statistics$.value?.USDT}
                 currency={CRYPTO_CURRENCY.USDT}
+                invoicesAppStore={invoicesAppStore}
             />
         </Box>
     );

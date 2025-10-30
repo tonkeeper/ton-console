@@ -11,14 +11,16 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { CreateInvoiceFrom } from './CreateInvoiceFrom';
-import { Invoice } from 'src/features';
+import { Invoice, InvoicesTableStore } from '../models';
 import { ViewInvoiceModalContent } from './ViewInvoiceModalContent';
-import { invoicesTableStore } from '../models';
 
-const CreateInvoiceModal: FC<{
+interface Props {
+    invoicesTableStore: InvoicesTableStore;
     isOpen: boolean;
     onClose: () => void;
-}> = ({ isOpen, onClose }) => {
+}
+
+const CreateInvoiceModal: FC<Props> = ({ invoicesTableStore, isOpen, onClose }) => {
     const [createdInvoice, setCreatedInvoice] = useState<Invoice | null>(null);
 
     const id = useId();

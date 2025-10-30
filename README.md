@@ -15,7 +15,7 @@ Launch a successful business with TON blockchain: manage dapps, tokens and payme
 2. `npm run generate-api`
 
 ### Lint & test
-- lint (eslint & prettier): `npm run lint`
+- lint (eslint): `npm run lint`
 - test (vitest): `npm run test`
 - check typings (vite DOESN'T do it automatically): `npx tsc --noEmit`
 

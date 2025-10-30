@@ -47,6 +47,7 @@ export const FeatureCard: FC<
             {...rest}
         >
             <CardBody
+                alignContent="center"
                 overflow="hidden"
                 h="274px"
                 minH="274px"
@@ -54,7 +55,6 @@ export const FeatureCard: FC<
                 px="10px"
                 pb="0"
                 bg={background}
-                alignContent="center"
             >
                 <chakra.picture
                     h="100%"
