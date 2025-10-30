@@ -1,5 +1,5 @@
 import React, { FC, ReactNode, useEffect } from 'react';
-import { ProjectProvider, useSetProject } from 'src/shared/contexts/ProjectIdContext';
+import { ProjectProvider, useSetProject } from 'src/shared/contexts/ProjectContext';
 import { projectsStore } from 'src/shared/stores';
 import { reaction } from 'mobx';
 

@@ -10,7 +10,7 @@ import {
 } from 'src/features';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-import { useProject } from 'src/shared/contexts/ProjectIdContext';
+import { useProject } from 'src/shared/contexts/ProjectContext';
 
 const HistoryPage: FC<BoxProps> = () => {
     const project = useProject();

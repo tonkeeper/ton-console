@@ -19,7 +19,7 @@ import { StatisticComponent } from './StatisticComponent';
 import { useParams } from 'react-router-dom';
 import { AirdropStore } from 'src/features/airdrop/model/airdrop.store';
 import { AirdropsStore } from 'src/features/airdrop/model/airdrops.store';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 
 interface AirdropPageProps extends BoxProps {
     airdropsStore: AirdropsStore;

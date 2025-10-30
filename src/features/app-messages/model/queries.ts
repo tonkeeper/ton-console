@@ -8,7 +8,7 @@ import {
     regenerateProjectMessagesAppToken,
     DTOMessagesPackage
 } from 'src/shared/api';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 import { createStandaloneToast } from '@chakra-ui/react';
 import { UsdCurrencyAmount } from 'src/shared';
 import { AppMessagesPackage } from './interfaces';

@@ -3,7 +3,7 @@ import { chakra, FormControl, FormLabel, Input, Textarea } from '@chakra-ui/reac
 import { useForm } from 'react-hook-form';
 import { FeedbackFromI } from './interfaces/form';
 import { userStore } from 'src/shared/stores';
-import { useProject } from 'src/shared/contexts/ProjectIdContext';
+import { useProject } from 'src/shared/contexts/ProjectContext';
 import { useFeedbackModal } from './contexts/FeedbackModalContext';
 import { useSendFeedbackMutation } from './model/queries';
 

@@ -17,7 +17,7 @@ import { Flex, Text } from '@chakra-ui/react';
 import { NftIcon24 } from 'src/shared';
 import { JettonIcon24 } from 'src/shared/ui/icons/JettonIcon24';
 import { useBalanceQuery } from 'src/features/balance';
-import { useProject } from 'src/shared/contexts/ProjectIdContext';
+import { useProject } from 'src/shared/contexts/ProjectContext';
 
 const Aside: FC = () => {
     const { data: balance, isLoading } = useBalanceQuery();

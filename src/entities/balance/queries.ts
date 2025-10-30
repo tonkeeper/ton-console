@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getDepositAddress, GetDepositAddressResponse, promoCodeDepositProject } from "src/shared/api";
-import { useProjectId } from "src/shared/contexts/ProjectIdContext";
+import { useProjectId } from "src/shared/contexts/ProjectContext";
 
 const DEPOSIT_ADDRESS_QUERY_KEY = 'deposit-address';
 const BALANCE_QUERY_KEY = 'balance';

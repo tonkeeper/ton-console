@@ -5,7 +5,7 @@ import {
     updateProjectTonApiToken,
     deleteProjectTonApiToken
 } from 'src/shared/api';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 import { ApiKey, CreateApiKeyForm, EditApiKeyForm } from './interfaces';
 import { DTOProjectTonApiToken } from 'src/shared/api';
 

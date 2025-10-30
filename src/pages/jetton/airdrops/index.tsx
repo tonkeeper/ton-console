@@ -4,7 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AirdropsStore } from 'src/features/airdrop/model/airdrops.store';
 import { Center, Spinner } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { useProject } from 'src/shared/contexts/ProjectIdContext';
+import { useProject } from 'src/shared/contexts/ProjectContext';
 
 const MainPage = lazy(() => import('./main'));
 const AirdropPage = lazy(() => import('./airdrop'));

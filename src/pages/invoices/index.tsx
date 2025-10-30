@@ -5,7 +5,7 @@ import { Center, Spinner } from '@chakra-ui/react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { lazy } from '@loadable/component';
 import { UnavailableInvoices } from 'src/features/invoices/ui';
-import { useProjectId, useProject } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId, useProject } from 'src/shared/contexts/ProjectContext';
 import { InvoicesAppStore, InvoicesTableStore } from 'src/features/invoices/models';
 
 const InvoiceDashboardPage = lazy(() => import('./dashboard'));
