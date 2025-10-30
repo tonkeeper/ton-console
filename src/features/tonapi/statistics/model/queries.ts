@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 import { getProjectTonApiStats, DTOStats } from 'src/shared/api';
 
 export interface ChartPoint {

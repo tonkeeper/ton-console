@@ -7,17 +7,17 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GraphSuccess } from './GraphSuccess';
 import { GraphError } from './GraphError';
 import { GraphHome } from './GraphHome';
-import { observer } from 'mobx-react-lite';
-import { projectsStore } from 'src/shared/stores';
+import { useProject } from 'src/shared/contexts/ProjectContext';
 
 const GraphPage: FC<BoxProps> = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const queryId = searchParams.get('id');
+    const project = useProject();
     const [queryResolved, setQueryResolved] = useState(false);
 
     const analyticsGraphQueryStore = useLocalObservable(
-        () => new AnalyticsGraphQueryStore()
+        () => new AnalyticsGraphQueryStore(project)
     );
 
     useEffect(() => {
@@ -37,7 +37,7 @@ const GraphPage: FC<BoxProps> = () => {
         }
     }, [queryId]);
 
-    const projectId = projectsStore.selectedProject?.id;
+    const projectId = project?.id;
     const prevProjectId = usePrevious(projectId);
 
     useEffect(() => {
@@ -81,4 +81,4 @@ const GraphPage: FC<BoxProps> = () => {
     return <GraphHome analyticsGraphQueryStore={analyticsGraphQueryStore} />;
 };
 
-export default observer(GraphPage);
+export default GraphPage;

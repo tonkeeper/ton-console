@@ -3,7 +3,7 @@ import {
     getProjectBillingHistory,
     DTOBalance
 } from 'src/shared/api';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 import { tonapiMainnet, toDecimals } from 'src/shared';
 import { Balance } from './interfaces';
 

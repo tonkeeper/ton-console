@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { DTOBillingTransaction, DTOBillingTxInfo, DTOCryptoCurrency, getProjectBillingHistory } from 'src/shared/api';
-import { projectsStore } from 'src/shared/stores';
 import { CRYPTO_CURRENCY, TokenCurrencyAmount, TonCurrencyAmount } from '..';
+import { useProjectId } from '../contexts/ProjectContext';
 
 const BILLING_HISTORY_QUERY_KEY = 'billing-history';
 const PAGE_SIZE = 20;
@@ -26,7 +26,7 @@ interface UseBillingHistoryQueryOptions {
  */
 export function useBillingHistoryQuery(options: UseBillingHistoryQueryOptions = {}) {
     const { before_tx, limit = PAGE_SIZE } = options;
-    const projectId = projectsStore.selectedProject?.id;
+    const projectId = useProjectId();
 
     return useQuery({
         queryKey: [BILLING_HISTORY_QUERY_KEY, projectId, before_tx, limit] as const,

@@ -1,5 +1,4 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { observer } from 'mobx-react-lite';
 import { H4, isTestnet, Overlay } from 'src/shared';
 import {
     Badge,
@@ -18,9 +17,9 @@ import { UploadComponent } from './UploadComponent';
 import { DeployComponent } from './DeployComponent';
 import { StatisticComponent } from './StatisticComponent';
 import { useParams } from 'react-router-dom';
-import { projectsStore } from 'src/shared/stores';
 import { AirdropStore } from 'src/features/airdrop/model/airdrop.store';
 import { AirdropsStore } from 'src/features/airdrop/model/airdrops.store';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 
 interface AirdropPageProps extends BoxProps {
     airdropsStore: AirdropsStore;
@@ -30,11 +29,12 @@ const AirdropPage: FC<AirdropPageProps> = ({ airdropsStore, ...props }) => {
     const { id } = useParams<{ id: string }>();
     const [loading, setLoading] = useState(false);
     const [showSwitch, setShowSwitch] = useState(true);
+    const projectId = useProjectId();
 
     const airdropStore = useMemo(
         () =>
             new AirdropStore({
-                projectId: projectsStore.selectedProject!.id,
+                projectId: projectId,
                 airdrops: airdropsStore.airdrops$.value
             }),
         [id]
@@ -193,4 +193,4 @@ const AirdropPage: FC<AirdropPageProps> = ({ airdropsStore, ...props }) => {
     );
 };
 
-export default observer(AirdropPage);
+export default AirdropPage;

@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { H2, Overlay, Span, toDecimals, InfoTooltip } from 'src/shared';
 import { Box, Button, Flex, Skeleton, useDisclosure, Text, Divider } from '@chakra-ui/react';
 import { RefillModal } from 'src/entities';
-import { observer } from 'mobx-react-lite';
 import { useBalanceQuery, useTonRateQuery } from 'src/features/balance';
 
 const BalanceBlock: FC = () => {
@@ -152,5 +151,4 @@ const BalanceBlock: FC = () => {
     );
 };
 
-// observer() to react to projectsStore.selectedProject changes
-export default observer(BalanceBlock);
+export default BalanceBlock;

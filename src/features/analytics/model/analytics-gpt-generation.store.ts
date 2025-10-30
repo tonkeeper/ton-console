@@ -5,8 +5,8 @@ import {
     statsChatGptRequest,
     type GetStatsChatGptPriceResponse
 } from 'src/shared/api';
-import { projectsStore } from 'src/shared/stores';
 import { GptGenerationPricing } from 'src/features';
+import { Project } from 'src/entities/project';
 
 export class AnalyticsGPTGenerationStore {
     generatedSQL$ = new Loadable<string | null>(null);
@@ -17,17 +17,17 @@ export class AnalyticsGPTGenerationStore {
 
     private disposers: Array<() => void> = [];
 
-    constructor() {
+    constructor(private readonly project: Project) {
         makeAutoObservable(this);
 
         const dispose = createImmediateReaction(
-            () => projectsStore.selectedProject,
+            () => project,
             project => {
                 this.gptPricing$.clear();
                 this.fetchPrice.cancelAllPendingCalls();
                 this.clear();
 
-                if (project?.capabilities.stats.query) {
+                if (project.capabilities.stats.query) {
                     this.fetchPrice();
                 }
             }
@@ -42,7 +42,7 @@ export class AnalyticsGPTGenerationStore {
 
     public fetchPrice = this.gptPricing$.createAsyncAction(async () => {
         const { data, error } = await getStatsChatGptPrice({
-            query: { project_id: projectsStore.selectedProject!.id }
+            query: { project_id: this.project.id }
         });
         if (error) throw error;
         return mapStatsChatGptPriceToGptGenerationPricing(data);
@@ -51,7 +51,7 @@ export class AnalyticsGPTGenerationStore {
     public generateSQL = this.generatedSQL$.createAsyncAction(
         async (message: string, context?: string) => {
             const { data, error } = await statsChatGptRequest({
-                query: { project_id: projectsStore.selectedProject!.id },
+                query: { project_id: this.project.id },
                 body: { message, context }
             });
 

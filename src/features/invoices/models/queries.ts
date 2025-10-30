@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getInvoicesApp, DTOInvoicesApp } from 'src/shared/api';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 import { InvoicesApp } from './interfaces';
 import { TonAddress } from 'src/shared';
 

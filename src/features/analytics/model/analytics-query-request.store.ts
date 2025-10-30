@@ -2,8 +2,8 @@ import { makeAutoObservable } from 'mobx';
 import { createReaction, Loadable, Network, TonCurrencyAmount } from 'src/shared';
 import { estimateStatsQuery, DTOChain, DTOStatsEstimateQuery } from 'src/shared/api';
 import { AnalyticsQueryTemplate } from './interfaces';
-import { projectsStore } from 'src/shared/stores';
 import { DTOChainNetworkMap } from 'src/shared/lib/blockchain/network';
+import { Project } from 'src/entities';
 
 export class AnalyticsQueryRequestStore {
     request$ = new Loadable<AnalyticsQueryTemplate | null>(null);
@@ -16,11 +16,11 @@ export class AnalyticsQueryRequestStore {
         return this._network;
     }
 
-    constructor() {
+    constructor(private readonly project: Project) {
         makeAutoObservable(this);
 
         const dispose = createReaction(
-            () => projectsStore.selectedProject?.id,
+            () => this.project,
             (_, prevId) => {
                 if (prevId) {
                     this.clear();
@@ -53,7 +53,7 @@ export class AnalyticsQueryRequestStore {
 
                 const { data, error } = await estimateStatsQuery({
                     body: {
-                        project_id: projectsStore.selectedProject!.id,
+                        project_id: this.project.id,
                         query: request,
                         name
                     },

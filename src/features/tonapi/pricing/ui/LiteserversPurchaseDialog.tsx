@@ -1,7 +1,7 @@
 import { FC, useCallback } from 'react';
 import { DTOLiteproxyTier, UsdCurrencyAmount } from 'src/shared';
 import { useSelectLiteproxyTierMutation } from 'src/features/tonapi/liteproxy/model/queries';
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 import { useQueryClient } from '@tanstack/react-query';
 import PurchaseDialog from './PurchaseDialog';
 

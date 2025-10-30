@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import TonapiRouting from 'src/pages/tonapi';
 import { lazy } from '@loadable/component';
 import { Layout } from './layouts';
-import { projectsStore, userStore } from 'src/shared/stores';
+import { userStore } from 'src/shared/stores';
 import { observer } from 'mobx-react-lite';
 import SettingsRouting from 'src/pages/settings';
 import InvoicesRouting from './invoices';
@@ -14,6 +14,7 @@ import NftRouting from 'src/pages/nft';
 import JettonRouting from 'src/pages/jetton';
 import { isDevelopmentMode } from 'src/shared';
 import { useLocation } from 'react-router-dom';
+import { useMaybeProject } from 'src/shared/contexts/ProjectContext';
 
 const LandingPage = lazy(() => import('./landing'));
 const LoginPage = lazy(() => import('./login'));
@@ -28,6 +29,7 @@ const Routing: FC = () => {
     const location = useLocation();
     const params = new URLSearchParams(location.search);
     const queryBackUrl = params.get('backUrl');
+    const project = useMaybeProject();
 
     useEffect(() => {
         /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
@@ -86,7 +88,7 @@ const Routing: FC = () => {
         );
     }
 
-    if (!projectsStore.selectedProject) {
+    if (!project) {
         const currentPath = location.pathname + location.search;
         const backUrl = encodeURIComponent(currentPath);
         const navigateTo = `/?backUrl=${backUrl}`;
@@ -108,7 +110,7 @@ const Routing: FC = () => {
         );
     }
 
-    if (projectsStore.selectedProject && queryBackUrl) {
+    if (project && queryBackUrl) {
         return <Navigate to={queryBackUrl} replace />;
     }
 
@@ -123,7 +125,14 @@ const Routing: FC = () => {
                         </Suspense>
                     }
                 />
-                <Route path="invoices/*" element={<InvoicesRouting />} />
+                <Route
+                    path="invoices/*"
+                    element={
+                        <Suspense>
+                            <InvoicesRouting />
+                        </Suspense>
+                    }
+                />
                 <Route path="tonapi">{TonapiRouting}</Route>
                 <Route
                     path="tonkeeper-messages"

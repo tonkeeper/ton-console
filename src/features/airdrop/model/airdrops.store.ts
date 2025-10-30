@@ -2,7 +2,7 @@ import { createImmediateReaction, Loadable } from 'src/shared';
 import { getJettonAirdrops, DTOJettonAirdrop } from 'src/shared/api';
 import { ADConfig, airdropApiClient } from 'src/shared/api/airdrop-api';
 import { makeAutoObservable } from 'mobx';
-import { projectsStore } from 'src/shared/stores';
+import { Project } from 'src/entities';
 
 export class AirdropsStore {
     airdrops$ = new Loadable<DTOJettonAirdrop[]>([]);
@@ -11,14 +11,14 @@ export class AirdropsStore {
 
     private projectId: number;
 
-    constructor() {
+    constructor(private readonly project: Project) {
         makeAutoObservable(this);
 
-        if (!projectsStore.selectedProject) throw new Error('Project is not selected');
-        this.projectId = projectsStore.selectedProject.id;
+        if (!project) throw new Error('Project is not selected');
+        this.projectId = project.id;
 
         createImmediateReaction(
-            () => projectsStore.selectedProject,
+            () => this.project,
             project => {
                 this.clearStore();
 
