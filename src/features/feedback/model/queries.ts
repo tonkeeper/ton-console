@@ -15,21 +15,7 @@ export function useSendFeedbackMutation() {
     const projectName = useProjectName();
 
     return useMutation({
-        mutationFn: async (form: FeedbackFromI & { source: string }): Promise<FeedbackResponse> => {
-            console.log({
-                name: form.name,
-                tg: form.tg,
-                company: form.company,
-                information: form.information,
-                x_source: form.source,
-                x_project_id: projectId?.toString() ?? '',
-                x_project_name: projectName ?? '',
-                x_tg_user_id: userStore.user$.value?.id.toString() ?? '',
-                x_tg_user_name: userStore.user$.value
-                    ? `${userStore.user$.value?.firstName} ${userStore.user$.value?.lastName}`
-                    : ''
-            });
-            
+        mutationFn: async (form: FeedbackFromI & { source: string }): Promise<FeedbackResponse> => {            
             const { data, error } = await feedback({
                 body: {
                     name: form.name,

@@ -4,16 +4,20 @@ import { observer } from 'mobx-react-lite';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
-import { invoicesTableStore } from '../../models';
+import { InvoicesTableStore } from '../../models';
 import InvoicesTableRaw from './InvoicesTableRaw';
 import { InvoicesTableStructure } from './InvoicesTableStructure';
 import { InvoicesTableContext } from 'src/features/invoices/ui/table/invoices-table-context';
 
-const InvoicesTable: FC<BoxProps> = props => {
+interface Props extends BoxProps {
+    invoicesTableStore: InvoicesTableStore;
+}
+
+const InvoicesTable: FC<Props> = ({ invoicesTableStore, ...props }) => {
     const rawHeight = '48px';
 
     return (
-        <InvoicesTableContext.Provider value={{ rawHeight }}>
+        <InvoicesTableContext.Provider value={{ rawHeight, invoicesTableStore }}>
             <Box {...props}>
                 <InfiniteLoader
                     isItemLoaded={invoicesTableStore.isItemLoaded}

@@ -9,13 +9,16 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { invoicesAppStore } from 'src/features';
+import { InvoicesAppStore } from 'src/features/invoices/models';
 import { observer } from 'mobx-react-lite';
 
-const InvoicesTokenRegenerateConfirmation: FC<{
+interface Props {
+    invoicesAppStore: InvoicesAppStore;
     isOpen: boolean;
     onClose: () => void;
-}> = ({ isOpen, onClose }) => {
+}
+
+const InvoicesTokenRegenerateConfirmation: FC<Props> = ({ invoicesAppStore, isOpen, onClose }) => {
     const onConfirm = (): Promise<void> => invoicesAppStore.regenerateAppToken().then(onClose);
 
     return (

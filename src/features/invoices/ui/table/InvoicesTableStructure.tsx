@@ -13,7 +13,6 @@ import {
 } from '@chakra-ui/react';
 import { FC, PropsWithChildren, useContext, useRef } from 'react';
 import InvoicesTableColumnLabel from './InvoicesTableSortButton';
-import { invoicesTableStore } from 'src/features';
 import { InvoicesTableContext } from 'src/features/invoices/ui/table/invoices-table-context';
 import { observer } from 'mobx-react-lite';
 
@@ -39,7 +38,7 @@ const EmptyTable: FC<PropsWithChildren> = ({ children }) => {
 export const InvoicesTableStructure = observer(
     forwardRef<PropsWithChildren<BoxProps>, typeof Box>(({ children, ...rest }, ref) => {
         let body = children;
-        const { rawHeight } = useContext(InvoicesTableContext);
+        const { rawHeight, invoicesTableStore } = useContext(InvoicesTableContext);
 
         if (!invoicesTableStore.invoices$.isResolved) {
             body = (
@@ -109,7 +108,7 @@ export const InvoicesTableStructure = observer(
                             bg="background.contentTint"
                             boxSizing="content-box"
                         >
-                            <InvoicesTableColumnLabel column="status">
+                            <InvoicesTableColumnLabel invoicesTableStore={invoicesTableStore} column="status">
                                 Status
                             </InvoicesTableColumnLabel>
                         </Th>
@@ -120,7 +119,7 @@ export const InvoicesTableStructure = observer(
                             bg="background.contentTint"
                             boxSizing="content-box"
                         >
-                            <InvoicesTableColumnLabel column="amount">
+                            <InvoicesTableColumnLabel invoicesTableStore={invoicesTableStore} column="amount">
                                 Amount
                             </InvoicesTableColumnLabel>
                         </Th>
@@ -131,7 +130,7 @@ export const InvoicesTableStructure = observer(
                             bg="background.contentTint"
                             boxSizing="content-box"
                         >
-                            <InvoicesTableColumnLabel column="creation-date">
+                            <InvoicesTableColumnLabel invoicesTableStore={invoicesTableStore} column="creation-date">
                                 Creation Date
                             </InvoicesTableColumnLabel>
                         </Th>
@@ -148,7 +147,7 @@ export const InvoicesTableStructure = observer(
                             borderTopRightRadius="sm"
                             boxSizing="content-box"
                         >
-                            <InvoicesTableColumnLabel column="description">
+                            <InvoicesTableColumnLabel invoicesTableStore={invoicesTableStore} column="description">
                                 Description
                             </InvoicesTableColumnLabel>
                         </Th>

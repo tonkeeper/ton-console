@@ -10,15 +10,18 @@ import {
     ModalOverlay,
     Text
 } from '@chakra-ui/react';
-import { Invoice, invoicesTableStore } from 'src/features';
+import { Invoice, InvoicesTableStore } from '../models';
 import { observer } from 'mobx-react-lite';
 import { H4, Span } from 'src/shared';
 
-const CancelInvoiceConfirmation: FC<{
+interface Props {
+    invoicesTableStore: InvoicesTableStore;
     invoice: Invoice;
     isOpen: boolean;
     onClose: () => void;
-}> = ({ invoice, isOpen, onClose }) => {
+}
+
+const CancelInvoiceConfirmation: FC<Props> = ({ invoicesTableStore, invoice, isOpen, onClose }) => {
     const onConfirm = async (): Promise<void> => {
         await invoicesTableStore.cancelInvoice(invoice.id);
         onClose();

@@ -18,7 +18,7 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { Invoice, invoicesTableStore } from '../../models';
+import { Invoice } from '../../models';
 import {
     CopyIcon16,
     sliceAddress,
@@ -71,7 +71,7 @@ const ItemRaw: FC<{ invoice: Invoice; style: React.CSSProperties }> = observer(
         );
         const [isStatusUpdating, setIsStatusUpdating] = useState(false);
 
-        const { rawHeight } = useContext(InvoicesTableContext);
+        const { rawHeight, invoicesTableStore } = useContext(InvoicesTableContext);
 
         const timeoutSeconds =
             invoice.status === 'pending'
@@ -108,6 +108,7 @@ const ItemRaw: FC<{ invoice: Invoice; style: React.CSSProperties }> = observer(
             <>
                 <ViewInvoiceModal isOpen={isOpenView} onClose={onCloseView} invoice={invoice} />
                 <CancelInvoiceConfirmation
+                    invoicesTableStore={invoicesTableStore}
                     isOpen={isOpenCancel}
                     onClose={onCloseCancel}
                     invoice={invoice}
@@ -266,6 +267,8 @@ const ItemRaw: FC<{ invoice: Invoice; style: React.CSSProperties }> = observer(
 );
 
 const InvoicesTableRaw: FC<{ index: number; style: React.CSSProperties }> = ({ index, style }) => {
+    const { invoicesTableStore } = useContext(InvoicesTableContext);
+
     if (invoicesTableStore.isItemLoaded(index)) {
         const invoice = toJS(invoicesTableStore.invoices$.value[index]);
         return <ItemRaw key={invoice.id} style={style} invoice={invoice} />;

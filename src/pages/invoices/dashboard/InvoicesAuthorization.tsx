@@ -2,9 +2,13 @@ import { FC } from 'react';
 import { Box, BoxProps, Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { CopyPad } from 'src/shared';
-import { invoicesAppStore, InvoicesTokenRegenerateConfirmation } from 'src/features';
+import { InvoicesAppStore, InvoicesTokenRegenerateConfirmation } from 'src/features';
 
-const InvoicesStats: FC<BoxProps> = props => {
+interface InvoicesAuthorizationProps extends BoxProps {
+    invoicesAppStore: InvoicesAppStore;
+}
+
+const InvoicesStats: FC<InvoicesAuthorizationProps> = ({ invoicesAppStore, ...props }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (
@@ -31,7 +35,7 @@ const InvoicesStats: FC<BoxProps> = props => {
                 >
                     Generate
                 </Button>
-                <InvoicesTokenRegenerateConfirmation isOpen={isOpen} onClose={onClose} />
+                <InvoicesTokenRegenerateConfirmation invoicesAppStore={invoicesAppStore} isOpen={isOpen} onClose={onClose} />
             </Flex>
             <Text textStyle="body2" mb="4" color="text.secondary">
                 Token-based authentication is a protocol which allows for identity verification and

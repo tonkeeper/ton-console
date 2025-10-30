@@ -13,10 +13,14 @@ import {
     UnorderedList
 } from '@chakra-ui/react';
 import { CopyPad, CardLink } from 'src/shared';
-import { invoicesAppStore, INVOICES_LINKS } from 'src/features';
+import { InvoicesAppStore, INVOICES_LINKS } from 'src/features';
 import { observer } from 'mobx-react-lite';
 
-const InvoicesApi: FC<BoxProps> = props => {
+interface InvoicesApiProps extends BoxProps {
+    invoicesAppStore: InvoicesAppStore;
+}
+
+const InvoicesApi: FC<InvoicesApiProps> = ({ invoicesAppStore, ...props }) => {
     return (
         <Box {...props}>
             <Tabs mb="4" isLazy={true}>

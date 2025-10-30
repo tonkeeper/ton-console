@@ -1,12 +1,15 @@
 import { FC, PropsWithChildren } from 'react';
 import { Box, Button, ButtonProps } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { invoicesTableStore, InvoiceTableColumn } from '../../models';
+import { InvoicesTableStore, InvoiceTableColumn } from '../../models';
 import { SortAscIcon16, SortDescIcon16 } from 'src/shared';
 
-const InvoicesTableColumnLabel: FC<
-    PropsWithChildren<ButtonProps & { column: InvoiceTableColumn }>
-> = ({ children, column, ...rest }) => {
+interface Props extends PropsWithChildren<ButtonProps> {
+    invoicesTableStore: InvoicesTableStore;
+    column: InvoiceTableColumn;
+}
+
+const InvoicesTableColumnLabel: FC<Props> = ({ invoicesTableStore, children, column, ...rest }) => {
     const disabled =
         !invoicesTableStore.invoices$.value.length && !invoicesTableStore.invoices$.isLoading;
 

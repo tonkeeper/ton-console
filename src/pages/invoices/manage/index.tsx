@@ -10,12 +10,21 @@ import {
     InvoicesProjectInfo,
     InvoicesSearchInput,
     InvoicesTable,
-    invoicesTableStore,
+    InvoicesAppStore,
+    InvoicesTableStore,
     RefreshInvoicesTableButton
 } from 'src/features';
 import { Box, Button, Flex, useDisclosure } from '@chakra-ui/react';
 
-const ManageInvoicesPage: FC = () => {
+interface ManageInvoicesPageProps {
+    invoicesAppStore: InvoicesAppStore;
+    invoicesTableStore: InvoicesTableStore;
+}
+
+const ManageInvoicesPage: FC<ManageInvoicesPageProps> = ({
+    invoicesAppStore,
+    invoicesTableStore
+}) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     return (
         <Overlay display="flex" flexDirection="column">
@@ -23,20 +32,20 @@ const ManageInvoicesPage: FC = () => {
                 <Box>
                     <Flex align="center" gap="2" mb="1">
                         <H4>Manage</H4>
-                        <RefreshInvoicesTableButton />
+                        <RefreshInvoicesTableButton invoicesTableStore={invoicesTableStore} />
                     </Flex>
-                    <InvoicesProjectInfo />
+                    <InvoicesProjectInfo invoicesAppStore={invoicesAppStore} />
                 </Box>
                 <Button h="44px" ml="auto" onClick={onOpen} variant="primary">
                     New Invoice
                 </Button>
             </Flex>
             <Flex align="center" gap="4" mb="6">
-                <InvoicesSearchInput w="264px" />
-                <FilterInvoiceByStatus />
-                <FilterInvoiceByPeriod />
-                <FilterInvoiceByCurrency />
-                <FilterInvoiceByOverpayment />
+                <InvoicesSearchInput w="264px" invoicesTableStore={invoicesTableStore} />
+                <FilterInvoiceByStatus invoicesTableStore={invoicesTableStore} />
+                <FilterInvoiceByPeriod invoicesTableStore={invoicesTableStore} />
+                <FilterInvoiceByCurrency invoicesTableStore={invoicesTableStore} />
+                <FilterInvoiceByOverpayment invoicesTableStore={invoicesTableStore} />
                 <ButtonLink
                     ml="auto"
                     leftIcon={<DownloadIcon16 />}
@@ -49,8 +58,12 @@ const ManageInvoicesPage: FC = () => {
                     Download CSV
                 </ButtonLink>
             </Flex>
-            <InvoicesTable flex="1 1 auto" />
-            <CreateInvoiceModal isOpen={isOpen} onClose={onClose} />
+            <InvoicesTable flex="1 1 auto" invoicesTableStore={invoicesTableStore} />
+            <CreateInvoiceModal
+                isOpen={isOpen}
+                onClose={onClose}
+                invoicesTableStore={invoicesTableStore}
+            />
         </Overlay>
     );
 };

@@ -18,11 +18,11 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 import { CopyIcon24, DeleteIcon24, Span, VerticalDotsIcon16 } from 'src/shared';
-import { AddWebhookModal, invoicesAppStore, InvoicesWebhook, INVOICES_LINKS } from 'src/features';
+import { AddWebhookModal, InvoicesAppStore, InvoicesWebhook, INVOICES_LINKS } from 'src/features';
 import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
 
-const WebhookItem: FC<{ webhook: InvoicesWebhook }> = observer(({ webhook }) => {
+const WebhookItem: FC<{ webhook: InvoicesWebhook; invoicesAppStore: InvoicesAppStore }> = observer(({ webhook, invoicesAppStore }) => {
     const { hasCopied, onCopy } = useClipboard(webhook.value);
 
     return (
@@ -66,12 +66,16 @@ const WebhookItem: FC<{ webhook: InvoicesWebhook }> = observer(({ webhook }) => 
     );
 });
 
-const InvoicesWebhooks: FC<BoxProps> = props => {
+interface InvoicesWebhooksProps extends BoxProps {
+    invoicesAppStore: InvoicesAppStore;
+}
+
+const InvoicesWebhooks: FC<InvoicesWebhooksProps> = ({ invoicesAppStore, ...props }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (
         <Box {...props}>
-            <AddWebhookModal isOpen={isOpen} onClose={onClose} />
+            <AddWebhookModal invoicesAppStore={invoicesAppStore} isOpen={isOpen} onClose={onClose} />
             <Flex>
                 <Box>
                     <Text textStyle="label1" mb="1">
@@ -98,7 +102,7 @@ const InvoicesWebhooks: FC<BoxProps> = props => {
             {!!invoicesAppStore.invoicesApp$.value!.webhooks.length && (
                 <OrderedList color="text.secondary" spacing="3">
                     {invoicesAppStore.invoicesApp$.value!.webhooks.map(webhook => (
-                        <WebhookItem key={webhook.id} webhook={toJS(webhook)} />
+                        <WebhookItem key={webhook.id} webhook={toJS(webhook)} invoicesAppStore={invoicesAppStore} />
                     ))}
                 </OrderedList>
             )}

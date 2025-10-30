@@ -39,7 +39,7 @@ export function useWebhooksQuery(network: Network) {
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error) => {
       // Don't retry on 501 - feature is not available
-      if ((error as any)?.status === 501) {
+      if (error && typeof error === 'object' && 'status' in error && (error as { status: number }).status === 501) {
         return false;
       }
       // Retry other errors up to 3 times

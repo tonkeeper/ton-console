@@ -11,14 +11,17 @@ import {
 } from '@chakra-ui/react';
 import { EditInvoicesProjectForm } from './EditInvoicesProjectForm';
 import { H4 } from 'src/shared';
-import { invoicesAppStore, InvoicesProjectForm } from '../models';
+import { InvoicesAppStore, InvoicesProjectForm } from '../models';
 import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
 
-const EditInvoicesProjectModal: FC<{
+interface Props {
+    invoicesAppStore: InvoicesAppStore;
     isOpen: boolean;
     onClose: () => void;
-}> = ({ isOpen, onClose }) => {
+}
+
+const EditInvoicesProjectModal: FC<Props> = ({ invoicesAppStore, isOpen, onClose }) => {
     const id = useId();
 
     const app = invoicesAppStore.invoicesApp$.value;

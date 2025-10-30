@@ -43,7 +43,7 @@ const WebhooksPage: FC = () => {
     }
 
     // Check if webhooks feature is unavailable (501 error)
-    if (error && (error as any)?.status === 501) {
+    if (error && typeof error === 'object' && 'status' in error && (error as { status: number }).status === 501) {
         return (
             <Overlay h="fit-content">
                 <UnavailableWebhooks />

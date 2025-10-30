@@ -250,7 +250,7 @@ const JettonCard: FC<JettonCardProps> = ({
             amount: count,
             connectedWalletAddress,
             tonConnection: tonconnect,
-            jettonWallet: jettonInfo as any // JettonInfo passed as jettonWallet for compatibility
+            jettonWallet: jettonInfo // JettonInfo passed as jettonWallet for compatibility
         });
     };
 
