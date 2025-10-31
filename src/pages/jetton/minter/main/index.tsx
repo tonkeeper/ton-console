@@ -1,6 +1,5 @@
 import { Flex, BoxProps, Button, Badge } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-import { observer } from 'mobx-react-lite';
 import { FC } from 'react';
 
 import { H4, Overlay } from 'src/shared';
@@ -30,4 +29,4 @@ const MainPage: FC<BoxProps> = () => {
     );
 };
 
-export default observer(MainPage);
+export default MainPage;

@@ -1,5 +1,4 @@
 import { FC, useState } from 'react';
-import { observer } from 'mobx-react-lite';
 import { useNavigate } from 'react-router-dom';
 import {
     Text,
@@ -171,7 +170,9 @@ export const WebhooksPricingCalculator = () => {
     );
 };
 
-export const WebhooksPricingSection: FC<{ hideActivation?: boolean }> = observer(({ hideActivation = false }) => {
+export const WebhooksPricingSection: FC<{ hideActivation?: boolean }> = ({
+    hideActivation = false
+}) => {
     const navigate = useNavigate();
 
     const handleActivateWebhooks = () => {
@@ -210,4 +211,4 @@ export const WebhooksPricingSection: FC<{ hideActivation?: boolean }> = observer
             </Flex>
         </Box>
     );
-});
+};

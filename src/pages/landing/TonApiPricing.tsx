@@ -1,6 +1,5 @@
 import { forwardRef } from 'react';
-import { Box, BoxProps, Divider } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
+import { Box, BoxProps, Divider } from '@chakra-ui/react';  
 import { H3 } from 'src/shared';
 import { RestApiTiersSection, LiteserversTiersSection, WebhooksPricingSection } from 'src/features/tonapi/pricing';
 
@@ -24,4 +23,4 @@ const TonApiPricing = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
 
 TonApiPricing.displayName = 'TonApiPricing';
 
-export default observer(TonApiPricing);
+export default TonApiPricing;
