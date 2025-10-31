@@ -25,11 +25,13 @@ import { Project } from 'src/entities/project';
 import { useMaybeProject, useSetProject } from 'src/shared/contexts/ProjectContext';
 import { useProjectsQuery } from 'src/shared/queries/projects';
 import { CreateProjectModal } from './CreateProjectModal';
+import { useUserQuery } from 'src/entities/user/queries';
 
 const SelectProject: FC<BoxProps> = props => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const selectedProject = useMaybeProject();
-    const { data: projects = [] } = useProjectsQuery();
+    const { data: user } = useUserQuery();
+    const { data: projects = [] } = useProjectsQuery({ enabled: !!user });
 
     if (!selectedProject) {
         return null;
