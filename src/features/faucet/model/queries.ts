@@ -46,6 +46,7 @@ export function useFaucetSupplyAndRate() {
             return mapTestnetAvailableData(data);
         },
         enabled: !!projectId,
+        refetchInterval: 30 * 1000, // 30 seconds
         staleTime: 30 * 1000 // 30 seconds
     });
 }
