@@ -2,7 +2,7 @@
 
 title: TON Console — AI Project Guide
 version: 1.0.0
-last_verified: 2025-10-27
+last_verified: 2025-10-31
 owners:
 
 * <fill in: owner GitHub handle/email>
@@ -18,7 +18,7 @@ This file is a source of truth for AI assistants and developers:
 * sets unambiguous do's and don'ts;
 * contains **safe blocks for AI auto‑updates** without clutter.
 
-> Rule #1: **For new CRUD/server data we use React Query.** MobX is allowed only in inherited/complex areas and is gradually phased out.
+> Rule #1: **For new CRUD/server data we use React Query.**
 
 ---
 
@@ -42,7 +42,6 @@ This file is a source of truth for AI assistants and developers:
 | Core         | React **19.2.0**, TypeScript **5.9.3** (strict) | **Only** functional components    |
 | Build        | Vite **5.4.6**                                  | Code-splitting by routes/features |
 | Server state | **@tanstack/react-query 5.90.5**                | Mandatory for CRUD/fetching       |
-| Local/legacy | MobX **6.15.0**                                 | ❗️legacy only; migrating away     |
 | UI           | Chakra UI **2.10.9**                            | Single theme/tokens               |
 | Charts       | Recharts **2.5.0**                              | Time series, see §7               |
 | Routing      | React Router DOM **6.9.0**                      | Pages are thin, composition only  |
@@ -68,17 +67,18 @@ src/
 │     │  │  ├─ queries.ts        # React Query hooks (new standard)
 │     │  │  └─ interfaces/       # domain types
 │     │  └─ ui/                  # "dumb" UI components
-│     ├─ webhooks/               # to migrate to React Query
-│     ├─ statistics/             # MobX (legacy)
-│     └─ liteproxy/              # MobX (legacy)
+│     ├─ webhooks/               # React Query
+│     ├─ statistics/             # React Query
+│     └─ liteproxy/              # React Query
 ├─ entities/             # domain models/entities (if shared)
 ├─ shared/
 │  ├─ api/
 │  │  └─ console/        # ⚙️ auto-generated from swagger.yaml
-│  ├─ stores/            # global stores: projectsStore, userStore, appStore
 │  ├─ lib/               # utilities (Loadable — legacy)
 │  ├─ ui/                # reusable UI components
-│  └─ hooks/             # shared hooks (legacy helpers)
+│  ├─ hooks/             # shared hooks (legacy helpers)
+│  ├─ contexts/          # ProjectContext.tsx — selected project context
+│  └─ queries/           # projects.ts — React Query for projects
 └─ processes/            # side-effects initialization
 ```
 
@@ -123,7 +123,6 @@ src/
 
 **Do not**
 
-* ❌ Write new MobX code for server data.
 * ❌ Create global stores for feature-local concerns.
 * ❌ Mix several unrelated API calls in a single `queryFn`.
 
@@ -137,7 +136,7 @@ src/
 
 ```ts
 // NEW: Use useProjectId() hook (preferred in new features)
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 
 const projectId = useProjectId();
 
@@ -155,14 +154,10 @@ return useQuery({
 });
 ```
 
-**Important: projectId in new features (MIGRATION IN PROGRESS)**
+**Important: projectId in new features**
 
-* ✅ **NEW CODE**: Use `const projectId = useProjectId()` from `ProjectIdContext`
-* ❌ **LEGACY**: Do NOT use `projectsStore.selectedProject?.id` in new query hooks
-* **Migration Status**: Currently transitioning from MobX `projectsStore` to React Context API
-  * `ProjectIdContext` acts as temporary bridge that syncs values from `projectsStore`
-  * `with-project-id.tsx` translates store changes to context using MobX `reaction()`
-  * When Phase 3 complete: Context will become sole source of truth, bridge will be removed
+* ✅ **NEW CODE**: Use `const projectId = useProjectId()` from `ProjectContext`
+* **Current Status**: `ProjectContext` is the single source of truth (localStorage persistence built-in).
 * Include `projectId` in all query keys to prevent cross-project cache collisions
 
 **Mutations & cache**
@@ -187,16 +182,6 @@ return useQuery({
 * Prevents race conditions when projectId changes during async operations
 * Simple add: `queryClient.setQueryData(['api-keys', projectId], updater)`.
 * Complex cases: `queryClient.invalidateQueries({ queryKey: ['api-keys', projectId] })`.
-
-**observer()**
-
-* Wrap a component with `observer()` **only** if it reads a MobX store (e.g., legacy features).
-* Do NOT use in new React Query features.
-
-## 5.2 MobX (legacy)
-
-* Allowed only in existing complex features (`statistics`, `liteproxy`).
-* No new MobX code; see migration plan — §10.
 
 ---
 
@@ -293,90 +278,20 @@ npm run generate-airdrop2
 
 ---
 
-# 10) Migration plan (MobX → React Query)
+# 10) Migration history (MobX → React Query)
 
-**Current Phase: Phase 1 — Simple stores migration**
+**Historical context:** The project previously used MobX stores for server state management. In 2025, we completed a full migration to React Query (`@tanstack/react-query`) for all CRUD and data fetching operations.
 
-**Status (2025-10-29) — Detailed Migration Plan Created**
+**Current state:**
+- ✅ All major features use React Query (API Keys, Webhooks, Statistics, Liteproxy, Pricing, Balance, Rates, NFT, Faucet, App Messages, Jetton, Projects)
+- ⚠️ A few isolated modules (Invoices, Analytics, Airdrop) retain localized MobX stores within their components for internal state management only
+- ✅ No global stores — `ProjectContext` manages project selection with React Query
 
-**Phase 1 — Simple Leaf Stores (next, 2-3 days)**
-* ✅ API Keys — migrated (reference)
-* ✅ Balance — global hook with `refetchInterval: 3000`, `refetchIntervalInBackground: true`
-* ✅ Rates — migrated to useQuery
-* ✅ Webhooks — migrated to useQuery + error handling for 501
-  * Created `ProjectIdContext` as temporary bridge to `projectsStore`
-  * Added `with-project-id.tsx` to sync MobX store → React Context
-  * Implemented projectId capture in mutations to prevent race conditions
-  * Added informational 501 error message with API docs link
-* ⏳ TonApiStatsStore — next after webhooks
-* ⏳ LiteproxysStore, RestApiTiersStore, CNFTStore, FaucetStore
-
-**Phase 1.5 — Replace projectsStore References (0.5-1 day)**
-* ⏳ Remove all `projectsStore.selectedProject?.id` from codebase
-* ⏳ Replace with `useProjectId()` hook from ProjectIdContext
-
-**Phase 2 — Remaining Stores + Localization (2-3 days)**
-* ⏳ JettonStore (wallet-based, no projectId dependency)
-* ⏳ DappStore (enable AppMessagesStore refactoring)
-* ⏳ Localize InvoicesTableStore & AnalyticsHistoryTableStore to component-level hooks
-
-**Phase 2.5 — Complex Store Refactoring (2-3 days)**
-* ⏳ AppMessagesStore → split into 4 hooks
-* ⏳ InvoicesAppStore → split into 2 hooks
-* ⏳ AnalyticsQueryStore → split into 3+ hooks
-
-**Phase 3 — ProjectsStore Removal (1-2 days, CRITICAL)**
-* ⏳ Delete `src/entities/project/model/projects.store.ts`
-* ⏳ Move logic to `shared/queries/projects.ts`
-* ⏳ Requires all 15 dependent stores migrated first
-
-**Phase 4 — Final Stores (1-2 days)**
-* ⏳ UserStore (decision: migrate or keep as exception)
-* ⏳ AppStore (→ `useAppInitialized()` hook)
-* ⏳ Analytics supporting stores (GPT, Graph, Request)
-* ⏳ AirdropsStore
-
-**See:** `MIGRATION_PLAN.md` for detailed phases, checklists, and risk analysis
-
-**Steps**
-
-1. Create `model/queries.ts` with domain types in the feature.
-2. Move fetching from Store to `useQuery`/`useMutation`.
-3. Add DTO → domain mappers.
-4. Update UI to use hooks instead of store.
-5. Keep `observer()` only where `projectsStore` is read.
-6. Remove the legacy store and `useLocalObservableWithDestroy`.
-7. Verify refetch on `projectId` change.
+**For new features:** Always use React Query. See patterns in §5.1 and examples in §19.
 
 ---
 
-# 11) Global stores (rare exceptions)
-
-Allowed:
-
-* `projectsStore` — current project selection (often needed for `project_id`)
-* `userStore` — auth/profile
-* `appStore` — global UI state
-
-**Prohibited:** adding feature stores into `root.store.ts`. That indicates an incorrect responsibility boundary.
-
----
-
-# 12) Self‑update protocol (for AI)
-
-**Goal:** keep this file up-to-date and compact, without clutter.
-
-**Golden rules**
-
-1. Do not duplicate rules; if there is a conflict, link to the existing point and refine the wording in a single place.
-
-**Before writing changes AI must:**
-
-* make sure the changes reflect the actual state of the code/repo;
-
----
-
-# 13) Security and secrets
+# 11) Security and secrets
 
 * Do not log secrets/API keys/tokens.
 * Environment configuration via **ENV**, no hardcoding.
@@ -384,7 +299,7 @@ Allowed:
 
 ---
 
-# 14) Performance
+# 12) Performance
 
 * Real-time: use `refetchInterval` only where needed (see Balance).
 * Use `staleTime` consciously; by default treat data as "stale" for freshness.
@@ -393,7 +308,7 @@ Allowed:
 
 ---
 
-# 15) UX, accessibility
+# 13) UX, accessibility
 
 * States (loading/error/empty) are mandatory.
 * Keyboard accessibility for modals and focus — Chakra is fine by default, do not break it.
@@ -401,7 +316,7 @@ Allowed:
 
 ---
 
-# 16) Time series and periods (TON metrics)
+# 14) Time series and periods (TON metrics)
 
 * Time units in API: unix (seconds).
 * Common case: last 7 days with 30-minute intervals.
@@ -410,7 +325,7 @@ Allowed:
 
 ---
 
-# 17) Git and workflow
+# 15) Git and workflow
 
 * Branch from `master`. Commits are atomic.
 * Commit messages are meaningful.
@@ -426,13 +341,27 @@ Allowed:
 
 ---
 
-# 19) Examples (reference snippets)
+# 16) Self‑update protocol (for AI)
 
-## 19.1 CRUD component (pattern)
+**Goal:** keep this file up-to-date and compact, without clutter.
+
+**Golden rules**
+
+1. Do not duplicate rules; if there is a conflict, link to the existing point and refine the wording in a single place.
+
+**Before writing changes AI must:**
+
+* make sure the changes reflect the actual state of the code/repo;
+
+---
+
+# 17) Examples (reference snippets)
+
+## 17.1 CRUD component (pattern)
 
 ```tsx
 // features/tonapi/api-keys/ui/ApiKeys.tsx
-export const ApiKeys: FC = observer(() => {
+export const ApiKeys: FC = () => {
   const { data: apiKeys, isLoading, error } = useApiKeysQuery();
   const { mutate: deleteKey, isPending } = useDeleteApiKeyMutation();
 
@@ -448,17 +377,17 @@ export const ApiKeys: FC = observer(() => {
       )}
     </Overlay>
   );
-});
+};
 ```
 
-## 19.2 Query hook (pattern)
+## 17.2 Query hook (pattern)
 
 ```ts
 // features/tonapi/api-keys/model/queries.ts
-import { useProjectId } from 'src/shared/contexts/ProjectIdContext';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 
 export function useApiKeysQuery() {
-  const projectId = useProjectId();  // NEW: Use context hook instead of store
+  const projectId = useProjectId();
   return useQuery({
     queryKey: ['api-keys', projectId || undefined],
     queryFn: async () => {
@@ -475,7 +404,7 @@ export function useApiKeysQuery() {
 }
 ```
 
-## 19.3 Mutation with projectId capture (pattern - IMPORTANT)
+## 17.3 Mutation with projectId capture (pattern - IMPORTANT)
 
 ```ts
 // features/tonapi/api-keys/model/queries.ts
@@ -507,7 +436,7 @@ export function useDeleteApiKeyMutation() {
 
 ---
 
-# 20) Resources
+# 18) Resources
 
 * Repository: `ton-console`
 * Main branch: `master`
@@ -515,7 +444,7 @@ export function useDeleteApiKeyMutation() {
 
 ---
 
-# 21) Command reference (for convenience)
+# 19) Command reference (for convenience)
 
 ```bash
 # Dev

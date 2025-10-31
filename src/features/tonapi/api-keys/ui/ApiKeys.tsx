@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { observer } from 'mobx-react-lite';
 import { Center, Spinner, Button, useDisclosure } from '@chakra-ui/react';
 import { Overlay } from 'src/shared';
 import { useApiKeysQuery } from '../model';
@@ -7,7 +6,7 @@ import ApiKeysTable from './ApiKeysTable';
 import { EmptyApiKeys } from './EmptyApiKeys';
 import CreateApiKeyModal from './CreateApiKeyModal';
 
-const ApiKeys: FC = observer(() => {
+const ApiKeys: FC = () => {
     const { data: apiKeys, isLoading, error } = useApiKeysQuery();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -44,6 +43,6 @@ const ApiKeys: FC = observer(() => {
             <CreateApiKeyModal isOpen={isOpen} onClose={onClose} />
         </>
     );
-});
+};
 
 export default ApiKeys;

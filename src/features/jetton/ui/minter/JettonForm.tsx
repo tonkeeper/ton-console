@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import { chakra, StyleProps } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { SubmitHandler, useFormContext } from 'react-hook-form';
 import { JettonMetadata } from '@ton-api/client';
 import NameControl from './controls/NameControl';
@@ -17,7 +16,7 @@ type JettonFormProps = StyleProps & {
     onSubmit: SubmitHandler<RawJettonMetadata>;
 };
 
-const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => {
+const JettonForm: FC<JettonFormProps> = ({ id, onSubmit, ...rest }) => {
     const context = useFormContext<RawJettonMetadata>();
     const { handleSubmit } = context;
 
@@ -45,6 +44,6 @@ const JettonForm: FC<JettonFormProps> = observer(({ id, onSubmit, ...rest }) => 
             <LogoControl context={context} />
         </chakra.form>
     );
-});
+};
 
 export default JettonForm;

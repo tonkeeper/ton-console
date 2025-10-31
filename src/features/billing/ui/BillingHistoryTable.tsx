@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import { Box, BoxProps, Center, Spinner } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { FixedSizeList } from 'react-window';
 import { BillingTableStructure } from './BillingTableStructure';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
@@ -79,4 +78,4 @@ const BillingHistoryTable: FC<BillingHistoryTableProps> = ({
     );
 };
 
-export default observer(BillingHistoryTable);
+export default BillingHistoryTable;

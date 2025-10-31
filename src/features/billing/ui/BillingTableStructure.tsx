@@ -1,9 +1,8 @@
 import { Table, Tbody, Td, Th, Thead, Tr, Skeleton, forwardRef } from '@chakra-ui/react';
 import { useContext, useRef } from 'react';
-import { observer } from 'mobx-react-lite';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 
-export const BillingTableStructure = observer(
+export const BillingTableStructure =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     forwardRef<any, any>(({ children, ...rest }: any, ref: any) => {
         const { rowHeight, isLoading, hasEverLoaded, skeletonRowCount } = useContext(
@@ -109,5 +108,4 @@ export const BillingTableStructure = observer(
                 </Tbody>
             </Table>
         );
-    })
-);
+    });

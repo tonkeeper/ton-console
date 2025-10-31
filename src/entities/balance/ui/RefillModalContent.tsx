@@ -15,7 +15,6 @@ import {
     Flex
 } from '@chakra-ui/react';
 import { createTransferLink, fromDecimals, H4 } from 'src/shared';
-import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
 import { useBillingHistoryQuery } from 'src/shared/hooks';
 import { UsdtRefillTab } from './UsdtRefillTab';
@@ -331,4 +330,4 @@ const RefillModalContent: FC<{
     );
 };
 
-export default observer(RefillModalContent);
+export default RefillModalContent;

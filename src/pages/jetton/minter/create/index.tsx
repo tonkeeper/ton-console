@@ -6,7 +6,6 @@ import {
     useTonConnectUI,
     useTonConnectModal
 } from '@tonconnect/ui-react';
-import { observer } from 'mobx-react-lite';
 import { FC, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -140,4 +139,4 @@ const JettonNewPage: FC<BoxProps> = () => {
     );
 };
 
-export default observer(JettonNewPage);
+export default JettonNewPage;
