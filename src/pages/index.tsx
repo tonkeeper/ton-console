@@ -78,7 +78,7 @@ const Routing: FC = () => {
                     <Route
                         index
                         element={
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={null}>
                                 <LandingPage />
                             </Suspense>
                         }
@@ -86,7 +86,7 @@ const Routing: FC = () => {
                     <Route
                         path="*"
                         element={
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={null}>
                                 <LoginPage />
                             </Suspense>
                         }
@@ -107,7 +107,7 @@ const Routing: FC = () => {
                     <Route
                         index
                         element={
-                            <Suspense>
+                            <Suspense fallback={null}>
                                 <CreateFirstProjectPage />
                             </Suspense>
                         }
@@ -128,7 +128,7 @@ const Routing: FC = () => {
                 <Route
                     path="dashboard"
                     element={
-                        <Suspense>
+                        <Suspense fallback={null}>
                             <DashboardPage />
                         </Suspense>
                     }
@@ -136,7 +136,7 @@ const Routing: FC = () => {
                 <Route
                     path="invoices/*"
                     element={
-                        <Suspense>
+                        <Suspense fallback={null}>
                             <InvoicesRouting />
                         </Suspense>
                     }
@@ -145,7 +145,7 @@ const Routing: FC = () => {
                 <Route
                     path="tonkeeper-messages"
                     element={
-                        <Suspense>
+                        <Suspense fallback={null}>
                             <AppMessagesPage />
                         </Suspense>
                     }
@@ -153,7 +153,7 @@ const Routing: FC = () => {
                 <Route
                     path="balance"
                     element={
-                        <Suspense>
+                        <Suspense fallback={null}>
                             <BalancePage />
                         </Suspense>
                     }
@@ -161,7 +161,7 @@ const Routing: FC = () => {
                 <Route
                     path="faucet"
                     element={
-                        <Suspense>
+                        <Suspense fallback={null}>
                             <FaucetPage />
                         </Suspense>
                     }
@@ -169,7 +169,7 @@ const Routing: FC = () => {
                 <Route
                     path="profile"
                     element={
-                        <Suspense>
+                        <Suspense fallback={null}>
                             <UserProfilePage />
                         </Suspense>
                     }
@@ -179,7 +179,7 @@ const Routing: FC = () => {
                 <Route
                     path="jetton/*"
                     element={
-                        <Suspense>
+                        <Suspense fallback={null}>
                             <JettonRouting />
                         </Suspense>
                     }
