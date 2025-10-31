@@ -1,0 +1,1 @@
+import{q as c,ad as d,j as o,ae as n,af as f}from"./index-BCN26Ft_.js";const h=c(function(a,s){const{className:e,...r}=a,t=d();return o.jsx(n.div,{ref:s,className:f("chakra-card__header",e),__css:t.header,...r})});export{h as C};

@@ -1,0 +1,1 @@
+import{cJ as n}from"./index-BCN26Ft_.js";class o{constructor(t){this.baseUrl=t}accountLink(t){return t instanceof n&&(t=t.userFriendly),`${this.baseUrl}/${t}`}transactionLink(t){return`${this.baseUrl}/transaction/${t}`}}const r=new o("https://testnet.tonviewer.com"),e=r;export{e,r as t};

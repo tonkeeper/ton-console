@@ -1,0 +1,1 @@
+import{j as o,aA as l,aB as a}from"./index-BCN26Ft_.js";import{R as e}from"./RefillModalContent-DlFbo1-1.js";const n=s=>o.jsxs(l,{scrollBehavior:"inside",size:"md",...s,children:[o.jsx(a,{}),o.jsx(e,{onClose:s.onClose})]});export{n as R};
