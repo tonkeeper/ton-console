@@ -14,14 +14,13 @@ import {
     ModalOverlay
 } from '@chakra-ui/react';
 import {
-    CRYPTO_CURRENCY,
     sliceAddress,
     Span,
     TonCurrencyAmount,
     TooltipHoverable,
+    UsdCurrencyAmount,
     toUserFriendlyAddress
 } from 'src/shared';
-import { CurrencyRate } from 'src/entities';
 import { RequestFaucetForm } from '../model';
 
 const FaucetPaymentDetailsModal: FC<{
@@ -29,7 +28,7 @@ const FaucetPaymentDetailsModal: FC<{
     onClose: () => void;
     amount?: TonCurrencyAmount;
     receiverAddress?: string;
-    price?: TonCurrencyAmount;
+    price?: UsdCurrencyAmount;
     isLoading?: boolean;
     onConfirm?: (form: RequestFaucetForm) => void;
 }> = ({ isOpen, onClose, amount, receiverAddress, price, isLoading, onConfirm }) => {
@@ -78,16 +77,9 @@ const FaucetPaymentDetailsModal: FC<{
                             <Flex align="flex-start" justify="space-between">
                                 <Span color="text.secondary">Price</Span>
                                 {price && (
-                                    <Box>
-                                        <CurrencyRate
-                                            amount={price.amount}
-                                            currency={CRYPTO_CURRENCY.TON}
-                                            justifyContent="flex-end"
-                                            leftSign="$"
-                                        />
-                                        <Box color="text.secondary">
-                                            {price.stringCurrencyAmount}
-                                        </Box>
+                                    <Box textAlign="right">
+                                        <Span>{price.stringCurrencyAmount}</Span>
+                                        <Box color="text.secondary">USD</Box>
                                     </Box>
                                 )}
                             </Flex>

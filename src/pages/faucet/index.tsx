@@ -1,6 +1,15 @@
 import { FC, useId, useState } from 'react';
-import { H4, isNumber, Overlay, Span, TonCurrencyAmount, useIntervalUpdate } from 'src/shared';
-import { Button, Divider, Flex, Link, useDisclosure } from '@chakra-ui/react';
+import {
+    H4,
+    isNumber,
+    Overlay,
+    Span,
+    TonCurrencyAmount,
+    UsdCurrencyAmount,
+    formatNumber,
+    useIntervalUpdate
+} from 'src/shared';
+import { Box, Button, Divider, Flex, Link, useDisclosure } from '@chakra-ui/react';
 import {
     FaucetForm,
     RequestFaucetForm,
@@ -11,14 +20,22 @@ import { FormProvider, useForm } from 'react-hook-form';
 import BigNumber from 'bignumber.js';
 import { RefillModal } from 'src/entities';
 import { useBalanceQuery } from 'src/features/balance';
-import { useFaucetSupplyAndRate, useBuyTestnetCoinsMutation } from 'src/features/faucet/model/queries';
+import {
+    useFaucetSupplyAndRate,
+    useBuyTestnetCoinsMutation
+} from 'src/features/faucet/model/queries';
+
+const USDT_DIVISOR = 1_000_000;
 
 const FaucetPage: FC = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { isOpen: isRefillOpen, onClose: onRefillClose, onOpen: onRefillOpen } = useDisclosure();
     const [receiverAddress, setReceiverAddress] = useState('');
     const [amount, setAmount] = useState<TonCurrencyAmount | undefined>(undefined);
-    const [latestPurchase, setLatestPurchase] = useState<{ amount: TonCurrencyAmount; link: string } | null>(null);
+    const [latestPurchase, setLatestPurchase] = useState<{
+        amount: TonCurrencyAmount;
+        link: string;
+    } | null>(null);
 
     const { data: supplyAndRate, refetch: refetchSupplyAndRate } = useFaucetSupplyAndRate();
     const { mutate: buyTestnetCoins, isPending: isBuyingAssets } = useBuyTestnetCoinsMutation();
@@ -30,32 +47,31 @@ const FaucetPage: FC = () => {
 
     const methods = useForm<FaucetFormInternal>();
     const { data: balance } = useBalanceQuery();
+    const availableUsdtBalance = balance?.usdt
+        ? new BigNumber(balance.usdt.amount.toString())
+              .plus(balance.usdt.promo_amount.toString())
+              .dividedBy(USDT_DIVISOR)
+        : null;
 
     const { watch } = methods;
     const inputAmount = watch('tonAmount');
     const rate = supplyAndRate?.tonRate ?? 0;
 
-    let price: TonCurrencyAmount | undefined;
+    let price: UsdCurrencyAmount | undefined;
     if (
         supplyAndRate &&
         isNumber(inputAmount) &&
         Number(inputAmount) &&
         Number(inputAmount) >= 0.01
     ) {
-        price = TonCurrencyAmount.fromRelativeAmount(
-            new BigNumber(Number(inputAmount)).multipliedBy(rate)
-        );
+        price = new UsdCurrencyAmount(new BigNumber(Number(inputAmount)).multipliedBy(rate));
     }
 
     const onSubmit = (form: RequestFaucetForm): void => {
         setReceiverAddress(form.receiverAddress);
         setAmount(form.amount);
 
-        if (
-            price &&
-            balance?.ton &&
-            BigInt(balance.ton.amount) >= BigInt(price.amount.toNumber())
-        ) {
+        if (price && availableUsdtBalance && availableUsdtBalance.gte(price.amount)) {
             return onOpen();
         }
 
@@ -64,7 +80,7 @@ const FaucetPage: FC = () => {
 
     const handlePaymentConfirm = (form: RequestFaucetForm): void => {
         buyTestnetCoins(form, {
-            onSuccess: (data) => {
+            onSuccess: data => {
                 setLatestPurchase({
                     amount: data.amount,
                     link: data.link
@@ -78,34 +94,41 @@ const FaucetPage: FC = () => {
         <Overlay h="fit-content">
             <H4 mb="5">Testnet Assets</H4>
             <Divider w="auto" mx="-6" mb="4" />
-            <FormProvider {...methods}>
-                <FaucetForm
-                    id={formId}
-                    tonLimit={supplyAndRate?.tonSupply || undefined}
-                    onSubmit={onSubmit}
-                    isDisabled={isBuyingAssets}
-                    mb="6"
-                    w="512px"
-                />
-            </FormProvider>
-            <Flex align="center" gap="4">
-                <Button form={formId} isLoading={isBuyingAssets} type="submit">
-                    {price ? `Buy for ${price.stringCurrencyAmount}` : 'Buy Testnet Assets'}
-                </Button>
-                {latestPurchase && (
-                    <Span textStyle="label2" color="text.secondary">
-                        Bought {latestPurchase.amount.stringAmount} testnet TON.{' '}
-                        <Link
-                            textStyle="label2"
-                            color="text.accent"
-                            href={latestPurchase.link}
-                            isExternal
-                        >
-                            View in explorer
-                        </Link>
-                    </Span>
-                )}
-            </Flex>
+            <Box maxW={'512px'}>
+                <FormProvider {...methods}>
+                    <FaucetForm
+                        id={formId}
+                        tonLimit={supplyAndRate?.tonSupply || undefined}
+                        onSubmit={onSubmit}
+                        isDisabled={isBuyingAssets}
+                        mb="6"
+                        w="100%"
+                    />
+                </FormProvider>
+                <Flex align="center" gap="4" justifyContent='space-between'>
+                    <Button form={formId} isLoading={isBuyingAssets} type="submit">
+                        {price ? `Buy for ${price.stringCurrencyAmount}` : 'Buy Testnet TON'}
+                    </Button>
+                    {rate > 0 && (
+                        <Box textStyle="label2" color="text.secondary" alignContent={'right'} alignSelf={'right'}>
+                            1 testnet TON =&nbsp;${formatNumber(rate, { decimalPlaces: 2 })}
+                        </Box>
+                    )}
+                    {latestPurchase && (
+                        <Box textStyle="label2" color="text.secondary">
+                            {`Bought ${latestPurchase.amount.stringAmount} testnet TON.`}{' '}
+                            <Link
+                                textStyle="label2"
+                                color="text.accent"
+                                href={latestPurchase.link}
+                                isExternal
+                            >
+                                View&nbsp;in&nbsp;explorer
+                            </Link>
+                        </Box>
+                    )}
+                </Flex>
+            </Box>
             <FaucetPaymentDetailsModal
                 isOpen={isOpen}
                 onClose={onClose}
