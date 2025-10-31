@@ -1,19 +1,20 @@
 import { FC, Suspense, useEffect } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import TonapiRouting from 'src/pages/tonapi';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { lazy } from '@loadable/component';
+import { useMaybeProject } from 'src/shared/contexts/ProjectContext';
+import { useUserQuery } from 'src/entities/user/queries';
+import { useProjectsQuery } from 'src/shared/queries/projects';
+import { useViewportScale } from 'src/shared';
+import AppInitialization from 'src/processes/AppInitialization';
 import { Layout } from './layouts';
-import SettingsRouting from 'src/pages/settings';
-import InvoicesRouting from './invoices';
 import { LayoutSolid } from 'src/pages/layouts/LayoutSolid';
 import { LayoutWithAside } from 'src/pages/layouts/LayoutWithAside';
+import TonapiRouting from 'src/pages/tonapi';
+import SettingsRouting from 'src/pages/settings';
+import InvoicesRouting from './invoices';
 import AnalyticsRouting from 'src/pages/analytics';
 import NftRouting from 'src/pages/nft';
 import JettonRouting from 'src/pages/jetton';
-import { isDevelopmentMode } from 'src/shared';
-import { useLocation } from 'react-router-dom';
-import { useMaybeProject } from 'src/shared/contexts/ProjectContext';
-import { useUserQuery } from 'src/entities/user/queries';
 
 const LandingPage = lazy(() => import('./landing'));
 const LoginPage = lazy(() => import('./login'));
@@ -26,16 +27,16 @@ const UserProfilePage = lazy(() => import('./user-profile'));
 
 const Routing: FC = () => {
     const location = useLocation();
-    const params = new URLSearchParams(location.search);
-    const queryBackUrl = params.get('backUrl');
+    const queryBackUrl = new URLSearchParams(location.search).get('backUrl');
     const project = useMaybeProject();
-    const { data: user, isLoading, isFetching, status } = useUserQuery();
+    const { data: user, isLoading: isUserLoading } = useUserQuery();
+    const { isLoading: isProjectsLoading } = useProjectsQuery({ enabled: !!user });
 
-    // Debug: log user query state
-    useEffect(() => {
-        console.log('[Routing] User query state:', { user, isLoading, isFetching, status });
-    }, [user, isLoading, isFetching, status]);
+    // Determine if app should show loading screen
+    // Show loader if user is loading OR if user exists and projects are loading
+    const isAppLoading = isUserLoading || (!!user && isProjectsLoading);
 
+    // Track page views with Yandex Metrika
     useEffect(() => {
         /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
         // @ts-ignore
@@ -46,149 +47,137 @@ const Routing: FC = () => {
         }
     }, [location]);
 
-    // Scale layout for mobile devices until adaptive layout is not ready
-    useEffect(() => {
-        const metatag = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
-        if (!metatag) {
-            return;
-        }
+    // Scale layout for mobile devices until adaptive layout is ready
+    useViewportScale(!!user);
 
-        if (isDevelopmentMode()) {
-            return;
-        }
-
-        if (!user) {
-            metatag.content = 'width=device-width, initial-scale=1.0';
-        } else {
-            metatag.content = 'width=1350px';
-        }
-    }, [user]);
-
-    // Show loading only if user data is being fetched for the first time
-    // Check both isLoading (no data in cache) and isFetching (request in progress)
-    if (isLoading) {
-        console.log('[Routing] Showing loader, isLoading:', isLoading);
-        return null;
-    }
-
+    // Unauthenticated user - show landing or login
     if (!user) {
         return (
-            <Routes>
-                <Route path="/" element={<LayoutSolid />}>
-                    <Route
-                        index
-                        element={
-                            <Suspense fallback={null}>
-                                <LandingPage />
-                            </Suspense>
-                        }
-                    ></Route>
-                    <Route
-                        path="*"
-                        element={
-                            <Suspense fallback={null}>
-                                <LoginPage />
-                            </Suspense>
-                        }
-                    ></Route>
-                </Route>
-            </Routes>
+            <AppInitialization isLoading={isAppLoading}>
+                <Routes>
+                    <Route path="/" element={<LayoutSolid />}>
+                        <Route
+                            index
+                            element={
+                                <Suspense>
+                                    <LandingPage />
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="*"
+                            element={
+                                <Suspense>
+                                    <LoginPage />
+                                </Suspense>
+                            }
+                        />
+                    </Route>
+                </Routes>
+            </AppInitialization>
         );
     }
 
+    // Authenticated user but no project selected - show create project page
     if (!project) {
         const currentPath = location.pathname + location.search;
         const backUrl = encodeURIComponent(currentPath);
         const navigateTo = `/?backUrl=${backUrl}`;
 
         return (
-            <Routes>
-                <Route path="/" element={<Layout />}>
-                    <Route
-                        index
-                        element={
-                            <Suspense fallback={null}>
-                                <CreateFirstProjectPage />
-                            </Suspense>
-                        }
-                    ></Route>
-                    <Route path="*" element={<Navigate to={navigateTo} replace />} />
-                </Route>
-            </Routes>
+            <AppInitialization isLoading={isAppLoading}>
+                <Routes>
+                    <Route path="/" element={<Layout />}>
+                        <Route
+                            index
+                            element={
+                                <Suspense>
+                                    <CreateFirstProjectPage />
+                                </Suspense>
+                            }
+                        />
+                        <Route path="*" element={<Navigate to={navigateTo} replace />} />
+                    </Route>
+                </Routes>
+            </AppInitialization>
         );
     }
 
-    if (project && queryBackUrl) {
+    // Handle redirect from create project flow
+    if (queryBackUrl) {
         return <Navigate to={queryBackUrl} replace />;
     }
 
+    // Main application routes with project selected
     return (
-        <Routes>
-            <Route path="/" element={<LayoutWithAside />}>
-                <Route
-                    path="dashboard"
-                    element={
-                        <Suspense fallback={null}>
-                            <DashboardPage />
-                        </Suspense>
-                    }
-                />
-                <Route
-                    path="invoices/*"
-                    element={
-                        <Suspense fallback={null}>
-                            <InvoicesRouting />
-                        </Suspense>
-                    }
-                />
-                <Route path="tonapi">{TonapiRouting}</Route>
-                <Route
-                    path="tonkeeper-messages"
-                    element={
-                        <Suspense fallback={null}>
-                            <AppMessagesPage />
-                        </Suspense>
-                    }
-                />
-                <Route
-                    path="balance"
-                    element={
-                        <Suspense fallback={null}>
-                            <BalancePage />
-                        </Suspense>
-                    }
-                />
-                <Route
-                    path="faucet"
-                    element={
-                        <Suspense fallback={null}>
-                            <FaucetPage />
-                        </Suspense>
-                    }
-                />
-                <Route
-                    path="profile"
-                    element={
-                        <Suspense fallback={null}>
-                            <UserProfilePage />
-                        </Suspense>
-                    }
-                />
-                <Route path="analytics">{AnalyticsRouting}</Route>
-                <Route path="nft">{NftRouting}</Route>
-                <Route
-                    path="jetton/*"
-                    element={
-                        <Suspense fallback={null}>
-                            <JettonRouting />
-                        </Suspense>
-                    }
-                />
-                <Route path="settings">{SettingsRouting}</Route>
-                <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path="*" element={<Navigate to="dashboard" replace />} />
-            </Route>
-        </Routes>
+        <AppInitialization isLoading={isAppLoading}>
+            <Routes>
+                <Route path="/" element={<LayoutWithAside />}>
+                    <Route
+                        path="dashboard"
+                        element={
+                            <Suspense>
+                                <DashboardPage />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="invoices/*"
+                        element={
+                            <Suspense>
+                                <InvoicesRouting />
+                            </Suspense>
+                        }
+                    />
+                    <Route path="tonapi">{TonapiRouting}</Route>
+                    <Route
+                        path="tonkeeper-messages"
+                        element={
+                            <Suspense>
+                                <AppMessagesPage />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="balance"
+                        element={
+                            <Suspense>
+                                <BalancePage />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="faucet"
+                        element={
+                            <Suspense>
+                                <FaucetPage />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="profile"
+                        element={
+                            <Suspense>
+                                <UserProfilePage />
+                            </Suspense>
+                        }
+                    />
+                    <Route path="analytics">{AnalyticsRouting}</Route>
+                    <Route path="nft">{NftRouting}</Route>
+                    <Route
+                        path="jetton/*"
+                        element={
+                            <Suspense>
+                                <JettonRouting />
+                            </Suspense>
+                        }
+                    />
+                    <Route path="settings">{SettingsRouting}</Route>
+                    <Route index element={<Navigate to="dashboard" replace />} />
+                    <Route path="*" element={<Navigate to="dashboard" replace />} />
+                </Route>
+            </Routes>
+        </AppInitialization>
     );
 };
 
