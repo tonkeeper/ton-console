@@ -14,6 +14,8 @@ export class TonApiStatsStore {
 
     liteproxyStats$ = new Loadable<TonApiStats | null>(null);
 
+    webhooksStats$ = new Loadable<TonApiStats | null>(null);
+
     constructor() {
         makeAutoObservable(this);
 
@@ -25,6 +27,7 @@ export class TonApiStatsStore {
                 if (project) {
                     this.fetchStats();
                     this.fetchLiteproxyStats();
+                    this.fetchWebhooksStats();
                 }
             }
         );
@@ -76,9 +79,40 @@ export class TonApiStatsStore {
         );
     });
 
+    fetchWebhooksStats = this.webhooksStats$.createAsyncAction(async () => {
+        const weekAgo = Math.round(Date.now() / 1000 - 3600 * 24 * 7);
+        const end = Math.floor(Date.now() / 1000);
+        const halfAnHourPeriod = 60 * 30;
+
+        // Fetch both webhook_delivered and webhook_failed metrics
+        const deliveredResponse = await apiClient.api.getProjectTonApiStats({
+            project_id: projectsStore.selectedProject!.id,
+            start: weekAgo,
+            step: halfAnHourPeriod,
+            end,
+            detailed: false,
+            dashboard: DTOGetProjectTonApiStatsParamsDashboardEnum.DTOTonapiWebhook
+        });
+
+        const failedResponse = await apiClient.api.getProjectTonApiStats({
+            project_id: projectsStore.selectedProject!.id,
+            start: weekAgo,
+            step: halfAnHourPeriod,
+            end,
+            detailed: false,
+            dashboard: DTOGetProjectTonApiStatsParamsDashboardEnum.DTOTonapiWebhook
+        });
+
+        return mapWebhooksStatsDTOToTonApiStats(
+            deliveredResponse.data.stats,
+            failedResponse.data.stats
+        );
+    });
+
     clearStore(): void {
         this.stats$.clear();
         this.liteproxyStats$.clear();
+        this.webhooksStats$.clear();
     }
 }
 
@@ -130,6 +164,57 @@ function mapLiteproxyStatsDTOToTonApiStats(
 
             const entry = timelineMap.get(time)!;
             entry.liteproxyConnections = Math.round(Number(value) * 100) / 100;
+        });
+    }
+
+    const chart = Array.from(timelineMap.values()).sort((a, b) => a.time - b.time);
+
+    return chart.length > 0 ? { chart } : null;
+}
+
+function mapWebhooksStatsDTOToTonApiStats(
+    deliveredStats: DTOStats,
+    failedStats: DTOStats
+): TonApiStats | null {
+    // Create a map with timestamps as keys
+    const timelineMap = new Map<
+        number,
+        { time: number; webhooksDelivered?: number; webhooksFailed?: number }
+    >();
+
+    // Process delivered stats - filter by operation type "delivered"
+    if (deliveredStats.result.length > 0) {
+        deliveredStats.result.forEach(item => {
+            if (item.metric?.operation === 'delivered') {
+                item.values.forEach(([timestamp, value]) => {
+                    const time = Number(timestamp) * 1000;
+
+                    if (!timelineMap.has(time)) {
+                        timelineMap.set(time, { time });
+                    }
+
+                    const entry = timelineMap.get(time)!;
+                    entry.webhooksDelivered = Math.round(Number(value) * 100) / 100;
+                });
+            }
+        });
+    }
+
+    // Process failed stats - filter by operation type "failed"
+    if (failedStats.result.length > 0) {
+        failedStats.result.forEach(item => {
+            if (item.metric?.operation === 'failed') {
+                item.values.forEach(([timestamp, value]) => {
+                    const time = Number(timestamp) * 1000;
+
+                    if (!timelineMap.has(time)) {
+                        timelineMap.set(time, { time });
+                    }
+
+                    const entry = timelineMap.get(time)!;
+                    entry.webhooksFailed = Math.round(Number(value) * 100) / 100;
+                });
+            }
         });
     }
 

@@ -4,5 +4,7 @@ export interface TonApiStats {
         requests?: number;
         liteproxyRequests?: number;
         liteproxyConnections?: number;
+        webhooksDelivered?: number;
+        webhooksFailed?: number;
     }[];
 }

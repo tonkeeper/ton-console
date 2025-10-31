@@ -1,10 +1,4 @@
-import {
-    apiClient,
-    createImmediateReaction,
-    DTOGetProjectTonApiStatsParamsDashboardEnum,
-    Loadable,
-    Network
-} from 'src/shared';
+import { createImmediateReaction, Loadable, Network } from 'src/shared';
 import { Webhook, CreateWebhookForm } from './interfaces';
 import { projectsStore } from 'src/shared/stores';
 import { makeAutoObservable } from 'mobx';
@@ -14,14 +8,11 @@ import {
     RTWebhookListStatusEnum
 } from 'src/shared/api/streaming-api';
 import { Address } from '@ton/core';
-import { WebhooksStat } from './interfaces/webhooks';
 
 export type Subscription = RTWebhookAccountTxSubscriptions['account_tx_subscriptions'][0];
 
 class WebhooksStore {
     webhooks$ = new Loadable<Webhook[]>([]);
-
-    stats$ = new Loadable<WebhooksStat | null>(null);
 
     selectedWebhook: Webhook | null = null;
 
@@ -45,7 +36,6 @@ class WebhooksStore {
 
                 if (project) {
                     this.fetchWebhooks();
-                    this.fetchWebhooksStats();
                 }
             }
         );
@@ -128,26 +118,6 @@ class WebhooksStore {
                 network: this.network
             })
             .then(res => res.data.webhooks.toSorted((a, b) => b.id - a.id));
-
-        return response;
-    });
-
-    fetchWebhooksStats = this.stats$.createAsyncAction(async () => {
-        const now = new Date();
-        const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-
-        const startTimestamp = Math.floor(startOfMonth.getTime() / 1000);
-        const endTimestamp = Math.floor(now.getTime() / 1000);
-
-        const response = await apiClient.api
-            .getProjectTonApiStats({
-                project_id: projectsStore.selectedProject!.id,
-                start: startTimestamp,
-                end: endTimestamp,
-                step: 3600,
-                dashboard: DTOGetProjectTonApiStatsParamsDashboardEnum.DTOTonapiWebhook
-            })
-            .then(res => res.data.stats);
 
         return response;
     });
@@ -313,7 +283,6 @@ class WebhooksStore {
 
     clearStore(): void {
         this.webhooks$.clear();
-        this.stats$.clear();
         this.selectedWebhook = null;
         this.subscriptions$.clear();
         this.subscriptionsPage = 1;
