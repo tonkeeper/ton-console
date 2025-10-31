@@ -43,7 +43,7 @@ export function useWebhooksQuery(network: Network) {
         return false;
       }
       // Retry other errors up to 3 times
-      return failureCount < 3;
+      return failureCount < 1;
     }
   });
 }
