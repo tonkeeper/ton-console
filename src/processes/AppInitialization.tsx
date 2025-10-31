@@ -1,8 +1,6 @@
 import { FC, PropsWithChildren, useEffect, useRef } from 'react';
 import { Box, Center, Fade, FadeProps } from '@chakra-ui/react';
 import { TonConsoleIcon } from 'src/shared';
-import { appStore } from 'src/shared/stores';
-import { observer } from 'mobx-react-lite';
 import { setupApiInterceptors } from 'src/shared/api/interceptors';
 
 const FadeAnimation: FC<FadeProps> = props => (
@@ -14,7 +12,11 @@ const FadeAnimation: FC<FadeProps> = props => (
     />
 );
 
-const AppInitialization: FC<PropsWithChildren> = props => {
+interface AppInitializationProps extends PropsWithChildren {
+    isLoading: boolean;
+}
+
+const AppInitialization: FC<AppInitializationProps> = ({ isLoading, children }) => {
     const ref = useRef<SVGSVGElement | null>(null);
 
     useEffect(() => {
@@ -23,10 +25,10 @@ const AppInitialization: FC<PropsWithChildren> = props => {
     }, []);
 
     useEffect(() => {
-        if (appStore.isInitialized && ref.current) {
+        if (!isLoading && ref.current) {
             ref.current.style.opacity = '0';
         }
-    }, [appStore.isInitialized]);
+    }, [isLoading]);
 
     return (
         <>
@@ -39,19 +41,19 @@ const AppInitialization: FC<PropsWithChildren> = props => {
                 bottom={0}
                 left={0}
                 bgColor="background.content"
-                in={!appStore.isInitialized}
+                in={isLoading}
             >
                 <TonConsoleIcon ref={ref} transition="opacity 0.1s linear" h="64px" w="64px" />
             </Center>
             <Box
-                overflow={appStore.isInitialized ? 'auto' : 'hidden'}
+                overflow={isLoading ? 'hidden' : 'auto'}
                 h="100%"
-                maxH={appStore.isInitialized ? 'unset' : '100%'}
+                maxH={isLoading ? '100%' : 'unset'}
             >
-                {props.children}
+                {children}
             </Box>
         </>
     );
 };
 
-export default observer(AppInitialization);
+export default AppInitialization;

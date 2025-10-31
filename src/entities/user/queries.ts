@@ -30,56 +30,39 @@ export function useUserQuery() {
     return useQuery({
         queryKey: ['user'],
         queryFn: async (): Promise<User | null> => {
-            try {
-                const { data, error } = await getUserInfo();
+            const { data, error } = await getUserInfo();
 
-                console.log('[useUserQuery] API response:', { data, error });
+            if (error) {
+                // Check for authentication errors in various formats
 
-                if (error) {
-                    console.log('[useUserQuery] Error details:', error);
-                    
-                    // Check for authentication errors in various formats
-                    
-                    // 1. Standard Axios 401 error
-                    if (error instanceof AxiosError && error.response?.status === 401) {
-                        console.log('[useUserQuery] 401 detected (AxiosError), returning null');
-                        return null;
-                    }
-                    
-                    // 2. API custom error format: {error: string, code: number}
-                    if (error && typeof error === 'object' && 'code' in error && 'error' in error) {
-                        const apiError = error as { error: string; code: number };
-                        // code: 0 typically means authentication error
-                        if (apiError.code === 0 || apiError.error.toLowerCase().includes('auth')) {
-                            console.log('[useUserQuery] Auth error detected (code 0 or auth message), returning null');
-                            return null;
-                        }
-                    }
-                    
-                    // 3. Direct status check
-                    if (error && typeof error === 'object' && 'status' in error && error.status === 401) {
-                        console.log('[useUserQuery] 401 detected (direct status), returning null');
-                        return null;
-                    }
-                    
-                    throw error;
-                }
-
-                return mapDTOUserToUser(data.user);
-            } catch (e) {
-                console.log('[useUserQuery] Caught exception:', e);
-                // If 401, user is not authenticated - this is expected, return null
-                if (e instanceof AxiosError && e.response?.status === 401) {
-                    console.log('[useUserQuery] 401 in catch, returning null');
+                // 1. Standard Axios 401 error
+                if (error instanceof AxiosError && error.response?.status === 401) {
                     return null;
                 }
-                // Check any object with status 401
-                if (e && typeof e === 'object' && 'status' in e && (e as any).status === 401) {
-                    console.log('[useUserQuery] 401 in catch (direct status), returning null');
+
+                // 2. API custom error format: {error: string, code: number}
+                if (error && typeof error === 'object' && 'code' in error && 'error' in error) {
+                    const apiError = error as { error: string; code: number };
+                    // code: 0 typically means authentication error
+                    if (apiError.code === 0 || apiError.error.toLowerCase().includes('auth')) {
+                        return null;
+                    }
+                }
+
+                // 3. Direct status check
+                if (
+                    error &&
+                    typeof error === 'object' &&
+                    'status' in error &&
+                    error.status === 401
+                ) {
                     return null;
                 }
-                throw e;
+
+                throw error;
             }
+
+            return mapDTOUserToUser(data.user);
         },
         retry: false, // Don't retry - if user is not authenticated, it's expected
         staleTime: Infinity, // Never consider data stale - only refetch on manual invalidation
