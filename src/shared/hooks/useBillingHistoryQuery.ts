@@ -47,7 +47,9 @@ export function useBillingHistoryQuery(options: UseBillingHistoryQueryOptions = 
     });
 }
 
-function mapDTOTransactionToBillingHistoryItem(dtoTx: DTOBillingTransaction): BillingHistoryItem {
+export function mapDTOTransactionToBillingHistoryItem(
+    dtoTx: DTOBillingTransaction
+): BillingHistoryItem {
     const date = new Date(dtoTx.created_at * 1000);
     const amount = mapDTOCurrencyToAmount(dtoTx.currency, dtoTx.amount);
 
