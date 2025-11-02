@@ -1,4 +1,4 @@
-import { TonAddress, TonCurrencyAmount } from 'src/shared';
+import { TonAddress, UsdCurrencyAmount } from 'src/shared';
 
 export interface AnalyticsGraphQueryBasic {
     type: 'graph';
@@ -12,7 +12,7 @@ export interface AnalyticsGraphQuerySuccess extends AnalyticsGraphQueryBasic {
     status: 'success';
     resultUrl: string;
     spentTimeMS: number;
-    cost: TonCurrencyAmount;
+    cost: UsdCurrencyAmount;
 }
 
 export interface AnalyticsGraphQueryPending extends AnalyticsGraphQueryBasic {
@@ -23,7 +23,7 @@ export interface AnalyticsGraphQueryError extends AnalyticsGraphQueryBasic {
     status: 'error';
     errorReason: string;
     spentTimeMS: number;
-    cost: TonCurrencyAmount;
+    cost?: UsdCurrencyAmount;
 }
 
 export type AnalyticsGraphQuery =

@@ -1,5 +1,5 @@
 import { makeAutoObservable, reaction } from 'mobx';
-import { Loadable, TonCurrencyAmount } from 'src/shared';
+import { Loadable, UsdCurrencyAmount } from 'src/shared';
 import { getSqlHistoryFromStats, DTOStatsQueryResult, DTOStatsQueryType } from 'src/shared/api';
 import {
     AnalyticsGraphQuery,
@@ -143,10 +143,9 @@ function mapDTOStatsQueryResultToAnalyticsQueryAggregated(
         lastQuery: mapDTOStatsSqlResultToAnalyticsQuery(value),
         lastQueryDate: new Date(value.last_repeat_date!),
         repeatFrequencyMs: value.query!.repeat_interval! * 1000,
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        totalCost: new TonCurrencyAmount(value.total_cost!),
+        totalCost: value.total_usd_cost
+            ? new UsdCurrencyAmount(value.total_usd_cost)
+            : new UsdCurrencyAmount(0),
         totalRepetitions: value.total_repetitions!
     };
 }

@@ -118,7 +118,7 @@ const DurationValueCell: FC<{
     ) : query.status === 'success' || query.status === 'error' ? (
         <Flex align="center" wrap="wrap" color="text.secondary">
             {query.spentTimeMS < 1000 ? '≈1s' : <Span>{toTimeLeft(query.spentTimeMS)}</Span>}
-            &nbsp;· {query.cost.stringCurrencyAmount}
+            {query.cost && <>&nbsp;· {query.cost.stringCurrencyAmount}</>}
         </Flex>
     ) : (
         formattedDuration

@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx';
-import { Loadable, TonCurrencyAmount } from 'src/shared';
+import { Loadable, UsdCurrencyAmount } from 'src/shared';
 import {
     getStatsChatGptPrice,
     statsChatGptRequest,
@@ -65,9 +65,6 @@ function mapStatsChatGptPriceToGptGenerationPricing(
     return {
         freeRequestsNumber: value.free_requests,
         usedFreeRequest: value.used,
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        requestPrice: value.price ? new TonCurrencyAmount(value.price) : value.usd_price
+        requestPrice: new UsdCurrencyAmount(value.usd_price)
     };
 }
