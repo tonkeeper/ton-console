@@ -1,15 +1,6 @@
 import { makeAutoObservable } from 'mobx';
-import {
-    createReaction,
-    Loadable,
-    TonAddress,
-    TonCurrencyAmount
-} from 'src/shared';
-import {
-    getGraphFromStats,
-    getSqlResultFromStats,
-    DTOStatsQueryResult
-} from 'src/shared/api';
+import { createReaction, Loadable, TonAddress, UsdCurrencyAmount } from 'src/shared';
+import { getGraphFromStats, getSqlResultFromStats, DTOStatsQueryResult } from 'src/shared/api';
 import { AnalyticsGraphQuery, AnalyticsGraphQueryBasic } from './interfaces';
 import { Project } from 'src/entities/project';
 
@@ -104,10 +95,7 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
                 value.url!
             )}&meta=${encodeURIComponent(value.meta_url!)}`,
             spentTimeMS: value.spent_time!,
-            // TODO: PRICES remove this after backend will be updated
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            cost: new TonCurrencyAmount(value.cost!)
+            cost: value.usd_cost ? new UsdCurrencyAmount(value.usd_cost) : new UsdCurrencyAmount(0)
         };
     }
 
@@ -123,9 +111,6 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
         status: 'error',
         errorReason: value.error!,
         spentTimeMS: value.spent_time!,
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        cost: new TonCurrencyAmount(value.cost!)
+        cost: value.usd_cost ? new UsdCurrencyAmount(value.usd_cost) : undefined
     };
 }

@@ -1,11 +1,17 @@
 import { FC, useEffect } from 'react';
-import { BoxProps, Button, Center, Flex, Skeleton, Spacer, useDisclosure } from '@chakra-ui/react';
+import {
+    Box,
+    BoxProps,
+    Button,
+    Center,
+    Flex,
+    Skeleton,
+    Spacer,
+    useDisclosure
+} from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { InfoIcon16, Span, TooltipHoverable, toTimeLeft } from 'src/shared';
-import {
-    AnalyticsQueryStore,
-    AnalyticsQueryRequestStore
-} from 'src/features';
+import { AnalyticsQueryStore, AnalyticsQueryRequestStore } from 'src/features';
 import { useSearchParams } from 'react-router-dom';
 import { computed } from 'mobx';
 import ExplainSQLModal from './ExplainSQLModal';
@@ -152,11 +158,13 @@ const AnalyticsQueryControlPanel: FC<AnalyticsQueryControlPanelProps> = ({
                                     minutes of execution.
                                 </Span>
                             </TooltipHoverable>
-                            <Span opacity="0.6" fontFamily="mono">
+                            <Span
+                                opacity="0.6"
+                                fontFamily="mono"
+                                title={request.estimatedCost.amount.toString()}
+                            >
                                 &nbsp;·&nbsp;
-                                {request.estimatedCost.toStringCurrencyAmount({
-                                    decimalPlaces: null
-                                })}
+                                {request.estimatedCost.toStringCurrencyAmount()}
                             </Span>
                         </Span>
                     )
