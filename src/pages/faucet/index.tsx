@@ -116,7 +116,7 @@ const FaucetPage: FC = () => {
 
     return (
         <Overlay h="fit-content">
-            <Flex justify="space-between" align="center" gap="4" flexWrap="wrap" maxW="512px">
+            <Flex align="center" justify="space-between" wrap="wrap" gap="4" maxW="512px">
                 <H4 mb="2">Testnet Assets</H4>
 
                 <Span textStyle="label2" color="text.tertiary" alignContent={'center'}>
@@ -135,8 +135,8 @@ const FaucetPage: FC = () => {
                         w="100%"
                     />
                 </FormProvider>
-                <Flex align="center" gap="4" justify="space-between" w="100%">
-                    <Flex align="center" gap="4" flexWrap="wrap">
+                <Flex align="center" justify="space-between" gap="4" w="100%">
+                    <Flex align="center" wrap="wrap" gap="4">
                         <Button form={formId} isLoading={isBuyingAssets} type="submit">
                             {price ? `Buy for ${price.stringCurrencyAmount}` : 'Buy Testnet TON'}
                         </Button>
@@ -148,7 +148,7 @@ const FaucetPage: FC = () => {
                     )}
 
                     {latestPurchase && (
-                        <Box textStyle="label2" color="text.secondary" textAlign="right" ml="auto">
+                        <Box textStyle="label2" ml="auto" color="text.secondary" textAlign="right">
                             Bought {latestPurchase.amount.stringAmount} testnet TON{' '}
                             <Link
                                 textStyle="label2"
