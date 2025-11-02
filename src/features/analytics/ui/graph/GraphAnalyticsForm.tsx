@@ -7,7 +7,8 @@ import {
     Checkbox,
     Flex,
     FormControl,
-    FormErrorMessage
+    FormErrorMessage,
+    useDisclosure
 } from '@chakra-ui/react';
 import { InfoTooltip, NumberedTextArea } from 'src/shared';
 import { Observer, observer } from 'mobx-react-lite';
@@ -15,6 +16,9 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { useForm } from 'react-hook-form';
 import { AnalyticsGraphQueryStore } from '../../model';
 import { useSearchParams } from 'react-router-dom';
+import RefillModal from 'src/entities/balance/ui/RefillModal';
+import { InsufficientBalanceModal } from 'src/entities/balance/ui/InsufficientBalanceModal';
+import { AxiosError } from 'axios';
 
 interface GraphAnalyticsFormProps extends BoxProps {
     analyticsGraphQueryStore: AnalyticsGraphQueryStore;
@@ -34,23 +38,45 @@ const GraphAnalyticsForm: FC<GraphAnalyticsFormProps> = ({
         addresses: string;
     }>();
     const [_, setSearchParams] = useSearchParams();
+    const {
+        isOpen: isInsufficientBalanceOpen,
+        onClose: onInsufficientBalanceClose,
+        onOpen: onInsufficientBalanceOpen
+    } = useDisclosure();
+    const {
+        isOpen: isRefillOpen,
+        onClose: onRefillClose,
+        onOpen: onRefillOpen
+    } = useDisclosure();
+
+    let insufficientBalanceError = '';
 
     const onSubmit = async (form: { isBetweenAccountsOnly: boolean; addresses: string }) => {
-        const addresses = form.addresses
-            .replaceAll(/[,; \t\v\f\r]/g, '')
-            .trim()
-            .split('\n')
-            .map(value => {
-                if (/^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-.]+$/.test(value)) {
-                    return value.toLowerCase();
-                }
-                return value;
+        try {
+            const addresses = form.addresses
+                .replaceAll(/[,; \t\v\f\r]/g, '')
+                .trim()
+                .split('\n')
+                .map(value => {
+                    if (/^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-.]+$/.test(value)) {
+                        return value.toLowerCase();
+                    }
+                    return value;
+                });
+            const query = await analyticsGraphQueryStore.createQuery({
+                addresses,
+                isBetweenSelectedOnly: form.isBetweenAccountsOnly
             });
-        const query = await analyticsGraphQueryStore.createQuery({
-            addresses,
-            isBetweenSelectedOnly: form.isBetweenAccountsOnly
-        });
-        setSearchParams({ id: query.id });
+            setSearchParams({ id: query.id });
+        } catch (error) {
+            const axiosError = error as AxiosError<{ error: string }>;
+            if (axiosError?.response?.status === 402) {
+                // Handle insufficient balance error from server
+                insufficientBalanceError = axiosError?.response?.data?.error || 'Insufficient balance to execute this query';
+                onInsufficientBalanceOpen();
+            }
+            // Other errors are handled by the toast in the store
+        }
     };
 
     const isFormDisabled =
@@ -154,6 +180,13 @@ const GraphAnalyticsForm: FC<GraphAnalyticsFormProps> = ({
                     )}
                 </AutoSizer>
             </Box>
+            <InsufficientBalanceModal
+                isOpen={isInsufficientBalanceOpen}
+                onClose={onInsufficientBalanceClose}
+                onOpenRefill={onRefillOpen}
+                errorMessage={insufficientBalanceError}
+            />
+            <RefillModal isOpen={isRefillOpen} onClose={onRefillClose} />
         </chakra.form>
     );
 };
