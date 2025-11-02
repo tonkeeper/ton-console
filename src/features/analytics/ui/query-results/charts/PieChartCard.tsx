@@ -1,7 +1,7 @@
-import { FC, useMemo } from 'react';
+import { FC, ReactElement, useMemo } from 'react';
 import { Box, BoxProps, Flex } from '@chakra-ui/react';
 import { ChartCard } from './ChartCard';
-import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
+import { Cell, Pie, PieChart, PieLabelRenderProps, ResponsiveContainer } from 'recharts';
 import { hashString, toColor } from 'src/shared';
 import { PieChartOptions } from '../../../model';
 
@@ -32,23 +32,16 @@ export const PieChartCard: FC<
         return [_data, _colors, true];
     }, [dataSource]);
 
-    const renderCustomizedLabel = ({
-        cx,
-        cy,
-        midAngle,
-        innerRadius,
-        outerRadius,
-        percent,
-        index
-    }: {
-        cx: number;
-        cy: number;
-        midAngle: number;
-        innerRadius: number;
-        outerRadius: number;
-        percent: number;
-        index: number;
-    }) => {
+    const renderCustomizedLabel = (props: PieLabelRenderProps): ReactElement => {
+        // Extract properties with proper defaults for optional ones
+        const cx = Number(props.cx);
+        const cy = Number(props.cy);
+        const innerRadius = Number(props.innerRadius);
+        const outerRadius = Number(props.outerRadius);
+        const index = Number(props.index);
+        const midAngle = typeof props.midAngle === 'number' ? props.midAngle : 0;
+        const percent = typeof props.percent === 'number' ? props.percent : 0;
+
         const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
         const x = cx + radius * Math.cos(-midAngle * RADIAN) * 2.5;
         const y = cy + radius * Math.sin(-midAngle * RADIAN) * 2.5;
