@@ -46,7 +46,7 @@ const WebhookChart: FC<WebhookChartProps> = ({ data, metricType, color }) => {
 
     return (
         <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={chartData}>
+            <BarChart data={chartData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
                 <XAxis
                     dataKey="time"
                     type="number"

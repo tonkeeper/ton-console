@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useProjectId } from 'src/shared/contexts/ProjectContext';
 import { getProjectTonApiStats, DTOStats } from 'src/shared/api';
+import { TimePeriod, getPeriodConfig, getTimestampRange } from './time-periods';
+
+export type { TimePeriod };
 
 export interface ChartPoint {
     time: number;
@@ -59,23 +62,21 @@ function mapLiteproxyStatsDTOToChartPoints(
 }
 
 // Query Hooks
-export function useRestStats() {
+export function useRestStats(period: TimePeriod = 'last_6h') {
     const projectId = useProjectId();
+    const config = getPeriodConfig(period);
+    const { start, end } = getTimestampRange(period);
 
     return useQuery({
-        queryKey: ['rest-stats', projectId || undefined],
+        queryKey: ['rest-stats', projectId || undefined, period],
         queryFn: async () => {
             if (!projectId) return null;
-
-            const weekAgo = Math.round(Date.now() / 1000 - 3600 * 24 * 7);
-            const end = Math.floor(Date.now() / 1000);
-            const halfAnHourPeriod = 60 * 30;
 
             const { data, error } = await getProjectTonApiStats({
                 query: {
                     project_id: projectId,
-                    start: weekAgo,
-                    step: halfAnHourPeriod,
+                    start,
+                    step: config.stepSeconds,
                     end,
                     detailed: false
                 }
@@ -90,24 +91,22 @@ export function useRestStats() {
     });
 }
 
-export function useLiteproxyStats() {
+export function useLiteproxyStats(period: TimePeriod = 'last_6h') {
     const projectId = useProjectId();
+    const config = getPeriodConfig(period);
+    const { start, end } = getTimestampRange(period);
 
     return useQuery({
-        queryKey: ['liteproxy-stats', projectId || undefined],
+        queryKey: ['liteproxy-stats', projectId || undefined, period],
         queryFn: async () => {
             if (!projectId) return null;
-
-            const weekAgo = Math.round(Date.now() / 1000 - 3600 * 6);
-            const end = Math.floor(Date.now() / 1000);
-            const halfAnHourPeriod = 60;
 
             // Fetch both liteproxy_requests and liteproxy_connections metrics
             const requestsStatsRequest = getProjectTonApiStats({
                 query: {
                     project_id: projectId,
-                    start: weekAgo,
-                    step: halfAnHourPeriod,
+                    start,
+                    step: config.stepSeconds,
                     end,
                     detailed: false,
                     dashboard: 'liteproxy_requests'
@@ -117,8 +116,8 @@ export function useLiteproxyStats() {
             const connectionsStatRequest = getProjectTonApiStats({
                 query: {
                     project_id: projectId,
-                    start: weekAgo,
-                    step: halfAnHourPeriod,
+                    start,
+                    step: config.stepSeconds,
                     end,
                     detailed: false,
                     dashboard: 'liteproxy_connections'

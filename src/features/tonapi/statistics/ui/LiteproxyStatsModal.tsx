@@ -78,7 +78,7 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = ({ isOpen, onClose }) 
                         </Text>
                         <Box h={250}>
                             <ResponsiveContainer height="100%">
-                                <LineChart data={value.requests} margin={{ left: 0, right: 0 }}>
+                                <LineChart data={value.requests} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
                                     <XAxis
                                         dataKey="time"
                                         type="number"
@@ -103,7 +103,7 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = ({ isOpen, onClose }) 
                         </Text>
                         <Box h={250}>
                             <ResponsiveContainer height="100%">
-                                <LineChart data={value.connections} margin={{ left: 0, right: 0 }}>
+                                <LineChart data={value.connections} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
                                     <XAxis
                                         dataKey="time"
                                         type="number"
