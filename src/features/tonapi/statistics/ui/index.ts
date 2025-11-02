@@ -1,3 +1,10 @@
 export { DashboardTierCard } from './DashboardTierCard';
 export { default as DashboardChart } from './DashboardChart';
+export { default as DashboardLiteproxyChart } from './DashboardLiteproxyChart';
+export { default as DashboardWebhooksChart } from './DashboardWebhooksChart';
 export { default as LiteproxyStatsModal } from './LiteproxyStatsModal';
+export { default as MetricChart } from './MetricChart';
+export { default as MetricChartCard } from './MetricChartCard';
+export { default as MetricChartModal } from './MetricChartModal';
+export { default as MetricGroupCard } from './MetricGroupCard';
+export { default as MetricChartContent } from './MetricChartContent';

@@ -60,7 +60,7 @@
     "react-virtualized-auto-sizer": "^1.0.20",
     "react-window": "^1.8.10",
     "react-window-infinite-loader": "^1.0.9",
-    "recharts": "^2.5.0"
+    "recharts": "^3.0.0"
   },
   "devDependencies": {
     "@chakra-ui/styled-system": "^2.7.0",

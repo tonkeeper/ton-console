@@ -1,10 +1,15 @@
 import { FC } from 'react';
-import { BoxProps, Center, Grid, GridItem, Spinner } from '@chakra-ui/react';
+import { BoxProps, Center, Flex, Spinner } from '@chakra-ui/react';
 import { DashboardTierCard } from '../../tonapi';
 import { useSelectedRestApiTier } from 'src/features/tonapi/pricing/model/queries';
+import { useSelectedLiteproxyTier } from 'src/features/tonapi/liteproxy/model/queries';
 
 const DashboardCardsList: FC<BoxProps> = props => {
-    const { data: selectedTier, isLoading } = useSelectedRestApiTier();
+    const { data: selectedRestApiTier, isLoading: isRestApiLoading } = useSelectedRestApiTier();
+    const { data: selectedLiteproxyTier, isLoading: isLiteproxyLoading } =
+        useSelectedLiteproxyTier();
+
+    const isLoading = isRestApiLoading || isLiteproxyLoading;
 
     if (isLoading) {
         return (
@@ -15,19 +20,19 @@ const DashboardCardsList: FC<BoxProps> = props => {
     }
 
     return (
-        <Grid gridTemplate="1fr / repeat(4, 1fr)" {...props}>
-            {selectedTier && (
-                <GridItem
-                    gridColumn={
-                        selectedTier.price.amount.isZero()
-                            ? 'unset'
-                            : 'span 2'
-                    }
-                >
-                    <DashboardTierCard tier={selectedTier} />
-                </GridItem>
+        <Flex wrap="wrap" gap="4" {...props}>
+            {selectedRestApiTier && <DashboardTierCard tier={selectedRestApiTier} service="REST API" />}
+            {selectedLiteproxyTier && (
+                <DashboardTierCard
+                    tier={{
+                        name: selectedLiteproxyTier.name,
+                        rps: selectedLiteproxyTier.rps,
+                        renewsDate: selectedLiteproxyTier.next_payment
+                    }}
+                    service="Liteproxy"
+                />
             )}
-        </Grid>
+        </Flex>
     );
 };
 
