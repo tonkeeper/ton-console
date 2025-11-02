@@ -8,6 +8,8 @@ import { getProjectTonApiStats, DTOStats } from 'src/shared/api';
 import { CreateWebhookForm } from './interfaces';
 import { Address } from '@ton/core';
 import { Network } from 'src/shared';
+import { ChartPoint, TimePeriod } from '../../statistics/model/queries';
+import { getPeriodConfig, getTimestampRange } from '../../statistics/model/time-periods';
 
 export type Subscription = RTWebhookAccountTxSubscriptions['account_tx_subscriptions'][0];
 
@@ -17,6 +19,28 @@ const WEBHOOKS_KEYS = {
   stats: (projectId: number | undefined) => ['webhooks', 'stats', projectId],
   subscriptions: (projectId: number | undefined, webhookId: number, page: number) => ['webhooks', 'subscriptions', projectId, webhookId, page]
 };
+
+// Mappers
+export function mapWebhooksStatsToChartPoints(
+  stats: DTOStats,
+  type: 'delivered' | 'failed'
+): ChartPoint[] {
+  interface WebhookStatItem {
+    metric: { type: string };
+    values: [number, string][];
+  }
+
+  const items = (stats.result as unknown as WebhookStatItem[])
+    .filter(item => item.metric?.type === type)
+    .flatMap(item =>
+      item.values.map(([timestamp, value]) => ({
+        time: timestamp * 1000,
+        value: parseFloat(value)
+      }))
+    );
+
+  return items;
+}
 
 /**
  * Fetch all webhooks for a project
@@ -51,29 +75,22 @@ export function useWebhooksQuery(network: Network) {
 /**
  * Fetch webhook stats
  */
-export function useWebhooksStatsQuery() {
+export function useWebhooksStatsQuery(period: TimePeriod = 'last_6h') {
   const projectId = useProjectId();
+  const config = getPeriodConfig(period);
+  const { start, end } = getTimestampRange(period);
 
   return useQuery({
-    queryKey: WEBHOOKS_KEYS.stats(projectId || undefined),
+    queryKey: [...WEBHOOKS_KEYS.stats(projectId || undefined), period],
     queryFn: async () => {
       if (!projectId) return null;
-
-      const now = new Date();
-      const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-
-      const startMonthTimestamp = Math.floor(startOfMonth.getTime() / 1000);
-      const endTimestamp = Math.floor(now.getTime() / 1000);
-
-      const parts = (endTimestamp - startMonthTimestamp) / (60 * 60);
-      const startTimestamp = parts > 500 ? endTimestamp - 500 * (60 * 60) : startMonthTimestamp;
 
       const { data, error } = await getProjectTonApiStats({
         query: {
           project_id: projectId,
-          start: startTimestamp,
-          end: endTimestamp,
-          step: 60 * 60,
+          start,
+          end,
+          step: config.stepSeconds,
           dashboard: 'tonapi_webhook'
         }
       });
@@ -83,7 +100,7 @@ export function useWebhooksStatsQuery() {
       return data.stats as DTOStats;
     },
     enabled: !!projectId,
-    staleTime: 5 * 60 * 1000
+    staleTime: 30 * 1000 // Aligned with other stats (30 seconds)
   });
 }
 
