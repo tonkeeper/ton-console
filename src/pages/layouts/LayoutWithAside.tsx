@@ -29,7 +29,7 @@ export const LayoutWithAside: FC = () => {
                 </Box>
             </GridItem>
 
-            <GridItem area="content" overflow="auto" pr="4">
+            <GridItem area="content" overflow="auto" mb="6" pr="4">
                 <ErrorBoundary fallback={<ErrorPage />}>
                     <Outlet />
                 </ErrorBoundary>
