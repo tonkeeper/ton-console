@@ -27,7 +27,7 @@ export const AnalyticsQueryResultsCountdown: FC<BoxProps & { query: AnalyticsQue
                 '< 1s'
             )}
             &nbsp;·&nbsp;
-            {query.estimatedCost.toStringCurrencyAmount({ decimalPlaces: null })}
+            {query.estimatedCost.toStringCurrencyAmount()}
         </Flex>
     );
 };

@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx';
-import { createReaction, Loadable, Network, TonCurrencyAmount } from 'src/shared';
+import { createReaction, Loadable, Network, UsdCurrencyAmount } from 'src/shared';
 import { estimateStatsQuery, DTOChain, DTOStatsEstimateQuery } from 'src/shared/api';
 import { AnalyticsQueryTemplate } from './interfaces';
 import { DTOChainNetworkMap } from 'src/shared/lib/blockchain/network';
@@ -110,14 +110,13 @@ function mapDTOStatsEstimateSQLToAnalyticsQuery(
     network: DTOChain,
     value: DTOStatsEstimateQuery
 ): AnalyticsQueryTemplate {
+    console.log(value.approximate_usd_cost);
     return {
         request,
         network: DTOChainNetworkMap[network],
         estimatedTimeMS: value.approximate_time,
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        estimatedCost: new TonCurrencyAmount(value.approximate_cost),
+
+        estimatedCost: new UsdCurrencyAmount(value.approximate_usd_cost),
         explanation: value.explain!
     };
 }

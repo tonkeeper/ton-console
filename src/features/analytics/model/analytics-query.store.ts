@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx';
-import { createReaction, Loadable, Network, TonCurrencyAmount } from 'src/shared';
+import { createReaction, Loadable, Network, UsdCurrencyAmount } from 'src/shared';
 import {
     getStatsDdl,
     sendQueryToStats,
@@ -36,7 +36,10 @@ export class AnalyticsQueryStore {
         return this.setRepeatOnQuery.isLoading || this.removeRepeatOnQuery.isLoading;
     }
 
-    constructor(analyticsGPTGenerationStore: AnalyticsGPTGenerationStore, private readonly project: Project) {
+    constructor(
+        analyticsGPTGenerationStore: AnalyticsGPTGenerationStore,
+        private readonly project: Project
+    ) {
         this.analyticsGPTGenerationStore = analyticsGPTGenerationStore;
         makeAutoObservable(this);
 
@@ -247,6 +250,10 @@ export class AnalyticsQueryStore {
 }
 
 export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult): AnalyticsQuery {
+    if (!value.estimate) {
+        throw new Error('Estimate is required');
+    }
+
     const basicQuery = {
         type: 'query',
         id: value.id,
@@ -254,10 +261,7 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         gptPrompt: value.query?.gpt_message,
         request: value.query!.sql!,
         estimatedTimeMS: value.estimate!.approximate_time,
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        estimatedCost: new TonCurrencyAmount(value.estimate!.approximate_cost),
+        estimatedCost: new UsdCurrencyAmount(value.estimate.approximate_usd_cost),
         explanation: value.estimate!.explain!,
         name: value.name,
         ...(value.query?.repeat_interval && {
@@ -277,10 +281,7 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         return {
             ...basicQuery,
             status: 'success',
-            // TODO: PRICES remove this after backend will be updated
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            cost: new TonCurrencyAmount(value.cost!),
+            cost: new UsdCurrencyAmount(value.usd_cost!),
             spentTimeMS: value.spent_time!,
             csvUrl: value.url!,
             preview: parsePreview(value.preview!, !!value.all_data_in_preview),
@@ -290,11 +291,8 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
 
     return {
         ...basicQuery,
-        status: 'error',
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        cost: new TonCurrencyAmount(value.cost!),
+        status: 'error',    
+        cost: new UsdCurrencyAmount(value.usd_cost!),
         spentTimeMS: value.spent_time!,
         errorReason: value.error!
     };
