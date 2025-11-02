@@ -30,7 +30,7 @@ const MetricChartContent: FC<MetricChartContentProps> = ({
 
     if (isLoading) {
         return (
-            <Box {...props}>
+            <Box w="100%" {...props}>
                 <Text textStyle="body2" mb="2" color="text.secondary">
                     {title}
                 </Text>
@@ -43,7 +43,7 @@ const MetricChartContent: FC<MetricChartContentProps> = ({
 
     if (error) {
         return (
-            <Box {...props}>
+            <Box w="100%" {...props}>
                 <Text textStyle="body2" mb="2" color="text.secondary">
                     {title}
                 </Text>
@@ -58,7 +58,7 @@ const MetricChartContent: FC<MetricChartContentProps> = ({
 
     if (!data || data.length === 0) {
         return (
-            <Box {...props}>
+            <Box w="100%" {...props}>
                 <Text textStyle="body2" mb="2" color="text.secondary">
                     {title}
                 </Text>
@@ -72,11 +72,11 @@ const MetricChartContent: FC<MetricChartContentProps> = ({
     }
 
     return (
-        <Box {...props}>
+        <Box w="100%" {...props}>
             <Text textStyle="body2" mb="2" color="text.secondary">
                 {title}
             </Text>
-            <Box h={dataHeight}>
+            <Box w="100%" h={dataHeight}>
                 <MetricChart
                     data={data}
                     title={title}

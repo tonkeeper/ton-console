@@ -1,6 +1,9 @@
 import { FC } from 'react';
 import { useDisclosure, BoxProps, useTheme, Center, Text } from '@chakra-ui/react';
-import { useWebhooksStatsQuery, mapWebhooksStatsToChartPoints } from 'src/features/tonapi/webhooks/model/queries';
+import {
+    useWebhooksStatsQuery,
+    mapWebhooksStatsToChartPoints
+} from 'src/features/tonapi/webhooks/model/queries';
 import { useSelectedLiteproxyTier } from 'src/features/tonapi/liteproxy/model/queries';
 import { TimePeriod } from '../model/queries';
 import MetricGroupCard from './MetricGroupCard';
@@ -9,9 +12,14 @@ import MetricChartModal from './MetricChartModal';
 
 interface DashboardWebhooksChartProps extends BoxProps {
     period: TimePeriod;
+    childrenDirection?: 'row' | 'column';
 }
 
-const DashboardWebhooksChart: FC<DashboardWebhooksChartProps> = ({ period, ...props }) => {
+const DashboardWebhooksChart: FC<DashboardWebhooksChartProps> = ({
+    period,
+    childrenDirection,
+    ...props
+}) => {
     const { colors } = useTheme();
     const { data, isLoading, error } = useWebhooksStatsQuery(period);
     const { data: selectedLiteproxyTier } = useSelectedLiteproxyTier();
@@ -19,7 +27,8 @@ const DashboardWebhooksChart: FC<DashboardWebhooksChartProps> = ({ period, ...pr
 
     const failedData = data ? mapWebhooksStatsToChartPoints(data, 'failed') : null;
     const deliveredData = data ? mapWebhooksStatsToChartPoints(data, 'delivered') : null;
-    const hasData = (failedData && failedData.length > 0) || (deliveredData && deliveredData.length > 0);
+    const hasData =
+        (failedData && failedData.length > 0) || (deliveredData && deliveredData.length > 0);
     const isServiceActive = !!selectedLiteproxyTier;
 
     // c. If no data at all (never used), don't render - even if tier is active
@@ -50,19 +59,12 @@ const DashboardWebhooksChart: FC<DashboardWebhooksChartProps> = ({ period, ...pr
     return (
         <>
             <MetricGroupCard
-                title="Webhook Statistics"
+                title="Webhook"
                 onExpand={onOpen}
                 hasData={hasData}
+                childrenDirection={childrenDirection}
                 {...props}
             >
-                <MetricChartContent
-                    title="Failed"
-                    data={failedData && failedData.length > 0 ? failedData : null}
-                    isLoading={isLoading}
-                    error={error}
-                    color={colors.accent.red}
-                    compact={!hasData}
-                />
                 <MetricChartContent
                     title="Delivered"
                     data={deliveredData && deliveredData.length > 0 ? deliveredData : null}
@@ -71,11 +73,19 @@ const DashboardWebhooksChart: FC<DashboardWebhooksChartProps> = ({ period, ...pr
                     color={colors.accent.blue}
                     compact={!hasData}
                 />
+                <MetricChartContent
+                    title="Failed"
+                    data={failedData && failedData.length > 0 ? failedData : null}
+                    isLoading={isLoading}
+                    error={error}
+                    color={colors.accent.red}
+                    compact={!hasData}
+                />
             </MetricGroupCard>
             <MetricChartModal
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Webhook Statistics"
+                title="Webhook"
                 charts={[
                     {
                         title: 'Failed webhook requests',

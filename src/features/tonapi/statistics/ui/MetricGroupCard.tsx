@@ -7,9 +7,10 @@ interface MetricGroupCardProps extends BoxProps {
     onExpand?: () => void;
     children: ReactNode;
     hasData?: boolean;
+    childrenDirection?: 'row' | 'column';
 }
 
-const MetricGroupCard: FC<MetricGroupCardProps> = ({ title, onExpand, children, hasData, ...rest }) => {
+const MetricGroupCard: FC<MetricGroupCardProps> = ({ title, onExpand, children, hasData, childrenDirection = 'column', ...rest }) => {
     return (
         <Box p="4" borderWidth="1px" borderColor="border.primary" borderRadius="12px" {...rest}>
             <Flex align="center" justify="space-between" mb="4">
@@ -26,7 +27,7 @@ const MetricGroupCard: FC<MetricGroupCardProps> = ({ title, onExpand, children, 
                     />
                 )}
             </Flex>
-            <Flex direction="column" gap="4">
+            <Flex direction={childrenDirection} gap="4">
                 {children}
             </Flex>
         </Box>

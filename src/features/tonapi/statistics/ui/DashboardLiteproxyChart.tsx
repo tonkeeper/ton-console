@@ -8,9 +8,10 @@ import MetricChartModal from './MetricChartModal';
 
 interface DashboardLiteproxyChartProps extends BoxProps {
     period: TimePeriod;
+    childrenDirection?: 'row' | 'column';
 }
 
-const DashboardLiteproxyChart: FC<DashboardLiteproxyChartProps> = ({ period, ...props }) => {
+const DashboardLiteproxyChart: FC<DashboardLiteproxyChartProps> = ({ period, childrenDirection, ...props }) => {
     const { colors } = useTheme();
     const { data, isLoading, error } = useLiteproxyStats(period);
     const { data: selectedLiteproxyTier } = useSelectedLiteproxyTier();
@@ -52,6 +53,7 @@ const DashboardLiteproxyChart: FC<DashboardLiteproxyChartProps> = ({ period, ...
                 title="Liteproxy Statistics"
                 onExpand={onOpen}
                 hasData={hasData}
+                childrenDirection={childrenDirection}
                 {...props}
             >
                 <MetricChartContent
@@ -71,8 +73,6 @@ const DashboardLiteproxyChart: FC<DashboardLiteproxyChartProps> = ({ period, ...
                     error={error}
                     color={colors.accent.green}
                     compact={!hasData}
-                    limit={selectedLiteproxyTier?.rps}
-                    limitLabel="Limit"
                 />
             </MetricGroupCard>
             <MetricChartModal
@@ -90,9 +90,7 @@ const DashboardLiteproxyChart: FC<DashboardLiteproxyChartProps> = ({ period, ...
                     {
                         title: 'Liteproxy Connections',
                         data: connectionsData || [],
-                        color: colors.accent.green,
-                        limit: selectedLiteproxyTier?.rps,
-                        limitLabel: 'Limit'
+                        color: colors.accent.green
                     }
                 ]}
             />
