@@ -67,19 +67,36 @@ const DashboardPage: FC = () => {
                             </Text>
                             <PeriodSelector value={period} onChange={setPeriod} />
                         </Flex>
-                        <Grid gap="4" templateColumns="repeat(auto-fit, minmax(400px, 1fr))" mb="6">
-                            <GridItem>
+                        <Grid gap="4" mb="6">
+                            <GridItem colSpan={{ base: 1, lg: 1 }}>
                                 <DashboardChart period={period} />
                             </GridItem>
-                            {shouldShowLiteproxy && (
-                                <GridItem colSpan={{ base: 1, lg: 1 }}>
-                                    <DashboardLiteproxyChart period={period} />
-                                </GridItem>
-                            )}
-                            {shouldShowWebhooks && (
-                                <GridItem colSpan={{ base: 1, lg: 1 }}>
-                                    <DashboardWebhooksChart period={period} />
-                                </GridItem>
+                            {(shouldShowLiteproxy || shouldShowWebhooks) && (
+                                <Grid
+                                    gap="4"
+                                    templateColumns={{
+                                        base: '1fr',
+                                        lg: shouldShowLiteproxy && shouldShowWebhooks ? 'repeat(2, 1fr)' : '1fr'
+                                    }}
+                                    w="100%"
+                                >
+                                    {shouldShowLiteproxy && (
+                                        <GridItem>
+                                            <DashboardLiteproxyChart
+                                                period={period}
+                                                childrenDirection={shouldShowLiteproxy && shouldShowWebhooks ? 'column' : 'row'}
+                                            />
+                                        </GridItem>
+                                    )}
+                                    {shouldShowWebhooks && (
+                                        <GridItem>
+                                            <DashboardWebhooksChart
+                                                period={period}
+                                                childrenDirection={shouldShowLiteproxy && shouldShowWebhooks ? 'column' : 'row'}
+                                            />
+                                        </GridItem>
+                                    )}
+                                </Grid>
                             )}
                         </Grid>
                     </>
