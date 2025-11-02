@@ -1,8 +1,13 @@
 import { FC, useEffect, useState } from 'react';
-import { Box, Button, HStack, Select } from '@chakra-ui/react';
+import {
+    Box,
+    Button,
+    HStack,
+    Select
+} from '@chakra-ui/react';
 import { H4, useBillingHistoryQuery } from 'src/shared';
 import { useProjectId } from 'src/shared/contexts/ProjectContext';
-import { BillingHistoryTable } from 'src/features/billing';
+import { BillingHistoryTable, useBillingCsvExport } from 'src/features/billing';
 
 const DEFAULT_PAGE_SIZE = 10;
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const;
@@ -14,6 +19,7 @@ const BillingBlock: FC = () => {
     const [cursorStack, setCursorStack] = useState<string[]>([]);
     const [currentCursor, setCurrentCursor] = useState<string | undefined>(undefined);
     const projectId = useProjectId();
+    const { isExporting, exportedCount, exportFullHistory } = useBillingCsvExport();
 
     const { data: billingHistory = [], isLoading } = useBillingHistoryQuery({
         before_tx: currentCursor,
@@ -67,9 +73,23 @@ const BillingBlock: FC = () => {
         setPageNumber(1);
     };
 
+    const handleExportFullHistory = async () => {
+        await exportFullHistory();
+    };
+
     return (
         <Box px="6" py="5">
-            <H4 mb="5">Billing History</H4>
+            <HStack align="center" justify="space-between" mb="5">
+                <H4 m="0">Billing History</H4>
+                <Button
+                    isDisabled={!projectId || isExporting}
+                    onClick={handleExportFullHistory}
+                    size="sm"
+                    variant="secondary"
+                >
+                    {isExporting ? `Exporting (${exportedCount})...` : 'Download CSV'}
+                </Button>
+            </HStack>
             <BillingHistoryTable
                 billingHistory={billingHistory}
                 isLoading={isLoading}
