@@ -120,26 +120,28 @@ const RefillModalContent: FC<{
     });
 
     const paymentLink = useMemo(() => {
-        if (mode !== 'USDT') return null;
-
-        if (!usdtDepositWallet) return null;
-        if (amount === '' || Number(amount) === 0) return null;
-
+        const jettonAddress = import.meta.env.VITE_USDT_JETTON_ADDRESS;
         const address = currency_addresses.USDT;
-        if (!address) return null;
+
+        const invalidAmount = amount === '' || Number(amount) === 0;
+        if (
+            mode !== 'USDT' ||
+            !address ||
+            !jettonAddress ||
+            invalidAmount ||
+            isDepositAddressLoading
+        ) {
+            return null;
+        }
 
         const decimals = CURRENCY_DECIMALS.USDT;
         const numAmount = fromDecimals(amount, decimals);
 
         const options: Parameters<typeof createTransferLink>[1] = {
-            amount: numAmount.toString()
+            amount: numAmount.toString(),
+            text: 'TON Console: Refill',
+            jetton: jettonAddress
         };
-
-        const jettonAddress = import.meta.env.VITE_USDT_JETTON_ADDRESS;
-        if (!jettonAddress) return null;
-        options.jetton = jettonAddress;
-
-        options.text = 'TON Console: Refill';
 
         return createTransferLink(address, options);
     }, [mode, amount, usdtDepositWallet]);
@@ -187,15 +189,14 @@ const RefillModalContent: FC<{
                 // Show toast notification
                 toast({
                     title: 'Refill detected',
-                    description: `${item.amount.stringCurrencyAmount} received at ${item.date.toLocaleTimeString(
-                        'en-US',
-                        {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit',
-                            hour12: false
-                        }
-                    )}`,
+                    description: `${
+                        item.amount.stringCurrencyAmount
+                    } received at ${item.date.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false
+                    })}`,
                     status: 'success',
                     position: 'bottom-left',
                     isClosable: true,
