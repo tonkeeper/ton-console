@@ -10,9 +10,8 @@ import {
     ModalFooter,
     ModalHeader
 } from '@chakra-ui/react';
-import { CURRENCY, formatWithSuffix, Span } from 'src/shared';
+import { formatWithSuffix, Span } from 'src/shared';
 import { AppMessagesPackage } from '../model';
-import { CurrencyRate } from 'src/entities';
 import { useBuyPackageMutation } from '../model/queries';
 
 const MessagesPaymentConfirmationModalContent: FC<{

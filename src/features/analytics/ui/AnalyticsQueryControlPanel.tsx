@@ -1,13 +1,5 @@
 import { FC, useEffect } from 'react';
-import {
-    BoxProps,
-    Button,
-    Center,
-    Flex,
-    Skeleton,
-    Spacer,
-    useDisclosure
-} from '@chakra-ui/react';
+import { BoxProps, Button, Center, Flex, Skeleton, Spacer, useDisclosure } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { InfoIcon16, Span, TooltipHoverable, toTimeLeft } from 'src/shared';
 import { AnalyticsQueryStore, AnalyticsQueryRequestStore } from 'src/features';
@@ -16,7 +8,7 @@ import { computed } from 'mobx';
 import ExplainSQLModal from './ExplainSQLModal';
 import RefillModal from 'src/entities/balance/ui/RefillModal';
 import { InsufficientBalanceModal } from 'src/entities/balance/ui/InsufficientBalanceModal';
-import { AxiosError } from 'axios';
+import { useInsufficientBalanceModal } from './hooks';
 
 interface AnalyticsQueryControlPanelProps extends BoxProps {
     type: 'sql' | 'gpt';
@@ -33,18 +25,13 @@ const AnalyticsQueryControlPanel: FC<AnalyticsQueryControlPanelProps> = ({
     ...props
 }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const { isOpen: isRefillOpen, onClose: onRefillClose, onOpen: onRefillOpen } = useDisclosure();
     const {
         isOpen: isInsufficientBalanceOpen,
         onClose: onInsufficientBalanceClose,
-        onOpen: onInsufficientBalanceOpen
-    } = useDisclosure();
-    const {
-        isOpen: isRefillOpen,
-        onClose: onRefillClose,
-        onOpen: onRefillOpen
-    } = useDisclosure();
-
-    let insufficientBalanceError = '';
+        error: insufficientBalanceError,
+        handlePaymentRequiredError
+    } = useInsufficientBalanceModal();
 
     const store = type === 'sql' ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
     const request = store.request$.value;
@@ -64,22 +51,16 @@ const AnalyticsQueryControlPanel: FC<AnalyticsQueryControlPanelProps> = ({
             !analyticsQueryStore.createQuery.isLoading
     );
 
-    const onCreate = async (): Promise<void> => {
-        try {
-            const query = await analyticsQueryStore.createQuery(
-                store.request$.value!.request,
-                store.request$.value!.network
-            );
-            setSearchParams({ id: query.id });
-        } catch (error) {
-            const axiosError = error as AxiosError<{ error: string }>;
-            if (axiosError?.response?.status === 402) {
-                // Handle insufficient balance error from server
-                insufficientBalanceError = axiosError?.response?.data?.error || 'Insufficient balance to execute this query';
-                onInsufficientBalanceOpen();
-            }
-            // Other errors are handled by the toast in the store
-        }
+    const onCreate = (): void => {
+        analyticsQueryStore
+            .createQuery(store.request$.value!.request, store.request$.value!.network)
+            .then(({ data, error }) => {
+                if (error) {
+                    handlePaymentRequiredError(error);
+                    return;
+                }
+                setSearchParams({ id: data!.id });
+            });
     };
 
     useEffect(() => {
@@ -216,7 +197,7 @@ const AnalyticsQueryControlPanel: FC<AnalyticsQueryControlPanelProps> = ({
                 isOpen={isInsufficientBalanceOpen}
                 onClose={onInsufficientBalanceClose}
                 onOpenRefill={onRefillOpen}
-                errorMessage={insufficientBalanceError}
+                error={insufficientBalanceError}
             />
             <RefillModal isOpen={isRefillOpen} onClose={onRefillClose} />
         </Flex>

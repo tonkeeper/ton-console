@@ -18,7 +18,7 @@ import { AnalyticsGraphQueryStore } from '../../model';
 import { useSearchParams } from 'react-router-dom';
 import RefillModal from 'src/entities/balance/ui/RefillModal';
 import { InsufficientBalanceModal } from 'src/entities/balance/ui/InsufficientBalanceModal';
-import { AxiosError } from 'axios';
+import { useInsufficientBalanceModal } from '../hooks';
 
 interface GraphAnalyticsFormProps extends BoxProps {
     analyticsGraphQueryStore: AnalyticsGraphQueryStore;
@@ -38,45 +38,37 @@ const GraphAnalyticsForm: FC<GraphAnalyticsFormProps> = ({
         addresses: string;
     }>();
     const [_, setSearchParams] = useSearchParams();
+    const { isOpen: isRefillOpen, onClose: onRefillClose, onOpen: onRefillOpen } = useDisclosure();
     const {
         isOpen: isInsufficientBalanceOpen,
         onClose: onInsufficientBalanceClose,
-        onOpen: onInsufficientBalanceOpen
-    } = useDisclosure();
-    const {
-        isOpen: isRefillOpen,
-        onClose: onRefillClose,
-        onOpen: onRefillOpen
-    } = useDisclosure();
-
-    let insufficientBalanceError = '';
+        error: insufficientBalanceError,
+        handlePaymentRequiredError
+    } = useInsufficientBalanceModal();
 
     const onSubmit = async (form: { isBetweenAccountsOnly: boolean; addresses: string }) => {
-        try {
-            const addresses = form.addresses
-                .replaceAll(/[,; \t\v\f\r]/g, '')
-                .trim()
-                .split('\n')
-                .map(value => {
-                    if (/^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-.]+$/.test(value)) {
-                        return value.toLowerCase();
-                    }
-                    return value;
-                });
-            const query = await analyticsGraphQueryStore.createQuery({
+        const addresses = form.addresses
+            .replaceAll(/[,; \t\v\f\r]/g, '')
+            .trim()
+            .split('\n')
+            .map(value => {
+                if (/^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-.]+$/.test(value)) {
+                    return value.toLowerCase();
+                }
+                return value;
+            });
+        analyticsGraphQueryStore
+            .createQuery({
                 addresses,
                 isBetweenSelectedOnly: form.isBetweenAccountsOnly
+            })
+            .then(({ data, error }) => {
+                if (error) {
+                    handlePaymentRequiredError(error);
+                    return;
+                }
+                setSearchParams({ id: data!.id });
             });
-            setSearchParams({ id: query.id });
-        } catch (error) {
-            const axiosError = error as AxiosError<{ error: string }>;
-            if (axiosError?.response?.status === 402) {
-                // Handle insufficient balance error from server
-                insufficientBalanceError = axiosError?.response?.data?.error || 'Insufficient balance to execute this query';
-                onInsufficientBalanceOpen();
-            }
-            // Other errors are handled by the toast in the store
-        }
     };
 
     const isFormDisabled =
@@ -172,7 +164,7 @@ const GraphAnalyticsForm: FC<GraphAnalyticsFormProps> = ({
                                         >
                                             Send
                                         </Button>
-                                        <Box>The request can cost from 0.01 up to 1 TON</Box>
+                                        <Box>The request can cost from 0.01 up to 5 USD</Box>
                                     </Flex>
                                 </>
                             )}
@@ -184,7 +176,7 @@ const GraphAnalyticsForm: FC<GraphAnalyticsFormProps> = ({
                 isOpen={isInsufficientBalanceOpen}
                 onClose={onInsufficientBalanceClose}
                 onOpenRefill={onRefillOpen}
-                errorMessage={insufficientBalanceError}
+                error={insufficientBalanceError}
             />
             <RefillModal isOpen={isRefillOpen} onClose={onRefillClose} />
         </chakra.form>
