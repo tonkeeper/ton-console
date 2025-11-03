@@ -9,3 +9,15 @@ export type Balance = {
         promo_amount: bigint;
     };
 };
+
+export type SufficiencyCheckResult = {
+    canPay: boolean;
+    usdt: {
+        sufficient: boolean;
+        deficit: bigint;
+    };
+    ton?: {
+        sufficient: boolean;
+        deficit: bigint;
+    };
+};

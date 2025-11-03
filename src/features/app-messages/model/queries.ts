@@ -57,7 +57,7 @@ export function usePackagesQuery() {
 /**
  * Hook to fetch messages balance for current project
  */
-export function useBalanceQuery() {
+export function useMessagesBalanceQuery() {
     const projectId = useProjectId();
 
     return useQuery({

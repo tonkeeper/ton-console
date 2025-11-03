@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
+import BigNumber from 'bignumber.js';
 import {
     getProjectBillingHistory,
     DTOBalance
 } from 'src/shared/api';
 import { useProjectId } from 'src/shared/contexts/ProjectContext';
 import { tonapiMainnet, toDecimals } from 'src/shared';
-import { Balance } from './interfaces';
+import { Balance, SufficiencyCheckResult } from './interfaces';
 
 const BALANCE_QUERY_KEY = ['balance'] as const;
 const TON_RATE_QUERY_KEY = ['ton-rate'] as const;
@@ -41,6 +42,97 @@ function mapDTOBalanceToBalance(
             }
         })
     };
+}
+
+// ==================== Sufficiency Check Function ====================
+
+/**
+ * Calculate balance sufficiency for a given USD amount
+ * @param balance Current balance (USDT + optionally TON)
+ * @param amountInUsd Amount to check (in USD, can be decimal like 0.2 or 10.5)
+ * @param tonRate Current TON/USD exchange rate
+ * @param includePromo Whether to include promo amount in the check
+ * @returns SufficiencyCheckResult with detailed breakdown
+ */
+export function calculateBalanceSufficiency(
+    balance: Balance,
+    amountInUsd: BigNumber | number,
+    tonRate: number,
+    includePromo = true
+): SufficiencyCheckResult {
+    const amountBn = amountInUsd instanceof BigNumber ? amountInUsd : new BigNumber(amountInUsd);
+
+    // Convert USD amount to cents (since USDT is in 6 decimals, but we work in cents for simplicity)
+    const amountInCents = amountBn.multipliedBy(100);
+
+    // Check USDT sufficiency
+    const usdtBalance = includePromo
+        ? balance.usdt.amount + balance.usdt.promo_amount
+        : balance.usdt.amount;
+
+    const usdtSufficient = usdtBalance >= BigInt(amountInCents.toFixed(0));
+    const usdtDeficit = usdtSufficient ? BigInt(0) : BigInt(amountInCents.toFixed(0)) - usdtBalance;
+
+    // Check TON sufficiency (if TON balance exists)
+    let tonSufficient = false;
+    let tonDeficit = BigInt(0);
+
+    if (balance.ton) {
+        const tonBalance = includePromo
+            ? balance.ton.amount + balance.ton.promo_amount
+            : balance.ton.amount;
+
+        // Convert TON to USD equivalent
+        // tonBalance is in nanoTON (10^9), so convert to TON first
+        const tonInUsd = Number(tonBalance) / Math.pow(10, TON_DECIMALS) * tonRate;
+        const tonInUsdCents = new BigNumber(tonInUsd).multipliedBy(100);
+
+        tonSufficient = tonInUsdCents.gte(amountInCents);
+        tonDeficit = tonSufficient ? BigInt(0) : BigInt(amountInCents.minus(tonInUsdCents).toFixed(0));
+    }
+
+    return {
+        canPay: usdtSufficient || tonSufficient,
+        usdt: {
+            sufficient: usdtSufficient,
+            deficit: usdtDeficit
+        },
+        ...(balance.ton && {
+            ton: {
+                sufficient: tonSufficient,
+                deficit: tonDeficit
+            }
+        })
+    };
+}
+
+/**
+ * Get the minimum deficit needed to make payment possible
+ * @param check SufficiencyCheckResult from calculateBalanceSufficiency
+ * @returns The minimum deficit (in the currency that needs less funding)
+ */
+export function getPaymentDeficit(check: SufficiencyCheckResult): bigint {
+    if (check.canPay) {
+        return BigInt(0);
+    }
+
+    // If only USDT is insufficient
+    if (!check.usdt.sufficient && (!check.ton || check.ton.sufficient)) {
+        return check.usdt.deficit;
+    }
+
+    // If only TON is insufficient
+    if (check.ton && !check.ton.sufficient && check.usdt.sufficient) {
+        return check.ton.deficit;
+    }
+
+    // Both are insufficient - return the minimum deficit
+    if (check.ton && !check.ton.sufficient && !check.usdt.sufficient) {
+        return check.ton.deficit < check.usdt.deficit ? check.ton.deficit : check.usdt.deficit;
+    }
+
+    // Fallback (shouldn't reach here)
+    return check.usdt.deficit;
 }
 
 // ==================== API Functions ====================
@@ -110,4 +202,25 @@ export function useTonRateQuery() {
         staleTime: 5 * 60 * 1000, // Cache for 5 minutes
         retry: 1
     });
+}
+
+/**
+ * Hook to check if balance is sufficient for a given USD amount
+ * @param amountInUsd Amount in USD (can be decimal like 0.2)
+ * @param options Options for the check
+ * @returns SufficiencyCheckResult or undefined if loading/error
+ */
+export function useBalanceSufficiencyCheck(
+    amountInUsd: BigNumber | number | null | undefined,
+    options?: { includePromo?: boolean }
+): SufficiencyCheckResult | undefined {
+    const { data: balance } = useBalanceQuery();
+    const { data: tonRate } = useTonRateQuery();
+
+    // Return undefined while loading or if dependencies are missing
+    if (!balance || !tonRate || !amountInUsd) {
+        return undefined;
+    }
+
+    return calculateBalanceSufficiency(balance, amountInUsd, tonRate, options?.includePromo ?? true);
 }

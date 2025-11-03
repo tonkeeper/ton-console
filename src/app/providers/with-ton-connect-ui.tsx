@@ -6,7 +6,7 @@ export const withTonConnectUI = (component: () => ReactNode) => {
     const WithTonConnectUI = () => (
         <TonConnectUIProvider
             manifestUrl={EXTERNAL_LINKS.TONCONNECT_MANIFEST}
-            walletsPreferredFeatures={{
+            walletsRequiredFeatures={{
                 sendTransaction: {
                     minMessages: 16
                 }
