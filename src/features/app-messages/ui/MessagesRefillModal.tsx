@@ -18,13 +18,13 @@ import {
     UseRadioProps,
     VStack
 } from '@chakra-ui/react';
-import { CURRENCY, FilledWarnIcon16, formatWithSuffix, H4 } from 'src/shared';
+import { FilledWarnIcon16, formatWithSuffix, H4 } from 'src/shared';
 import { RadioCard } from 'src/shared/ui/checkbox';
 import { AppMessagesPackage } from '../model';
-import { CurrencyRate, RefillModalContent } from 'src/entities';
+import { RefillModalContent } from 'src/entities';
 import MessagesPaymentConfirmationModalContent from './MessagesPaymentConfirmationModalContent';
 import { usePackagesQuery } from '../model/queries';
-import { useBalanceQuery } from 'src/features/balance';
+import { useBalanceSufficiencyCheck, getPaymentDeficit } from 'src/features/balance';
 
 const MessagesRefillModal: FC<{
     isOpen: boolean;
@@ -32,7 +32,6 @@ const MessagesRefillModal: FC<{
 }> = ({ isOpen, onClose }) => {
     const { data: options = [] } = usePackagesQuery();
     const [selectedPlan, setSelectedPlan] = useState<AppMessagesPackage | null>(null);
-    const { data: balance } = useBalanceQuery();
 
     const { getRootProps, getRadioProps } = useRadioGroup({
         name: 'package',
@@ -40,12 +39,8 @@ const MessagesRefillModal: FC<{
         onChange: name => setSelectedPlan(options.find(pkg => pkg.name === name) || null)
     });
     const group = getRootProps();
-    const notEnoughAmount =
-        balance &&
-        selectedPlan &&
-        BigInt(balance.ton?.amount || 0) < BigInt(selectedPlan.price.amount.toNumber())
-            ? BigInt(selectedPlan.price.amount.toNumber()) - BigInt(balance.ton?.amount || 0)
-            : 0;
+    const sufficiencyCheck = useBalanceSufficiencyCheck(selectedPlan?.price.amount || null);
+    const notEnoughAmount = sufficiencyCheck ? getPaymentDeficit(sufficiencyCheck) : BigInt(0);
 
     useEffect(() => {
         setSelectedPlan(options[0]);
@@ -94,21 +89,9 @@ const MessagesRefillModal: FC<{
                                             {pkg.price.stringCurrencyAmount}
                                         </Text>
                                     </Flex>
-                                    <Flex justify="space-between" w="100%">
-                                        <Text textStyle="body2" color="text.secondary">
-                                            {formatWithSuffix(pkg.messagesIncluded)} messages
-                                        </Text>
-                                        <CurrencyRate
-                                            textStyle="body2"
-                                            color="text.secondary"
-                                            leftSign=""
-                                            textAlign="end"
-                                            currency={CURRENCY.TON}
-                                            amount={pkg.price.amount}
-                                            reverse
-                                            contentUnderSkeleton="&nbsp;TON"
-                                        />
-                                    </Flex>
+                                    <Text textStyle="body2" color="text.secondary">
+                                        {formatWithSuffix(pkg.messagesIncluded)} messages
+                                    </Text>
                                 </Box>
                             </RadioCard>
                         ))}
