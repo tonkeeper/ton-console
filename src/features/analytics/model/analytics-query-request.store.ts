@@ -110,7 +110,6 @@ function mapDTOStatsEstimateSQLToAnalyticsQuery(
     network: DTOChain,
     value: DTOStatsEstimateQuery
 ): AnalyticsQueryTemplate {
-    console.log(value.approximate_usd_cost);
     return {
         request,
         network: DTOChainNetworkMap[network],

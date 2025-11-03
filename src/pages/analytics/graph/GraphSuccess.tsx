@@ -10,7 +10,7 @@ interface GraphSuccessProps {
 
 export const GraphSuccess: FC<GraphSuccessProps> = ({ query }) => {
     const [_, setSearchParams] = useSearchParams();
-    const { hasCopied, onCopy } = useClipboard(query.addresses.map(a => a.userFriendly).join('\n'));
+    const { hasCopied, onCopy } = useClipboard(query.addresses.map(a => a.toString()).join('\n'));
 
     return (
         <Overlay h="100%" maxH="100%" display="flex" flexDirection="column">

@@ -139,7 +139,7 @@ const NameRequestCell: FC<{
                     <>
                         Graph:&nbsp;
                         <Span color="accent.blue">
-                            {query.addresses.map(a => sliceAddress(a.userFriendly)).join(', ')}
+                            {query.addresses.map(a => sliceAddress(a.toString())).join(', ')}
                         </Span>
                     </>
                 ) : (

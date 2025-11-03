@@ -122,8 +122,12 @@ export class AnalyticsQueryStore {
                 }
             });
 
-            if (error) throw error;
-            return mapDTOStatsSqlResultToAnalyticsQuery(data);
+            const result = {
+                data: error ? undefined : mapDTOStatsSqlResultToAnalyticsQuery(data),
+                error: error ? error : undefined
+            };
+
+            return result;
         },
         {
             errorToast: e => ({
@@ -291,7 +295,7 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
 
     return {
         ...basicQuery,
-        status: 'error',    
+        status: 'error',
         cost: new UsdCurrencyAmount(value.usd_cost!),
         spentTimeMS: value.spent_time!,
         errorReason: value.error!

@@ -1,8 +1,9 @@
 import { makeAutoObservable } from 'mobx';
-import { createReaction, Loadable, TonAddress, UsdCurrencyAmount } from 'src/shared';
+import { createReaction, Loadable, UsdCurrencyAmount } from 'src/shared';
 import { getGraphFromStats, getSqlResultFromStats, DTOStatsQueryResult } from 'src/shared/api';
 import { AnalyticsGraphQuery, AnalyticsGraphQueryBasic } from './interfaces';
 import { Project } from 'src/entities/project';
+import { Address } from '@ton/core';
 
 export class AnalyticsGraphQueryStore {
     query$ = new Loadable<AnalyticsGraphQuery | null>(null);
@@ -38,8 +39,12 @@ export class AnalyticsGraphQueryStore {
                 }
             });
 
-            if (error) throw error;
-            return mapDTOStatsGraphResultToAnalyticsGraphQuery(data);
+            const result = {
+                data: error ? undefined : mapDTOStatsGraphResultToAnalyticsGraphQuery(data),
+                error: error ? error : undefined
+            };
+
+            return result;
         },
         {
             onError: () => {
@@ -82,7 +87,7 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
     const basicQuery: AnalyticsGraphQueryBasic = {
         id: value.id,
         type: 'graph',
-        addresses: value.query!.addresses!.map(a => TonAddress.parse(a)),
+        addresses: value.query?.addresses?.map(a => Address.parse(a)) ?? [],
         creationDate: new Date(value.date_create),
         isBetweenSelectedOnly: value.query!.only_between!
     };

@@ -1120,6 +1120,8 @@ paths:
           $ref: '#/components/responses/StatsQueryResult'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '402':
+          $ref: '#/components/responses/PaymentRequiredError'
         '403':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -4010,6 +4012,23 @@ components:
               code:
                 type: integer
                 description: "backend error code"
+    PaymentRequiredError:
+      description: "Not enough funds"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error
+              - need_usd
+            properties:
+              error:
+                type: string
+                description: "Error message"
+              need_usd:
+                type: number
+                format: float64
+                description: "need USD on balance"
     UnauthorizedError:
       description: "Access token is missing or invalid"
       content:

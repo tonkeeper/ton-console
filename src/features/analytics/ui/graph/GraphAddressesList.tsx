@@ -1,8 +1,8 @@
 import { FC } from 'react';
 import { ListItem, ListProps, OrderedList } from '@chakra-ui/react';
-import { TonAddress } from 'src/shared';
+import { Address } from '@ton/core';
 
-export const GraphAddressesList: FC<ListProps & { addresses: TonAddress[] }> = ({
+export const GraphAddressesList: FC<ListProps & { addresses: Address[] }> = ({
     addresses,
     ...props
 }) => {
@@ -26,8 +26,8 @@ export const GraphAddressesList: FC<ListProps & { addresses: TonAddress[] }> = (
             {...props}
         >
             {addresses.map(address => (
-                <ListItem key={address.userFriendly} display="block">
-                    {address.userFriendly}
+                <ListItem key={address.toString()} display="block">
+                    {address.toString()}
                 </ListItem>
             ))}
         </OrderedList>
