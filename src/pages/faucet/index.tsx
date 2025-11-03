@@ -19,14 +19,11 @@ import {
 import { FormProvider, useForm } from 'react-hook-form';
 import BigNumber from 'bignumber.js';
 import { RefillModal } from 'src/entities';
-import { useBalanceQuery, useTonRateQuery } from 'src/features/balance';
+import { useBalanceSufficiencyCheck } from 'src/features/balance';
 import {
     useFaucetSupplyAndRate,
     useBuyTestnetCoinsMutation
 } from 'src/features/faucet/model/queries';
-
-const USDT_DIVISOR = 1_000_000;
-const TON_DIVISOR = 1_000_000_000;
 
 const FaucetPage: FC = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
@@ -47,15 +44,11 @@ const FaucetPage: FC = () => {
     const formId = useId();
 
     const methods = useForm<FaucetFormInternal>();
-    const { data: balance } = useBalanceQuery();
-    const { data: tonRate } = useTonRateQuery();
 
     const { watch } = methods;
     const inputAmount = watch('tonAmount');
     const testnetTonRate = supplyAndRate?.tonRate ?? 0;
     const testnetTonRateBigNumber = new BigNumber(testnetTonRate);
-    const tonRateBigNumber =
-        tonRate !== undefined ? new BigNumber(tonRate) : null;
 
     let price: UsdCurrencyAmount | undefined;
     if (
@@ -69,33 +62,15 @@ const FaucetPage: FC = () => {
         );
     }
 
-    const availableUsdtBalance = balance?.usdt
-        ? new BigNumber(balance.usdt.amount.toString()).dividedBy(USDT_DIVISOR)
-        : null;
-    const availableTonBalance = balance?.ton
-        ? new BigNumber(balance.ton.amount.toString()).dividedBy(TON_DIVISOR)
-        : null;
-    const availableTonBalanceInUsd =
-        availableTonBalance && tonRateBigNumber && tonRateBigNumber.gt(0)
-            ? availableTonBalance.multipliedBy(tonRateBigNumber)
-            : null;
+    const sufficiencyCheck = useBalanceSufficiencyCheck(price?.amount || null, {
+        includePromo: false
+    });
 
     const onSubmit = (form: RequestFaucetForm): void => {
         setReceiverAddress(form.receiverAddress);
         setAmount(form.amount);
 
-        const hasSufficientUsdt = !!(
-            price &&
-            availableUsdtBalance &&
-            availableUsdtBalance.gte(price.amount)
-        );
-        const hasSufficientTon = !!(
-            price &&
-            availableTonBalanceInUsd &&
-            availableTonBalanceInUsd.gte(price.amount)
-        );
-
-        if (price && (hasSufficientUsdt || hasSufficientTon)) {
+        if (price && sufficiencyCheck?.canPay) {
             return onOpen();
         }
 
