@@ -164,7 +164,7 @@ const GraphAnalyticsForm: FC<GraphAnalyticsFormProps> = ({
                                         >
                                             Send
                                         </Button>
-                                        <Box>The request can cost from 0.01 up to 1 TON</Box>
+                                        <Box>The request can cost from 0.01 up to 5 USD</Box>
                                     </Flex>
                                 </>
                             )}
