@@ -49,7 +49,7 @@ function mapRestApiTierToSubscription(tier: RestApiSelectedTier | null): Subscri
     return {
         id: `tonapi-${tier.id}`,
         plan: `REST API «${tier.name}»`,
-        interval: tier.type === 'monthly' ? 'Monthly' : 'Pay as you go',
+        interval: tier.type,
         renewsDate: tier.renewsDate,
         price: tier.price
     };

@@ -14,10 +14,13 @@ import { RestApiTier, RestApiSelectedTier } from './interfaces';
 
 // Mappers
 function mapTierToRestApiTier(tier: DTOTier): RestApiTier {
+    // Convert price for 1K requests for pay-as-you-go tiers
+    const usdPrice = tier.instant_payment ? tier.usd_price * 1000 : tier.usd_price;
+
     return {
         id: tier.id,
         name: tier.name,
-        price: new UsdCurrencyAmount(tier.usd_price),
+        price: new UsdCurrencyAmount(usdPrice),
         rps: tier.rpc,
         type: tier.instant_payment ? 'pay-as-you-go' : 'monthly'
     };
@@ -28,16 +31,12 @@ function mapAppTierToSelectedTier(tier: DTOAppTier | null): RestApiSelectedTier 
         return null;
     }
 
-    const nextPayment = tier.next_payment;
-    const usdPrice = tier.usd_price;
-    const renewsDate = nextPayment && usdPrice ? new Date(nextPayment) : undefined;
+    const { id, name, rpc, usd_price, instant_payment, next_payment } = tier;
+    const restApiTier = mapTierToRestApiTier({ id, name, rpc, usd_price, instant_payment });
+    const renewsDate = next_payment && usd_price ? new Date(next_payment) : undefined;
 
     return {
-        id: tier.id,
-        name: tier.name,
-        price: new UsdCurrencyAmount(usdPrice),
-        rps: tier.rpc,
-        type: tier.instant_payment ? 'pay-as-you-go' : 'monthly',
+        ...restApiTier,
         renewsDate,
         active: true
     };
@@ -58,7 +57,7 @@ export function useRestApiTiers() {
 
 export function useSelectedRestApiTier() {
     const project = useMaybeProject();
-    
+
     return useQuery({
         queryKey: ['selected-rest-api-tier', project?.id || undefined],
         queryFn: async () => {
@@ -76,7 +75,6 @@ export function useSelectedRestApiTier() {
     });
 }
 
-// Legacy export for backward compatibility
 export function useRestApiSelectedTierQuery() {
     return useSelectedRestApiTier();
 }
@@ -100,7 +98,7 @@ export function useSelectRestApiTierMutation() {
 
             return { tier: mapAppTierToSelectedTier(data.tier), _projectId: currentProjectId };
         },
-        onSuccess: (data) => {
+        onSuccess: data => {
             queryClient.invalidateQueries({
                 queryKey: ['selected-rest-api-tier', data._projectId]
             });
