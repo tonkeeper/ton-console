@@ -1,9 +1,10 @@
-import { TonAddress, UsdCurrencyAmount } from 'src/shared';
+import { Address } from '@ton/core';
+import { UsdCurrencyAmount } from 'src/shared';
 
 export interface AnalyticsGraphQueryBasic {
     type: 'graph';
     id: string;
-    addresses: TonAddress[];
+    addresses: Address[];
     isBetweenSelectedOnly: boolean;
     creationDate: Date;
 }

@@ -10,7 +10,7 @@ interface GraphErrorProps {
 
 export const GraphError: FC<GraphErrorProps> = ({ query }) => {
     const [_, setSearchParams] = useSearchParams();
-    const { hasCopied, onCopy } = useClipboard(query.addresses.map(a => a.userFriendly).join('\n'));
+    const { hasCopied, onCopy } = useClipboard(query.addresses.map(a => a.toString()).join('\n'));
     return (
         <Overlay display="flex" flexDirection="column">
             <H4 color="accent.red" mb="2" display="flex" alignItems="center">

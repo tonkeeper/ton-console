@@ -5270,6 +5270,19 @@ export type SendQueryToStatsErrors = {
         code: number;
     };
     /**
+     * Not enough funds
+     */
+    402: {
+        /**
+         * Error message
+         */
+        error: string;
+        /**
+         * need USD on balance
+         */
+        need_usd: number;
+    };
+    /**
      * Access token is missing or invalid
      */
     403: {
