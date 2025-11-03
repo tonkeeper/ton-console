@@ -24,6 +24,17 @@ interface SubscriptionListItemProps {
     subscription?: Subscription;
 }
 
+const intervalToText = (interval: string) => {
+    switch (interval) {
+        case 'month':
+            return 'Monthly';
+        case 'pay_as_you_go':
+            return 'Pay as you go';
+        default:
+            return interval;
+    }
+};
+
 const SubscriptionListItem: FC<SubscriptionListItemProps> = ({ subscription }) => {
     const navigate = useNavigate();
 
@@ -36,7 +47,7 @@ const SubscriptionListItem: FC<SubscriptionListItemProps> = ({ subscription }) =
                             {subscription.plan}
                         </Text>
                         <Text color="text.secondary" fontSize="sm">
-                            {subscription.interval}
+                            {intervalToText(subscription.interval)}
                             {subscription.renewsDate &&
                                 ` · Renews ${toDate(subscription.renewsDate)}`}
                         </Text>
@@ -78,7 +89,11 @@ const SubscriptionListItem: FC<SubscriptionListItemProps> = ({ subscription }) =
     );
 };
 
-const SubscriptionList: FC<SubscriptionListProps> = ({ subscriptions, isLoading = false, ...props }) => {
+const SubscriptionList: FC<SubscriptionListProps> = ({
+    subscriptions,
+    isLoading = false,
+    ...props
+}) => {
     // First load - show Spinner
     if (isLoading) {
         return (
