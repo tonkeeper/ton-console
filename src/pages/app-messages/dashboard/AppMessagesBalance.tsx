@@ -14,7 +14,7 @@ const AppMessagesBalance: FC<BoxProps> = props => {
                 Available messages
             </Text>
             <Box gap="2" display="flex" flexDirection="column">
-                <Text mb="0" flex="1">
+                <Text mb="0" flex="1" color={amount === 0 ? 'accent.red' : 'text.primary'} fontWeight={amount === 0 ? 'bold' : 'normal'}>
                     {isLoading ? <Skeleton w="80px" h="6" /> : formatWithSuffix(amount || 0)}{' '}
                     messages
                 </Text>
