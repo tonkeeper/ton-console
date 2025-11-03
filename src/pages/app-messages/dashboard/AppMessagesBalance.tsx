@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { formatWithSuffix, H4 } from 'src/shared';
+import { formatWithSuffix } from 'src/shared';
 import { Box, BoxProps, Button, Flex, Skeleton, Text, useDisclosure } from '@chakra-ui/react';
 import { MessagesRefillModal } from 'src/features';
 import { useMessagesBalanceQuery } from 'src/features/app-messages/model/queries';
@@ -13,15 +13,15 @@ const AppMessagesBalance: FC<BoxProps> = props => {
             <Text textStyle="label1" mb="5">
                 Available messages
             </Text>
-            <Box gap="2" display="flex" flexDirection="column">
-                <Text mb="0" flex="1" color={amount === 0 ? 'accent.red' : 'text.primary'} fontWeight={amount === 0 ? 'bold' : 'normal'}>
+            <Flex direction="column" gap="2">
+                <Text flex="1" mb="0" color={amount === 0 ? 'accent.red' : 'text.primary'} fontWeight={amount === 0 ? 'bold' : 'normal'}>
                     {isLoading ? <Skeleton w="80px" h="6" /> : formatWithSuffix(amount || 0)}{' '}
                     messages
                 </Text>
-                <Button onClick={onOpen} size="lg" variant="primary" w="100%">
+                <Button w="100%" onClick={onOpen} size="lg" variant="primary">
                     Refill
                 </Button>
-            </Box>
+            </Flex>
             <MessagesRefillModal isOpen={isOpen} onClose={onClose} />
         </Box>
     );
