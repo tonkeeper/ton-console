@@ -41,7 +41,7 @@ const AppMessagesAuthDocs: FC<BoxProps> = props => {
                     <CopyPad
                         isLoading={tokenLoading}
                         flex="1"
-                        wordBreak="break-all"
+                        breakAll={true}
                         text={token || ''}
                     />
                     <Button
