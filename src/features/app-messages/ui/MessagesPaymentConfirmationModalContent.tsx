@@ -50,17 +50,6 @@ const MessagesPaymentConfirmationModalContent: FC<{
                             <Span color="text.secondary">Price</Span>
                             <Span>{pkg.price.stringCurrencyAmount}</Span>
                         </Flex>
-                        <Flex justify="flex-end">
-                            <CurrencyRate
-                                color="text.secondary"
-                                textStyle="body2"
-                                currency={CURRENCY.TON}
-                                amount={pkg.price.amount}
-                                reverse
-                            >
-                                &nbsp;TON
-                            </CurrencyRate>
-                        </Flex>
                     </CardBody>
                 </Card>
             </ModalBody>
