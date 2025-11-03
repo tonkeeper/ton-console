@@ -17,10 +17,14 @@ import {
     isNumber,
     mergeRefs,
     Span,
-    TonCurrencyAmount
+    UsdCurrencyAmount
 } from 'src/shared';
 import { useIMask } from 'react-imask';
-import { useCNftConfig, useCNftAddressCheck, IndexingCnftCollectionDataT } from '../../model/queries';
+import {
+    useCNftConfig,
+    useCNftAddressCheck,
+    IndexingCnftCollectionDataT
+} from '../../model/queries';
 
 const CNFTAddForm = forwardRef<
     HTMLFormElement,
@@ -30,7 +34,13 @@ const CNFTAddForm = forwardRef<
     }
 >(({ id, onSubmit, ...rest }, ref) => {
     const { data: pricePerNFT, isLoading: isPriceLoading } = useCNftConfig();
-    const { mutate: checkCNft, data: checkedAddress, isPending: isCheckingAddress, error: checkError, reset: resetAddressCheck } = useCNftAddressCheck();
+    const {
+        mutate: checkCNft,
+        data: checkedAddress,
+        isPending: isCheckingAddress,
+        error: checkError,
+        reset: resetAddressCheck
+    } = useCNftAddressCheck();
     const [addressCheckError, setAddressCheckError] = useState<string | null>(null);
 
     const submitHandler = (form: IndexingCnftCollectionDataT): void => {
@@ -68,17 +78,14 @@ const CNFTAddForm = forwardRef<
 
     const inputCount = watch('count');
     const canCalculatePrice =
-        !isPriceLoading &&
-        inputCount > 0 &&
-        isNumber(inputCount) &&
-        inputCount >= 0.01;
+        !isPriceLoading && inputCount > 0 && isNumber(inputCount) && inputCount >= 0.01;
 
     const priceString =
         canCalculatePrice && pricePerNFT
-            ? TonCurrencyAmount.fromRelativeAmount(
+            ? new UsdCurrencyAmount(
                   pricePerNFT.amount.multipliedBy(inputCount)
               ).toStringCurrencyAmount({ decimalPlaces: 4 })
-            : undefined;
+            : '0';
 
     const { ref: maskRef } = useIMask({
         mask: Number,
@@ -94,9 +101,7 @@ const CNFTAddForm = forwardRef<
     const { nft_count, paid_indexing_count } = checkedAddress ?? {};
     const currentAddressDataExists = nft_count !== undefined && paid_indexing_count !== undefined;
     const invalidHelpText =
-        addressCheckError && !errors.account
-            ? addressCheckError
-            : 'Please enter cNFT address';
+        addressCheckError && !errors.account ? addressCheckError : 'Please enter cNFT address';
     const availableNFTCount = currentAddressDataExists ? nft_count - paid_indexing_count : 0;
     const addressHelpText = currentAddressDataExists
         ? `Collection NFT count: ${nft_count}, Paid: ${paid_indexing_count}, Available: ${availableNFTCount}`
@@ -116,12 +121,22 @@ const CNFTAddForm = forwardRef<
         valueAsNumber: true
     });
 
-    const handleAddressChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        checkCNft(e.target.value);
-    }, [checkCNft]);
+    const handleAddressChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            checkCNft(e.target.value);
+        },
+        [checkCNft]
+    );
 
     return (
-        <chakra.form ref={ref} id={id} w="100%" onSubmit={handleSubmit(submitHandler)} noValidate {...rest}>
+        <chakra.form
+            ref={ref}
+            id={id}
+            w="100%"
+            onSubmit={handleSubmit(submitHandler)}
+            noValidate
+            {...rest}
+        >
             <FormControl isInvalid={!!errors.account} isRequired>
                 <FormLabel htmlFor="address">Address</FormLabel>
                 <AsyncInput

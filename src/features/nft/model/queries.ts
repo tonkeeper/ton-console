@@ -11,7 +11,7 @@ import {
     DTOCnftCollection,
     DTOCnftIndexing
 } from 'src/shared/api';
-import { TonCurrencyAmount } from 'src/shared';
+import { UsdCurrencyAmount } from 'src/shared';
 import { CnftCollection } from './interfaces/CnftCollection';
 
 // Mappers
@@ -29,7 +29,7 @@ export function useCNftConfig() {
         queryFn: async () => {
             const { data, error } = await getCNftConfig();
             if (error) throw error;
-            return new TonCurrencyAmount(data.usd_price_per_nft);
+            return new UsdCurrencyAmount(data.usd_price_per_nft);
         },
         staleTime: 5 * 60 * 1000 // 5 minutes
     });
