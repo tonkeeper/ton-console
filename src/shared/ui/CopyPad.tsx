@@ -15,6 +15,7 @@ export const CopyPad: FC<
         size?: 'sm' | 'md';
         variant?: 'primary' | 'flat';
         hideCopyIcon?: boolean;
+        breakAll?: boolean;
     }
      
 > = ({
@@ -27,6 +28,7 @@ export const CopyPad: FC<
     variant,
     textStyles,
     hideCopyIcon = false,
+    breakAll = false,
     ...rest
 }) => {
     const { hasCopied, onCopy } = useClipboard(text);
@@ -124,7 +126,7 @@ export const CopyPad: FC<
                     pb={iconPosition === 'sticky' ? pb : 0}
                     pl={iconPosition === 'sticky' ? pl : 0}
                     whiteSpace="inherit"
-                    wordBreak="break-word"
+                    wordBreak={breakAll ? 'break-all' : 'break-word'}
                 >
                     {isLoading ? (
                         <Spinner mx="auto" size="sm" />
