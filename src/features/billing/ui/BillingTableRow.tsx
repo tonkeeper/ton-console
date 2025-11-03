@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react';
 import { Link, Skeleton, Td, Tr } from '@chakra-ui/react';
-import { toDateTime, DTOBillingTransaction, explorer } from 'src/shared';
+import { toDateTime, DTOBillingTransaction, explorer, TonCurrencyAmount } from 'src/shared';
 import { DTOBillingTxInfo } from 'src/shared/api';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 import {
@@ -133,7 +133,7 @@ const descriptionFormatters: DescriptionFormattersMap = {
                 {meta.testnet_coins && (
                     <>
                         {' '}
-                        — <strong>{meta.testnet_coins} coins</strong>
+                        — <strong>{new TonCurrencyAmount(meta.testnet_coins).toStringCurrencyAmount()} coins</strong>
                     </>
                 )}
             </>
