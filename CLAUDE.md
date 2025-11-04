@@ -283,7 +283,7 @@ npm run generate-airdrop2
 **Historical context:** The project previously used MobX stores for server state management. In 2025, we completed a full migration to React Query (`@tanstack/react-query`) for all CRUD and data fetching operations.
 
 **Current state:**
-- ✅ All major features use React Query (API Keys, Webhooks, Statistics, Liteproxy, Pricing, Balance, Rates, NFT, Faucet, App Messages, Jetton, Projects)
+- ✅ All major features use React Query (API Keys, Webhooks, Statistics, Liteservers, Pricing, Balance, Rates, NFT, Faucet, App Messages, Jetton, Projects)
 - ⚠️ A few isolated modules (Invoices, Analytics, Airdrop) retain localized MobX stores within their components for internal state management only
 - ✅ No global stores — `ProjectContext` manages project selection with React Query
 

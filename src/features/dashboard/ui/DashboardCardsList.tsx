@@ -29,7 +29,7 @@ const DashboardCardsList: FC<BoxProps> = props => {
                         rps: selectedLiteproxyTier.rps,
                         renewsDate: selectedLiteproxyTier.next_payment
                     }}
-                    service="Liteproxy"
+                    service="Liteservers"
                 />
             )}
         </Flex>
