@@ -38,7 +38,7 @@ const DashboardLiteproxyChart: FC<DashboardLiteproxyChartProps> = ({ period, chi
                 borderRadius="12px"
                 {...props}
             >
-                <Text color="text.secondary">Liteproxy service is not activated</Text>
+                <Text color="text.secondary">Liteservers service is not activated</Text>
             </Center>
         );
     }
@@ -50,7 +50,7 @@ const DashboardLiteproxyChart: FC<DashboardLiteproxyChartProps> = ({ period, chi
     return (
         <>
             <MetricGroupCard
-                title="Liteproxy Statistics"
+                title="Liteservers Statistics"
                 onExpand={onOpen}
                 hasData={hasData}
                 childrenDirection={childrenDirection}
@@ -78,17 +78,17 @@ const DashboardLiteproxyChart: FC<DashboardLiteproxyChartProps> = ({ period, chi
             <MetricChartModal
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Liteproxy Statistics"
+                title="Liteservers Statistics"
                 charts={[
                     {
-                        title: 'Liteproxy Requests',
+                        title: 'Liteservers Requests',
                         data: requestsData || [],
                         color: colors.accent.blue,
                         limit: selectedLiteproxyTier?.rps,
                         limitLabel: 'Limit'
                     },
                     {
-                        title: 'Liteproxy Connections',
+                        title: 'Liteservers Connections',
                         data: connectionsData || [],
                         color: colors.accent.green
                     }
