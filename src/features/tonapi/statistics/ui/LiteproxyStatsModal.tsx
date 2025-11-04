@@ -36,7 +36,7 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = ({ isOpen, onClose }) 
             <Modal isOpen={isOpen} onClose={onClose} size="4xl">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Liteproxy Statistics</ModalHeader>
+                    <ModalHeader>Liteservers Statistics</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                         <Center h="400px">
@@ -53,7 +53,7 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = ({ isOpen, onClose }) 
             <Modal isOpen={isOpen} onClose={onClose} size="4xl">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Liteproxy Statistics</ModalHeader>
+                    <ModalHeader>Liteservers Statistics</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                         <Center h="400px">
@@ -69,16 +69,19 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = ({ isOpen, onClose }) 
         <Modal isOpen={isOpen} onClose={onClose} size="4xl">
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Liteproxy Statistics</ModalHeader>
+                <ModalHeader>Liteservers Statistics</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody pb={4}>
                     <Flex direction="column" gap={8}>
                         <Text textStyle="text.label1" mb={1} color="text.secondary" fontSize={16}>
-                            Liteproxy Requests
+                            Liteservers Requests
                         </Text>
                         <Box h={250}>
                             <ResponsiveContainer height="100%">
-                                <LineChart data={value.requests} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                                <LineChart
+                                    data={value.requests}
+                                    margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+                                >
                                     <XAxis
                                         dataKey="time"
                                         type="number"
@@ -99,11 +102,14 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = ({ isOpen, onClose }) 
                         </Box>
 
                         <Text textStyle="text.label1" mb={1} color="text.secondary" fontSize={16}>
-                            Liteproxy Connections
+                            Liteservers Connections
                         </Text>
                         <Box h={250}>
                             <ResponsiveContainer height="100%">
-                                <LineChart data={value.connections} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                                <LineChart
+                                    data={value.connections}
+                                    margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+                                >
                                     <XAxis
                                         dataKey="time"
                                         type="number"
