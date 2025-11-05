@@ -13,7 +13,11 @@ import { RefillModal } from 'src/entities';
 import { Link as RouterLink } from 'react-router-dom';
 import { openFeedbackModal } from 'src/features/feedback/model/feedback';
 
-export const RestApiTiersSection: FC = () => {
+interface RestApiTiersSectionProps {
+    displayOnly?: boolean;
+}
+
+export const RestApiTiersSection: FC<RestApiTiersSectionProps> = ({ displayOnly = false }) => {
     const [selectedTier, setSelectedTier] = useState<RestApiTier | null>(null);
     const { data: tiers, isLoading: isRestApiTiersLoading } = useRestApiTiers();
     const { data: currentRestApiTier } = useSelectedRestApiTier();
@@ -97,6 +101,7 @@ export const RestApiTiersSection: FC = () => {
                         const isCurrent = currentTierId === tier.id;
                         const isFree = tier.price.amount.eq(0);
                         const isPayAsYouGo = tier.type === 'pay-as-you-go';
+                        const isDisabled = displayOnly || isCurrent;
 
                         return (
                             <SimpleTierCard
@@ -108,12 +113,12 @@ export const RestApiTiersSection: FC = () => {
                                     isPayAsYouGo
                                         ? 'per 1K requests'
                                         : tier.type === 'monthly'
-                                          ? 'Monthly'
-                                          : undefined
+                                        ? 'Monthly'
+                                        : undefined
                                 }
                                 isCurrent={isCurrent}
                                 onSelect={
-                                    !isCurrent ? () => handleSelectRestApiTier(tier) : undefined
+                                    !isDisabled ? () => handleSelectRestApiTier(tier) : undefined
                                 }
                             />
                         );
@@ -124,7 +129,7 @@ export const RestApiTiersSection: FC = () => {
                         price="Custom"
                         rps="∞"
                         priceDescription="Contact us"
-                        onSelect={openFeedbackModal('unlimited-restapi')}
+                        onSelect={!displayOnly ? openFeedbackModal('unlimited-restapi') : undefined}
                         buttonText="Request"
                         buttonVariant="contrast"
                     />
