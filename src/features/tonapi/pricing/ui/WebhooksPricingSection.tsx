@@ -175,18 +175,21 @@ export const WebhooksPricingCalculator: FC<{ isDisabled?: boolean }> = ({ isDisa
     );
 };
 
-export const WebhooksPricingSection: FC = () => {
-    const navigate = useNavigate();
-    const { data: webhooks = [], isLoading, error } = useWebhooksQuery(Network.MAINNET);
-
-    const isWebhooksUnavailable = Boolean(error);
-    const isWebhooksInactive = webhooks.length === 0 && !isLoading && !isWebhooksUnavailable;
-
-    const handleTryWebhooks = () => {
-        navigate('../webhooks');
-    };
-
-    // Loading state
+/**
+ * Reusable content component for webhooks pricing section
+ * Separates rendering logic from data-fetching concerns
+ *
+ * Props:
+ * - isLoading: Show loading spinner (only when fetching data)
+ * - isInactive: Show Inactive badge and Try Webhooks button
+ * - onTryWebhooks: Callback for Try Webhooks button
+ */
+const WebhooksPricingContent: FC<{
+    isLoading?: boolean;
+    isInactive?: boolean;
+    onTryWebhooks?: () => void;
+}> = ({ isLoading = false, isInactive = false, onTryWebhooks }) => {
+    // Show loading state
     if (isLoading) {
         return (
             <Center py="8">
@@ -197,19 +200,19 @@ export const WebhooksPricingSection: FC = () => {
 
     return (
         <Box>
-            {/* Header with Inactive badge */}
+            {/* Header with optional Inactive badge */}
             <Flex align="baseline" gap="3" mb="4">
                 <Text textStyle="h4" fontWeight={600}>
                     Webhooks
                 </Text>
-                {isWebhooksInactive && (
+                {isInactive && (
                     <Badge fontSize="xs" colorScheme="gray">
                         Inactive
                     </Badge>
                 )}
             </Flex>
 
-            {/* Main content: Pricing diagram and calculator */}
+            {/* Pricing diagram and calculator */}
             <Flex align="flex-start" wrap="wrap" gap="6">
                 <Box flex="3 1 300px" minW="300px">
                     <Text textStyle="body2" mb="3" color="text.secondary">
@@ -220,13 +223,48 @@ export const WebhooksPricingSection: FC = () => {
                 </Box>
                 <Box flex="1 1 308px" minW="280px">
                     <WebhooksPricingCalculator />
-                    {isWebhooksInactive && (
-                        <Button w="100%" mt="4" onClick={handleTryWebhooks} variant="primary">
+                    {isInactive && onTryWebhooks && (
+                        <Button w="100%" mt="4" onClick={onTryWebhooks} variant="primary">
                             Try Webhooks
                         </Button>
                     )}
                 </Box>
             </Flex>
         </Box>
+    );
+};
+
+interface WebhooksPricingSectionProps {
+    displayOnly?: boolean;
+}
+
+export const WebhooksPricingSection: FC<WebhooksPricingSectionProps> = ({
+    displayOnly = false
+}) => {
+    // Hooks must be called unconditionally at top level (React hooks rules)
+    const navigate = useNavigate();
+    const {
+        data: webhooks = [],
+        isLoading,
+        error
+    } = displayOnly
+        ? { data: [], isLoading: false, error: null }
+        : useWebhooksQuery(Network.MAINNET);
+
+    // Display-only mode: render static content without using data-fetching result
+    if (displayOnly) {
+        return <WebhooksPricingContent />;
+    }
+
+    // Normal mode: compute state from fetched data and render with callbacks
+    const isWebhooksUnavailable = Boolean(error);
+    const isWebhooksInactive = webhooks.length === 0 && !isLoading && !isWebhooksUnavailable;
+
+    return (
+        <WebhooksPricingContent
+            isLoading={isLoading}
+            isInactive={isWebhooksInactive}
+            onTryWebhooks={() => navigate('../webhooks')}
+        />
     );
 };

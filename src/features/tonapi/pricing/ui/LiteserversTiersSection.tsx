@@ -27,7 +27,13 @@ interface LiteserverTierWithUnspent extends DTOLiteproxyTier {
     unspentMoney?: UsdCurrencyAmount;
 }
 
-export const LiteserversTiersSection: FC = () => {
+interface LiteserversTiersSectionProps {
+    displayOnly?: boolean;
+}
+
+export const LiteserversTiersSection: FC<LiteserversTiersSectionProps> = ({
+    displayOnly = false
+}) => {
     const navigate = useNavigate();
     const [selectedLiteserverTier, setSelectedLiteserverTier] =
         useState<LiteserverTierWithUnspent | null>(null);
@@ -38,6 +44,7 @@ export const LiteserversTiersSection: FC = () => {
     const { mutateAsync: checkValidChangeTier } = useCheckValidChangeLiteproxyTierMutation();
 
     const isLiteserversInactive = !currentLiteserverTier && !isCurrentLiteserverTierLoading;
+    const isDisabled = !displayOnly && isLiteserversInactive;
 
     const handleActivateLiteservers = () => {
         navigate('../liteservers');
@@ -91,7 +98,7 @@ export const LiteserversTiersSection: FC = () => {
                     <Text textStyle="h4" fontWeight={600}>
                         Liteservers
                     </Text>
-                    {isLiteserversInactive && (
+                    {!displayOnly && isLiteserversInactive && (
                         <Badge fontSize="xs" colorScheme="gray">
                             Inactive
                         </Badge>
@@ -107,7 +114,7 @@ export const LiteserversTiersSection: FC = () => {
                     >
                         Learn more about Liteservers
                     </Link>
-                    {isLiteserversInactive && (
+                    {isDisabled && (
                         <>
                             . To get started with Liteservers, activate the service in the{' '}
                             <Link
@@ -136,9 +143,9 @@ export const LiteserversTiersSection: FC = () => {
                                 rps={tier.rps}
                                 priceDescription="Monthly"
                                 isCurrent={isCurrent}
-                                isDisabled={isLiteserversInactive}
+                                isDisabled={isDisabled}
                                 onSelect={
-                                    !isCurrent && !isLiteserversInactive
+                                    !isDisabled && !isCurrent
                                         ? () => handleSelectLiteserverTier(tier)
                                         : undefined
                                 }
@@ -151,11 +158,9 @@ export const LiteserversTiersSection: FC = () => {
                         price="Custom"
                         rps="∞"
                         priceDescription="Contact us"
-                        isDisabled={isLiteserversInactive}
+                        isDisabled={isDisabled}
                         onSelect={
-                            !isLiteserversInactive
-                                ? openFeedbackModal('unlimited-liteservers')
-                                : undefined
+                            !isDisabled ? openFeedbackModal('unlimited-liteservers') : undefined
                         }
                         buttonText="Request"
                         buttonVariant="contrast"
