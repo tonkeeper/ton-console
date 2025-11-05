@@ -1,6 +1,6 @@
 import { BillingHistoryItem } from 'src/shared/hooks/useBillingHistoryQuery';
 
-export const EXPORT_PAGE_SIZE = 100;
+export const EXPORT_PAGE_SIZE = 500;
 export const MIN_REQUEST_INTERVAL_MS = Math.ceil(1000 / 3);
 
 const CSV_HEADERS = [
