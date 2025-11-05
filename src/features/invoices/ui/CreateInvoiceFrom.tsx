@@ -28,7 +28,6 @@ import {
     TokenCurrencyAmount
 } from 'src/shared';
 import { useIMask } from 'react-imask';
-import { observer } from 'mobx-react-lite';
 import { CRYPTO_CURRENCY_DECIMALS } from 'src/shared/lib/currency/CRYPTO_CURRENCY';
 
 interface InternalForm {
@@ -53,7 +52,7 @@ export const CreateInvoiceFrom: FC<
         defaultValues?: Partial<InvoiceForm>;
         disableDefaultFocus?: boolean;
     }
-> = observer(({ onSubmit, defaultValues, disableDefaultFocus, ...rest }) => {
+> = ({ onSubmit, defaultValues, disableDefaultFocus, ...rest }) => {
     const { amount: defaultAmount, ...restDefaultValues } = defaultValues || {};
     const context = useFormContext<InternalForm>();
     let { handleSubmit, register, formState, setFocus } = useForm<InternalForm>({
@@ -200,4 +199,4 @@ export const CreateInvoiceFrom: FC<
             </FormControl>
         </chakra.form>
     );
-});
+};
