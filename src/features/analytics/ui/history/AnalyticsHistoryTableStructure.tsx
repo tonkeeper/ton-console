@@ -11,13 +11,13 @@ import {
     Center,
     BoxProps
 } from '@chakra-ui/react';
-import { FC, PropsWithChildren, useContext, useRef } from 'react';
+import { FC, PropsWithChildren, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
-import { AnalyticsHistoryTableContext } from './analytics-history-table-context';
+import { useAnalyticsHistoryTableContext } from './analytics-history-table-context';
 import { EmptyFolderIcon48 } from 'src/shared';
 
 const EmptyTable: FC<PropsWithChildren<BoxProps>> = ({ children, ...props }) => {
-    const { rowHeight } = useContext(AnalyticsHistoryTableContext);
+    const { rowHeight } = useAnalyticsHistoryTableContext();
     return (
         <Tr h={rowHeight} maxH={rowHeight}>
             <Td
@@ -38,7 +38,7 @@ const EmptyTable: FC<PropsWithChildren<BoxProps>> = ({ children, ...props }) => 
 export const AnalyticsHistoryTableStructure = observer(
     forwardRef<PropsWithChildren<BoxProps>, typeof Box>(({ children, ...rest }, ref) => {
         let body = children;
-        const { rowHeight, analyticsHistoryTableStore } = useContext(AnalyticsHistoryTableContext);
+        const { rowHeight, analyticsHistoryTableStore } = useAnalyticsHistoryTableContext();
 
         if (!analyticsHistoryTableStore.queries$.isResolved) {
             body = (
