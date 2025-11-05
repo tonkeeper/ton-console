@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DTOUser, getUserInfo, authViaTg, accountLogout } from 'src/shared/api';
+import { useSetProject } from 'src/shared/contexts/ProjectContext';
 import { User } from './model/interfaces/user';
 import { loginViaTG } from './model/telegram-oauth';
 import { AxiosError } from 'axios';
@@ -142,24 +143,20 @@ export function useUpdateUserMutation() {
  */
 export function useLogoutMutation() {
     const queryClient = useQueryClient();
+    const setProject = useSetProject();
 
     return useMutation({
         mutationFn: async (): Promise<void> => {
-            try {
-                const { error } = await accountLogout();
-                if (error) {
-                    console.error('Logout API error:', error);
-                }
-            } catch (e) {
-                console.error('Logout failed:', e);
+            const { error } = await accountLogout();
+            if (error) {
+                console.error('Logout API error:', error);
             }
         },
         onSuccess: () => {
-            // Clear user from cache
-            // Projects will be automatically disabled through dependency chain
-            queryClient.setQueryData(['user'], null);
+            // Clear selected project from memory so components can react to it
+            setProject(null);
 
-            // Clear all other cached data
+            // Clear all cached data (including projects)
             queryClient.clear();
         }
     });
