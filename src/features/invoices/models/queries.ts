@@ -13,7 +13,7 @@ import {
     createInvoicesInvoice,
     cancelInvoicesInvoice,
     DTOCryptoCurrency,
-    DTOInvoiceFieldOrder,
+    DTOInvoiceStatus,
     GetInvoicesData
 } from 'src/shared/api';
 import { useProjectId } from 'src/shared/contexts/ProjectContext';
@@ -127,7 +127,7 @@ export function useInvoicesStatisticsQuery(
                 return null;
             }
 
-            return {
+            const stats: InvoicesAllStatistics = {
                 [CRYPTO_CURRENCY.TON]: mapInvoicesStatsDTOToInvoicesStats(
                     tonResult.data.stats,
                     CRYPTO_CURRENCY.TON
@@ -136,7 +136,8 @@ export function useInvoicesStatisticsQuery(
                     usdtResult.data.stats,
                     CRYPTO_CURRENCY.USDT
                 )
-            } as InvoicesAllStatistics;
+            };
+            return stats;
         },
         enabled: !!appId && (options?.enabled !== false),
         staleTime: 30 * 1000 // 30 seconds
@@ -161,32 +162,56 @@ export function useInvoicesListQuery(
         queryFn: async () => {
             if (!appId) return { items: [], totalCount: 0 };
 
+            const queryParams: Partial<Omit<GetInvoicesData['query'], 'app_id'>> & { app_id: number } = {
+                app_id: appId,
+                offset: pagination.offset,
+                limit: pagination.pageSize,
+                field_order: pagination.sort.column,
+                type_order: pagination.sort.direction
+            };
+
+            if (pagination.filter.id) {
+                queryParams.search_id = pagination.filter.id;
+            }
+
+            if (pagination.filter.status?.length) {
+                queryParams.filter_status = pagination.filter.status.map(s => {
+                    // Map internal status to API status
+                    switch (s) {
+                        case 'success':
+                            return DTOInvoiceStatus.PAID;
+                        case 'pending':
+                            return DTOInvoiceStatus.PENDING;
+                        case 'cancelled':
+                            return DTOInvoiceStatus.CANCELLED;
+                        case 'expired':
+                            return DTOInvoiceStatus.EXPIRED;
+                        default: {
+                            // Exhaustive check - this should never happen
+                            const _exhaustive: never = s;
+                            return _exhaustive;
+                        }
+                    }
+                });
+            }
+
+            if (pagination.filter.currency?.length === 1) {
+                queryParams.currency = pagination.filter.currency[0] === 'TON'
+                    ? DTOCryptoCurrency.TON
+                    : DTOCryptoCurrency.USDT;
+            }
+
+            if (pagination.filter.period && isCustomFiltrationPeriod(pagination.filter.period)) {
+                queryParams.start = Math.floor(pagination.filter.period.from.getTime() / 1000);
+                queryParams.end = Math.floor(pagination.filter.period.to.getTime() / 1000);
+            }
+
+            if (pagination.filter.overpayment) {
+                queryParams.overpayment = true;
+            }
+
             const { data, error } = await getInvoices({
-                query: {
-                    app_id: appId,
-                    offset: pagination.offset,
-                    limit: pagination.pageSize,
-                    ...(pagination.filter.id && { search_id: pagination.filter.id }),
-                    ...(pagination.filter.status?.length && {
-                        status: pagination.filter.status
-                    }),
-                    ...(pagination.filter.currency?.length && {
-                        currency: pagination.filter.currency.map(c =>
-                            c === 'TON'
-                                ? DTOCryptoCurrency.TON
-                                : DTOCryptoCurrency.USDT
-                        )
-                    }),
-                    field_order: pagination.sort.column as DTOInvoiceFieldOrder,
-                    type_order: pagination.sort.direction as GetInvoicesData['query']['type_order'],
-                    ...(pagination.filter.period && isCustomFiltrationPeriod(pagination.filter.period) && {
-                        created_at_start_date: Math.floor(pagination.filter.period.from.getTime() / 1000),
-                        created_at_end_date: Math.floor(pagination.filter.period.to.getTime() / 1000)
-                    }),
-                    ...(pagination.filter.overpayment && {
-                        is_overpayment: true
-                    })
-                } as GetInvoicesData['query']
+                query: queryParams
             });
 
             if (error || !data) return { items: [], totalCount: 0 };

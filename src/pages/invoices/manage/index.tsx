@@ -81,7 +81,7 @@ const ManageInvoicesPage: FC = () => {
                 onCreateInvoice={async (form: InvoiceForm) => {
                     await Promise.resolve(invoicesList.createInvoice(form));
                     onClose();
-                    return {
+                    const newInvoice: Invoice = {
                         id: '',
                         amount: form.amount,
                         currency: form.currency,
@@ -91,7 +91,8 @@ const ManageInvoicesPage: FC = () => {
                         payTo: invoicesApp.app!.receiverAddress,
                         paymentLink: '',
                         status: 'pending'
-                    } as unknown as Invoice;
+                    };
+                    return newInvoice;
                 }}
                 isLoading={invoicesList.isCreatingInvoice}
             />
