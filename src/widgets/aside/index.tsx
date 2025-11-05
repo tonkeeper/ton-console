@@ -53,8 +53,8 @@ const Aside: FC = () => {
                     content="Payment Tracker"
                     linkTo="invoices"
                 >
-                    <DropDownMenuItem linkTo="manage">Manage</DropDownMenuItem>
                     <DropDownMenuItem linkTo="dashboard">Overview</DropDownMenuItem>
+                    <DropDownMenuItem linkTo="manage">Manage</DropDownMenuItem>
                 </DropDownMenuItemExpandable>
             ) : (
                 <DropDownMenuItem linkTo="invoices" leftIcon={<InvoicesIcon24 />}>

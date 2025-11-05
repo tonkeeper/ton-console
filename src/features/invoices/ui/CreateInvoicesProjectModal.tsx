@@ -11,17 +11,22 @@ import {
 } from '@chakra-ui/react';
 import { EditInvoicesProjectForm } from './EditInvoicesProjectForm';
 import { H4 } from 'src/shared';
-import { InvoicesAppStore } from '../models';
-import { observer } from 'mobx-react-lite';
+import { useInvoicesApp } from '../models';
+import type { InvoicesProjectForm } from '../models';
 
 interface Props {
-    invoicesAppStore: InvoicesAppStore;
     isOpen: boolean;
     onClose: () => void;
 }
 
-const CreateInvoicesProjectModal: FC<Props> = ({ invoicesAppStore, isOpen, onClose }) => {
+const CreateInvoicesProjectModal: FC<Props> = ({ isOpen, onClose }) => {
     const id = useId();
+    const { createApp, isCreatingApp } = useInvoicesApp();
+
+    const handleSubmit = (form: InvoicesProjectForm) => {
+        createApp(form);
+        onClose();
+    };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside" size="md">
@@ -34,7 +39,7 @@ const CreateInvoicesProjectModal: FC<Props> = ({ invoicesAppStore, isOpen, onClo
                 <ModalBody py="0">
                     <EditInvoicesProjectForm
                         id={id}
-                        onSubmit={form => invoicesAppStore.createInvoicesApp(form)}
+                        onSubmit={handleSubmit}
                     />
                 </ModalBody>
                 <ModalFooter gap="3">
@@ -44,7 +49,7 @@ const CreateInvoicesProjectModal: FC<Props> = ({ invoicesAppStore, isOpen, onClo
                     <Button
                         flex={1}
                         form={id}
-                        isLoading={invoicesAppStore.createInvoicesApp.isLoading}
+                        isLoading={isCreatingApp}
                         type="submit"
                         variant="primary"
                     >
@@ -56,4 +61,4 @@ const CreateInvoicesProjectModal: FC<Props> = ({ invoicesAppStore, isOpen, onClo
     );
 };
 
-export default observer(CreateInvoicesProjectModal);
+export default CreateInvoicesProjectModal;

@@ -10,20 +10,20 @@ import {
     ModalOverlay,
     Text
 } from '@chakra-ui/react';
-import { Invoice, InvoicesTableStore } from '../models';
-import { observer } from 'mobx-react-lite';
+import { Invoice } from '../models';
 import { H4, Span } from 'src/shared';
 
 interface Props {
-    invoicesTableStore: InvoicesTableStore;
     invoice: Invoice;
     isOpen: boolean;
     onClose: () => void;
+    onCancelInvoice: (invoiceId: string) => Promise<void>;
+    isLoading?: boolean;
 }
 
-const CancelInvoiceConfirmation: FC<Props> = ({ invoicesTableStore, invoice, isOpen, onClose }) => {
+const CancelInvoiceConfirmation: FC<Props> = ({ invoice, isOpen, onClose, onCancelInvoice, isLoading = false }) => {
     const onConfirm = async (): Promise<void> => {
-        await invoicesTableStore.cancelInvoice(invoice.id);
+        await onCancelInvoice(invoice.id);
         onClose();
     };
     return (
@@ -50,7 +50,7 @@ const CancelInvoiceConfirmation: FC<Props> = ({ invoicesTableStore, invoice, isO
                     </Button>
                     <Button
                         flex={1}
-                        isLoading={invoicesTableStore.cancelInvoice.isLoading}
+                        isLoading={isLoading}
                         onClick={onConfirm}
                         type="submit"
                         variant="primary"
@@ -63,4 +63,4 @@ const CancelInvoiceConfirmation: FC<Props> = ({ invoicesTableStore, invoice, isO
     );
 };
 
-export default observer(CancelInvoiceConfirmation);
+export default CancelInvoiceConfirmation;

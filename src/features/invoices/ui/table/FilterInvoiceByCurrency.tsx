@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import {
-    BoxProps,
     Button,
     Center,
     Checkbox,
@@ -10,15 +9,21 @@ import {
     MenuList,
     useDisclosure
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { ArrowIcon, MenuButtonDefault, Span, TickIcon } from 'src/shared';
-import { InvoicesTableStore, InvoiceCurrency } from '../../models';
+import { InvoiceCurrency } from '../../models';
 
-interface Props extends BoxProps {
-    invoicesTableStore: InvoicesTableStore;
+interface Props {
+    selectedCurrencies?: InvoiceCurrency[];
+    onToggle: (currency: InvoiceCurrency) => void;
+    onClear: () => void;
 }
 
-const FilterInvoiceByCurrency: FC<Props> = ({ invoicesTableStore, ...props }) => {
+const FilterInvoiceByCurrency: FC<Props> = ({
+    selectedCurrencies = [],
+    onToggle,
+    onClear,
+    ...props
+}) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (
@@ -33,7 +38,7 @@ const FilterInvoiceByCurrency: FC<Props> = ({ invoicesTableStore, ...props }) =>
             <MenuButtonDefault px="4" rightIcon={<ArrowIcon />}>
                 <Flex textStyle="label2" gap="2">
                     Currency{' '}
-                    {!!invoicesTableStore.pagination.filter.currency?.length && (
+                    {!!selectedCurrencies?.length && (
                         <Center
                             textStyle="label3"
                             w="5"
@@ -42,7 +47,7 @@ const FilterInvoiceByCurrency: FC<Props> = ({ invoicesTableStore, ...props }) =>
                             borderRadius="100%"
                             bgColor="text.primary"
                         >
-                            {invoicesTableStore.pagination.filter.currency.length}
+                            {selectedCurrencies.length}
                         </Center>
                     )}
                 </Flex>
@@ -50,10 +55,10 @@ const FilterInvoiceByCurrency: FC<Props> = ({ invoicesTableStore, ...props }) =>
             <MenuList zIndex={100} w="240px">
                 <Flex justify="space-between" mb="2" px="1" pt="2" color="text.secondary">
                     <Span textStyle="label2">Display only</Span>
-                    {!!invoicesTableStore.pagination.filter.currency?.length && (
+                    {!!selectedCurrencies?.length && (
                         <Button
                             onClick={() => {
-                                invoicesTableStore.clearFilterByCurrency();
+                                onClear();
                                 onClose();
                             }}
                             size="fit"
@@ -70,15 +75,12 @@ const FilterInvoiceByCurrency: FC<Props> = ({ invoicesTableStore, ...props }) =>
                         key={currency}
                         onClick={e => {
                             e.preventDefault();
-                            invoicesTableStore.toggleFilterByCurrency(currency as InvoiceCurrency);
+                            onToggle(currency as InvoiceCurrency);
                         }}
                     >
                         <Checkbox
                             icon={<TickIcon w="12px" />}
-                            id="subtractFeeFromAmount"
-                            isChecked={invoicesTableStore.pagination.filter.currency?.includes(
-                                currency as InvoiceCurrency
-                            )}
+                            isChecked={selectedCurrencies?.includes(currency as InvoiceCurrency)}
                         >
                             {currency}
                         </Checkbox>
@@ -89,4 +91,4 @@ const FilterInvoiceByCurrency: FC<Props> = ({ invoicesTableStore, ...props }) =>
     );
 };
 
-export default observer(FilterInvoiceByCurrency);
+export default FilterInvoiceByCurrency;
