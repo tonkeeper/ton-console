@@ -99,7 +99,7 @@ export const InsufficientBalanceModal: FC<InsufficientBalanceModalProps> = ({
                                 <Text color="status.error.foreground" fontSize="sm">
                                     You need to top up your balance by at least{' '}
                                     <Box as="span" fontWeight="bold">
-                                        ${formatBalance(deficit)} USDT
+                                        ${formatBalance(deficit)}
                                     </Box>
                                 </Text>
                             </Box>

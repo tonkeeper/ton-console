@@ -27,9 +27,10 @@ const STORAGE_KEY = 'SelectedProject:selectedProjectId';
 export const ProjectProvider: FC<{ children: ReactNode }> = ({ children }) => {
     // Check if user is authenticated
     const { data: user } = useUserQuery();
-    
+
     // Only fetch projects if user is logged in
-    const { data: projects = [] } = useProjectsQuery({ enabled: !!user });
+    // userId in query key ensures each user has separate cache and controls enabled state
+    const { data: projects = [] } = useProjectsQuery({ userId: user?.id });
 
     // Initialize from localStorage
     const [selectedProjectId, setSelectedProjectIdState] = useState<number | null>(() => {

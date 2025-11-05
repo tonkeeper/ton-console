@@ -30,7 +30,7 @@ const Routing: FC = () => {
     const queryBackUrl = new URLSearchParams(location.search).get('backUrl');
     const project = useMaybeProject();
     const { data: user, isLoading: isUserLoading } = useUserQuery();
-    const { isLoading: isProjectsLoading } = useProjectsQuery({ enabled: !!user });
+    const { isLoading: isProjectsLoading } = useProjectsQuery({ userId: user?.id });
 
     // Determine if app should show loading screen
     // Show loader if user is loading OR if user exists and projects are loading
