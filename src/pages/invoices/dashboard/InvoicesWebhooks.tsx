@@ -18,11 +18,13 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 import { CopyIcon24, DeleteIcon24, Span, VerticalDotsIcon16 } from 'src/shared';
-import { AddWebhookModal, InvoicesAppStore, InvoicesWebhook, INVOICES_LINKS } from 'src/features';
-import { observer } from 'mobx-react-lite';
-import { toJS } from 'mobx';
+import { AddWebhookModal, InvoicesWebhook, INVOICES_LINKS } from 'src/features';
 
-const WebhookItem: FC<{ webhook: InvoicesWebhook; invoicesAppStore: InvoicesAppStore }> = observer(({ webhook, invoicesAppStore }) => {
+const WebhookItem: FC<{ webhook: InvoicesWebhook; isDeleting: boolean; onDelete: (id: string) => void }> = ({
+    webhook,
+    isDeleting,
+    onDelete
+}) => {
     const { hasCopied, onCopy } = useClipboard(webhook.value);
 
     return (
@@ -42,18 +44,18 @@ const WebhookItem: FC<{ webhook: InvoicesWebhook; invoicesAppStore: InvoicesAppS
                         </MenuItem>
                         <MenuItem
                             pos="relative"
-                            isDisabled={invoicesAppStore.deleteWebhook.isLoading}
-                            onClick={() => invoicesAppStore.deleteWebhook(webhook.id)}
+                            isDisabled={isDeleting}
+                            onClick={() => onDelete(webhook.id)}
                         >
                             <Flex
                                 align="center"
                                 gap="2"
-                                opacity={invoicesAppStore.deleteWebhook.isLoading ? '0.3' : 1}
+                                opacity={isDeleting ? '0.3' : 1}
                             >
                                 <DeleteIcon24 />
                                 Delete
                             </Flex>
-                            {invoicesAppStore.deleteWebhook.isLoading && (
+                            {isDeleting && (
                                 <Center pos="absolute" top="0" right="0" bottom="0" left="0">
                                     <Spinner size="sm" />
                                 </Center>
@@ -64,18 +66,29 @@ const WebhookItem: FC<{ webhook: InvoicesWebhook; invoicesAppStore: InvoicesAppS
             </Flex>
         </ListItem>
     );
-});
+};
 
 interface InvoicesWebhooksProps extends BoxProps {
-    invoicesAppStore: InvoicesAppStore;
+    webhooks?: InvoicesWebhook[];
+    onAddWebhook: (webhook: string) => Promise<void>;
+    onDeleteWebhook: (webhookId: string) => void;
+    isDeletingWebhook?: boolean;
+    isAddingWebhook?: boolean;
 }
 
-const InvoicesWebhooks: FC<InvoicesWebhooksProps> = ({ invoicesAppStore, ...props }) => {
+const InvoicesWebhooks: FC<InvoicesWebhooksProps> = ({
+    webhooks = [],
+    onAddWebhook,
+    onDeleteWebhook,
+    isDeletingWebhook = false,
+    isAddingWebhook = false,
+    ...props
+}) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (
         <Box {...props}>
-            <AddWebhookModal invoicesAppStore={invoicesAppStore} isOpen={isOpen} onClose={onClose} />
+            <AddWebhookModal isOpen={isOpen} onClose={onClose} onAddWebhook={onAddWebhook} isLoading={isAddingWebhook} />
             <Flex>
                 <Box>
                     <Text textStyle="label1" mb="1">
@@ -92,17 +105,22 @@ const InvoicesWebhooks: FC<InvoicesWebhooksProps> = ({ invoicesAppStore, ...prop
                 </Box>
                 <Button
                     ml="auto"
-                    isLoading={invoicesAppStore.addWebhook.isLoading}
+                    isLoading={isAddingWebhook}
                     onClick={onOpen}
                     variant="secondary"
                 >
                     + Add
                 </Button>
             </Flex>
-            {!!invoicesAppStore.invoicesApp$.value!.webhooks.length && (
+            {!!webhooks.length && (
                 <OrderedList color="text.secondary" spacing="3">
-                    {invoicesAppStore.invoicesApp$.value!.webhooks.map(webhook => (
-                        <WebhookItem key={webhook.id} webhook={toJS(webhook)} invoicesAppStore={invoicesAppStore} />
+                    {webhooks.map(webhook => (
+                        <WebhookItem
+                            key={webhook.id}
+                            webhook={webhook}
+                            isDeleting={isDeletingWebhook}
+                            onDelete={onDeleteWebhook}
+                        />
                     ))}
                 </OrderedList>
             )}
@@ -110,4 +128,4 @@ const InvoicesWebhooks: FC<InvoicesWebhooksProps> = ({ invoicesAppStore, ...prop
     );
 };
 
-export default observer(InvoicesWebhooks);
+export default InvoicesWebhooks;

@@ -8,13 +8,11 @@ import {
     Menu,
     MenuItem,
     MenuList,
-    MenuListProps,
     useDisclosure,
     useMenuItem,
     useOutsideClick,
     useToast
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import {
     ArrowIcon,
     DateToDDMMYYYY,
@@ -29,7 +27,7 @@ import {
     toDate,
     XMarkCircleIcon16
 } from 'src/shared';
-import { InvoicesTableStore, InvoiceTableFiltration, isCustomFiltrationPeriod } from '../../models';
+import { InvoiceTableFiltration, isCustomFiltrationPeriod } from '../../models';
 import { IMask, useIMask } from 'react-imask';
 
 const useFormattedPeriod = (period: InvoiceTableFiltration['period']): string => {
@@ -66,12 +64,13 @@ const months = [
 ];
 
 interface Props extends BoxProps {
-    invoicesTableStore: InvoicesTableStore;
+    period?: InvoiceTableFiltration['period'];
+    onSetPeriod: (period: InvoiceTableFiltration['period']) => void;
+    onClear: () => void;
 }
 
-const FilterInvoiceByPeriod: FC<Props> = ({ invoicesTableStore, ...props }) => {
+const FilterInvoiceByPeriod: FC<Props> = ({ period, onSetPeriod, onClear, ...props }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const period = invoicesTableStore.pagination.filter.period;
 
     const formattedPeriod = useFormattedPeriod(period);
 
@@ -93,7 +92,7 @@ const FilterInvoiceByPeriod: FC<Props> = ({ invoicesTableStore, ...props }) => {
                             icon={<XMarkCircleIcon16 />}
                             onClick={e => {
                                 e.stopPropagation();
-                                invoicesTableStore.clearFilterByPeriod();
+                                onClear();
                                 onClose();
                             }}
                         />
@@ -112,7 +111,7 @@ const FilterInvoiceByPeriod: FC<Props> = ({ invoicesTableStore, ...props }) => {
                     <MenuItem
                         key={p.month}
                         onClick={() => {
-                            invoicesTableStore.setFilterByPeriod(p);
+                            onSetPeriod(p);
                         }}
                     >
                         <Span>
@@ -124,17 +123,19 @@ const FilterInvoiceByPeriod: FC<Props> = ({ invoicesTableStore, ...props }) => {
                         )}
                     </MenuItem>
                 ))}
-                <MenuInput invoicesTableStore={invoicesTableStore} onClose={onClose} />
+                <MenuInput period={period} onSetPeriod={onSetPeriod} onClose={onClose} />
             </MenuList>
         </Menu>
     );
 };
 
-const MenuInput: FC<MenuListProps & { invoicesTableStore: InvoicesTableStore; onClose: () => void }> = props => {
+const MenuInput: FC<
+    BoxProps & { period?: InvoiceTableFiltration['period']; onSetPeriod: (period: InvoiceTableFiltration['period']) => void; onClose: () => void }
+> = props => {
     const toast = useToast();
     const [lockFocus, setLockFocus] = useState(false);
 
-    const { invoicesTableStore, onClose, ...restProps } = props;
+    const { period, onSetPeriod, onClose, ...restProps } = props;
     const {
         role,
         ref: menuRef,
@@ -178,7 +179,6 @@ const MenuInput: FC<MenuListProps & { invoicesTableStore: InvoicesTableStore; on
     });
 
     let defaultValue = '';
-    const period = invoicesTableStore.pagination.filter.period;
     if (isCustomFiltrationPeriod(period)) {
         defaultValue = `${DateToDDMMYYYY(period.from)} - ${DateToDDMMYYYY(period.to)}`;
     }
@@ -206,9 +206,7 @@ const MenuInput: FC<MenuListProps & { invoicesTableStore: InvoicesTableStore; on
                         {...rest}
                     />
                 </FocusLock>
-                {isCustomFiltrationPeriod(invoicesTableStore.pagination.filter.period) && (
-                    <TickIcon ml="auto" mr="3" />
-                )}
+                {isCustomFiltrationPeriod(period) && <TickIcon ml="auto" mr="3" />}
             </Flex>
             {!!value && (
                 <Button
@@ -228,7 +226,7 @@ const MenuInput: FC<MenuListProps & { invoicesTableStore: InvoicesTableStore; on
                             });
                         }
 
-                        invoicesTableStore.setFilterByPeriod({
+                        onSetPeriod({
                             from,
                             to
                         });
@@ -243,4 +241,4 @@ const MenuInput: FC<MenuListProps & { invoicesTableStore: InvoicesTableStore; on
     );
 };
 
-export default observer(FilterInvoiceByPeriod);
+export default FilterInvoiceByPeriod;

@@ -1,10 +1,10 @@
 import { InvoicesWebhook } from './invoices-webhook';
-import { TonAddress } from 'src/shared';
+import { Address } from '@ton/core';
 
 export interface InvoicesApp {
     id: number;
     name: string;
-    receiverAddress: TonAddress;
+    receiverAddress: Address;
     creationDate: Date;
     webhooks: InvoicesWebhook[];
 }

@@ -9,24 +9,24 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { CreateInvoiceFrom } from './CreateInvoiceFrom';
-import { Invoice, InvoicesTableStore } from '../models';
+import { Invoice, InvoiceForm } from '../models';
 import { ViewInvoiceModalContent } from './ViewInvoiceModalContent';
 
 interface Props {
-    invoicesTableStore: InvoicesTableStore;
     isOpen: boolean;
     onClose: () => void;
+    onCreateInvoice: (form: InvoiceForm) => Promise<Invoice>;
+    isLoading?: boolean;
 }
 
-const CreateInvoiceModal: FC<Props> = ({ invoicesTableStore, isOpen, onClose }) => {
+const CreateInvoiceModal: FC<Props> = ({ isOpen, onClose, onCreateInvoice, isLoading = false }) => {
     const [createdInvoice, setCreatedInvoice] = useState<Invoice | null>(null);
 
     const id = useId();
 
     const closeHandler = (): void => {
-        if (!invoicesTableStore.createInvoice.isLoading) {
+        if (!isLoading) {
             setCreatedInvoice(null);
             onClose();
         }
@@ -45,7 +45,7 @@ const CreateInvoiceModal: FC<Props> = ({ invoicesTableStore, isOpen, onClose }) 
                         <CreateInvoiceFrom
                             id={id}
                             onSubmit={form =>
-                                invoicesTableStore.createInvoice(form).then(setCreatedInvoice)
+                                onCreateInvoice(form).then(setCreatedInvoice)
                             }
                         />
                     </ModalBody>
@@ -56,7 +56,7 @@ const CreateInvoiceModal: FC<Props> = ({ invoicesTableStore, isOpen, onClose }) 
                         <Button
                             flex={1}
                             form={id}
-                            isLoading={invoicesTableStore.createInvoice.isLoading}
+                            isLoading={isLoading}
                             type="submit"
                             variant="primary"
                         >
@@ -69,4 +69,4 @@ const CreateInvoiceModal: FC<Props> = ({ invoicesTableStore, isOpen, onClose }) 
     );
 };
 
-export default observer(CreateInvoiceModal);
+export default CreateInvoiceModal;
