@@ -22,6 +22,8 @@ import { useIMask } from 'react-imask';
 
 type TimeInterval = 'day' | 'hour' | 'minute';
 
+const TIME_INTERVALS: TimeInterval[] = ['day', 'hour', 'minute'];
+
 const intervalLabels: Record<TimeInterval, string> = {
     day: 'Days',
     hour: 'Hours',
@@ -202,11 +204,11 @@ const RepeatRequestModalContent: FC<RepeatRequestModalContentProps> = ({
                             </MenuButtonDefault>
                             <Portal>
                                 <MenuList zIndex={10000}>
-                                    {Object.keys(intervalLabels).map(interval => (
+                                    {TIME_INTERVALS.map(interval => (
                                         <MenuItem
                                             key={interval}
                                             onClick={() => {
-                                                setSelectedInterval(interval as TimeInterval);
+                                                setSelectedInterval(interval);
                                                 setTimeout(() => {
                                                     if (menuButtonRef.current) {
                                                         setPr(menuButtonRef.current?.clientWidth);
@@ -214,7 +216,7 @@ const RepeatRequestModalContent: FC<RepeatRequestModalContentProps> = ({
                                                 });
                                             }}
                                         >
-                                            {intervalLabels[interval as TimeInterval]}
+                                            {intervalLabels[interval]}
                                         </MenuItem>
                                     ))}
                                 </MenuList>

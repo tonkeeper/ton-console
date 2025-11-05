@@ -2,9 +2,9 @@ import { crc32c } from '@ton/core';
 import { Buffer } from 'buffer';
 
 export function toColor(value: number, range?: { min?: number; max?: number }): string {
-    range ||= {} as { min: number; max: number };
-    range.min ||= 0;
-    range.max ||= 255;
+    range = range ?? {};
+    range.min = range.min ?? 0;
+    range.max = range.max ?? 255;
     const rangeLimit = range.max - range.min;
     value = (value % rangeLimit) + range.min;
 
