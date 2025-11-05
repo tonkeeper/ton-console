@@ -56,22 +56,20 @@ function mapDTOBalanceToBalance(
  */
 export function calculateBalanceSufficiency(
     balance: Balance,
-    amountInUsd: BigNumber | number,
+    amountInUsd: BigNumber,
     tonRate: number,
     includePromo = true
 ): SufficiencyCheckResult {
-    const amountBn = amountInUsd instanceof BigNumber ? amountInUsd : new BigNumber(amountInUsd);
-
     // Convert USD amount to cents (since USDT is in 6 decimals, but we work in cents for simplicity)
-    const amountInCents = amountBn.multipliedBy(100);
+    const amountInMicroUsdt = amountInUsd.multipliedBy(1e6);
 
     // Check USDT sufficiency
     const usdtBalance = includePromo
         ? balance.usdt.amount + balance.usdt.promo_amount
         : balance.usdt.amount;
 
-    const usdtSufficient = usdtBalance >= BigInt(amountInCents.toFixed(0));
-    const usdtDeficit = usdtSufficient ? BigInt(0) : BigInt(amountInCents.toFixed(0)) - usdtBalance;
+    const usdtSufficient = usdtBalance >= BigInt(amountInMicroUsdt.toFixed(0));
+    const usdtDeficit = usdtSufficient ? BigInt(0) : BigInt(amountInMicroUsdt.toFixed(0)) - usdtBalance;
 
     // Check TON sufficiency (if TON balance exists)
     let tonSufficient = false;
@@ -85,10 +83,10 @@ export function calculateBalanceSufficiency(
         // Convert TON to USD equivalent
         // tonBalance is in nanoTON (10^9), so convert to TON first
         const tonInUsd = Number(tonBalance) / Math.pow(10, TON_DECIMALS) * tonRate;
-        const tonInUsdCents = new BigNumber(tonInUsd).multipliedBy(100);
+        const tonInUsdMicroUsd = new BigNumber(tonInUsd).multipliedBy(1e6);
 
-        tonSufficient = tonInUsdCents.gte(amountInCents);
-        tonDeficit = tonSufficient ? BigInt(0) : BigInt(amountInCents.minus(tonInUsdCents).toFixed(0));
+        tonSufficient = tonInUsdMicroUsd.gte(amountInMicroUsdt);
+        tonDeficit = tonSufficient ? BigInt(0) : BigInt(amountInMicroUsdt.minus(tonInUsdMicroUsd).toFixed(0));
     }
 
     return {
@@ -211,7 +209,7 @@ export function useTonRateQuery() {
  * @returns SufficiencyCheckResult or undefined if loading/error
  */
 export function useBalanceSufficiencyCheck(
-    amountInUsd: BigNumber | number | null | undefined,
+    amountInUsd: BigNumber | null,
     options?: { includePromo?: boolean }
 ): SufficiencyCheckResult | undefined {
     const { data: balance } = useBalanceQuery();

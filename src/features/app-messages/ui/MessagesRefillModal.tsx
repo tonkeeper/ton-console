@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from 'react';
+import BigNumber from 'bignumber.js';
 import {
     Box,
     Button,
@@ -18,7 +19,7 @@ import {
     UseRadioProps,
     VStack
 } from '@chakra-ui/react';
-import { FilledWarnIcon16, formatWithSuffix, H4 } from 'src/shared';
+import { FilledWarnIcon16, formatWithSuffix, H4, UsdCurrencyAmount } from 'src/shared';
 import { RadioCard } from 'src/shared/ui/checkbox';
 import { AppMessagesPackage } from '../model';
 import { RefillModalContent } from 'src/entities';
@@ -39,12 +40,9 @@ const MessagesRefillModal: FC<{
         onChange: name => setSelectedPlan(options.find(pkg => pkg.name === name) || null)
     });
     const group = getRootProps();
-    const sufficiencyCheck = useBalanceSufficiencyCheck(selectedPlan?.price.amount || null);
+    const sufficiencyCheck = useBalanceSufficiencyCheck(selectedPlan?.price.amount ?? null);
     const notEnoughAmount = sufficiencyCheck ? getPaymentDeficit(sufficiencyCheck) : BigInt(0);
-
-    useEffect(() => {
-        setSelectedPlan(options[0]);
-    }, [options]);
+    const notEnoughAmountUsdt = new UsdCurrencyAmount(new BigNumber(notEnoughAmount).div(1e6));
 
     const tonRefillModal = useDisclosure();
     const confirmPaymentModal = useDisclosure();
@@ -104,8 +102,8 @@ const MessagesRefillModal: FC<{
                 {!!notEnoughAmount && (
                     <Text textStyle="body2" mt="3" color="text.secondary">
                         <FilledWarnIcon16 />
-                        &nbsp;Not enough ${notEnoughAmount.toString()} to buy the plan, fund your
-                        account
+                        &nbsp;Not enough {notEnoughAmountUsdt.stringCurrencyAmount} USDT to buy the
+                        plan, fund your account
                     </Text>
                 )}
             </ModalBody>
