@@ -1,5 +1,4 @@
 import { Address } from '@ton/core';
-import { TonAddress } from 'src/shared';
 
 export function toUserFriendlyAddress(
     rawAddress: string,
@@ -12,14 +11,12 @@ export function toUserFriendlyAddress(
 }
 
 export function sliceAddress(
-    address: string | TonAddress | Address,
+    address: string | Address,
     options?: { headLength?: number; tailLength?: number; bounceable?: boolean }
 ): string {
     const headLength = options?.headLength || 6;
     const tailLength = options?.headLength || 4;
-    if (address instanceof TonAddress) {
-        address = address.userFriendly;
-    }
+
     if (address instanceof Address) {
         address = address.toString({ bounceable: options?.bounceable });
     }
