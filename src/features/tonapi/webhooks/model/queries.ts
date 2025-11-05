@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useProjectId } from 'src/shared/contexts/ProjectContext';
+import { useMaybeProject, useProjectId } from 'src/shared/contexts/ProjectContext';
 import {
   rtTonApiClient,
   RTWebhookAccountTxSubscriptions
@@ -47,6 +47,14 @@ export function mapWebhooksStatsToChartPoints(
     });
 
   return items;
+}
+
+export function useWebhooksMaybeQuery(network: Network) {
+  const project = useMaybeProject();
+  if (project) {
+    return useWebhooksQuery(network);
+  }
+  return { data: [], isLoading: false, error: null };
 }
 
 /**
