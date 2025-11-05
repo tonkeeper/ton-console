@@ -1,13 +1,12 @@
 import { FC, PropsWithChildren } from 'react';
 import { Box, Button, ButtonProps } from '@chakra-ui/react';
-import { InvoiceTableColumn } from '../../models';
-import { SortAscIcon16, SortDescIcon16 } from 'src/shared';
+import { DTOInvoiceFieldOrder, SortAscIcon16, SortDescIcon16 } from 'src/shared';
 
 interface Props extends PropsWithChildren<ButtonProps> {
-    currentColumn?: InvoiceTableColumn;
+    currentColumn?: DTOInvoiceFieldOrder;
     direction?: 'asc' | 'desc';
-    column: InvoiceTableColumn;
-    onSetColumn: (column: InvoiceTableColumn) => void;
+    column: DTOInvoiceFieldOrder;
+    onSetColumn: (column: DTOInvoiceFieldOrder) => void;
     onToggleDirection: () => void;
     isDisabled?: boolean;
 }

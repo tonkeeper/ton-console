@@ -71,19 +71,19 @@ const FilterInvoiceByStatus: FC<Props> = ({
                         </Button>
                     )}
                 </Flex>
-                {Object.keys(InvoiceStatus).map(status => (
+                {Object.values(InvoiceStatus).map((statusValue) => (
                     <MenuItem
-                        key={status}
+                        key={statusValue}
                         onClick={e => {
                             e.preventDefault();
-                            onToggle(status as InvoiceStatus);
+                            onToggle(statusValue);
                         }}
                     >
                         <Checkbox
                             icon={<TickIcon w="12px" />}
-                            isChecked={selectedStatuses?.includes(status as InvoiceStatus)}
+                            isChecked={selectedStatuses?.includes(statusValue)}
                         >
-                            {invoiceBadges[status as InvoiceStatus].label}
+                            {invoiceBadges[statusValue].label}
                         </Checkbox>
                     </MenuItem>
                 ))}

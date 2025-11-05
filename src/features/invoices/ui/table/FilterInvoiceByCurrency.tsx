@@ -70,17 +70,17 @@ const FilterInvoiceByCurrency: FC<Props> = ({
                         </Button>
                     )}
                 </Flex>
-                {Object.keys(InvoiceCurrency).map(currency => (
+                {Object.values(InvoiceCurrency).map(currency => (
                     <MenuItem
                         key={currency}
                         onClick={e => {
                             e.preventDefault();
-                            onToggle(currency as InvoiceCurrency);
+                            onToggle(currency);
                         }}
                     >
                         <Checkbox
                             icon={<TickIcon w="12px" />}
-                            isChecked={selectedCurrencies?.includes(currency as InvoiceCurrency)}
+                            isChecked={selectedCurrencies?.includes(currency)}
                         >
                             {currency}
                         </Checkbox>
