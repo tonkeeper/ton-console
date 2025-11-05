@@ -10,14 +10,17 @@ import {
     Flex,
     Grid,
     Button,
-    Badge
+    Badge,
+    Center,
+    Spinner
 } from '@chakra-ui/react';
-import { UsdCurrencyAmount } from 'src/shared';
+import { UsdCurrencyAmount, Network } from 'src/shared';
+import { useWebhooksQuery } from '../../webhooks/model/queries';
 import { WebhookTiers, calculateExpectedPrice } from '../utils/calculating';
 
-export const PricingDiagram = () => {
+export const PricingDiagram: FC<{ isDisabled?: boolean }> = ({ isDisabled = false }) => {
     return (
-        <Grid gap={3}>
+        <Grid gap={3} opacity={isDisabled ? 0.6 : 1}>
             <Box>
                 <Text textStyle="label2" pb={2} fontWeight={600}>
                     Subscribed accounts
@@ -120,7 +123,7 @@ export const PricingDiagram = () => {
     );
 };
 
-export const WebhooksPricingCalculator = () => {
+export const WebhooksPricingCalculator: FC<{ isDisabled?: boolean }> = ({ isDisabled = false }) => {
     const [accounts, setAccounts] = useState<number | null>(null);
     const [messages, setMessages] = useState<number | null>(null);
 
@@ -136,7 +139,7 @@ export const WebhooksPricingCalculator = () => {
 
     const currentPrice = new UsdCurrencyAmount(calculateExpectedPrice(accounts, messages));
     return (
-        <Card w="100%">
+        <Card flexDir="column" display="flex" w="100%" opacity={isDisabled ? 0.6 : 1}>
             <CardHeader>
                 <Text textStyle="text.label2" fontWeight={600}>
                     Pricing Calculator
@@ -146,14 +149,16 @@ export const WebhooksPricingCalculator = () => {
                 <Input
                     bg="white"
                     border="1px solid #83898F52"
-                    onChange={e => parseIntInput(e, setAccounts)}
+                    isDisabled={isDisabled}
+                    onChange={e => !isDisabled && parseIntInput(e, setAccounts)}
                     placeholder="Subscribed accounts"
                     value={accounts ?? ''}
                 />
                 <Input
                     bg="white"
                     border="1px solid #83898F52"
-                    onChange={e => parseIntInput(e, setMessages)}
+                    isDisabled={isDisabled}
+                    onChange={e => !isDisabled && parseIntInput(e, setMessages)}
                     placeholder="Number of messages sent"
                     value={messages ?? ''}
                 />
@@ -170,28 +175,41 @@ export const WebhooksPricingCalculator = () => {
     );
 };
 
-export const WebhooksPricingSection: FC<{ hideActivation?: boolean }> = ({
-    hideActivation = false
-}) => {
+export const WebhooksPricingSection: FC = () => {
     const navigate = useNavigate();
+    const { data: webhooks = [], isLoading, error } = useWebhooksQuery(Network.MAINNET);
 
-    const handleActivateWebhooks = () => {
+    const isWebhooksUnavailable = Boolean(error);
+    const isWebhooksInactive = webhooks.length === 0 && !isLoading && !isWebhooksUnavailable;
+
+    const handleTryWebhooks = () => {
         navigate('../webhooks');
     };
 
+    // Loading state
+    if (isLoading) {
+        return (
+            <Center py="8">
+                <Spinner />
+            </Center>
+        );
+    }
+
     return (
         <Box>
+            {/* Header with Inactive badge */}
             <Flex align="baseline" gap="3" mb="4">
                 <Text textStyle="h4" fontWeight={600}>
                     Webhooks
                 </Text>
-                {!hideActivation && (
+                {isWebhooksInactive && (
                     <Badge fontSize="xs" colorScheme="gray">
                         Inactive
                     </Badge>
                 )}
             </Flex>
 
+            {/* Main content: Pricing diagram and calculator */}
             <Flex align="flex-start" wrap="wrap" gap="6">
                 <Box flex="3 1 300px" minW="300px">
                     <Text textStyle="body2" mb="3" color="text.secondary">
@@ -202,9 +220,9 @@ export const WebhooksPricingSection: FC<{ hideActivation?: boolean }> = ({
                 </Box>
                 <Box flex="1 1 308px" minW="280px">
                     <WebhooksPricingCalculator />
-                    {!hideActivation && (
-                        <Button w="100%" mt="4" onClick={handleActivateWebhooks} variant="primary">
-                            Activate Webhooks
+                    {isWebhooksInactive && (
+                        <Button w="100%" mt="4" onClick={handleTryWebhooks} variant="primary">
+                            Try Webhooks
                         </Button>
                     )}
                 </Box>
