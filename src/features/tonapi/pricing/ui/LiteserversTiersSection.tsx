@@ -1,5 +1,17 @@
 import { FC, useState } from 'react';
-import { Box, Text, Grid, Link, Flex, useDisclosure, Spinner, Center } from '@chakra-ui/react';
+import {
+    Box,
+    Text,
+    Grid,
+    Link,
+    Flex,
+    useDisclosure,
+    Spinner,
+    Center,
+    Badge,
+    Button
+} from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 import { SimpleTierCard } from './SimpleTierCard';
 import {
     useLiteproxyTiers,
@@ -16,12 +28,20 @@ interface LiteserverTierWithUnspent extends DTOLiteproxyTier {
 }
 
 export const LiteserversTiersSection: FC = () => {
+    const navigate = useNavigate();
     const [selectedLiteserverTier, setSelectedLiteserverTier] =
         useState<LiteserverTierWithUnspent | null>(null);
 
     const { data: liteserverTiers, isLoading: isLiteserversLoading } = useLiteproxyTiers();
-    const { data: currentLiteserverTier } = useSelectedLiteproxyTier();
+    const { data: currentLiteserverTier, isLoading: isCurrentLiteserverTierLoading } =
+        useSelectedLiteproxyTier();
     const { mutateAsync: checkValidChangeTier } = useCheckValidChangeLiteproxyTierMutation();
+
+    const isLiteserversInactive = !currentLiteserverTier && !isCurrentLiteserverTierLoading;
+
+    const handleActivateLiteservers = () => {
+        navigate('../liteservers');
+    };
 
     const {
         isOpen: isLiteserversPurchaseDialogOpen,
@@ -67,21 +87,40 @@ export const LiteserversTiersSection: FC = () => {
     return (
         <>
             <Box mb="8">
-                <Flex align="baseline" direction="column" gap="2" mb="4">
+                <Flex align="baseline" gap="3" mb="4">
                     <Text textStyle="h4" fontWeight={600}>
                         Liteservers
                     </Text>
-                    <Text textStyle="body2" color="text.secondary">
-                        Direct access to TON blockchain via Liteserver protocol.{' '}
-                        <Link
-                            color="accent.blue"
-                            href="https://docs.tonconsole.com/tonapi/liteservers"
-                            isExternal
-                        >
-                            Learn more about Liteservers
-                        </Link>
-                    </Text>
+                    {isLiteserversInactive && (
+                        <Badge fontSize="xs" colorScheme="gray">
+                            Inactive
+                        </Badge>
+                    )}
                 </Flex>
+
+                <Text textStyle="body2" mb="4" color="text.secondary">
+                    Direct access to TON blockchain via Liteserver protocol.{' '}
+                    <Link
+                        color="accent.blue"
+                        href="https://docs.tonconsole.com/tonapi/liteservers"
+                        isExternal
+                    >
+                        Learn more about Liteservers
+                    </Link>
+                    {isLiteserversInactive && (
+                        <>
+                            . To get started with Liteservers, activate the service in the{' '}
+                            <Link
+                                color="accent.blue"
+                                fontWeight={500}
+                                cursor="pointer"
+                                onClick={handleActivateLiteservers}
+                            >
+                                dedicated section
+                            </Link>
+                        </>
+                    )}
+                </Text>
 
                 <Grid gap="4" templateColumns="repeat(auto-fit, minmax(230px, 1fr))">
                     {liteserverTiers?.map(tier => {
@@ -97,8 +136,11 @@ export const LiteserversTiersSection: FC = () => {
                                 rps={tier.rps}
                                 priceDescription="Monthly"
                                 isCurrent={isCurrent}
+                                isDisabled={isLiteserversInactive}
                                 onSelect={
-                                    !isCurrent ? () => handleSelectLiteserverTier(tier) : undefined
+                                    !isCurrent && !isLiteserversInactive
+                                        ? () => handleSelectLiteserverTier(tier)
+                                        : undefined
                                 }
                             />
                         );
@@ -109,7 +151,12 @@ export const LiteserversTiersSection: FC = () => {
                         price="Custom"
                         rps="∞"
                         priceDescription="Contact us"
-                        onSelect={openFeedbackModal('unlimited-liteservers')}
+                        isDisabled={isLiteserversInactive}
+                        onSelect={
+                            !isLiteserversInactive
+                                ? openFeedbackModal('unlimited-liteservers')
+                                : undefined
+                        }
                         buttonText="Request"
                         buttonVariant="contrast"
                     />

@@ -8,6 +8,7 @@ interface SimpleTierCardProps extends CardProps {
     rps: string | number;
     priceDescription?: string;
     isCurrent?: boolean;
+    isDisabled?: boolean;
     onSelect?: () => void;
     buttonText?: string;
     buttonVariant?: string;
@@ -19,6 +20,7 @@ export const SimpleTierCard: FC<SimpleTierCardProps> = ({
     rps,
     priceDescription,
     isCurrent = false,
+    isDisabled = false,
     onSelect,
     buttonText = 'Choose',
     buttonVariant,
@@ -31,11 +33,12 @@ export const SimpleTierCard: FC<SimpleTierCardProps> = ({
             pos="relative"
             direction="column"
             p="2"
+            opacity={isDisabled ? 0.6 : 1}
             border={isCurrent ? '2px solid' : '1px solid'}
             borderColor={isCurrent ? 'text.secondary' : 'gray.200'}
             transition="all 0.2s"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            onMouseEnter={() => !isDisabled && setIsHovered(true)}
+            onMouseLeave={() => !isDisabled && setIsHovered(false)}
             size="xl"
             {...rest}
         >
@@ -72,7 +75,7 @@ export const SimpleTierCard: FC<SimpleTierCardProps> = ({
                 </Flex>
 
                 <Flex justify="center">
-                    {isHovered && onSelect ? (
+                    {isHovered && onSelect && !isDisabled ? (
                         <Button
                             alignSelf="center"
                             onClick={onSelect}

@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 import { AnalyticsTableSource } from '../../model';
 
 export type AnalyticsTableContextType = {
@@ -13,3 +13,11 @@ export type AnalyticsTableContextType = {
 export const AnalyticsTableContext = createContext<AnalyticsTableContextType | undefined>(
     undefined
 );
+
+export function useAnalyticsTableContext(): AnalyticsTableContextType {
+    const context = useContext(AnalyticsTableContext);
+    if (!context) {
+        throw new Error('useAnalyticsTableContext must be used within AnalyticsTableProvider');
+    }
+    return context;
+}
