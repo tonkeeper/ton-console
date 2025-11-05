@@ -31,7 +31,7 @@ const SelectProject: FC<BoxProps> = props => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const selectedProject = useMaybeProject();
     const { data: user } = useUserQuery();
-    const { data: projects = [] } = useProjectsQuery({ enabled: !!user });
+    const { data: projects = [] } = useProjectsQuery({ userId: user?.id });
 
     if (!selectedProject) {
         return null;
