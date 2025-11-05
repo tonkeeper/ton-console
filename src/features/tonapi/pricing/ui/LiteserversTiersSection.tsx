@@ -8,8 +8,7 @@ import {
     useDisclosure,
     Spinner,
     Center,
-    Badge,
-    Button
+    Badge
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { SimpleTierCard } from './SimpleTierCard';
