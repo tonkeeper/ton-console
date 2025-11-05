@@ -1,13 +1,7 @@
-import { TonAddress } from 'src/shared';
-
 class Explorer {
     constructor(private readonly baseUrl: string) {}
 
-    public accountLink(userFriendlyAddress: string | TonAddress): string {
-        if (userFriendlyAddress instanceof TonAddress) {
-            userFriendlyAddress = userFriendlyAddress.userFriendly;
-        }
-
+    public accountLink(userFriendlyAddress: string): string {
         return `${this.baseUrl}/${userFriendlyAddress}`;
     }
 
