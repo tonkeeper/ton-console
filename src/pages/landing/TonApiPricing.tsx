@@ -15,7 +15,7 @@ const TonApiPricing = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
                 <Divider my="8" />
                 <LiteserversTiersSection />
                 <Divider my="8" />
-                <WebhooksPricingSection hideActivation />
+                <WebhooksPricingSection />
             </Box>
         </Box>
     );
