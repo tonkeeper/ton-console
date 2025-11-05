@@ -10,9 +10,9 @@ import {
     TableProps
 } from '@chakra-ui/react';
 import { FC, PropsWithChildren, useContext, useRef } from 'react';
+import { DTOInvoiceFieldOrder } from 'src/shared/api';
 import InvoicesTableSortButton from './InvoicesTableSortButton';
 import { InvoicesTableContext } from 'src/features/invoices/ui/table/invoices-table-context';
-import { InvoiceTableColumn } from '../../models';
 
 const EmptyTable: FC<PropsWithChildren> = ({ children }) => {
     const { rawHeight } = useContext(InvoicesTableContext);
@@ -36,9 +36,9 @@ const EmptyTable: FC<PropsWithChildren> = ({ children }) => {
 interface InvoicesTableStructureProps extends PropsWithChildren<TableProps> {
     isLoading?: boolean;
     isEmpty?: boolean;
-    currentSortColumn?: InvoiceTableColumn;
+    currentSortColumn?: DTOInvoiceFieldOrder;
     sortDirection?: 'asc' | 'desc';
-    onSetSortColumn: (column: InvoiceTableColumn) => void;
+    onSetSortColumn: (column: DTOInvoiceFieldOrder) => void;
     onToggleSortDirection: () => void;
 }
 
@@ -126,7 +126,7 @@ export const InvoicesTableStructure: FC<InvoicesTableStructureProps> = ({
                         <InvoicesTableSortButton
                             currentColumn={currentSortColumn}
                             direction={sortDirection}
-                            column="status"
+                            column={DTOInvoiceFieldOrder.STATUS}
                             onSetColumn={onSetSortColumn}
                             onToggleDirection={onToggleSortDirection}
                             isDisabled={isLoading || isEmpty}
@@ -144,7 +144,7 @@ export const InvoicesTableStructure: FC<InvoicesTableStructureProps> = ({
                         <InvoicesTableSortButton
                             currentColumn={currentSortColumn}
                             direction={sortDirection}
-                            column="amount"
+                            column={DTOInvoiceFieldOrder.AMOUNT}
                             onSetColumn={onSetSortColumn}
                             onToggleDirection={onToggleSortDirection}
                             isDisabled={isLoading || isEmpty}
@@ -162,7 +162,7 @@ export const InvoicesTableStructure: FC<InvoicesTableStructureProps> = ({
                         <InvoicesTableSortButton
                             currentColumn={currentSortColumn}
                             direction={sortDirection}
-                            column="date_create"
+                            column={DTOInvoiceFieldOrder.LIFE_TIME}
                             onSetColumn={onSetSortColumn}
                             onToggleDirection={onToggleSortDirection}
                             isDisabled={isLoading || isEmpty}
@@ -186,7 +186,7 @@ export const InvoicesTableStructure: FC<InvoicesTableStructureProps> = ({
                         <InvoicesTableSortButton
                             currentColumn={currentSortColumn}
                             direction={sortDirection}
-                            column="description"
+                            column={DTOInvoiceFieldOrder.DESCRIPTION}
                             onSetColumn={onSetSortColumn}
                             onToggleDirection={onToggleSortDirection}
                             isDisabled={isLoading || isEmpty}

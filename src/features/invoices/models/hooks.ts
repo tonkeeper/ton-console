@@ -1,4 +1,5 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { DTOInvoiceFieldOrder } from 'src/shared/api';
 import {
     useInvoicesAppQuery,
     useInvoicesAppTokenQuery,
@@ -23,7 +24,7 @@ import type {
 const DEFAULT_PAGE_SIZE = 30;
 
 const DEFAULT_SORT: InvoiceTableSort = {
-    column: 'date_create',
+    column: DTOInvoiceFieldOrder.DATE_CREATE,
     direction: 'desc'
 };
 
@@ -223,6 +224,10 @@ export function useInvoicesList(appId: number | null | undefined) {
     const cancelInvoiceMutation = useCancelInvoiceMutation(appId);
 
     // Reset offset when filters or sort change
+    useEffect(() => {
+        setOffset(0);
+    }, [tableState.filter, tableState.sort]);
+
     const invoices = listQuery.data?.items || [];
     const totalCount = listQuery.data?.totalCount || 0;
 

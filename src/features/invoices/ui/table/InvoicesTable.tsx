@@ -6,15 +6,16 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import InvoicesTableRaw from './InvoicesTableRaw';
 import { InvoicesTableStructure } from './InvoicesTableStructure';
 import { InvoicesTableContext } from 'src/features/invoices/ui/table/invoices-table-context';
-import { Invoice, InvoiceTableColumn } from '../../models';
+import { Invoice } from '../../models';
+import { DTOInvoiceFieldOrder } from 'src/shared';
 
 interface Props extends BoxProps {
     invoices: Invoice[];
     isLoading: boolean;
     isEmpty: boolean;
-    currentSortColumn?: InvoiceTableColumn;
+    currentSortColumn?: DTOInvoiceFieldOrder;
     sortDirection?: 'asc' | 'desc';
-    onSetSortColumn: (column: InvoiceTableColumn) => void;
+    onSetSortColumn: (column: DTOInvoiceFieldOrder) => void;
     onToggleSortDirection: () => void;
     onCancel: (id: string) => Promise<void>;
     isCancelLoading: boolean;
@@ -39,7 +40,7 @@ const InvoicesTable: FC<Props> = ({
     const isItemLoaded = (index: number) => !isLoading && index < invoices.length;
 
     const innerElementType = useCallback(
-        ({ children, ...rest }: Record<string, unknown>) => (
+        ({ children, ...rest }: Record<string, unknown> & { children: React.ReactNode }) => (
             <InvoicesTableStructure
                 {...rest}
                 isLoading={isLoading}
@@ -49,7 +50,7 @@ const InvoicesTable: FC<Props> = ({
                 onSetSortColumn={onSetSortColumn}
                 onToggleSortDirection={onToggleSortDirection}
             >
-                {children as React.ReactNode}
+                {children}
             </InvoicesTableStructure>
         ),
         [isLoading, isEmpty, currentSortColumn, sortDirection, onSetSortColumn, onToggleSortDirection]

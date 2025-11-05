@@ -94,7 +94,12 @@ src/
 
 **TypeScript**
 
-* strict mode required; **no `any`**.
+* strict mode required; **ABSOLUTELY NO `any` types** — this is a CRITICAL priority.
+* **ABSOLUTELY NO Type Assertion (`as` keyword)** — even `as const` should be avoided unless absolutely necessary. Build proper types instead. This is EQUALLY CRITICAL as banning `any`.
+  - ❌ BAD: `const data = response as unknown as MyType`
+  - ❌ BAD: `status.map(s => s as InvoiceStatus)`
+  - ✅ GOOD: Build type-safe objects with proper typing
+  - ✅ GOOD: Use `Object.entries()` + proper type mapping instead of `as`
 * Explicit types for public functions and after `map/filter/reduce`.
 * Domain types in `features/<domain>/<feature>/model/interfaces`.
 
