@@ -60,8 +60,7 @@ const ImageInput = forwardRef<
                         if (key === 'value') {
                             if (fileList && fileList[0]) {
                                 // to make  isDirty = true
-                                (fileList[0] as unknown as { identity: number }).identity =
-                                    fileList[0].size;
+                                Object.assign(fileList[0], { identity: fileList[0].size });
                             }
                             return fileList;
                         }
@@ -104,7 +103,7 @@ const ImageInput = forwardRef<
     );
 
     const handleChange = useCallback(
-        (e: ChangeEvent<HTMLInputElement>): void => {
+        (e: ChangeEvent<HTMLInputElement> | { target: HTMLInputElement }): void => {
             if (e.target.files?.[0]) {
                 setFileList(e.target.files);
                 onChange({
@@ -159,7 +158,7 @@ const ImageInput = forwardRef<
         dropContainerRef.current.ondrop = evt => {
             if (!file) {
                 inputRef.current!.files = evt.dataTransfer?.files || null;
-                handleChange({ target: inputRef.current } as ChangeEvent<HTMLInputElement>);
+                handleChange({ target: inputRef.current! });
             }
             evt.preventDefault();
         };

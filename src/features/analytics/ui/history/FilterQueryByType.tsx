@@ -14,6 +14,8 @@ import { observer } from 'mobx-react-lite';
 import { ArrowIcon, MenuButtonDefault, Span, TickIcon } from 'src/shared';
 import { AnalyticsHistoryTableStore, AnalyticsQueryType } from 'src/features';
 
+const QUERY_TYPES: AnalyticsQueryType[] = ['sql', 'gpt', 'graph'];
+
 const QueryTypesLabels: Record<AnalyticsQueryType, string> = {
     sql: 'SQL',
     gpt: 'Chat GPT',
@@ -73,24 +75,22 @@ const FilterQueryByType: FC<FilterQueryByTypeProps> = ({ analyticsHistoryTableSt
                         </Button>
                     )}
                 </Flex>
-                {Object.keys(QueryTypesLabels).map(type => (
+                {QUERY_TYPES.map(type => (
                     <MenuItem
                         key={type}
                         onClick={e => {
                             e.preventDefault();
-                            analyticsHistoryTableStore.toggleFilterByType(
-                                type as AnalyticsQueryType
-                            );
+                            analyticsHistoryTableStore.toggleFilterByType(type);
                         }}
                     >
                         <Checkbox
                             icon={<TickIcon w="12px" />}
                             id="subtractFeeFromAmount"
                             isChecked={analyticsHistoryTableStore.pagination.filter.type?.includes(
-                                type as AnalyticsQueryType
+                                type
                             )}
                         >
-                            {QueryTypesLabels[type as AnalyticsQueryType]}
+                            {QueryTypesLabels[type]}
                         </Checkbox>
                     </MenuItem>
                 ))}

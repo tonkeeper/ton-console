@@ -3,13 +3,12 @@ import {
     FC,
     memo,
     PropsWithChildren,
-    useContext,
     useEffect,
     useMemo,
     useRef,
     useState
 } from 'react';
-import { AnalyticsTableContext } from './analytics-table-context';
+import { useAnalyticsTableContext } from './analytics-table-context';
 import { getTextWidth } from './analytics-query-ui-utils';
 
 export const AnalyticsQueryTableStructure: FC<PropsWithChildren> = memo(() => {
@@ -19,14 +18,14 @@ export const AnalyticsQueryTableStructure: FC<PropsWithChildren> = memo(() => {
         setIsResizingProcess,
         source: { headings },
         setIColumnWidth
-    } = useContext(AnalyticsTableContext);
+    } = useAnalyticsTableContext();
     const [hoverOnColumn, setHoverOnColumn] = useState<number | undefined>(undefined);
 
     const pressedColumn = useRef<
         { index: number; initialPageX: number; initialWidth: number } | undefined
     >(undefined);
 
-    const textWidths = useMemo(() => headings.map(v => getTextWidth(v)), [headings.join(';')]);
+    const textWidths = useMemo(() => headings.map((v: string) => getTextWidth(v)), [headings.join(';')]);
 
     const changeColWidth = (i: number, change: number) => {
         if (!pressedColumn.current) {
@@ -91,7 +90,7 @@ export const AnalyticsQueryTableStructure: FC<PropsWithChildren> = memo(() => {
             fontFamily="mono"
             bg="background.content"
         >
-            {headings.map((text, i) => (
+            {headings.map((text: string, i: number) => (
                 <>
                     <Flex
                         key={text}

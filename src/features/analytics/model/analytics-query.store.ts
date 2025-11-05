@@ -358,10 +358,10 @@ function parseDDL(ddl: string): AnalyticsTablesSchema {
 
     const groups = Array.from(ddl.matchAll(tableRegex));
 
-    return groups.reduce((acc, group) => {
+    return groups.reduce<AnalyticsTablesSchema>((acc, group) => {
         const name = group[1];
         const properties = (group[2] + ',').matchAll(propertiesRegex);
         acc[name] = Array.from(properties).map(match => match[2]);
         return acc;
-    }, {} as AnalyticsTablesSchema);
+    }, {});
 }

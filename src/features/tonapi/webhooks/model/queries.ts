@@ -21,23 +21,30 @@ const WEBHOOKS_KEYS = {
 };
 
 // Mappers
+// TODO: CRITICAL BUG INVESTIGATION NEEDED
+// The DTOStats type has metric: { operation?: string }, but this function filters by metric.type
+// which doesn't exist in the type definition. This suggests either:
+// 1. The API response format for webhook stats is different than general DTOStats
+// 2. The DTOStats type definition is incomplete/incorrect for this endpoint
+// The type assertion `as unknown as` was hiding this mismatch. Please verify actual API response.
 export function mapWebhooksStatsToChartPoints(
   stats: DTOStats,
   type: 'delivered' | 'failed'
 ): ChartPoint[] {
-  interface WebhookStatItem {
-    metric: { type: string };
-    values: [number, string][];
-  }
-
-  const items = (stats.result as unknown as WebhookStatItem[])
-    .filter(item => item.metric?.type === type)
-    .flatMap(item =>
-      item.values.map(([timestamp, value]) => ({
+  const items = stats.result
+    .filter(item => {
+      // NOTE: Accessing metric.type even though DTOStats defines metric.operation
+      // This will likely return undefined and filter out all items until fixed
+      const metricType = (item.metric as unknown as Record<string, string>)?.type;
+      return metricType === type;
+    })
+    .flatMap(item => {
+      const values = item.values as [number, string][];
+      return values.map(([timestamp, value]) => ({
         time: timestamp * 1000,
         value: parseFloat(value)
-      }))
-    );
+      }));
+    });
 
   return items;
 }
