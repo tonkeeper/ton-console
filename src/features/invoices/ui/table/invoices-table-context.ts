@@ -1,10 +1,14 @@
 import { createContext } from 'react';
-import { InvoicesTableStore } from '../../models';
+import { Invoice } from '../../models';
 
 export const InvoicesTableContext = createContext<{
     rawHeight: string;
-    invoicesTableStore: InvoicesTableStore;
+    invoices?: Invoice[];
+    onCancel: (id: string) => Promise<void>;
+    isCancelLoading: boolean;
 }>({
-    rawHeight: '12',
-    invoicesTableStore: {} as InvoicesTableStore
+    rawHeight: '48px',
+    invoices: [],
+    onCancel: async () => {},
+    isCancelLoading: false
 });

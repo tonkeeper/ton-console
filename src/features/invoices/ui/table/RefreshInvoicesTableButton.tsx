@@ -1,19 +1,15 @@
 import { FC } from 'react';
 import { ButtonProps } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { IconButton, RefreshIcon16 } from 'src/shared';
-import { InvoicesTableStore } from '../../models';
 
 interface Props extends ButtonProps {
-    invoicesTableStore: InvoicesTableStore;
+    onRefresh: () => void;
 }
 
-const RefreshInvoicesTableButton: FC<Props> = ({ invoicesTableStore, ...props }) => {
+const RefreshInvoicesTableButton: FC<Props> = ({ onRefresh, ...props }) => {
     return (
         <IconButton
-            onClick={() =>
-                invoicesTableStore.loadFirstPageWithNewParams({ cancelPreviousCall: true })
-            }
+            onClick={onRefresh}
             icon={<RefreshIcon16 />}
             aria-label="refresh table"
             {...props}
@@ -21,4 +17,4 @@ const RefreshInvoicesTableButton: FC<Props> = ({ invoicesTableStore, ...props })
     );
 };
 
-export default observer(RefreshInvoicesTableButton);
+export default RefreshInvoicesTableButton;

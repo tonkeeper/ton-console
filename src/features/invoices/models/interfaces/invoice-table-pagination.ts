@@ -1,8 +1,7 @@
 import type { InvoiceStatus, InvoiceCurrency } from '../interfaces';
 import { MonthName } from 'src/shared';
 
-export type InvoiceTableColumn = 'id' | 'status' | 'creation-date' | 'description' | 'amount';
-export type InvoiceTableSortColumn = InvoiceTableColumn;
+export type InvoiceTableColumn = 'id' | 'status' | 'date_create' | 'description' | 'amount';
 
 export type InvoiceTableFiltration = {
     id?: string;

@@ -1,15 +1,12 @@
 import { FC } from 'react';
 import { ButtonLink, FolderIcon40, H4, Overlay } from 'src/shared';
 import { Button, Divider, Flex, Text, useDisclosure } from '@chakra-ui/react';
-import { CreateInvoicesProjectModal, INVOICES_LINKS, InvoicesAppStore } from 'src/features';
-import { observer } from 'mobx-react-lite';
+import { CreateInvoicesProjectModal, INVOICES_LINKS } from 'src/features';
+import { useInvoicesApp } from 'src/features/invoices/models';
 
-interface RegisterProjectProps {
-    invoicesAppStore: InvoicesAppStore;
-}
-
-const RegisterProject: FC<RegisterProjectProps> = ({ invoicesAppStore }) => {
+const RegisterProject: FC = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const { isCreatingApp } = useInvoicesApp();
 
     return (
         <Overlay h="fit-content" pb="76px">
@@ -32,7 +29,7 @@ const RegisterProject: FC<RegisterProjectProps> = ({ invoicesAppStore }) => {
                         Read Guide
                     </ButtonLink>
                     <Button
-                        isLoading={invoicesAppStore.createInvoicesApp.isLoading}
+                        isLoading={isCreatingApp}
                         onClick={onOpen}
                         variant="primary"
                     >
@@ -43,10 +40,9 @@ const RegisterProject: FC<RegisterProjectProps> = ({ invoicesAppStore }) => {
             <CreateInvoicesProjectModal
                 isOpen={isOpen}
                 onClose={onClose}
-                invoicesAppStore={invoicesAppStore}
             />
         </Overlay>
     );
 };
 
-export default observer(RegisterProject);
+export default RegisterProject;

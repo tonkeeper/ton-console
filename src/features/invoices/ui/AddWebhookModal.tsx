@@ -14,16 +14,15 @@ import {
 } from '@chakra-ui/react';
 import { H4 } from 'src/shared';
 import { useForm } from 'react-hook-form';
-import { InvoicesAppStore } from 'src/features/invoices/models';
-import { observer } from 'mobx-react-lite';
 
 interface Props {
-    invoicesAppStore: InvoicesAppStore;
     isOpen: boolean;
     onClose: () => void;
+    onAddWebhook: (webhook: string) => Promise<void>;
+    isLoading?: boolean;
 }
 
-const AddWebhookModal: FC<Props> = ({ invoicesAppStore, isOpen, onClose }) => {
+const AddWebhookModal: FC<Props> = ({ isOpen, onClose, onAddWebhook, isLoading = false }) => {
     const { formState, register, handleSubmit, reset, watch, setFocus } = useForm<{
         value: string;
     }>();
@@ -32,7 +31,7 @@ const AddWebhookModal: FC<Props> = ({ invoicesAppStore, isOpen, onClose }) => {
     const value = watch('value');
 
     const onSubmit = handleSubmit(async form => {
-        await invoicesAppStore.addWebhook(form.value);
+        await onAddWebhook(form.value);
         onClose();
         setTimeout(reset, 1000);
     });
@@ -80,7 +79,7 @@ const AddWebhookModal: FC<Props> = ({ invoicesAppStore, isOpen, onClose }) => {
                     <Button
                         flex={1}
                         form={formId}
-                        isLoading={invoicesAppStore.addWebhook.isLoading}
+                        isLoading={isLoading}
                         type="submit"
                         variant="primary"
                     >
@@ -92,4 +91,4 @@ const AddWebhookModal: FC<Props> = ({ invoicesAppStore, isOpen, onClose }) => {
     );
 };
 
-export default observer(AddWebhookModal);
+export default AddWebhookModal;

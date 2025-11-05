@@ -9,17 +9,16 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { InvoicesAppStore } from 'src/features/invoices/models';
-import { observer } from 'mobx-react-lite';
 
 interface Props {
-    invoicesAppStore: InvoicesAppStore;
     isOpen: boolean;
     onClose: () => void;
+    onRegenerateToken: () => Promise<void>;
+    isLoading?: boolean;
 }
 
-const InvoicesTokenRegenerateConfirmation: FC<Props> = ({ invoicesAppStore, isOpen, onClose }) => {
-    const onConfirm = (): Promise<void> => invoicesAppStore.regenerateAppToken().then(onClose);
+const InvoicesTokenRegenerateConfirmation: FC<Props> = ({ isOpen, onClose, onRegenerateToken, isLoading = false }) => {
+    const onConfirm = (): Promise<void> => onRegenerateToken().then(onClose);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside" size="md">
@@ -36,7 +35,7 @@ const InvoicesTokenRegenerateConfirmation: FC<Props> = ({ invoicesAppStore, isOp
                     </Button>
                     <Button
                         flex={1}
-                        isLoading={invoicesAppStore.regenerateAppToken.isLoading}
+                        isLoading={isLoading}
                         onClick={onConfirm}
                         variant="primary"
                     >
@@ -48,4 +47,4 @@ const InvoicesTokenRegenerateConfirmation: FC<Props> = ({ invoicesAppStore, isOp
     );
 };
 
-export default observer(InvoicesTokenRegenerateConfirmation);
+export default InvoicesTokenRegenerateConfirmation;

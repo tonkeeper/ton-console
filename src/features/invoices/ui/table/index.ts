@@ -5,3 +5,4 @@ export { default as RefreshInvoicesTableButton } from './RefreshInvoicesTableBut
 export { default as InvoicesSearchInput } from './InvoicesSearchInput';
 export { default as FilterInvoiceByOverpayment } from './FilterInvoiceByOverpayment';
 export { default as FilterInvoiceByCurrency } from './FilterInvoiceByCurrency';
+export { default as InvoicesTableSortButton } from './InvoicesTableSortButton';

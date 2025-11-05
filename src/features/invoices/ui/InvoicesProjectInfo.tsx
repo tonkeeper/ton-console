@@ -1,17 +1,20 @@
 import { FC } from 'react';
 import { Box, Button, Flex, FlexProps, Text, useDisclosure } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { sliceAddress, Span, TooltipHoverable } from 'src/shared';
-import { InvoicesAppStore } from '../models';
+import type { InvoicesApp, InvoicesProjectForm } from '../models';
 import EditInvoicesProjectModal from './EditInvoicesProjectModal';
 
 interface Props extends FlexProps {
-    invoicesAppStore: InvoicesAppStore;
+    invoicesApp: {
+        app: InvoicesApp | null | undefined;
+        editApp: (form: InvoicesProjectForm & { id: number }) => void;
+        isEditingApp: boolean;
+    };
 }
 
-const InvoicesProjectInfo: FC<Props> = ({ invoicesAppStore, ...props }) => {
+const InvoicesProjectInfo: FC<Props> = ({ invoicesApp, ...props }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const app = invoicesAppStore.invoicesApp$.value;
+    const app = invoicesApp.app;
     if (!app) {
         return null;
     }
@@ -29,7 +32,7 @@ const InvoicesProjectInfo: FC<Props> = ({ invoicesAppStore, ...props }) => {
                 placement="top"
                 host={<Span cursor="default">{sliceAddress(app.receiverAddress)}</Span>}
             >
-                <Span color="text.primary">{app.receiverAddress.userFriendly}</Span>
+                <Span color="text.primary">{app.receiverAddress.toString()}</Span>
             </TooltipHoverable>
             <Button
                 textStyle="label2"
@@ -42,9 +45,9 @@ const InvoicesProjectInfo: FC<Props> = ({ invoicesAppStore, ...props }) => {
             >
                 Edit
             </Button>
-            <EditInvoicesProjectModal invoicesAppStore={invoicesAppStore} isOpen={isOpen} onClose={onClose} />
+            <EditInvoicesProjectModal invoicesApp={invoicesApp} isOpen={isOpen} onClose={onClose} />
         </Flex>
     );
 };
 
-export default observer(InvoicesProjectInfo);
+export default InvoicesProjectInfo;
