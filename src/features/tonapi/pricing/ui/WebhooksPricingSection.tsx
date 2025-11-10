@@ -15,7 +15,7 @@ import {
     Spinner
 } from '@chakra-ui/react';
 import { UsdCurrencyAmount, Network } from 'src/shared';
-import { useWebhooksMaybeQuery, useWebhooksQuery } from '../../webhooks/model/queries';
+import { useWebhooksQuery } from '../../webhooks/model/queries';
 import { WebhookTiers, calculateExpectedPrice } from '../utils/calculating';
 
 export const PricingDiagram: FC<{ isDisabled?: boolean }> = ({ isDisabled = false }) => {
@@ -243,7 +243,7 @@ export const WebhooksPricingSection: FC<WebhooksPricingSectionProps> = ({
 }) => {
     // Hooks must be called unconditionally at top level (React hooks rules)
     const navigate = useNavigate();
-    const { data: webhooks = [], isLoading, error } = useWebhooksMaybeQuery(Network.MAINNET);
+    const { data: webhooks = [], isLoading, error } = useWebhooksQuery(Network.MAINNET);
 
     // Display-only mode: render static content without using data-fetching result
     if (displayOnly) {
