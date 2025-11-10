@@ -51,10 +51,13 @@ export function mapWebhooksStatsToChartPoints(
 
 export function useWebhooksMaybeQuery(network: Network) {
   const project = useMaybeProject();
-  if (project) {
-    return useWebhooksQuery(network);
+  const query = useWebhooksQuery(network);
+
+  if (!project) {
+    return { data: [], isLoading: false, error: null };
   }
-  return { data: [], isLoading: false, error: null };
+
+  return query;
 }
 
 /**
