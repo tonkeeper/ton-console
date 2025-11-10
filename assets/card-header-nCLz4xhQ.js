@@ -1,0 +1,1 @@
+import{y as c,j as o,aI as d,aJ as m}from"./index-CVGjkr-X.js";import{u as n}from"./card-Bq9dcuXt.js";const x=c(function(a,s){const{className:r,...e}=a,t=n();return o.jsx(d.div,{ref:s,className:m("chakra-card__header",r),__css:t.header,...e})});export{x as C};
