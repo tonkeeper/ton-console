@@ -63,7 +63,8 @@ const FaucetPage: FC = () => {
     }
 
     const sufficiencyCheck = useBalanceSufficiencyCheck(price?.amount || null, {
-        includePromo: false
+        includePromo: false,
+        onlyUsdt: true
     });
 
     const onSubmit = (form: RequestFaucetForm): void => {

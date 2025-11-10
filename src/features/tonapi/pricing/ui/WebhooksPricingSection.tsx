@@ -15,7 +15,7 @@ import {
     Spinner
 } from '@chakra-ui/react';
 import { UsdCurrencyAmount, Network } from 'src/shared';
-import { useWebhooksMaybeQuery, useWebhooksQuery } from '../../webhooks/model/queries';
+import { useWebhooksMaybeQuery } from '../../webhooks/model/queries';
 import { WebhookTiers, calculateExpectedPrice } from '../utils/calculating';
 
 export const PricingDiagram: FC<{ isDisabled?: boolean }> = ({ isDisabled = false }) => {

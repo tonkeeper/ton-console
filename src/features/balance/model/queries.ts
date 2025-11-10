@@ -52,13 +52,15 @@ function mapDTOBalanceToBalance(
  * @param amountInUsd Amount to check (in USD, can be decimal like 0.2 or 10.5)
  * @param tonRate Current TON/USD exchange rate
  * @param includePromo Whether to include promo amount in the check
+ * @param onlyUsdt If true, only check USDT balance (ignore TON)
  * @returns SufficiencyCheckResult with detailed breakdown
  */
 export function calculateBalanceSufficiency(
     balance: Balance,
     amountInUsd: BigNumber,
     tonRate: number,
-    includePromo = true
+    includePromo = true,
+    onlyUsdt = false
 ): SufficiencyCheckResult {
     // Convert USD amount to cents (since USDT is in 6 decimals, but we work in cents for simplicity)
     const amountInMicroUsdt = amountInUsd.multipliedBy(1e6);
@@ -90,7 +92,7 @@ export function calculateBalanceSufficiency(
     }
 
     return {
-        canPay: usdtSufficient || tonSufficient,
+        canPay: onlyUsdt ? usdtSufficient : (usdtSufficient || tonSufficient),
         usdt: {
             sufficient: usdtSufficient,
             deficit: usdtDeficit
@@ -210,7 +212,7 @@ export function useTonRateQuery() {
  */
 export function useBalanceSufficiencyCheck(
     amountInUsd: BigNumber | null,
-    options?: { includePromo?: boolean }
+    options?: { includePromo?: boolean; onlyUsdt?: boolean }
 ): SufficiencyCheckResult | undefined {
     const { data: balance } = useBalanceQuery();
     const { data: tonRate } = useTonRateQuery();
@@ -220,5 +222,11 @@ export function useBalanceSufficiencyCheck(
         return undefined;
     }
 
-    return calculateBalanceSufficiency(balance, amountInUsd, tonRate, options?.includePromo ?? true);
+    return calculateBalanceSufficiency(
+        balance,
+        amountInUsd,
+        tonRate,
+        options?.includePromo ?? true,
+        options?.onlyUsdt ?? false
+    );
 }
