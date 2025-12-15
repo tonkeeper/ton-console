@@ -1,8 +1,14 @@
 import { Address } from '@ton/core';
 import { TonAddress } from 'src/shared';
 
-export function toUserFriendlyAddress(rawAddress: string): string {
-    return Address.parse(rawAddress).toString();
+export function toUserFriendlyAddress(
+    rawAddress: string,
+    options?: { bounceable?: boolean; testOnly?: boolean }
+): string {
+    return Address.parse(rawAddress).toString({
+        bounceable: options?.bounceable,
+        testOnly: options?.testOnly
+    });
 }
 
 export function sliceAddress(

@@ -32,7 +32,9 @@ const FaucetPaymentDetailsModal: FunctionComponent<{
     receiverAddress?: string;
     price?: TonCurrencyAmount;
 }> = ({ isOpen, onClose, amount, receiverAddress, price }) => {
-    const userFriendlyAddress = receiverAddress ? toUserFriendlyAddress(receiverAddress) : '';
+    const userFriendlyAddress = receiverAddress
+        ? toUserFriendlyAddress(receiverAddress, { testOnly: true, bounceable: false })
+        : '';
 
     const onSubmit = async (): Promise<void> => {
         await faucetStore.buyAssets({
