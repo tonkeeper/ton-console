@@ -32,7 +32,9 @@ const FaucetPaymentDetailsModal: FC<{
     isLoading?: boolean;
     onConfirm?: (form: RequestFaucetForm) => void;
 }> = ({ isOpen, onClose, amount, receiverAddress, price, isLoading, onConfirm }) => {
-    const userFriendlyAddress = receiverAddress ? toUserFriendlyAddress(receiverAddress) : '';
+    const userFriendlyAddress = receiverAddress
+        ? toUserFriendlyAddress(receiverAddress, { testOnly: true, bounceable: false })
+        : '';
 
     const handleConfirm = useCallback((): void => {
         if (onConfirm && amount && receiverAddress) {
