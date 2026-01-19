@@ -49,35 +49,25 @@ export function mapWebhooksStatsToChartPoints(
   return items;
 }
 
-export function useWebhooksMaybeQuery(network: Network) {
-  const project = useMaybeProject();
-  const query = useWebhooksQuery(network);
-
-  if (!project) {
-    return { data: [], isLoading: false, error: null };
-  }
-
-  return query;
-}
-
 /**
  * Fetch all webhooks for a project
+ * Returns empty array if no project selected
  * Returns error state if webhooks feature is not available (501 error)
  */
 export function useWebhooksQuery(network: Network) {
-  const projectId = useProjectId();
+  const project = useMaybeProject();
 
   return useQuery({
-    queryKey: WEBHOOKS_KEYS.list(projectId || undefined, network),
+    queryKey: WEBHOOKS_KEYS.list(project?.id, network),
     queryFn: async () => {
-      if (!projectId) return [];
+      if (!project) return [];
       const response = await rtTonApiClient.webhooks.getWebhooks({
-        project_id: projectId.toString(),
+        project_id: project.id.toString(),
         network
       });
       return response.data.webhooks.toSorted((a, b) => b.id - a.id);
     },
-    enabled: !!projectId,
+    enabled: !!project,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error) => {
       // Don't retry on 501 - feature is not available
