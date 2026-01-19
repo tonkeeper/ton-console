@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import { H4, Overlay, TgChannelCardLink } from 'src/shared';
-import { Box, Divider, Flex, Text } from '@chakra-ui/react';
+import { EXTERNAL_LINKS, H4, Overlay, TgIcon } from 'src/shared';
+import { Box, Divider, Flex, Hide, HStack, Link as ChakraLink, Text } from '@chakra-ui/react';
 import { TonApiTiers } from 'src/features/tonapi/pricing';
 import { Link } from 'react-router-dom';
 
@@ -16,7 +16,18 @@ const PricingPage: FC = () => {
                         </Link>
                     </Text>
                 </Box>
-                <TgChannelCardLink />
+                <ChakraLink
+                    _hover={{ textDecoration: 'none', opacity: 0.8 }}
+                    href={EXTERNAL_LINKS.TG_CHANNEL}
+                    isExternal
+                >
+                    <HStack color="text.secondary" spacing="2">
+                        <TgIcon />
+                        <Hide below="md">
+                            <Text textStyle="body2">Telegram Channel</Text>
+                        </Hide>
+                    </HStack>
+                </ChakraLink>
             </Flex>
             <Divider my="4" />
             <TonApiTiers />

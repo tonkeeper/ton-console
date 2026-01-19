@@ -86,11 +86,9 @@ export function useCreateProjectMutation() {
 
             return mapProjectDtoToProject(data.project);
         },
-        onSuccess: (newProject) => {
-            // Add new project to cache
-            queryClient.setQueryData<Project[]>(['projects'], (old = []) => {
-                return [...old, newProject];
-            });
+        onSuccess: () => {
+            // Invalidate all project queries (matches ['projects', userId] for any userId)
+            queryClient.invalidateQueries({ queryKey: ['projects'] });
 
             toast({
                 title: 'Project created successfully',
@@ -144,13 +142,9 @@ export function useUpdateProjectMutation() {
 
             return mapProjectDtoToProject(data.project);
         },
-        onSuccess: (updatedProject) => {
-            // Update project in cache
-            queryClient.setQueryData<Project[]>(['projects'], (old = []) => {
-                return old.map(project =>
-                    project.id === updatedProject.id ? updatedProject : project
-                );
-            });
+        onSuccess: () => {
+            // Invalidate all project queries (matches ['projects', userId] for any userId)
+            queryClient.invalidateQueries({ queryKey: ['projects'] });
 
             toast({
                 title: 'Project updated successfully',
@@ -185,11 +179,9 @@ export function useDeleteProjectMutation() {
 
             return { deletedId: projectId };
         },
-        onSuccess: ({ deletedId }) => {
-            // Remove project from cache
-            queryClient.setQueryData<Project[]>(['projects'], (old = []) => {
-                return old.filter(project => project.id !== deletedId);
-            });
+        onSuccess: () => {
+            // Invalidate all project queries (matches ['projects', userId] for any userId)
+            queryClient.invalidateQueries({ queryKey: ['projects'] });
 
             toast({
                 title: 'Project deleted successfully',
@@ -211,7 +203,7 @@ export function useDeleteProjectMutation() {
  * Query hook to fetch project participants
  * Requires selectedProjectId from context
  */
-export function useProjectParticipantsQuery(projectId: number | null, currentUserId?: number) {
+export function useProjectParticipantsQuery(projectId: number | null) {
     return useQuery({
         queryKey: ['project-participants', projectId],
         queryFn: async (): Promise<DTOParticipant[]> => {
@@ -223,8 +215,7 @@ export function useProjectParticipantsQuery(projectId: number | null, currentUse
 
             if (error) throw error;
 
-            // Filter out current user
-            return data.items.filter(item => item.id !== currentUserId);
+            return data.items;
         },
         enabled: !!projectId,
         staleTime: 2 * 60 * 1000 // 2 minutes

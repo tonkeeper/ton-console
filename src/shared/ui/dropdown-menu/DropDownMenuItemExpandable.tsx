@@ -20,7 +20,7 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 import { ArrowIcon } from 'src/shared';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 export interface DropDownMenuItemExpandableProps extends PropsWithChildren {
     content: ReactNode;
@@ -62,16 +62,15 @@ export const DropDownMenuItemExpandable: FC<DropDownMenuItemExpandableProps> = p
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const location = useLocation();
-    const navigate = useNavigate();
-    const isMathLocation = location.pathname.startsWith('/' + path);
+    const isMatchLocation = location.pathname.startsWith('/' + path);
 
     useEffect(() => {
-        if (isMathLocation) {
+        if (isMatchLocation) {
             onOpen();
         } else {
             onClose();
         }
-    }, [isMathLocation, onOpen, onClose]);
+    }, [isMatchLocation, onOpen, onClose]);
 
     const index = useMemo(() => {
         return isOpen ? [0] : [];
@@ -79,12 +78,13 @@ export const DropDownMenuItemExpandable: FC<DropDownMenuItemExpandableProps> = p
 
     useEffect(() => setShouldAnimate(true), []);
 
-    const onClick = useCallback(() => {
-        if (isMathLocation) {
-            return;
+    const onToggle = useCallback(() => {
+        if (isOpen) {
+            onClose();
+        } else {
+            onOpen();
         }
-        navigate(path!);
-    }, [isMathLocation, path, navigate]);
+    }, [isOpen, onOpen, onClose]);
 
     return (
         <Accordion allowToggle index={index} reduceMotion={!shouldAnimate}>
@@ -94,6 +94,7 @@ export const DropDownMenuItemExpandable: FC<DropDownMenuItemExpandableProps> = p
                     justifyContent="space-between"
                     gap="3"
                     display="flex"
+                    minH="44px"
                     py="2"
                     pr="3"
                     pl={props.layer ? props.layer * 16 : 3} /*Chakra UI bug workaround*/
@@ -102,7 +103,7 @@ export const DropDownMenuItemExpandable: FC<DropDownMenuItemExpandableProps> = p
                     borderRadius="md"
                     _hover={_hover}
                     transition=""
-                    onClick={onClick}
+                    onClick={onToggle}
                 >
                     {props.leftIcon}
                     <Box textAlign="left" wordBreak="break-all" noOfLines={1}>

@@ -32,7 +32,7 @@ const BalanceBlock: FC = () => {
 
     return (
         <>
-            <Overlay h="100%" p="0" display="flex" flexDirection="column" flex="1" minW="330px">
+            <Overlay h="100%" p={0} display="flex" flexDirection="column" flex="1" minW="330px">
                 <Box>
                     <Flex align="center" justify="space-between" px="6" py="5">
                         <Box>
