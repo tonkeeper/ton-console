@@ -4,7 +4,6 @@ import { lazy } from '@loadable/component';
 import { useMaybeProject } from 'src/shared/contexts/ProjectContext';
 import { useUserQuery } from 'src/entities/user/queries';
 import { useProjectsQuery } from 'src/shared/queries/projects';
-import { useViewportScale } from 'src/shared';
 import AppInitialization from 'src/processes/AppInitialization';
 import { Layout } from './layouts';
 import { LayoutSolid } from 'src/pages/layouts/LayoutSolid';
@@ -46,9 +45,6 @@ const Routing: FC = () => {
             ym(99709953, 'hit', location.pathname);
         }
     }, [location]);
-
-    // Scale layout for mobile devices until adaptive layout is ready
-    useViewportScale(!!user);
 
     // Unauthenticated user - show landing or login
     if (!user) {

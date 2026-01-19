@@ -8,7 +8,7 @@ export const DocumentationButton: FC = () => {
 
     const buttonText = useBreakpointValue({
         base: 'Docs',
-        md: 'Documentation'
+        lg: 'Documentation'
     });
 
     return isAuth ? (

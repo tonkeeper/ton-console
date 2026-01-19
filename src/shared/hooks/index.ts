@@ -7,5 +7,4 @@ export { useIntervalUpdate } from './useIntervalUpdate';
 export { useLocalStorage } from './useLocalStorage';
 export { useSearchParams } from './useSearchParams';
 export { useBillingHistoryQuery } from './useBillingHistoryQuery';
-export { useViewportScale } from './useViewportScale';
 export * from './useIsTextTruncated';

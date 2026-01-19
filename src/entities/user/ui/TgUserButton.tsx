@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { ArrowIcon, CopyPad, DisconnectIcon, MenuButtonDefault, TgIcon } from 'src/shared';
 import { ProfileIcon24 } from 'src/shared/ui/icons/ProfileIcon24';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useUserQuery, useLoginMutation, useLogoutMutation } from 'src/entities/user/queries';
 
 const ExistUserMenu: FC<{ user: User }> = ({ user }) => {
@@ -54,6 +54,31 @@ const ExistUserMenu: FC<{ user: User }> = ({ user }) => {
     );
 };
 
+const MobileUserAvatar: FC<{ user: User }> = ({ user }) => (
+    <Flex as={Link} align="center" to="/profile">
+        <Image
+            w="10"
+            h="10"
+            borderRadius="full"
+            fallback={
+                <Flex
+                    align="center"
+                    justify="center"
+                    w="10"
+                    h="10"
+                    color="text.primary"
+                    fontWeight="medium"
+                    bg="background.contentTint"
+                    borderRadius="full"
+                >
+                    {user.name?.[0] || '?'}
+                </Flex>
+            }
+            src={user.imageUrl}
+        />
+    </Flex>
+);
+
 export const TgUserButton: FC = () => {
     const { data: user, isLoading } = useUserQuery();
     const login = useLoginMutation();
@@ -63,8 +88,11 @@ export const TgUserButton: FC = () => {
         md: 'Connect via Telegram'
     });
 
+    // Mobile (<640px): avatar linking to profile, Tablet+: dropdown menu
+    const isMobile = useBreakpointValue({ base: true, md: false });
+
     return user ? (
-        <ExistUserMenu user={user} />
+        isMobile ? <MobileUserAvatar user={user} /> : <ExistUserMenu user={user} />
     ) : (
         <Button
             isLoading={isLoading || login.isPending}

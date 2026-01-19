@@ -1,5 +1,5 @@
 import { FC, useMemo, useState } from 'react';
-import { H4, Overlay, TgChannelCardLink } from 'src/shared';
+import { H4, Overlay } from 'src/shared';
 import {
     DashboardCardsList,
     DashboardChart,
@@ -7,7 +7,8 @@ import {
     DashboardWebhooksChart,
     FeaturesList
 } from 'src/features';
-import { Flex, Text, Grid, GridItem } from '@chakra-ui/react';
+import { Flex, Text, Grid, GridItem, Hide, HStack, Link, Show, Divider } from '@chakra-ui/react';
+import { EXTERNAL_LINKS, TgIcon } from 'src/shared';
 import { useRestStats, useLiteproxyStats, TimePeriod } from 'src/features/tonapi/statistics/model/queries';
 import { useWebhooksStatsQuery, mapWebhooksStatsToChartPoints } from 'src/features/tonapi/webhooks/model/queries';
 import { useSelectedRestApiTier } from 'src/features/tonapi/pricing/model/queries';
@@ -54,14 +55,30 @@ const DashboardPage: FC = () => {
     return (
         <>
             <Overlay h="fit-content" mb="4">
-                <Flex align="flex-start" justify="space-between" mb="4">
+                <Flex align="center" justify="space-between" mb="4">
                     <H4>Dashboard</H4>
-                    <TgChannelCardLink size="sm" />
+                    <Link
+                        _hover={{ textDecoration: 'none', opacity: 0.8 }}
+                        href={EXTERNAL_LINKS.TG_CHANNEL}
+                        isExternal
+                    >
+                        <HStack color="text.secondary" spacing="2">
+                            <TgIcon />
+                            <Hide below="md">
+                                <Text textStyle="body2">Telegram Channel</Text>
+                            </Hide>
+                        </HStack>
+                    </Link>
                 </Flex>
-                <DashboardCardsList mb="6" />
+                <DashboardCardsList mb={{ base: 4, md: 6 }} />
+                {(hasRestApiData || selectedRestApiTier) && (
+                    <Show below="md">
+                        <Divider mb="4" />
+                    </Show>
+                )}
                 {(hasRestApiData || selectedRestApiTier) && (
                     <>
-                        <Flex align="center" justify="space-between" mb="5">
+                        <Flex align="center" justify="space-between" wrap="wrap" gap="2" mb="5">
                             <Text textStyle="label1" color="text.primary">
                                 Statistics
                             </Text>

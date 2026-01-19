@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import {
     chakra,
     FormControl,
@@ -8,28 +8,19 @@ import {
     StyleProps
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
-import { ImageInput, imageUrlToFilesList } from 'src/shared';
 import { ProjectFormValues } from '../model/interfaces';
-import { EditProjectParticipan } from './EditProjectParticipan';
-import AddProjectParticipantModal from './AddProjectParticipantModal';
-
-type ProjectFormValuesInternal = Omit<ProjectFormValues, 'icon'> & {
-    icon: FileList;
-};
 
 export const ProjectForm: FC<
     StyleProps & {
         id?: string;
         onSubmit: SubmitHandler<ProjectFormValues>;
-        defaultValues?: Partial<Omit<ProjectFormValues, 'icon'> & { imgUrl: string }>;
+        defaultValues?: Partial<ProjectFormValues>;
         disableDefaultFocus?: boolean;
     }
 > = ({ onSubmit, defaultValues, disableDefaultFocus, ...rest }) => {
-    const context = useFormContext<ProjectFormValuesInternal>();
-    const [isParticipanModalOpen, setIsParticipanModalOpen] = useState(false);
+    const context = useFormContext<ProjectFormValues>();
 
-    let { handleSubmit, register, formState, reset, setFocus } =
-        useForm<ProjectFormValuesInternal>();
+    let { handleSubmit, register, formState, reset, setFocus } = useForm<ProjectFormValues>();
     if (context) {
         ({ handleSubmit, register, formState, reset, setFocus } = context);
     }
@@ -40,66 +31,34 @@ export const ProjectForm: FC<
         }
     }, [disableDefaultFocus, setFocus]);
 
-    const getDefaultValues = useCallback(async () => {
-        let icon: FileList | null = null;
-        if (defaultValues?.imgUrl) {
-            icon = await imageUrlToFilesList(defaultValues.imgUrl);
-        }
-
+    const getDefaultValues = useCallback(() => {
         return {
-            name: defaultValues?.name || '',
-            icon: icon!
+            name: defaultValues?.name || ''
         };
     }, [defaultValues]);
 
     useEffect(() => {
-        getDefaultValues().then(reset);
+        reset(getDefaultValues());
     }, [defaultValues, reset, getDefaultValues]);
 
-    const submitMiddleware = (values: ProjectFormValuesInternal): void => {
-        onSubmit({ name: values.name, icon: values.icon?.length ? values.icon[0] : undefined });
-    };
-
     return (
-        <>
-            <chakra.form w="100%" onSubmit={handleSubmit(submitMiddleware)} noValidate {...rest}>
-                <FormControl isInvalid={!!formState.errors.name} isRequired>
-                    <FormLabel htmlFor="name">Name</FormLabel>
-                    <Input
-                        autoComplete="off"
-                        id="name"
-                        placeholder="Project name"
-                        {...register('name', {
-                            required: 'This is required',
-                            minLength: { value: 3, message: 'Minimum length should be 3' },
-                            maxLength: { value: 64, message: 'Maximum length is 64' }
-                        })}
-                    />
-                    <FormErrorMessage>
-                        {formState.errors.name && formState.errors.name.message}
-                    </FormErrorMessage>
-                </FormControl>
-
-                {defaultValues && ( // if project exists
-                    <>
-                        <FormLabel fontSize={14} fontWeight={600}>
-                            Access to the project
-                        </FormLabel>
-                        <EditProjectParticipan
-                            onAddParticipan={() => setIsParticipanModalOpen(true)}
-                        />
-                    </>
-                )}
-
-                <FormControl mb="0">
-                    <FormLabel htmlFor="icon">Icon</FormLabel>
-                    <ImageInput {...register('icon')} />
-                </FormControl>
-            </chakra.form>
-            <AddProjectParticipantModal
-                isOpen={isParticipanModalOpen}
-                onClose={() => setIsParticipanModalOpen(false)}
-            />
-        </>
+        <chakra.form w="100%" onSubmit={handleSubmit(onSubmit)} noValidate {...rest}>
+            <FormControl isInvalid={!!formState.errors.name} isRequired>
+                <FormLabel htmlFor="name">Name</FormLabel>
+                <Input
+                    autoComplete="off"
+                    id="name"
+                    placeholder="Project name"
+                    {...register('name', {
+                        required: 'This is required',
+                        minLength: { value: 3, message: 'Minimum length should be 3' },
+                        maxLength: { value: 64, message: 'Maximum length is 64' }
+                    })}
+                />
+                <FormErrorMessage>
+                    {formState.errors.name && formState.errors.name.message}
+                </FormErrorMessage>
+            </FormControl>
+        </chakra.form>
     );
 };

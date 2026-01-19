@@ -27,7 +27,7 @@ import { useProjectsQuery } from 'src/shared/queries/projects';
 import { CreateProjectModal } from './CreateProjectModal';
 import { useUserQuery } from 'src/entities/user/queries';
 
-const SelectProject: FC<BoxProps> = props => {
+const SelectProject: FC<BoxProps> = ({ w, maxW, ...props }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const selectedProject = useMaybeProject();
     const { data: user } = useUserQuery();
@@ -49,10 +49,14 @@ const SelectProject: FC<BoxProps> = props => {
         </MenuItem>
     );
 
+    // Use passed width or default responsive width
+    const buttonWidth = w ?? { base: '160px', md: '240px' };
+    const buttonMaxWidth = maxW ?? { base: 'auto', md: '182px', lg: '240px' };
+
     return (
         <Box {...props}>
             <Menu placement="bottom">
-                <MenuButtonDefault w="240px" rightIcon={<ArrowIcon />}>
+                <MenuButtonDefault w={buttonWidth} maxW={buttonMaxWidth} rightIcon={<ArrowIcon />}>
                     <HStack spacing="2">
                         {selectedProject.imgUrl ? (
                             <Image

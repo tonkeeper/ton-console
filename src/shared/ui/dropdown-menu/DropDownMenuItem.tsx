@@ -11,6 +11,7 @@ const MenuItemButton = chakra(Button, {
         alignItems: 'center',
         justifyContent: 'flex-start',
         width: '100%',
+        minHeight: '44px',
         color: 'text.primary',
         borderRadius: 'md',
         backgroundColor: 'transparent',

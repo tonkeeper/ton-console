@@ -37,7 +37,7 @@ const AddProjectParticipantModal: FC<{
     const formId = 'add-project-participant-form';
     const projectId = useProjectId();
 
-    const { data: participants = [] } = useProjectParticipantsQuery(projectId, undefined);
+    const { data: participants = [] } = useProjectParticipantsQuery(projectId);
     const addParticipant = useAddProjectParticipantMutation(projectId);
 
     const { handleSubmit, register, formState, reset } = useForm<AddProjectParticipantFormValues>();
