@@ -1,4 +1,4 @@
-import { FunctionComponent, useId, useState } from 'react';
+import { FC, useId, useState } from 'react';
 import {
     Button,
     Modal,
@@ -11,14 +11,21 @@ import {
 } from '@chakra-ui/react';
 import { H4 } from 'src/shared';
 import { observer } from 'mobx-react-lite';
-import { analyticsQueryStore } from '../../model';
+import { AnalyticsQueryStore } from '../../model';
 import RepeatRequestModalContent from 'src/features/analytics/ui/query-results/RepeatRequestModalContent';
 import { toJS } from 'mobx';
 
-const RepeatRequestModal: FunctionComponent<{
+interface RepeatRequestModalProps {
     isOpen: boolean;
     onClose: () => void;
-}> = ({ isOpen, onClose }) => {
+    analyticsQueryStore: AnalyticsQueryStore;
+}
+
+const RepeatRequestModal: FC<RepeatRequestModalProps> = ({
+    isOpen,
+    onClose,
+    analyticsQueryStore
+}) => {
     const formId = useId();
     const [isDirty, setIsDirty] = useState(false);
 
@@ -37,6 +44,7 @@ const RepeatRequestModal: FunctionComponent<{
                             onIsDirtyChange={setIsDirty}
                             formId={formId}
                             onClose={onClose}
+                            analyticsQueryStore={analyticsQueryStore}
                         />
                     )}
                 </ModalBody>

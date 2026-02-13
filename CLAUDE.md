@@ -1,266 +1,479 @@
-# TON Console - Developer Guide
+---
 
-## Overview
+title: TON Console — AI Project Guide
+version: 1.0.0
+last_verified: 2025-10-31
+owners:
 
-TON Console is a web application for managing TON blockchain API access, providing dashboards for API metrics, managing liteproxy servers, webhooks, and API key administration.
+* <fill in: owner GitHub handle/email>
+  ai_maintained: true
 
-## Tech Stack
+---
 
-- **React 18.2.0** with TypeScript 5.6.2 (strict mode)
-- **Vite 5.4.6** for build tooling
-- **MobX 6.7.0** for state management
-- **Chakra UI 2.6.1** for UI components
-- **Recharts 2.5.0** for data visualization
-- **React Router DOM 6.9.0** for routing
+# 0) Purpose of this file
 
-## Project Architecture
+This file is a source of truth for AI assistants and developers:
 
-### Folder Structure
+* describes the project's architecture, conventions, and patterns;
+* sets unambiguous do's and don'ts;
+* contains **safe blocks for AI auto‑updates** without clutter.
+
+> Rule #1: **For new CRUD/server data we use React Query.**
+
+---
+
+# 1) Project overview
+
+**TON Console** is a web application for managing access to TON blockchain APIs:
+
+* metrics and dashboards;
+* API keys;
+* webhooks;
+* management of liteproxy servers.
+
+**Out of scope:** no server-side rendering, no Redux, no manual caching on top of React Query.
+
+---
+
+# 2) Tech stack (quick reference)
+
+| Area         | Choice / Version                                | Rules                             |
+| ------------ | ----------------------------------------------- | --------------------------------- |
+| Core         | React **19.2.0**, TypeScript **5.9.3** (strict) | **Only** functional components    |
+| Build        | Vite **5.4.6**                                  | Code-splitting by routes/features |
+| Server state | **@tanstack/react-query 5.90.5**                | Mandatory for CRUD/fetching       |
+| UI           | Chakra UI **2.10.9**                            | Single theme/tokens               |
+| Charts       | Recharts **2.5.0**                              | Time series, see §7               |
+| Routing      | React Router DOM **6.9.0**                      | Pages are thin, composition only  |
+| Quality      | ESLint **9.38.0**, Prettier **3.6.2**, Vitest   | Zero errors/warnings in CI        |
+
+---
+
+# 3) Architecture and folder structure
 
 ```
 src/
-├── app/              # Application entry, providers, routing
-├── pages/            # Route pages (import and compose features)
-│   └── tonapi/
-│       ├── api-keys/
-│       ├── liteservers/
-│       ├── webhooks/
-│       └── pricing/
-├── features/         # Business logic grouped by domain
-│   └── tonapi/
-│       ├── api-keys/      # {model/, ui/, index.ts}
-│       ├── statistics/    # {model/, ui/, index.ts}
-│       ├── webhooks/      # {model/, ui/, index.ts}
-│       └── liteproxy/     # {model/, ui/, index.ts}
-├── entities/         # Domain models and entity stores
-├── shared/           # Reusable utilities, hooks, components
-│   ├── api/          # API client (auto-generated from swagger)
-│   ├── stores/       # Root store initialization
-│   ├── lib/          # Utilities (includes Loadable state wrapper)
-│   ├── ui/           # Shared UI components
-│   └── hooks/        # Custom hooks
-└── processes/        # Side effects initialization
+├─ app/                  # entry, providers, routing
+├─ pages/                # pages (compose features; no business logic)
+│  └─ tonapi/
+│     ├─ api-keys/
+│     ├─ liteservers/
+│     ├─ webhooks/
+│     └─ pricing/
+├─ features/             # features (grouped by domain)
+│  └─ tonapi/
+│     ├─ api-keys/       # {model/, ui/, index.ts}
+│     │  ├─ model/
+│     │  │  ├─ queries.ts        # React Query hooks (new standard)
+│     │  │  └─ interfaces/       # domain types
+│     │  └─ ui/                  # "dumb" UI components
+│     ├─ webhooks/               # React Query
+│     ├─ statistics/             # React Query
+│     └─ liteproxy/              # React Query
+├─ entities/             # domain models/entities (if shared)
+├─ shared/
+│  ├─ api/
+│  │  └─ console/        # ⚙️ auto-generated from swagger.yaml
+│  ├─ lib/               # utilities (Loadable — legacy)
+│  ├─ ui/                # reusable UI components
+│  ├─ hooks/             # shared hooks (legacy helpers)
+│  ├─ contexts/          # ProjectContext.tsx — selected project context
+│  └─ queries/           # projects.ts — React Query for projects
+└─ processes/            # side-effects initialization
 ```
 
-**Key principle:** Features are self-contained modules with their own model (stores) and UI (components). Pages compose these features together.
+**Principles**
 
-### State Management Pattern
+* **Thin pages:** composition only.
+* **Feature = isolated module:** `model/` (data/queries) + `ui/` (presentation).
+* **Do not touch generated files manually** (see §6.2).
 
-Use MobX stores with the custom `Loadable<T>` wrapper for async operations:
+---
 
-```typescript
-export class MyFeatureStore {
-    data$ = new Loadable<MyData | null>(null);
+# 4) Code conventions
 
-    constructor() {
-        makeAutoObservable(this);
-        // Auto-fetch when project changes
-        createImmediateReaction(
-            () => projectsStore.selectedProject,
-            project => {
-                this.clearStore();
-                if (project) this.fetchData();
-            }
-        );
-    }
+**TypeScript**
 
-    fetchData = this.data$.createAsyncAction(async () => {
-        const response = await apiClient.api.getProjectData({
-            project_id: projectsStore.selectedProject!.id,
-            // ... other params
-        });
-        return mapDTOToData(response.data);
+* strict mode required; **ABSOLUTELY NO `any` types** — this is a CRITICAL priority.
+* **ABSOLUTELY NO Type Assertion (`as` keyword)** — even `as const` should be avoided unless absolutely necessary. Build proper types instead. This is EQUALLY CRITICAL as banning `any`.
+  - ❌ BAD: `const data = response as unknown as MyType`
+  - ❌ BAD: `status.map(s => s as InvoiceStatus)`
+  - ✅ GOOD: Build type-safe objects with proper typing
+  - ✅ GOOD: Use `Object.entries()` + proper type mapping instead of `as`
+* Explicit types for public functions and after `map/filter/reduce`.
+* Domain types in `features/<domain>/<feature>/model/interfaces`.
+
+**Linting**
+
+* Run `npm run lint:fix` to fix linting errors.
+* Do **not use `// eslint-disable`** to disable linting errors.
+* ESLint error should be fixed, instead of disabled
+
+**Naming**
+
+* Components: `PascalCase`. Hooks: `useXxx`.
+* Feature folders: `kebab-case`. Files: no suffixes like `.component.tsx`.
+* Export feature through its root `index.ts` inside the feature folder.
+
+**Imports**
+
+* Pages import **only** from `features/*/ui` and/or the feature's public `index.ts`.
+* Shared items — from `shared/*`.
+
+**UI**
+
+* Chakra UI: centralized theme and tokens.
+* Modals: `useDisclosure`; live in `features/*/ui`.
+* States: `Spinner` → `ErrorMessage` → `EmptyState` → content.
+
+**Do not**
+
+* ❌ Create global stores for feature-local concerns.
+* ❌ Mix several unrelated API calls in a single `queryFn`.
+
+---
+
+# 5) State management
+
+## 5.1 React Query (mandatory pattern for CRUD/fetching)
+
+**Query keys** must include `projectId`:
+
+```ts
+// NEW: Use useProjectId() hook (preferred in new features)
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
+
+const projectId = useProjectId();
+
+return useQuery({
+  queryKey: ['api-keys', projectId || undefined],
+  queryFn: async () => {
+    if (!projectId) return [];
+    const { data, error } = await getProjectTonApiTokens({
+      query: { project_id: projectId.toString() }
     });
-}
-```
-
-**Loadable key properties:**
-- `isResolved`: true when data is loaded or error occurred
-- `isLoading`: true during fetch
-- `value`: the loaded data (or null)
-- `error`: error object if fetch failed
-- `state`: full state enum (unresolved, pending, ready, refreshing, resolveErrored, refetchErrored)
-
-### Component Pattern
-
-Components should be wrapped with `observer()` from mobx-react-lite and follow this pattern:
-
-```typescript
-const MyComponent = observer(() => {
-    const { isResolved, value, error } = someStore.data$;
-
-    if (!isResolved) return <Spinner />;
-    if (error) return <ErrorMessage error={error} />;
-    if (!value) return <EmptyState />;
-
-    return <DataDisplay data={value} />;
+    if (error) throw error;
+    return data.items.map(mapDTOToApiKey);
+  },
+  enabled: !!projectId,
 });
-
-export default MyComponent;
 ```
 
-**Important:** Components receive their state through closures over stores, not props (store-based state). Callback props can be passed for events.
+**Important: projectId in new features**
 
-### Data Transformation
+* ✅ **NEW CODE**: Use `const projectId = useProjectId()` from `ProjectContext`
+* **Current Status**: `ProjectContext` is the single source of truth (localStorage persistence built-in).
+* Include `projectId` in all query keys to prevent cross-project cache collisions
 
-API responses come from auto-generated client (`src/shared/api/api.generated.ts`). Always:
-1. Create domain model interfaces in `features/*/model/interfaces/`
-2. Create mapping functions to transform DTOs to domain models
-3. Use proper TypeScript typing (never use `any`)
+**Mutations & cache**
 
-Example from liteproxy statistics:
-```typescript
-// Transform API response to chart data
-const getLiteproxyRequestsData = (
-    data: TonApiStats
-): Array<{ time: number; value: number | undefined }> => {
-    return data.chart
-        .filter(item => item.liteproxyRequests !== undefined)
-        .map(item => ({
-            time: item.time,
-            value: item.liteproxyRequests
-        }));
+* **Important**: Capture `projectId` in `mutationFn` at mutation time (not hook closure):
+  ```ts
+  mutationFn: async (data) => {
+    const currentProjectId = projectId;  // Capture at mutation start
+    if (!currentProjectId) throw new Error('Project not selected');
+
+    const response = await apiCall(...);
+
+    return { ...response, _projectId: currentProjectId };  // Return for onSuccess
+  },
+  onSuccess: (data) => {
+    // Use projectId from mutation result, not from hook closure
+    queryClient.invalidateQueries({
+      queryKey: ['api-keys', data._projectId]
+    });
+  }
+  ```
+* Prevents race conditions when projectId changes during async operations
+* Simple add: `queryClient.setQueryData(['api-keys', projectId], updater)`.
+* Complex cases: `queryClient.invalidateQueries({ queryKey: ['api-keys', projectId] })`.
+
+---
+
+# 6) Working with the API and models
+
+## 6.1 DTO → Domain models
+
+1. Define domain interfaces in `model/interfaces/`.
+2. Create mappers from SDK DTO → domain model.
+3. Return **domain models** from `queryFn` (not DTOs).
+
+```ts
+// model/interfaces/api-key.ts
+export interface ApiKey {
+  id: string;
+  label: string;
+  createdAt: number; // unix sec
+}
+
+// model/queries.ts
+const mapDTOToApiKey = (dto: DTO_TonApiToken): ApiKey => ({
+  id: dto.id,
+  label: dto.label,
+  createdAt: dto.created_at,
+});
+```
+
+## 6.2 SDK generation
+
+* Files in `src/shared/api/console/*` are generated from `scripts/swagger.yaml`.
+* **Never edit them manually.**
+* Regenerate via: `npm run api:generate` (only when swagger changed).
+* Additional generators: `generate-webhooks`, `generate-airdrop`, `generate-airdrop2` — **leave untouched** unless required by a task.
+
+---
+
+# 7) Time series and charts (Recharts)
+
+* Unified data shape: `{ time: number; value: number | undefined }[]`, where `time` is unix seconds.
+* X axis: `domain={['dataMin', 'dataMax']}`.
+* Pre-filter `undefined` values (avoid holes during render).
+* Default margin: `{ left: 0, right: 0 }`.
+* Example transformation:
+
+```ts
+const toLiteproxySeries = (data: TonApiStats) =>
+  data.chart
+    .filter(i => i.liteproxyRequests !== undefined)
+    .map(i => ({ time: i.time, value: i.liteproxyRequests }));
+```
+
+---
+
+# 8) Routing
+
+* Pages in `src/pages/*` **do not** contain business logic — composition only.
+* Code-splitting by pages.
+* 404/NotFound is mandatory.
+
+---
+
+# 9) Testing, quality, Definition of Done
+
+**Commands**
+
+```bash
+npm run dev
+npm run dev-host
+
+npm run typecheck
+npm run lint
+npm run lint:fix
+npm run test
+
+npm run build
+npm run build:staging
+npm run preview
+
+npm run api:generate
+# (other generators only when required)
+npm run generate-webhooks
+npm run generate-airdrop
+npm run generate-airdrop2
+```
+
+**Definition of Done (required)**
+
+* ✅ `npm run typecheck` — 0 errors
+* ✅ `npm run lint` — 0 errors (at least in changed files)
+* ✅ Tests (where applicable) are green
+* ✅ No `any` and no implicit types in the changes
+* ✅ UI states covered (loading/error/empty)
+* ✅ Mutations update cache correctly
+
+---
+
+# 10) Migration history (MobX → React Query)
+
+**Historical context:** The project previously used MobX stores for server state management. In 2025, we completed a full migration to React Query (`@tanstack/react-query`) for all CRUD and data fetching operations.
+
+**Current state:**
+- ✅ All major features use React Query (API Keys, Webhooks, Statistics, Liteservers, Pricing, Balance, Rates, NFT, Faucet, App Messages, Jetton, Projects)
+- ⚠️ A few isolated modules (Invoices, Analytics, Airdrop) retain localized MobX stores within their components for internal state management only
+- ✅ No global stores — `ProjectContext` manages project selection with React Query
+
+**For new features:** Always use React Query. See patterns in §5.1 and examples in §19.
+
+---
+
+# 11) Security and secrets
+
+* Do not log secrets/API keys/tokens.
+* Environment configuration via **ENV**, no hardcoding.
+* TON API permissions — only via backend proxies where applicable.
+
+---
+
+# 12) Performance
+
+* Real-time: use `refetchInterval` only where needed (see Balance).
+* Use `staleTime` consciously; by default treat data as "stale" for freshness.
+* Avoid unnecessary re-renders: memoize props for heavy tables/lists.
+* Lazy-load pages/features.
+
+---
+
+# 13) UX, accessibility
+
+* States (loading/error/empty) are mandatory.
+* Keyboard accessibility for modals and focus — Chakra is fine by default, do not break it.
+* All text is in English.
+
+---
+
+# 14) Time series and periods (TON metrics)
+
+* Time units in API: unix (seconds).
+* Common case: last 7 days with 30-minute intervals.
+* Centralize date formatting utilities.
+* Example: `const weekAgo = Math.round(Date.now() / 1000 - 3600 * 24 * 7)`.
+
+---
+
+# 15) Git and workflow
+
+* Branch from `master`. Commits are atomic.
+* Commit messages are meaningful.
+* **Important:** tools/assistants **must not** run `git add/commit/push` without an explicit request.
+* Before PR: pass DoD (§9).
+* Review checklist:
+
+  * [ ] Matches React Query patterns
+  * [ ] No `any`/implicit types
+  * [ ] React Query cache updates are correct
+  * [ ] UI states covered
+  * [ ] Generated files unchanged manually
+
+---
+
+# 16) Self‑update protocol (for AI)
+
+**Goal:** keep this file up-to-date and compact, without clutter.
+
+**Golden rules**
+
+1. Do not duplicate rules; if there is a conflict, link to the existing point and refine the wording in a single place.
+
+**Before writing changes AI must:**
+
+* make sure the changes reflect the actual state of the code/repo;
+
+---
+
+# 17) Examples (reference snippets)
+
+## 17.1 CRUD component (pattern)
+
+```tsx
+// features/tonapi/api-keys/ui/ApiKeys.tsx
+export const ApiKeys: FC = () => {
+  const { data: apiKeys, isLoading, error } = useApiKeysQuery();
+  const { mutate: deleteKey, isPending } = useDeleteApiKeyMutation();
+
+  if (isLoading) return <Spinner />;
+  if (error)     return <ErrorMessage error={error} />;
+
+  return (
+    <Overlay h="fit-content">
+      {apiKeys?.length ? (
+        <ApiKeysTable data={apiKeys} onDelete={id => deleteKey({ id })} isBusy={isPending} />
+      ) : (
+        <EmptyState onAction={() => {/* open create modal */}} />
+      )}
+    </Overlay>
+  );
 };
 ```
 
-## Code Style & TypeScript
+## 17.2 Query hook (pattern)
 
-### Requirements
+```ts
+// features/tonapi/api-keys/model/queries.ts
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 
-- **TypeScript strict mode enabled** - always provide explicit types
-- **No `any` types** - if you see `any`, find the root cause and fix the type
-- **Explicit return types** for functions, especially after filter/map operations
-- **Import from features** - pages should import UI components from `features/*/ui`, not local files
+export function useApiKeysQuery() {
+  const projectId = useProjectId();
+  return useQuery({
+    queryKey: ['api-keys', projectId || undefined],
+    queryFn: async () => {
+      if (!projectId) return [];
+      const { data, error } = await getProjectTonApiTokens({
+        query: { project_id: projectId.toString() }
+      });
+      if (error) throw error;
+      return data.items.map(mapDTOToApiKey);
+    },
+    enabled: !!projectId,
+    staleTime: 5 * 60 * 1000  // 5 minutes
+  });
+}
+```
 
-### Common Patterns
+## 17.3 Mutation with projectId capture (pattern - IMPORTANT)
 
-**For async operations:**
-- Always make separate API calls for different data (don't mix concerns)
-- Use `createAsyncAction()` to wrap async functions
-- Filter and map API responses with explicit return types
+```ts
+// features/tonapi/api-keys/model/queries.ts
+export function useDeleteApiKeyMutation() {
+  const queryClient = useQueryClient();
+  const projectId = useProjectId();
 
-**For charts:**
-- Transform data to `{ time: number, value: number }[]` format
-- Use Recharts with `margin={{ left: 0, right: 0 }}` for full width
-- Set XAxis domain to `['dataMin', 'dataMax']` for proper scaling
+  return useMutation({
+    mutationFn: async (keyId: string) => {
+      // Capture projectId at mutation time to prevent race conditions
+      const currentProjectId = projectId;
+      if (!currentProjectId) throw new Error('Project not selected');
 
-**For modals:**
-- Use Chakra UI `useDisclosure()` hook for modal state
-- Place modal components in `features/*/ui/` (not pages)
-- Export from feature's `index.ts`
+      await deleteApiKey(keyId, { project_id: currentProjectId.toString() });
 
-## Common Commands
+      return { keyId, projectId: currentProjectId };
+    },
+    onSuccess: (data) => {
+      // Use projectId from mutation result, not from hook closure
+      queryClient.invalidateQueries({
+        queryKey: ['api-keys', data.projectId]
+      });
+    }
+  });
+}
+```
+
+**Why capture projectId?** If user changes project while request is in flight, `onSuccess` uses stale projectId from closure, invalidating wrong cache. By capturing in `mutationFn` and returning, we ensure correct cache invalidation.
+
+---
+
+# 18) Resources
+
+* Repository: `ton-console`
+* Main branch: `master`
+* Liteservers documentation: link available in the UI
+
+---
+
+# 19) Command reference (for convenience)
 
 ```bash
-# Build and type-check
-npm run build
+# Dev
+npm run dev
+npm run dev-host
 
-# Type checking only (fast)
-npm run test:ts
-
-# Linting
+# Quality
+npm run typecheck
 npm run lint
 npm run lint:fix
+npm run test
 
-# Development server
-npm run dev
+# Build/preview
+npm run build
+npm run build:staging
+npm run preview
+
+# API generation
+npm run api:generate
+
+# Other generators (only when required)
+npm run generate-webhooks
+npm run generate-airdrop
+npm run generate-airdrop2
 ```
 
-## Testing & Verification Checklist
-
-Before declaring work complete:
-
-```bash
-# Run type check - must have ZERO errors
-npm run test:ts 2>&1
-
-# Run lint - must have ZERO errors (for your changes)
-npm run lint 2>&1
-
-# Review changes
-git diff
-git status
-```
-
-**Important:** Never claim work is ready if TypeScript or lint errors exist. Always verify the full output.
-
-## Git Workflow
-
-- Create feature branches from `master`
-- Keep commits atomic and focused
-- Include only necessary files in commits (no auto-generated files unless API changed)
-- Write clear commit messages
-- Ensure all tests pass before committing
-
-## Key Best Practices
-
-### 1. Study Patterns BEFORE Coding
-
-Before implementing a new feature:
-- Find similar features in the codebase (webhooks, api-keys, statistics)
-- Understand the store structure and how they fetch data
-- Check how UI components are organized and exported
-- Look at data transformation patterns
-
-### 2. Respect Auto-Generated Files
-
-Files like `src/shared/api/api.generated.ts` are generated from Swagger specs:
-- Do NOT modify them manually
-- Do NOT revert them without checking API changes
-- They contain essential types and methods for API integration
-
-### 3. Analyze Root Cause, Don't Mask Errors
-
-- TypeScript error? Identify what's wrongly typed
-- Lint error? Understand why the rule triggered
-- API error? Check which method/parameter is missing
-- Never use `any` to bypass type errors
-
-### 4. Feature Modularity
-
-Each feature should:
-- Live in `src/features/domain/featureName/`
-- Have `model/` folder for stores and interfaces
-- Have `ui/` folder for components
-- Export publicly from `index.ts`
-- Be importable as `import { Component } from 'src/features/domain/featureName'`
-
-### 5. Separate Concerns
-
-- Pages compose features, don't contain business logic
-- Stores manage data fetching and transformations
-- Components display data and handle user interactions
-- Imports flow: pages → features (ui/model) → shared → base types
-
-## Project-Specific Notes
-
-### API Client
-
-- Generated from OpenAPI/Swagger spec
-- Located in `src/shared/api/api.generated.ts`
-- Accessed via `apiClient.api.*` methods
-- All API calls require `project_id` from `projectsStore.selectedProject`
-
-### Store Initialization
-
-Root store (`src/shared/stores/root.store.ts`) exports main stores:
-- `projectsStore` - manages selected project
-- `userStore` - user information
-- `tonApiStatsStore` - TonAPI statistics
-- `liteproxysStore` - liteproxy servers
-
-Feature stores are lazy-loaded when projects are ready. Access them from shared stores.
-
-### Time Series Data
-
-When working with metrics/statistics:
-- Use Unix timestamps (seconds) for API calls
-- Common period: last 7 days with 30-min intervals
-- Calculate: `weekAgo = Math.round(Date.now() / 1000 - 3600 * 24 * 7)`
-- Format dates for display with `toLocaleDateString()` and `toLocaleTimeString()`
-
-## Resources
-
-- Project repository: `ton-console`
-- Main branch: `master`
-- Documentation on liteservers is linked in the UI
+---

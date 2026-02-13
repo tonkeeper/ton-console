@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from 'react';
+import { useLocalObservable } from 'mobx-react-lite';
 import {
     Box,
     BoxProps,
@@ -30,17 +31,15 @@ import {
 } from 'src/shared';
 import {
     ANALYTICS_LINKS,
-    analyticsGPTGenerationStore,
+    AnalyticsGPTGenerationStore,
     AnalyticsQueryCode,
-    analyticsQueryGPTRequestStore,
+    AnalyticsQueryRequestStore,
     AnalyticsQueryGTPGeneration,
     AnalyticsQueryResults,
-    analyticsQuerySQLRequestStore,
-    analyticsQueryStore
+    AnalyticsQueryStore
 } from 'src/features';
 import { useNavigate } from 'react-router-dom';
-import { projectsStore } from 'src/shared/stores';
-import { observer } from 'mobx-react-lite';
+import { useProject } from 'src/shared/contexts/ProjectContext';
 
 const QueryPage: FC<BoxProps> = () => {
     const navigate = useNavigate();
@@ -49,11 +48,24 @@ const QueryPage: FC<BoxProps> = () => {
     const queryType = searchParams.get('type');
     const queryNetwork = searchParams.get('network');
     const queryQuery = searchParams.get('query');
-
+    const project = useProject();
     const decodedQuery = (queryQuery && decodeURIComponent(queryQuery)) ?? undefined;
     const [initialQueryGPT] = useState(queryType === 'gpt' ? decodedQuery : undefined);
     const [initialQuerySQL] = useState(queryType !== 'gpt' ? decodedQuery : undefined);
     const [queryResolved, setQueryResolved] = useState(false);
+
+    const analyticsGPTGenerationStore = useLocalObservable(
+        () => new AnalyticsGPTGenerationStore(project)
+    );
+    const analyticsQueryStore = useLocalObservable(
+        () => new AnalyticsQueryStore(analyticsGPTGenerationStore, project)
+    );
+    const analyticsQuerySQLRequestStore = useLocalObservable(
+        () => new AnalyticsQueryRequestStore(project)
+    );
+    const analyticsQueryGPTRequestStore = useLocalObservable(
+        () => new AnalyticsQueryRequestStore(project)
+    );
 
     useEffect(() => {
         analyticsQueryStore.fetchAllTablesSchema();
@@ -75,7 +87,7 @@ const QueryPage: FC<BoxProps> = () => {
         }
 
         updateSearchParams({ query: null });
-    }, [updateSearchParams]);
+    }, [queryId, updateSearchParams]);
 
     useEffect(() => {
         const typedNetwork = queryNetwork as Network;
@@ -84,9 +96,9 @@ const QueryPage: FC<BoxProps> = () => {
 
         analyticsQuerySQLRequestStore.setNetwork(validNetwork);
         analyticsQueryGPTRequestStore.setNetwork(validNetwork);
-    }, [queryNetwork, analyticsQuerySQLRequestStore, analyticsQueryGPTRequestStore]);
+    }, [queryNetwork]);
 
-    const projectId = projectsStore.selectedProject?.id;
+    const projectId = project.id;
     const prevProjectId = usePrevious(projectId);
     const tabIndex = queryType === 'gpt' ? 1 : 0;
     const setTabIndex = (index: number) =>
@@ -101,6 +113,20 @@ const QueryPage: FC<BoxProps> = () => {
             navigate('../history');
         }
     }, [prevProjectId, projectId]);
+
+    useEffect(() => {
+        return () => {
+            analyticsQueryStore.destroy?.();
+            analyticsGPTGenerationStore.destroy?.();
+            analyticsQuerySQLRequestStore.destroy?.();
+            analyticsQueryGPTRequestStore.destroy?.();
+        };
+    }, [
+        analyticsQueryStore,
+        analyticsGPTGenerationStore,
+        analyticsQuerySQLRequestStore,
+        analyticsQueryGPTRequestStore
+    ]);
 
     return (
         <Overlay display="flex" flexDirection="column">
@@ -119,14 +145,14 @@ const QueryPage: FC<BoxProps> = () => {
                     <MenuList w="122px">
                         <MenuItem
                             gap="2"
-                            onClick={() => updateSearchParams({ network: DTOChain.DTOMainnet })}
+                            onClick={() => updateSearchParams({ network: DTOChain.MAINNET })}
                         >
                             <Span textStyle="label2">Mainnet</Span>
                             {network === Network.MAINNET && <TickIcon />}
                         </MenuItem>
                         <MenuItem
                             gap="2"
-                            onClick={() => updateSearchParams({ network: DTOChain.DTOTestnet })}
+                            onClick={() => updateSearchParams({ network: DTOChain.TESTNET })}
                         >
                             <Span textStyle="label2">Testnet</Span>
                             {network === Network.TESTNET && <TickIcon />}
@@ -167,6 +193,10 @@ const QueryPage: FC<BoxProps> = () => {
                                     flex="1"
                                     type="sql"
                                     defaultRequest={initialQuerySQL}
+                                    analyticsQueryStore={analyticsQueryStore}
+                                    analyticsQuerySQLRequestStore={analyticsQuerySQLRequestStore}
+                                    analyticsQueryGPTRequestStore={analyticsQueryGPTRequestStore}
+                                    analyticsGPTGenerationStore={analyticsGPTGenerationStore}
                                 />
                             </TabPanel>
                             <TabPanel flex="1">
@@ -174,15 +204,32 @@ const QueryPage: FC<BoxProps> = () => {
                                     <AnalyticsQueryGTPGeneration
                                         mb="5"
                                         defaultRequest={initialQueryGPT}
+                                        analyticsGPTGenerationStore={analyticsGPTGenerationStore}
+                                        analyticsQueryGPTRequestStore={
+                                            analyticsQueryGPTRequestStore
+                                        }
                                     />
                                     {!!analyticsGPTGenerationStore.generatedSQL$.value && (
-                                        <AnalyticsQueryCode flex="1" type="gpt" />
+                                        <AnalyticsQueryCode
+                                            flex="1"
+                                            type="gpt"
+                                            analyticsQueryStore={analyticsQueryStore}
+                                            analyticsQuerySQLRequestStore={
+                                                analyticsQuerySQLRequestStore
+                                            }
+                                            analyticsQueryGPTRequestStore={
+                                                analyticsQueryGPTRequestStore
+                                            }
+                                            analyticsGPTGenerationStore={
+                                                analyticsGPTGenerationStore
+                                            }
+                                        />
                                     )}
                                 </Box>
                             </TabPanel>
                         </TabPanels>
                     </Tabs>
-                    <AnalyticsQueryResults flex="1" />
+                    <AnalyticsQueryResults flex="1" analyticsQueryStore={analyticsQueryStore} />
                 </Flex>
             ) : (
                 <Center h="300px">
@@ -193,4 +240,4 @@ const QueryPage: FC<BoxProps> = () => {
     );
 };
 
-export default observer(QueryPage);
+export default QueryPage;

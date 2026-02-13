@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useId } from 'react';
+import { FC, useEffect, useId } from 'react';
 import {
     Button,
     FormControl,
@@ -14,13 +14,15 @@ import {
 } from '@chakra-ui/react';
 import { H4 } from 'src/shared';
 import { useForm } from 'react-hook-form';
-import { invoicesAppStore } from 'src/features';
-import { observer } from 'mobx-react-lite';
 
-const AddWebhookModal: FunctionComponent<{
+interface Props {
     isOpen: boolean;
     onClose: () => void;
-}> = ({ isOpen, onClose }) => {
+    onAddWebhook: (webhook: string) => Promise<void>;
+    isLoading?: boolean;
+}
+
+const AddWebhookModal: FC<Props> = ({ isOpen, onClose, onAddWebhook, isLoading = false }) => {
     const { formState, register, handleSubmit, reset, watch, setFocus } = useForm<{
         value: string;
     }>();
@@ -29,7 +31,7 @@ const AddWebhookModal: FunctionComponent<{
     const value = watch('value');
 
     const onSubmit = handleSubmit(async form => {
-        await invoicesAppStore.addWebhook(form.value);
+        await onAddWebhook(form.value);
         onClose();
         setTimeout(reset, 1000);
     });
@@ -77,7 +79,7 @@ const AddWebhookModal: FunctionComponent<{
                     <Button
                         flex={1}
                         form={formId}
-                        isLoading={invoicesAppStore.addWebhook.isLoading}
+                        isLoading={isLoading}
                         type="submit"
                         variant="primary"
                     >
@@ -89,4 +91,4 @@ const AddWebhookModal: FunctionComponent<{
     );
 };
 
-export default observer(AddWebhookModal);
+export default AddWebhookModal;

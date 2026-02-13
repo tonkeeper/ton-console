@@ -57,7 +57,7 @@ export const isValidAddress = (address: string) => {
             return false;
         }
         return true;
-    } catch (error) {
+    } catch (_error) {
         return false;
     }
 };

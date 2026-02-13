@@ -1,8 +1,8 @@
-import { ChangeEvent, ComponentProps, UIEvent, useContext, KeyboardEvent } from 'react';
-import { forwardRef, Textarea } from '@chakra-ui/react';
+import { ChangeEvent, UIEvent, useContext, KeyboardEvent } from 'react';
+import { forwardRef, Textarea, TextareaProps } from '@chakra-ui/react';
 import { TextareaGroupContext } from './textarea-group-context';
 
-export const TextareaBody = forwardRef<ComponentProps<typeof Textarea>, typeof Textarea>(
+export const TextareaBody = forwardRef<TextareaProps, typeof Textarea>(
     ({ onScroll, onFocus, onBlur, onChange, onKeyDown, ...props }, ref) => {
         const { hasFooter, hasRight, setShowScrollDivider, setFocused } =
             useContext(TextareaGroupContext);

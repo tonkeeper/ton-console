@@ -1,13 +1,5 @@
-import {
-    Children,
-    ComponentProps,
-    FunctionComponent,
-    isValidElement,
-    PropsWithChildren,
-    useMemo,
-    useState
-} from 'react';
-import { Box } from '@chakra-ui/react';
+import { Children, FC, isValidElement, PropsWithChildren, useMemo, useState } from 'react';
+import { Box, BoxProps } from '@chakra-ui/react';
 import { TextareaFooter } from './TextareaFooter';
 import { TextareaGroupContext } from './textarea-group-context';
 import { TextareaRight } from './TextareaRight';
@@ -19,10 +11,7 @@ const horizontalStyles = {
     }
 };
 
-export const TextareaGroup: FunctionComponent<PropsWithChildren<ComponentProps<typeof Box>>> = ({
-    children,
-    ...props
-}) => {
+export const TextareaGroup: FC<PropsWithChildren<BoxProps>> = ({ children, ...props }) => {
     const [showScrollDivider, setShowScrollDivider] = useState(false);
     const [focused, setFocused] = useState(false);
     const [hasFooter, hasRight] = useMemo(() => {

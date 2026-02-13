@@ -15,7 +15,7 @@ import {
     getMessages,
     checkAccount,
     prettifyAmount
-} from './deployUtils';
+} from 'src/features/airdrop/lib/deploy-utils';
 import { ADDistributorData } from 'src/shared/api/airdrop-api';
 import { ConfirmationDialog } from 'src/entities';
 import { AirdropStore } from 'src/features/airdrop/model/airdrop.store';
@@ -136,12 +136,12 @@ const DeployComponentInner = ({
                 validUntil: Math.floor(new Date().getTime() / 1000 + 120),
                 messages: messages
             });
-            if (!!hideEnableButton) {
+            if (hideEnableButton) {
                 hideEnableButton();
             }
             setLoading(true);
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     };
 

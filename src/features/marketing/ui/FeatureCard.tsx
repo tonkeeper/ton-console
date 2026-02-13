@@ -1,24 +1,32 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren, ReactElement } from 'react';
-import { Box, Card, CardBody, CardFooter, Flex, Image, Text, chakra } from '@chakra-ui/react';
+import { FC, PropsWithChildren, ReactElement } from 'react';
+import {
+    Box,
+    BoxProps,
+    Card,
+    CardBody,
+    CardFooter,
+    Flex,
+    Image,
+    Text,
+    chakra
+} from '@chakra-ui/react';
 import type * as CSS from 'csstype';
 
-export const FeatureCard: FunctionComponent<
+export const FeatureCard: FC<
     PropsWithChildren<
-        ComponentProps<typeof Box> & {
+        BoxProps & {
             background: CSS.Property.Color;
             fallback?: ReactElement;
             src: string;
             heading: string;
             description: string;
             imgBorder?: boolean;
-            imgHeight: ComponentProps<typeof Image>['height'];
             imgSources?: { media: string; srcSet: string }[];
         }
     >
 > = ({
     imgBorder,
     imgSources,
-    imgHeight,
     background,
     fallback,
     heading,
@@ -29,21 +37,39 @@ export const FeatureCard: FunctionComponent<
 }) => {
     return (
         <Card
+            flex="1 1 280px"
             overflow="hidden"
+            minW="280px"
+            h="auto"
             borderRadius="lg"
             bgColor="background.contentTint"
             size="xl"
             {...rest}
         >
-            <CardBody h="274px" minH="274px" maxH="274px" pb="0" px="10px" bg={background}>
-                <chakra.picture h="100%" alignItems="center" justifyContent="center" display="flex">
+            <CardBody
+                alignContent="center"
+                overflow="hidden"
+                h="274px"
+                minH="274px"
+                maxH="274px"
+                px="10px"
+                pb="0"
+                bg={background}
+            >
+                <chakra.picture
+                    h="100%"
+                    w="100%"
+                    alignItems="center"
+                    justifyContent="center"
+                    display="flex"
+                >
                     {imgSources?.map(item => (
                         <source key={item.media} media={item.media} srcSet={item.srcSet} />
                     ))}
                     <Image
-                        h={imgHeight}
+                        maxW="100%"
+                        maxH="274px"
                         px={imgBorder ? '1' : '0'}
-                        objectFit="contain"
                         bgColor={imgBorder ? 'rgba(255, 255, 255, 0.24)' : 'transparent'}
                         draggable="false"
                         fallback={fallback || <></>}

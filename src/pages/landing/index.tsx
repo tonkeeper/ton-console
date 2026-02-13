@@ -1,14 +1,14 @@
-import { FunctionComponent, useRef } from 'react';
+import { FC, useRef } from 'react';
 import { ButtonLink, DocsIcon16, EXTERNAL_LINKS, H1, H2, H3, Overlay, TgIcon } from 'src/shared';
 import { Button, Flex, Text, useBreakpointValue } from '@chakra-ui/react';
-import { userStore } from 'src/shared/stores';
-import { observer } from 'mobx-react-lite';
+import { useLoginMutation } from 'src/entities/user/queries';
 import TonApiPricing from './TonApiPricing';
 import { Footer } from 'src/widgets';
 import { FeaturesList } from 'src/features';
 
-const LandingPage: FunctionComponent = () => {
+const LandingPage: FC = () => {
     const tonapiRef = useRef<HTMLDivElement | null>(null);
+    const login = useLoginMutation();
 
     const onTonapiClick = (): void => {
         tonapiRef?.current?.scrollIntoView({ behavior: 'smooth' });
@@ -34,10 +34,10 @@ const LandingPage: FunctionComponent = () => {
                     pb={{ base: 12, md: 14 }}
                     textAlign={{ base: 'start', md: 'center' }}
                 >
-                    <Heading mb="5">Connecting businesses to the TON ecosystem</Heading>
+                    <Heading mb="5">Connecting businesses to&nbsp;the&nbsp;TON ecosystem</Heading>
                     <Text textStyle="body1" mb={{ base: 8, md: 10 }} color="text.secondary">
                         Launch a successful business with the TON blockchain: manage Dapps, tokens,
-                        and payments in just one place with a deeply integrated commercial API
+                        and&nbsp;payments in just one place with a deeply integrated commercial API
                     </Text>
                     <Flex
                         direction={{ base: 'column', md: 'row' }}
@@ -45,9 +45,9 @@ const LandingPage: FunctionComponent = () => {
                         w={{ base: '100%', md: 'auto' }}
                     >
                         <Button
-                            isLoading={userStore.user$.isLoading}
+                            isLoading={login.isPending}
                             leftIcon={<TgIcon color="constant.white" />}
-                            onClick={() => userStore.login()}
+                            onClick={() => login.mutate()}
                             variant="primary"
                         >
                             Connect and Try
@@ -73,4 +73,4 @@ const LandingPage: FunctionComponent = () => {
     );
 };
 
-export default observer(LandingPage);
+export default LandingPage;

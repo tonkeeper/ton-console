@@ -4,7 +4,7 @@ export interface ApiKey {
     id: number;
     name: string;
     value: string;
-    limitRps: number | null;
+    limitRps?: number;
     origins?: string[];
     creationDate: Date;
     capabilities: DTOTokenCapability[];

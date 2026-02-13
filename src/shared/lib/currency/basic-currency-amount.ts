@@ -4,12 +4,12 @@ import BigNumber from 'bignumber.js';
 import { Amount } from '../types';
 import { formatNumber } from 'src/shared';
 
-type BasicCurrencyAmountStruct = { amount: Amount; currency: CURRENCY };
+type BasicCurrencyAmountStruct = { amount: Amount; currency: keyof typeof CURRENCY };
 
 export class BasicCurrencyAmount implements CurrencyAmount {
     public readonly amount: BigNumber;
 
-    public readonly currency: CURRENCY;
+    public readonly currency: keyof typeof CURRENCY;
 
     protected readonly decimalPlaces = 2;
 

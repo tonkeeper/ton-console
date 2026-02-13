@@ -1,9 +1,8 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren } from 'react';
-import { Skeleton, Text, useTheme } from '@chakra-ui/react';
+import { FC, PropsWithChildren } from 'react';
+import { Skeleton, Text, TextProps, useTheme } from '@chakra-ui/react';
 import { subtractPixels } from 'src/shared';
-import { observer } from 'mobx-react-lite';
 
-const TextWithSkeleton: FunctionComponent<
+const TextWithSkeleton: FC<
     PropsWithChildren<
         { isLoading: boolean; skeletonWidth: string | number } & (
             | { textStyle: string }
@@ -11,7 +10,7 @@ const TextWithSkeleton: FunctionComponent<
             | { height: string | number }
             | { h: string | number }
         ) &
-            ComponentProps<typeof Text>
+            TextProps
     >
 > = ({ isLoading, skeletonWidth, children, ...rest }) => {
     const theme = useTheme();
@@ -34,4 +33,4 @@ const TextWithSkeleton: FunctionComponent<
     return <Text {...rest}>{children}</Text>;
 };
 
-export default observer(TextWithSkeleton);
+export default TextWithSkeleton;

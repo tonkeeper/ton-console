@@ -1,5 +1,5 @@
-import { ComponentProps, FunctionComponent } from 'react';
-import { Badge, forwardRef } from '@chakra-ui/react';
+import { FC } from 'react';
+import { Badge, BadgeProps, forwardRef } from '@chakra-ui/react';
 import { AnalyticsQuery } from '../../model';
 import { Span } from 'src/shared';
 
@@ -18,14 +18,13 @@ const queryBadges: Record<AnalyticsQuery['status'], { color: string; label: stri
     }
 };
 
-export const AnalyticsQueryStatusBadge: FunctionComponent<
-    ComponentProps<typeof Badge> & { status: AnalyticsQuery['status'] }
-> = forwardRef(({ status, ...rest }, ref) => {
-    const badge = queryBadges[status];
+export const AnalyticsQueryStatusBadge: FC<BadgeProps & { status: AnalyticsQuery['status'] }> =
+    forwardRef(({ status, ...rest }, ref) => {
+        const badge = queryBadges[status];
 
-    return (
-        <Badge ref={ref} pos="relative" bgColor={badge.color} {...rest}>
-            <Span>{badge.label}</Span>
-        </Badge>
-    );
-});
+        return (
+            <Badge ref={ref} pos="relative" bgColor={badge.color} {...rest}>
+                <Span>{badge.label}</Span>
+            </Badge>
+        );
+    });

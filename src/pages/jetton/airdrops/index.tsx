@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AirdropsStore } from 'src/features/airdrop/model/airdrops.store';
 import { Center, Spinner } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
+import { useProject } from 'src/shared/contexts/ProjectContext';
 
 const MainPage = lazy(() => import('./main'));
 const AirdropPage = lazy(() => import('./airdrop'));
@@ -13,9 +14,10 @@ const CreatePage = lazy(() => import('./create'));
 const AirdropsRouting = observer(() => {
     const [store, setStore] = useState<AirdropsStore | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-
+    const project = useProject();
+    
     useEffect(() => {
-        const airdropsStore = new AirdropsStore();
+        const airdropsStore = new AirdropsStore(project);
         setStore(airdropsStore);
     }, []);
 

@@ -1,5 +1,5 @@
-import { ComponentProps, forwardRef, PropsWithChildren, useEffect, useRef, useState } from 'react';
-import { Box, useRadioGroup, chakra } from '@chakra-ui/react';
+import { forwardRef, PropsWithChildren, useEffect, useRef, useState } from 'react';
+import { Box, useRadioGroup, chakra, BoxProps } from '@chakra-ui/react';
 import { UseFormRegisterReturn } from 'react-hook-form';
 import { mergeRefs, OptionsInputOption, setNativeElementValue } from 'src/shared';
 import { ejectRegisterProps } from '../input';
@@ -9,10 +9,9 @@ const unsetRadioValue = '#unset';
 
 export const OptionsInput = forwardRef<
     HTMLInputElement,
-    PropsWithChildren<
-        ComponentProps<typeof Box> & UseFormRegisterReturn & { defaultValue?: string }
-    >
->(({ children, defaultValue, ...props }, ref) => {
+    PropsWithChildren<BoxProps & UseFormRegisterReturn & { defaultValue?: string }>
+>((props, ref) => {
+    const { children, defaultValue } = props;
     const [inputType, setInputType] = useState<'radio' | 'text'>('radio');
     const [value, setValue] = useState(defaultValue);
     const elementRef = useRef<HTMLInputElement | null>(null);
@@ -26,6 +25,7 @@ export const OptionsInput = forwardRef<
 
         setValue(value);
     };
+
 
     const { register, rest } = ejectRegisterProps(props);
 

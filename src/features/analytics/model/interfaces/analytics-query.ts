@@ -1,4 +1,4 @@
-import { Network, TonCurrencyAmount } from 'src/shared';
+import { Network, UsdCurrencyAmount } from 'src/shared';
 import { AnalyticsChartsConfig } from './charts';
 import { AnalyticsGraphQuery } from './analytics-graph-query';
 
@@ -11,7 +11,7 @@ export interface AnalyticsTableSource {
 export interface AnalyticsQueryTemplate {
     request: string;
     estimatedTimeMS: number;
-    estimatedCost: TonCurrencyAmount;
+    estimatedCost: UsdCurrencyAmount;
     explanation: string;
     network: Network;
 }
@@ -29,7 +29,7 @@ export interface AnalyticsQueryBasic extends AnalyticsQueryTemplate {
 export interface AnalyticsQueryCompleted extends AnalyticsQueryBasic {
     status: 'success' | 'error';
     spentTimeMS: number;
-    cost: TonCurrencyAmount;
+    cost: UsdCurrencyAmount;
 }
 
 export interface AnalyticsQuerySuccessful extends AnalyticsQueryCompleted {
@@ -76,5 +76,5 @@ export type AnalyticsRepeatingQueryAggregated = {
     lastQueryDate: Date;
     repeatFrequencyMs: number;
     totalRepetitions: number;
-    totalCost: TonCurrencyAmount;
+    totalCost: UsdCurrencyAmount;
 };

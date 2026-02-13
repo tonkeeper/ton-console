@@ -1,4 +1,4 @@
-import { FunctionComponent, useId } from 'react';
+import { FC, useId } from 'react';
 import {
     Button,
     Modal,
@@ -11,26 +11,36 @@ import {
 } from '@chakra-ui/react';
 import { EditInvoicesProjectForm } from './EditInvoicesProjectForm';
 import { H4 } from 'src/shared';
-import { invoicesAppStore, InvoicesProjectForm } from '../models';
-import { observer } from 'mobx-react-lite';
-import { toJS } from 'mobx';
+import type { InvoicesProjectForm, InvoicesApp } from '../models';
 
-const EditInvoicesProjectModal: FunctionComponent<{
+interface Props {
+    invoicesApp: {
+        app: InvoicesApp | null | undefined;
+        editApp: (form: InvoicesProjectForm & { id: number }) => void;
+        isEditingApp: boolean;
+    };
     isOpen: boolean;
     onClose: () => void;
-}> = ({ isOpen, onClose }) => {
+}
+
+const EditInvoicesProjectModal: FC<Props> = ({ invoicesApp, isOpen, onClose }) => {
     const id = useId();
 
-    const app = invoicesAppStore.invoicesApp$.value;
+    const app = invoicesApp.app;
 
-    const stuctApp = toJS(app);
-
-    const defaultValues: Partial<InvoicesProjectForm> | undefined = stuctApp
+    const defaultValues: Partial<InvoicesProjectForm> | undefined = app
         ? {
-              ...stuctApp,
-              receiverAddress: stuctApp.receiverAddress.userFriendly
+              name: app.name,
+              receiverAddress: app.receiverAddress.toString()
           }
         : undefined;
+
+    const handleSubmit = (form: InvoicesProjectForm) => {
+        if (app) {
+            invoicesApp.editApp({ ...form, id: app.id });
+            onClose();
+        }
+    };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside" size="md">
@@ -45,11 +55,7 @@ const EditInvoicesProjectModal: FunctionComponent<{
                         <EditInvoicesProjectForm
                             defaultValues={defaultValues}
                             id={id}
-                            onSubmit={form =>
-                                invoicesAppStore
-                                    .editInvoicesApp({ ...form, id: app.id })
-                                    .then(onClose)
-                            }
+                            onSubmit={handleSubmit}
                         />
                     )}
                 </ModalBody>
@@ -60,7 +66,7 @@ const EditInvoicesProjectModal: FunctionComponent<{
                     <Button
                         flex={1}
                         form={id}
-                        isLoading={invoicesAppStore.editInvoicesApp.isLoading}
+                        isLoading={invoicesApp.isEditingApp}
                         type="submit"
                         variant="primary"
                     >
@@ -72,4 +78,4 @@ const EditInvoicesProjectModal: FunctionComponent<{
     );
 };
 
-export default observer(EditInvoicesProjectModal);
+export default EditInvoicesProjectModal;

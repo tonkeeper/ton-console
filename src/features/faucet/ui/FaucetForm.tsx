@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import {
     chakra,
     Flex,
@@ -15,14 +15,14 @@ import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
 import { isNumber, isAddressValid, TonCurrencyAmount, mergeRefs, tonMask, Span } from 'src/shared';
 import { useIMask } from 'react-imask';
 import { RequestFaucetForm } from '../model';
-import { Address } from 'ton-core';
+import { Address } from '@ton/core';
 
 export type FaucetFormInternal = {
     tonAmount: string;
     address: string;
 };
 
-export const FaucetForm: FunctionComponent<
+export const FaucetForm: FC<
     StyleProps & {
         id?: string;
         tonLimit?: TonCurrencyAmount;

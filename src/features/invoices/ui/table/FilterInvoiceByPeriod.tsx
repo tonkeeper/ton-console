@@ -1,6 +1,6 @@
-import { ComponentProps, FunctionComponent, useState } from 'react';
+import { FC, useState } from 'react';
 import {
-    Box,
+    BoxProps,
     Button,
     Flex,
     FocusLock,
@@ -13,7 +13,6 @@ import {
     useOutsideClick,
     useToast
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import {
     ArrowIcon,
     DateToDDMMYYYY,
@@ -28,7 +27,7 @@ import {
     toDate,
     XMarkCircleIcon16
 } from 'src/shared';
-import { invoicesTableStore, InvoiceTableFiltration, isCustomFiltrationPeriod } from '../../models';
+import { InvoiceTableFiltration, isCustomFiltrationPeriod } from '../../models';
 import { IMask, useIMask } from 'react-imask';
 
 const useFormattedPeriod = (period: InvoiceTableFiltration['period']): string => {
@@ -64,9 +63,14 @@ const months = [
     { month: monthsNames[mod(currentMonthIndex - 1, 12)], year: prevMonthYear }
 ];
 
-const FilterInvoiceByPeriod: FunctionComponent<ComponentProps<typeof Box>> = props => {
+interface Props extends BoxProps {
+    period?: InvoiceTableFiltration['period'];
+    onSetPeriod: (period: InvoiceTableFiltration['period']) => void;
+    onClear: () => void;
+}
+
+const FilterInvoiceByPeriod: FC<Props> = ({ period, onSetPeriod, onClear, ...props }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const period = invoicesTableStore.pagination.filter.period;
 
     const formattedPeriod = useFormattedPeriod(period);
 
@@ -88,7 +92,7 @@ const FilterInvoiceByPeriod: FunctionComponent<ComponentProps<typeof Box>> = pro
                             icon={<XMarkCircleIcon16 />}
                             onClick={e => {
                                 e.stopPropagation();
-                                invoicesTableStore.clearFilterByPeriod();
+                                onClear();
                                 onClose();
                             }}
                         />
@@ -107,7 +111,7 @@ const FilterInvoiceByPeriod: FunctionComponent<ComponentProps<typeof Box>> = pro
                     <MenuItem
                         key={p.month}
                         onClick={() => {
-                            invoicesTableStore.setFilterByPeriod(p);
+                            onSetPeriod(p);
                         }}
                     >
                         <Span>
@@ -119,19 +123,19 @@ const FilterInvoiceByPeriod: FunctionComponent<ComponentProps<typeof Box>> = pro
                         )}
                     </MenuItem>
                 ))}
-                <MenuInput onClose={onClose} />
+                <MenuInput period={period} onSetPeriod={onSetPeriod} onClose={onClose} />
             </MenuList>
         </Menu>
     );
 };
 
-const MenuInput: FunctionComponent<
-    ComponentProps<typeof MenuList> & { onClose: () => void }
+const MenuInput: FC<
+    BoxProps & { period?: InvoiceTableFiltration['period']; onSetPeriod: (period: InvoiceTableFiltration['period']) => void; onClose: () => void }
 > = props => {
     const toast = useToast();
     const [lockFocus, setLockFocus] = useState(false);
 
-    const { onClose, ...restProps } = props;
+    const { period, onSetPeriod, onClose, ...restProps } = props;
     const {
         role,
         ref: menuRef,
@@ -175,7 +179,6 @@ const MenuInput: FunctionComponent<
     });
 
     let defaultValue = '';
-    const period = invoicesTableStore.pagination.filter.period;
     if (isCustomFiltrationPeriod(period)) {
         defaultValue = `${DateToDDMMYYYY(period.from)} - ${DateToDDMMYYYY(period.to)}`;
     }
@@ -203,9 +206,7 @@ const MenuInput: FunctionComponent<
                         {...rest}
                     />
                 </FocusLock>
-                {isCustomFiltrationPeriod(invoicesTableStore.pagination.filter.period) && (
-                    <TickIcon ml="auto" mr="3" />
-                )}
+                {isCustomFiltrationPeriod(period) && <TickIcon ml="auto" mr="3" />}
             </Flex>
             {!!value && (
                 <Button
@@ -225,7 +226,7 @@ const MenuInput: FunctionComponent<
                             });
                         }
 
-                        invoicesTableStore.setFilterByPeriod({
+                        onSetPeriod({
                             from,
                             to
                         });
@@ -240,4 +241,4 @@ const MenuInput: FunctionComponent<
     );
 };
 
-export default observer(FilterInvoiceByPeriod);
+export default FilterInvoiceByPeriod;

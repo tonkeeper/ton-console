@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Card,
@@ -10,16 +10,21 @@ import {
     ModalFooter,
     ModalHeader
 } from '@chakra-ui/react';
-import { CURRENCY, formatWithSuffix, Span } from 'src/shared';
-import { AppMessagesPackage, appMessagesStore } from '../model';
-import { CurrencyRate } from 'src/entities';
-import { observer } from 'mobx-react-lite';
+import { formatWithSuffix, Span } from 'src/shared';
+import { AppMessagesPackage } from '../model';
+import { useBuyPackageMutation } from '../model/queries';
 
-const MessagesPaymentConfirmationModalContent: FunctionComponent<{
+const MessagesPaymentConfirmationModalContent: FC<{
     onClose: () => void;
     pkg: AppMessagesPackage;
 }> = ({ onClose, pkg }) => {
-    const onConfirm = (): Promise<void> => appMessagesStore.buyPackage(pkg.id).then(onClose);
+    const buyMutation = useBuyPackageMutation();
+
+    const onConfirm = (): void => {
+        buyMutation.mutate(pkg.id, {
+            onSuccess: onClose
+        });
+    };
 
     return (
         <ModalContent>
@@ -44,17 +49,6 @@ const MessagesPaymentConfirmationModalContent: FunctionComponent<{
                             <Span color="text.secondary">Price</Span>
                             <Span>{pkg.price.stringCurrencyAmount}</Span>
                         </Flex>
-                        <Flex justify="flex-end">
-                            <CurrencyRate
-                                color="text.secondary"
-                                textStyle="body2"
-                                currency={CURRENCY.TON}
-                                amount={pkg.price.amount}
-                                reverse
-                            >
-                                &nbsp;TON
-                            </CurrencyRate>
-                        </Flex>
                     </CardBody>
                 </Card>
             </ModalBody>
@@ -64,7 +58,7 @@ const MessagesPaymentConfirmationModalContent: FunctionComponent<{
                 </Button>
                 <Button
                     flex={1}
-                    isLoading={appMessagesStore.buyPackage.isLoading}
+                    isLoading={buyMutation.isPending}
                     onClick={onConfirm}
                     variant="primary"
                 >
@@ -75,4 +69,4 @@ const MessagesPaymentConfirmationModalContent: FunctionComponent<{
     );
 };
 
-export default observer(MessagesPaymentConfirmationModalContent);
+export default MessagesPaymentConfirmationModalContent;

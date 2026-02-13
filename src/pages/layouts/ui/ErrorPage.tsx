@@ -7,7 +7,7 @@ const ErrorPage = () => {
         <Overlay pt="60px" display="flex" flexDirection="column" alignItems="center">
             <H3>Something went wrong</H3>
 
-            <Text textAlign="center" marginY="4">
+            <Text my="4" textAlign="center">
                 We are sorry, but something went wrong. Please try again later.
             </Text>
 

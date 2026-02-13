@@ -6,6 +6,6 @@ export enum Network {
 }
 
 export const DTOChainNetworkMap: Record<DTOChain, Network> = {
-    [DTOChain.DTOMainnet]: Network.MAINNET,
-    [DTOChain.DTOTestnet]: Network.TESTNET
+    [DTOChain.MAINNET]: Network.MAINNET,
+    [DTOChain.TESTNET]: Network.TESTNET
 };

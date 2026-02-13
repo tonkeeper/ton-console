@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC, useCallback } from 'react';
 import {
     Box,
     Button,
@@ -14,36 +14,36 @@ import {
     ModalOverlay
 } from '@chakra-ui/react';
 import {
-    CRYPTO_CURRENCY,
     sliceAddress,
     Span,
     TonCurrencyAmount,
     TooltipHoverable,
+    UsdCurrencyAmount,
     toUserFriendlyAddress
 } from 'src/shared';
-import { CurrencyRate } from 'src/entities';
-import { faucetStore } from 'src/features';
-import { observer } from 'mobx-react-lite';
+import { RequestFaucetForm } from '../model';
 
-const FaucetPaymentDetailsModal: FunctionComponent<{
+const FaucetPaymentDetailsModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     amount?: TonCurrencyAmount;
     receiverAddress?: string;
-    price?: TonCurrencyAmount;
-}> = ({ isOpen, onClose, amount, receiverAddress, price }) => {
+    price?: UsdCurrencyAmount;
+    isLoading?: boolean;
+    onConfirm?: (form: RequestFaucetForm) => void;
+}> = ({ isOpen, onClose, amount, receiverAddress, price, isLoading, onConfirm }) => {
     const userFriendlyAddress = receiverAddress
         ? toUserFriendlyAddress(receiverAddress, { testOnly: true, bounceable: false })
         : '';
 
-    const onSubmit = async (): Promise<void> => {
-        await faucetStore.buyAssets({
-            amount: amount!,
-            receiverAddress: receiverAddress!
-        });
-
-        onClose();
-    };
+    const handleConfirm = useCallback((): void => {
+        if (onConfirm && amount && receiverAddress) {
+            onConfirm({
+                amount,
+                receiverAddress
+            });
+        }
+    }, [onConfirm, amount, receiverAddress]);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
@@ -79,16 +79,9 @@ const FaucetPaymentDetailsModal: FunctionComponent<{
                             <Flex align="flex-start" justify="space-between">
                                 <Span color="text.secondary">Price</Span>
                                 {price && (
-                                    <Box>
-                                        <CurrencyRate
-                                            amount={price.amount}
-                                            currency={CRYPTO_CURRENCY.TON}
-                                            justifyContent="flex-end"
-                                            leftSign="$"
-                                        />
-                                        <Box color="text.secondary">
-                                            {price.stringCurrencyAmount}
-                                        </Box>
+                                    <Box textAlign="right">
+                                        <Span>{price.stringCurrencyAmount}</Span>
+                                        <Box color="text.secondary">USD</Box>
                                     </Box>
                                 )}
                             </Flex>
@@ -101,8 +94,8 @@ const FaucetPaymentDetailsModal: FunctionComponent<{
                     </Button>
                     <Button
                         flex={1}
-                        isLoading={faucetStore.buyAssets.isLoading}
-                        onClick={onSubmit}
+                        isLoading={isLoading}
+                        onClick={handleConfirm}
                         variant="primary"
                     >
                         Confirm Purchase
@@ -113,4 +106,4 @@ const FaucetPaymentDetailsModal: FunctionComponent<{
     );
 };
 
-export default observer(FaucetPaymentDetailsModal);
+export default FaucetPaymentDetailsModal;

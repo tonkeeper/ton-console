@@ -94,7 +94,13 @@ export function flattenSnakeCell(cell: Cell): Buffer {
         if (s.remainingBits === 0) return v;
 
         const data = s.loadBuffer(s.remainingBits / 8);
-        v = Buffer.concat([v, data]);
+        const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data);
+
+        // Manually concatenate to avoid Buffer.concat type issues with strict TypeScript
+        const combined = new Uint8Array(v.length + dataBuffer.length);
+        combined.set(v, 0);
+        combined.set(dataBuffer, v.length);
+        v = Buffer.from(combined);
 
         const newCell = s.remainingRefs > 0 ? s.loadRef() : null;
         s.endParse();

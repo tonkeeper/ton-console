@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import {
     chakra,
     FormControl,
@@ -28,7 +28,6 @@ import {
     TokenCurrencyAmount
 } from 'src/shared';
 import { useIMask } from 'react-imask';
-import { observer } from 'mobx-react-lite';
 import { CRYPTO_CURRENCY_DECIMALS } from 'src/shared/lib/currency/CRYPTO_CURRENCY';
 
 interface InternalForm {
@@ -46,14 +45,14 @@ const invoiceLifeTimeMask = {
     max: 60 * 24 * 90 // 3 months
 };
 
-export const CreateInvoiceFrom: FunctionComponent<
+export const CreateInvoiceFrom: FC<
     StyleProps & {
         id?: string;
         onSubmit: SubmitHandler<InvoiceForm>;
         defaultValues?: Partial<InvoiceForm>;
         disableDefaultFocus?: boolean;
     }
-> = observer(({ onSubmit, defaultValues, disableDefaultFocus, ...rest }) => {
+> = ({ onSubmit, defaultValues, disableDefaultFocus, ...rest }) => {
     const { amount: defaultAmount, ...restDefaultValues } = defaultValues || {};
     const context = useFormContext<InternalForm>();
     let { handleSubmit, register, formState, setFocus } = useForm<InternalForm>({
@@ -192,7 +191,7 @@ export const CreateInvoiceFrom: FunctionComponent<
                 </FormErrorMessage>
                 <Text
                     textStyle="body3"
-                    mt={!!formState.errors.description ? '0' : '2'}
+                    mt={formState.errors.description ? '0' : '2'}
                     color="text.secondary"
                 >
                     Only the administrator can see this description.
@@ -200,4 +199,4 @@ export const CreateInvoiceFrom: FunctionComponent<
             </FormControl>
         </chakra.form>
     );
-});
+};

@@ -1,7 +1,12 @@
 import { makeAutoObservable } from 'mobx';
-import { apiClient, createImmediateReaction, Loadable, TonCurrencyAmount } from 'src/shared';
-import { projectsStore } from 'src/shared/stores';
+import { Loadable, UsdCurrencyAmount } from 'src/shared';
+import {
+    getStatsChatGptPrice,
+    statsChatGptRequest,
+    type GetStatsChatGptPriceResponse
+} from 'src/shared/api';
 import { GptGenerationPricing } from 'src/features';
+import { Project } from 'src/entities/project';
 
 export class AnalyticsGPTGenerationStore {
     generatedSQL$ = new Loadable<string | null>(null);
@@ -10,42 +15,40 @@ export class AnalyticsGPTGenerationStore {
 
     gptPrompt = '';
 
-    constructor() {
+    private disposers: Array<() => void> = [];
+
+    constructor(private readonly project: Project) {
         makeAutoObservable(this);
 
-        createImmediateReaction(
-            () => projectsStore.selectedProject,
-            project => {
-                this.gptPricing$.clear();
-                this.fetchPrice.cancelAllPendingCalls();
-                this.clear();
+        if (project.capabilities.stats.query) {
+            this.fetchPrice();
+        }
+    }
 
-                if (project?.capabilities.stats.query) {
-                    this.fetchPrice();
-                }
-            }
-        );
+    destroy(): void {
+        this.disposers.forEach(dispose => dispose?.());
+        this.disposers = [];
     }
 
     public fetchPrice = this.gptPricing$.createAsyncAction(async () => {
-        const result = await apiClient.api.getStatsChatGptPrice({
-            project_id: projectsStore.selectedProject!.id
+        const { data, error } = await getStatsChatGptPrice({
+            query: { project_id: this.project.id }
         });
-        return mapStatsChatGptPriceToGptGenerationPricing(result.data);
+        if (error) throw error;
+        return mapStatsChatGptPriceToGptGenerationPricing(data);
     });
 
     public generateSQL = this.generatedSQL$.createAsyncAction(
         async (message: string, context?: string) => {
-            const result = await apiClient.api.statsChatGptRequest(
-                {
-                    project_id: projectsStore.selectedProject!.id
-                },
-                { message, context }
-            );
+            const { data, error } = await statsChatGptRequest({
+                query: { project_id: this.project.id },
+                body: { message, context }
+            });
 
+            if (error) throw error;
             await this.fetchPrice();
 
-            return result.data.message;
+            return data.message;
         }
     );
 
@@ -57,14 +60,11 @@ export class AnalyticsGPTGenerationStore {
 }
 
 function mapStatsChatGptPriceToGptGenerationPricing(
-    value: Awaited<ReturnType<typeof apiClient.api.getStatsChatGptPrice>>['data']
+    value: GetStatsChatGptPriceResponse
 ): GptGenerationPricing {
     return {
         freeRequestsNumber: value.free_requests,
         usedFreeRequest: value.used,
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        requestPrice: value.price ? new TonCurrencyAmount(value.price) : value.usd_price
+        requestPrice: new UsdCurrencyAmount(value.usd_price)
     };
 }

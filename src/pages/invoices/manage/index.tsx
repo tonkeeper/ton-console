@@ -1,6 +1,6 @@
-import { FunctionComponent } from 'react';
-import { observer } from 'mobx-react-lite';
-import { ButtonLink, DownloadIcon16, H4, Overlay } from 'src/shared';
+import { FC } from 'react';
+import { Box, Button, Flex, useDisclosure } from '@chakra-ui/react';
+import { H4, Overlay } from 'src/shared';
 import {
     CreateInvoiceModal,
     FilterInvoiceByOverpayment,
@@ -10,49 +10,94 @@ import {
     InvoicesProjectInfo,
     InvoicesSearchInput,
     InvoicesTable,
-    invoicesTableStore,
     RefreshInvoicesTableButton
 } from 'src/features';
-import { Box, Button, Flex, useDisclosure } from '@chakra-ui/react';
+import { useInvoicesApp, useInvoicesList, InvoiceForm, Invoice } from 'src/features/invoices/models';
 
-const ManageInvoicesPage: FunctionComponent = () => {
+const ManageInvoicesPage: FC = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const invoicesApp = useInvoicesApp();
+    const invoicesList = useInvoicesList(invoicesApp.app?.id);
+
     return (
         <Overlay display="flex" flexDirection="column">
             <Flex align="center" justify="space-between" mb="5">
                 <Box>
                     <Flex align="center" gap="2" mb="1">
                         <H4>Manage</H4>
-                        <RefreshInvoicesTableButton />
+                        <RefreshInvoicesTableButton onRefresh={invoicesList.refetch} />
                     </Flex>
-                    <InvoicesProjectInfo />
+                    <InvoicesProjectInfo invoicesApp={invoicesApp} />
                 </Box>
                 <Button h="44px" ml="auto" onClick={onOpen} variant="primary">
                     New Invoice
                 </Button>
             </Flex>
             <Flex align="center" gap="4" mb="6">
-                <InvoicesSearchInput w="264px" />
-                <FilterInvoiceByStatus />
-                <FilterInvoiceByPeriod />
-                <FilterInvoiceByCurrency />
-                <FilterInvoiceByOverpayment />
-                <ButtonLink
-                    ml="auto"
-                    leftIcon={<DownloadIcon16 />}
-                    size="sm"
-                    variant="flat"
-                    href={invoicesTableStore.downloadInvoicesLink}
-                    isExternal
-                    download="invoices.csv"
-                >
-                    Download CSV
-                </ButtonLink>
+                <InvoicesSearchInput
+                    w="264px"
+                    onSearch={invoicesList.setFilterById}
+                />
+                <FilterInvoiceByStatus
+                    selectedStatuses={invoicesList.filter.status}
+                    onToggle={invoicesList.toggleFilterByStatus}
+                    onClear={invoicesList.clearFilterByStatus}
+                />
+                <FilterInvoiceByPeriod
+                    period={invoicesList.filter.period}
+                    onSetPeriod={invoicesList.setFilterByPeriod}
+                    onClear={invoicesList.clearFilterByPeriod}
+                />
+                <FilterInvoiceByCurrency
+                    selectedCurrencies={invoicesList.filter.currency}
+                    onToggle={invoicesList.toggleFilterByCurrency}
+                    onClear={invoicesList.clearFilterByCurrency}
+                />
+                <FilterInvoiceByOverpayment
+                    isActive={invoicesList.filter.overpayment}
+                    onToggle={invoicesList.toggleFilterByOverpayment}
+                />
             </Flex>
-            <InvoicesTable flex="1 1 auto" />
-            <CreateInvoiceModal isOpen={isOpen} onClose={onClose} />
+            <InvoicesTable
+                flex="1 1 auto"
+                invoices={invoicesList.invoices}
+                isLoading={invoicesList.isLoading}
+                isEmpty={!invoicesList.invoices.length}
+                currentSortColumn={invoicesList.sort.column}
+                sortDirection={invoicesList.sort.direction}
+                onSetSortColumn={invoicesList.setSortColumn}
+                onToggleSortDirection={invoicesList.toggleSortDirection}
+                onCancel={async (id: string) => {
+                    await new Promise<void>((resolve) => {
+                        invoicesList.cancelInvoice(id);
+                        resolve();
+                    });
+                }}
+                isCancelLoading={invoicesList.isCancelingInvoice}
+            />
+            <CreateInvoiceModal
+                isOpen={isOpen}
+                onClose={onClose}
+                onCreateInvoice={async (form: InvoiceForm) => {
+                    await Promise.resolve(invoicesList.createInvoice(form));
+                    onClose();
+                    const newInvoice: Invoice = {
+                        id: '',
+                        amount: form.amount,
+                        currency: form.currency,
+                        validUntil: new Date(Date.now() + form.lifeTimeSeconds * 1000),
+                        description: form.description,
+                        creationDate: new Date(),
+                        payTo: invoicesApp.app!.receiverAddress,
+                        paymentLink: '',
+                        status: 'pending'
+                    };
+                    return newInvoice;
+                }}
+                isLoading={invoicesList.isCreatingInvoice}
+            />
         </Overlay>
     );
 };
 
-export default observer(ManageInvoicesPage);
+export default ManageInvoicesPage;

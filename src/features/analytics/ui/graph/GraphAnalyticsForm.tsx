@@ -1,21 +1,33 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Box,
+    BoxProps,
     Button,
     chakra,
     Checkbox,
     Flex,
     FormControl,
-    FormErrorMessage
+    FormErrorMessage,
+    useDisclosure
 } from '@chakra-ui/react';
 import { InfoTooltip, NumberedTextArea } from 'src/shared';
 import { Observer, observer } from 'mobx-react-lite';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { useForm } from 'react-hook-form';
-import { analyticsGraphQueryStore } from '../../model';
+import { AnalyticsGraphQueryStore } from '../../model';
 import { useSearchParams } from 'react-router-dom';
+import RefillModal from 'src/entities/balance/ui/RefillModal';
+import { InsufficientBalanceModal } from 'src/entities/balance/ui/InsufficientBalanceModal';
+import { useInsufficientBalanceModal } from '../hooks';
 
-const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props => {
+interface GraphAnalyticsFormProps extends BoxProps {
+    analyticsGraphQueryStore: AnalyticsGraphQueryStore;
+}
+
+const GraphAnalyticsForm: FC<GraphAnalyticsFormProps> = ({
+    analyticsGraphQueryStore,
+    ...props
+}) => {
     const textAreaLineHeight = 22;
     const {
         register,
@@ -26,6 +38,13 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
         addresses: string;
     }>();
     const [_, setSearchParams] = useSearchParams();
+    const { isOpen: isRefillOpen, onClose: onRefillClose, onOpen: onRefillOpen } = useDisclosure();
+    const {
+        isOpen: isInsufficientBalanceOpen,
+        onClose: onInsufficientBalanceClose,
+        error: insufficientBalanceError,
+        handlePaymentRequiredError
+    } = useInsufficientBalanceModal();
 
     const onSubmit = async (form: { isBetweenAccountsOnly: boolean; addresses: string }) => {
         const addresses = form.addresses
@@ -38,11 +57,18 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                 }
                 return value;
             });
-        const query = await analyticsGraphQueryStore.createQuery({
-            addresses,
-            isBetweenSelectedOnly: form.isBetweenAccountsOnly
-        });
-        setSearchParams({ id: query.id });
+        analyticsGraphQueryStore
+            .createQuery({
+                addresses,
+                isBetweenSelectedOnly: form.isBetweenAccountsOnly
+            })
+            .then(({ data, error }) => {
+                if (error) {
+                    handlePaymentRequiredError(error);
+                    return;
+                }
+                setSearchParams({ id: data!.id });
+            });
     };
 
     const isFormDisabled =
@@ -138,7 +164,7 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                                         >
                                             Send
                                         </Button>
-                                        <Box>The request can cost from 0.01 up to 1 TON</Box>
+                                        <Box>The request can cost from 0.01 up to 5 USD</Box>
                                     </Flex>
                                 </>
                             )}
@@ -146,6 +172,13 @@ const GraphAnalyticsForm: FunctionComponent<ComponentProps<typeof Box>> = props 
                     )}
                 </AutoSizer>
             </Box>
+            <InsufficientBalanceModal
+                isOpen={isInsufficientBalanceOpen}
+                onClose={onInsufficientBalanceClose}
+                onOpenRefill={onRefillOpen}
+                error={insufficientBalanceError}
+            />
+            <RefillModal isOpen={isRefillOpen} onClose={onRefillClose} />
         </chakra.form>
     );
 };

@@ -1,11 +1,19 @@
-import { ComponentProps, FunctionComponent, useEffect } from 'react';
-import { Input, InputGroup, InputLeftElement, InputRightElement } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
+import { FC, useEffect } from 'react';
+import {
+    Input,
+    InputGroup,
+    InputGroupProps,
+    InputLeftElement,
+    InputRightElement
+} from '@chakra-ui/react';
 import { IconButton, SearchIcon24, useDebounce, XMarkCircleIcon16 } from 'src/shared';
 import { useIMask } from 'react-imask';
-import { invoicesTableStore } from 'src/features';
 
-const InvoicesSearchInput: FunctionComponent<ComponentProps<typeof InputGroup>> = props => {
+interface Props extends InputGroupProps {
+    onSearch: (searchId: string | undefined) => void;
+}
+
+const InvoicesSearchInput: FC<Props> = ({ onSearch, ...props }) => {
     const { ref, value, setValue } = useIMask({
         mask: /^[a-zA-Z\d]{1,6}$/
     });
@@ -14,11 +22,11 @@ const InvoicesSearchInput: FunctionComponent<ComponentProps<typeof InputGroup>> 
 
     useEffect(() => {
         if (debouncedValue) {
-            invoicesTableStore.setFilterById(debouncedValue);
+            onSearch(debouncedValue);
         } else {
-            invoicesTableStore.setFilterById(undefined);
+            onSearch(undefined);
         }
-    }, [debouncedValue]);
+    }, [debouncedValue, onSearch]);
 
     return (
         <InputGroup {...props}>
@@ -39,4 +47,4 @@ const InvoicesSearchInput: FunctionComponent<ComponentProps<typeof InputGroup>> 
     );
 };
 
-export default observer(InvoicesSearchInput);
+export default InvoicesSearchInput;

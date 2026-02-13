@@ -11,7 +11,8 @@ import {
     MenuList,
     MenuItem,
     Menu,
-    TableContainerProps
+    TableContainerProps,
+    Spinner
 } from '@chakra-ui/react';
 import { FC, useCallback, useState } from 'react';
 import {
@@ -21,13 +22,16 @@ import {
     MenuButtonIcon,
     Pagination
 } from 'src/shared';
-import { webhooksStore } from '../model';
-import { observer } from 'mobx-react-lite';
-import { Subscription } from '../model/webhooks.store';
+import { Subscription, useWebhookSubscriptionsQuery, useWebhooksUI } from '../model';
 import DeleteSubscriptionsModal from './DeleteSubscriptionModal';
 import { Address } from '@ton/core';
 
 const SubscriptionsTable: FC<TableContainerProps> = props => {
+    const { selectedWebhookId, subscriptionsPage, setSubscriptionsPage } = useWebhooksUI();
+    const { data: subscriptions = [], isLoading } = useWebhookSubscriptionsQuery(
+        selectedWebhookId,
+        subscriptionsPage
+    );
     const [modal, setModal] = useState<{ key: Subscription; action: 'edit' | 'delete' } | null>();
 
     const openEditModal = useCallback((key: Subscription) => {
@@ -41,6 +45,10 @@ const SubscriptionsTable: FC<TableContainerProps> = props => {
     const closeModal = useCallback(() => {
         setModal(null);
     }, []);
+
+    if (isLoading) {
+        return <Spinner />;
+    }
 
     return (
         <>
@@ -61,7 +69,7 @@ const SubscriptionsTable: FC<TableContainerProps> = props => {
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {webhooksStore.subscriptions$.value.map(subscription => (
+                        {subscriptions.map((subscription: Subscription) => (
                             <Tr key={subscription.account_id}>
                                 <Td overflow="hidden" minW={250}>
                                     {Address.parse(subscription.account_id).toString({
@@ -112,9 +120,9 @@ const SubscriptionsTable: FC<TableContainerProps> = props => {
                 </Table>
             </TableContainer>
             <Pagination
-                currentPage={webhooksStore.subscriptionsPage}
-                totalPages={webhooksStore.subscriptionsTotalPages}
-                onPageChange={(page: number) => webhooksStore.setSubscriptionsPage(page)}
+                currentPage={subscriptionsPage}
+                totalPages={Math.ceil(subscriptions.length / 20)}
+                onPageChange={(page: number) => setSubscriptionsPage(page)}
             />
             {modal && (
                 <DeleteSubscriptionsModal
@@ -127,4 +135,4 @@ const SubscriptionsTable: FC<TableContainerProps> = props => {
     );
 };
 
-export default observer(SubscriptionsTable);
+export default SubscriptionsTable;

@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { Box, BoxProps, Button, Textarea } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import { analyticsGPTGenerationStore, analyticsQueryGPTRequestStore } from '../model';
+import { AnalyticsGPTGenerationStore, AnalyticsQueryRequestStore } from '../model';
 import { Span, TextareaBody, TextareaFooter, TextareaGroup, useLocalStorage } from 'src/shared';
 
 const SHOW_CONTEXT_CMD = 'run:show_context';
@@ -9,10 +9,14 @@ const HIDE_CONTEXT_CMD = 'run:hide_context';
 
 interface AnalyticsQueryGPTGenerationProps extends BoxProps {
     defaultRequest?: string;
+    analyticsGPTGenerationStore: AnalyticsGPTGenerationStore;
+    analyticsQueryGPTRequestStore: AnalyticsQueryRequestStore;
 }
 
 const AnalyticsQueryGPTGeneration: FC<AnalyticsQueryGPTGenerationProps> = ({
     defaultRequest,
+    analyticsGPTGenerationStore,
+    analyticsQueryGPTRequestStore,
     ...restProps
 }) => {
     const [message, setMessage] = useState(defaultRequest ?? '');

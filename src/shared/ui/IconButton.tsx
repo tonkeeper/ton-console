@@ -1,8 +1,7 @@
-import { forwardRef, IconButton as ChakraIconButton } from '@chakra-ui/react';
-import { ComponentProps } from 'react';
+import { forwardRef, IconButton as ChakraIconButton, IconButtonProps } from '@chakra-ui/react';
 
 export const IconButton = forwardRef<
-    ComponentProps<typeof ChakraIconButton> & {
+    IconButtonProps & {
         iconColor?: string;
         iconColorHover?: string;
         iconColorActive?: string;

@@ -1,6 +1,6 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
-    Box,
+    BoxProps,
     Button,
     Center,
     Checkbox,
@@ -12,7 +12,9 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { ArrowIcon, MenuButtonDefault, Span, TickIcon } from 'src/shared';
-import { analyticsHistoryTableStore, AnalyticsQueryType } from 'src/features';
+import { AnalyticsHistoryTableStore, AnalyticsQueryType } from 'src/features';
+
+const QUERY_TYPES: AnalyticsQueryType[] = ['sql', 'gpt', 'graph'];
 
 const QueryTypesLabels: Record<AnalyticsQueryType, string> = {
     sql: 'SQL',
@@ -20,7 +22,11 @@ const QueryTypesLabels: Record<AnalyticsQueryType, string> = {
     graph: 'Graph'
 };
 
-const FilterQueryByType: FunctionComponent<ComponentProps<typeof Box>> = props => {
+interface FilterQueryByTypeProps extends BoxProps {
+    analyticsHistoryTableStore: AnalyticsHistoryTableStore;
+}
+
+const FilterQueryByType: FC<FilterQueryByTypeProps> = ({ analyticsHistoryTableStore, ...props }) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     const selectedTypesNumber = analyticsHistoryTableStore.pagination.filter.type?.length;
@@ -52,7 +58,7 @@ const FilterQueryByType: FunctionComponent<ComponentProps<typeof Box>> = props =
                 </Flex>
             </MenuButtonDefault>
             <MenuList zIndex={100} w="240px">
-                <Flex justify="space-between" mb="2" pt="2" px="1" color="text.secondary">
+                <Flex justify="space-between" mb="2" px="1" pt="2" color="text.secondary">
                     <Span textStyle="label2">Display only</Span>
                     {!!selectedTypesNumber && (
                         <Button
@@ -69,24 +75,22 @@ const FilterQueryByType: FunctionComponent<ComponentProps<typeof Box>> = props =
                         </Button>
                     )}
                 </Flex>
-                {Object.keys(QueryTypesLabels).map(type => (
+                {QUERY_TYPES.map(type => (
                     <MenuItem
                         key={type}
                         onClick={e => {
                             e.preventDefault();
-                            analyticsHistoryTableStore.toggleFilterByType(
-                                type as AnalyticsQueryType
-                            );
+                            analyticsHistoryTableStore.toggleFilterByType(type);
                         }}
                     >
                         <Checkbox
                             icon={<TickIcon w="12px" />}
                             id="subtractFeeFromAmount"
                             isChecked={analyticsHistoryTableStore.pagination.filter.type?.includes(
-                                type as AnalyticsQueryType
+                                type
                             )}
                         >
-                            {QueryTypesLabels[type as AnalyticsQueryType]}
+                            {QueryTypesLabels[type]}
                         </Checkbox>
                     </MenuItem>
                 ))}

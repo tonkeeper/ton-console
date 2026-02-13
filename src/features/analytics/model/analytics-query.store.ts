@@ -1,14 +1,14 @@
 import { makeAutoObservable } from 'mobx';
+import { createReaction, Loadable, Network, UsdCurrencyAmount } from 'src/shared';
 import {
-    apiClient,
-    createReaction,
+    getStatsDdl,
+    sendQueryToStats,
+    updateStatsQuery,
+    getSqlResultFromStats,
     DTOChain,
     DTOStatsQueryResult,
-    DTOStatsQueryStatus,
-    Loadable,
-    Network,
-    TonCurrencyAmount
-} from 'src/shared';
+    DTOStatsQueryStatus
+} from 'src/shared/api';
 import {
     AnalyticsChart,
     AnalyticsChartOptions,
@@ -17,9 +17,9 @@ import {
     AnalyticsTablesSchema,
     isAnalyticsQuerySuccessful
 } from './interfaces';
-import { projectsStore } from 'src/shared/stores';
-import { analyticsGPTGenerationStore } from 'src/features';
+import { AnalyticsGPTGenerationStore } from './analytics-gpt-generation.store';
 import { parse } from 'csv-parse/sync';
+import { Project } from 'src/entities';
 
 export class AnalyticsQueryStore {
     query$ = new Loadable<AnalyticsQuery | null>(null);
@@ -28,23 +28,32 @@ export class AnalyticsQueryStore {
 
     tablesSchema$ = new Loadable<AnalyticsTablesSchema | undefined>(undefined);
 
+    private analyticsGPTGenerationStore: AnalyticsGPTGenerationStore;
+
+    private disposers: Array<() => void> = [];
+
     get isQueryIntervalUpdateLoading(): boolean {
         return this.setRepeatOnQuery.isLoading || this.removeRepeatOnQuery.isLoading;
     }
 
-    constructor() {
+    constructor(
+        analyticsGPTGenerationStore: AnalyticsGPTGenerationStore,
+        private readonly project: Project
+    ) {
+        this.analyticsGPTGenerationStore = analyticsGPTGenerationStore;
         makeAutoObservable(this);
 
-        createReaction(
-            () => projectsStore.selectedProject?.id,
+        const dispose1 = createReaction(
+            () => this.project,
             (_, prevId) => {
                 if (prevId) {
                     this.clear();
                 }
             }
         );
+        this.disposers.push(dispose1);
 
-        createReaction(
+        const dispose2 = createReaction(
             () =>
                 (this.query$.value?.id || '').toString() +
                 (this.query$.value?.status || '').toString(),
@@ -58,13 +67,20 @@ export class AnalyticsQueryStore {
                 }
             }
         );
+        this.disposers.push(dispose2);
+    }
+
+    destroy(): void {
+        this.disposers.forEach(dispose => dispose?.());
+        this.disposers = [];
     }
 
     public fetchAllTablesSchema = this.tablesSchema$.createAsyncAction(
         async () => {
             if (!this.tablesSchema$.value) {
-                const result = await apiClient.api.getStatsDdl();
-                return parseDDL(result.data as unknown as string);
+                const { data, error } = await getStatsDdl();
+                if (error) throw error;
+                return parseDDL(data as unknown as string);
             }
         },
         { resetBeforeExecution: true }
@@ -92,21 +108,26 @@ export class AnalyticsQueryStore {
 
     createQuery = this.query$.createAsyncAction(
         async (query: string, network: 'mainnet' | 'testnet') => {
-            const result = await apiClient.api.sendQueryToStats(
-                {
-                    project_id: projectsStore.selectedProject!.id,
+            const { data, error } = await sendQueryToStats({
+                body: {
+                    project_id: this.project.id,
                     query,
                     ...(query.trim() ===
-                        analyticsGPTGenerationStore.generatedSQL$.value?.trim() && {
-                        gpt_message: analyticsGPTGenerationStore.gptPrompt
+                        this.analyticsGPTGenerationStore.generatedSQL$.value?.trim() && {
+                        gpt_message: this.analyticsGPTGenerationStore.gptPrompt
                     })
                 },
-                {
-                    chain: network === 'testnet' ? DTOChain.DTOTestnet : DTOChain.DTOMainnet
+                query: {
+                    chain: network === 'testnet' ? DTOChain.TESTNET : DTOChain.MAINNET
                 }
-            );
+            });
 
-            return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
+            const result = {
+                data: error ? undefined : mapDTOStatsSqlResultToAnalyticsQuery(data),
+                error: error ? error : undefined
+            };
+
+            return result;
         },
         {
             errorToast: e => ({
@@ -118,14 +139,13 @@ export class AnalyticsQueryStore {
 
     setRepeatOnQuery = this.query$.createAsyncAction(
         async (repeatIntervalS: number) => {
-            const result = await apiClient.api.updateStatsQuery(
-                this.query$.value!.id,
-                {
-                    project_id: projectsStore.selectedProject!.id
-                },
-                { repeat_interval: repeatIntervalS }
-            );
-            this.query$.value!.repeatFrequencyMs = result.data.repeat_interval! * 1000;
+            const { data, error } = await updateStatsQuery({
+                path: { id: this.query$.value!.id },
+                query: { project_id: this.project.id },
+                body: { repeat_interval: repeatIntervalS }
+            });
+            if (error) throw error;
+            this.query$.value!.repeatFrequencyMs = data.repeat_interval! * 1000;
         },
         {
             successToast: {
@@ -146,14 +166,13 @@ export class AnalyticsQueryStore {
 
     setNameForQuery = this.query$.createAsyncAction(
         async (name: string) => {
-            await apiClient.api.updateStatsQuery(
-                this.query$.value!.id,
-                {
-                    project_id: projectsStore.selectedProject!.id
-                },
-                { name }
-            );
+            const { error } = await updateStatsQuery({
+                path: { id: this.query$.value!.id },
+                query: { project_id: this.project.id },
+                body: { name }
+            });
 
+            if (error) throw error;
             this.query$.value!.name = name;
         },
         {
@@ -175,14 +194,13 @@ export class AnalyticsQueryStore {
 
     removeRepeatOnQuery = this.query$.createAsyncAction(
         async () => {
-            await apiClient.api.updateStatsQuery(
-                this.query$.value!.id,
-                {
-                    project_id: projectsStore.selectedProject!.id
-                },
-                { repeat_interval: 0 }
-            );
+            const { error } = await updateStatsQuery({
+                path: { id: this.query$.value!.id },
+                query: { project_id: this.project.id },
+                body: { repeat_interval: 0 }
+            });
 
+            if (error) throw error;
             delete this.query$.value!.repeatFrequencyMs;
         },
         {
@@ -203,14 +221,20 @@ export class AnalyticsQueryStore {
     );
 
     refetchQuery = this.query$.createAsyncAction(async () => {
-        const result = await apiClient.api.getSqlResultFromStats(this.query$.value!.id);
-        return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
+        const { data, error } = await getSqlResultFromStats({
+            path: { id: this.query$.value!.id }
+        });
+        if (error) throw error;
+        return mapDTOStatsSqlResultToAnalyticsQuery(data);
     });
 
     loadQuery = this.query$.createAsyncAction(
         async (queryId: string) => {
-            const result = await apiClient.api.getSqlResultFromStats(queryId);
-            return mapDTOStatsSqlResultToAnalyticsQuery(result.data);
+            const { data, error } = await getSqlResultFromStats({
+                path: { id: queryId }
+            });
+            if (error) throw error;
+            return mapDTOStatsSqlResultToAnalyticsQuery(data);
         },
         { resetBeforeExecution: true }
     );
@@ -230,6 +254,10 @@ export class AnalyticsQueryStore {
 }
 
 export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult): AnalyticsQuery {
+    if (!value.estimate) {
+        throw new Error('Estimate is required');
+    }
+
     const basicQuery = {
         type: 'query',
         id: value.id,
@@ -237,10 +265,7 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         gptPrompt: value.query?.gpt_message,
         request: value.query!.sql!,
         estimatedTimeMS: value.estimate!.approximate_time,
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        estimatedCost: new TonCurrencyAmount(value.estimate!.approximate_cost),
+        estimatedCost: new UsdCurrencyAmount(value.estimate.approximate_usd_cost),
         explanation: value.estimate!.explain!,
         name: value.name,
         ...(value.query?.repeat_interval && {
@@ -249,21 +274,18 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
         network: value.testnet ? Network.TESTNET : Network.MAINNET
     } as const;
 
-    if (value.status === DTOStatsQueryStatus.DTOExecuting) {
+    if (value.status === DTOStatsQueryStatus.EXECUTING) {
         return {
             ...basicQuery,
             status: 'executing'
         };
     }
 
-    if (value.status === DTOStatsQueryStatus.DTOSuccess) {
+    if (value.status === DTOStatsQueryStatus.SUCCESS) {
         return {
             ...basicQuery,
             status: 'success',
-            // TODO: PRICES remove this after backend will be updated
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            cost: new TonCurrencyAmount(value.cost!),
+            cost: new UsdCurrencyAmount(value.usd_cost!),
             spentTimeMS: value.spent_time!,
             csvUrl: value.url!,
             preview: parsePreview(value.preview!, !!value.all_data_in_preview),
@@ -274,10 +296,7 @@ export function mapDTOStatsSqlResultToAnalyticsQuery(value: DTOStatsQueryResult)
     return {
         ...basicQuery,
         status: 'error',
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        cost: new TonCurrencyAmount(value.cost!),
+        cost: new UsdCurrencyAmount(value.usd_cost!),
         spentTimeMS: value.spent_time!,
         errorReason: value.error!
     };
@@ -290,7 +309,6 @@ function isStrictDecimal(value: string): boolean {
 
 async function downloadAndParseCSV(url: string): Promise<Record<string, number>[]> {
     const preFetched = await fetch(url);
-    // console.log(preFetched.headers.get('content-length')); // TODO check content-length
 
     const result = await preFetched.text();
 
@@ -340,10 +358,10 @@ function parseDDL(ddl: string): AnalyticsTablesSchema {
 
     const groups = Array.from(ddl.matchAll(tableRegex));
 
-    return groups.reduce((acc, group) => {
+    return groups.reduce<AnalyticsTablesSchema>((acc, group) => {
         const name = group[1];
         const properties = (group[2] + ',').matchAll(propertiesRegex);
         acc[name] = Array.from(properties).map(match => match[2]);
         return acc;
-    }, {} as AnalyticsTablesSchema);
+    }, {});
 }

@@ -1,4 +1,5 @@
-import { FunctionComponent, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
+import BigNumber from 'bignumber.js';
 import {
     Box,
     Button,
@@ -15,39 +16,33 @@ import {
     Text,
     useDisclosure,
     useRadioGroup,
+    UseRadioProps,
     VStack
 } from '@chakra-ui/react';
-import { CURRENCY, FilledWarnIcon16, formatWithSuffix, H4 } from 'src/shared';
+import { FilledWarnIcon16, formatWithSuffix, H4, UsdCurrencyAmount } from 'src/shared';
 import { RadioCard } from 'src/shared/ui/checkbox';
-import { AppMessagesPackage, appMessagesStore } from '../model';
-import { CurrencyRate, RefillModalContent } from 'src/entities';
+import { AppMessagesPackage } from '../model';
+import { RefillModalContent } from 'src/entities';
 import MessagesPaymentConfirmationModalContent from './MessagesPaymentConfirmationModalContent';
-import { observer } from 'mobx-react-lite';
-import { balancesStore } from 'src/shared/stores';
+import { usePackagesQuery } from '../model/queries';
+import { useBalanceSufficiencyCheck, getPaymentDeficit } from 'src/features/balance';
 
-const MessagesRefillModal: FunctionComponent<{
+const MessagesRefillModal: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ isOpen, onClose }) => {
-    const options = appMessagesStore.packages$.value;
+    const { data: options = [] } = usePackagesQuery();
     const [selectedPlan, setSelectedPlan] = useState<AppMessagesPackage | null>(null);
 
     const { getRootProps, getRadioProps } = useRadioGroup({
         name: 'package',
-        defaultValue: appMessagesStore.packages$.value[0]?.name || '',
+        defaultValue: options[0]?.name || '',
         onChange: name => setSelectedPlan(options.find(pkg => pkg.name === name) || null)
     });
     const group = getRootProps();
-
-    const balance = balancesStore.tonBalanceUSDEquivalent;
-    const notEnoughUsd =
-        balance && selectedPlan && balance.isLT(selectedPlan?.price)
-            ? selectedPlan.price.amount.minus(balance.amount).decimalPlaces(1).toNumber()
-            : 0;
-
-    useEffect(() => {
-        setSelectedPlan(options[0]);
-    }, [options]);
+    const sufficiencyCheck = useBalanceSufficiencyCheck(selectedPlan?.price.amount ?? null);
+    const notEnoughAmount = sufficiencyCheck ? getPaymentDeficit(sufficiencyCheck) : BigInt(0);
+    const notEnoughAmountUsdt = new UsdCurrencyAmount(new BigNumber(notEnoughAmount).div(1e6));
 
     const tonRefillModal = useDisclosure();
     const confirmPaymentModal = useDisclosure();
@@ -60,7 +55,7 @@ const MessagesRefillModal: FunctionComponent<{
     }, [isOpen]);
 
     const onPrimaryButtonClick = (): void => {
-        if (notEnoughUsd) {
+        if (notEnoughAmount) {
             tonRefillModal.onOpen();
         } else {
             confirmPaymentModal.onOpen();
@@ -77,13 +72,13 @@ const MessagesRefillModal: FunctionComponent<{
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody pt="0" pb="2">
-                {appMessagesStore.packages$.isResolved ? (
+                {options.length > 0 ? (
                     <VStack {...group}>
                         {options.map(pkg => (
                             <RadioCard
                                 w="100%"
                                 key={pkg.id}
-                                {...getRadioProps({ value: pkg.name })}
+                                {...(getRadioProps({ value: pkg.name }) as UseRadioProps)}
                             >
                                 <Box w="100%">
                                     <Flex justify="space-between">
@@ -92,21 +87,9 @@ const MessagesRefillModal: FunctionComponent<{
                                             {pkg.price.stringCurrencyAmount}
                                         </Text>
                                     </Flex>
-                                    <Flex justify="space-between" w="100%">
-                                        <Text textStyle="body2" color="text.secondary">
-                                            {formatWithSuffix(pkg.messagesIncluded)} messages
-                                        </Text>
-                                        <CurrencyRate
-                                            textStyle="body2"
-                                            color="text.secondary"
-                                            leftSign=""
-                                            textAlign="end"
-                                            currency={CURRENCY.TON}
-                                            amount={pkg.price.amount}
-                                            reverse
-                                            contentUnderSkeleton="&nbsp;TON"
-                                        />
-                                    </Flex>
+                                    <Text textStyle="body2" color="text.secondary">
+                                        {formatWithSuffix(pkg.messagesIncluded)} messages
+                                    </Text>
                                 </Box>
                             </RadioCard>
                         ))}
@@ -116,10 +99,11 @@ const MessagesRefillModal: FunctionComponent<{
                         <Spinner />
                     </Center>
                 )}
-                {!!notEnoughUsd && (
+                {!!notEnoughAmount && (
                     <Text textStyle="body2" mt="3" color="text.secondary">
                         <FilledWarnIcon16 />
-                        &nbsp;Not enough ${notEnoughUsd} to buy the plan, fund your account
+                        &nbsp;Not enough {notEnoughAmountUsdt.stringCurrencyAmount} USDT to buy the
+                        plan, fund your account
                     </Text>
                 )}
             </ModalBody>
@@ -128,7 +112,7 @@ const MessagesRefillModal: FunctionComponent<{
                     Cancel
                 </Button>
                 <Button flex={1} onClick={onPrimaryButtonClick} variant="primary">
-                    {notEnoughUsd ? 'Refill balance' : 'Choose'}
+                    {notEnoughAmount ? 'Refill balance' : 'Choose'}
                 </Button>
             </ModalFooter>
         </ModalContent>
@@ -148,4 +132,4 @@ const MessagesRefillModal: FunctionComponent<{
     );
 };
 
-export default observer(MessagesRefillModal);
+export default MessagesRefillModal;

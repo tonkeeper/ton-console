@@ -1,10 +1,7 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren } from 'react';
-import { Box } from '@chakra-ui/react';
+import { FC, PropsWithChildren } from 'react';
+import { Box, BoxProps } from '@chakra-ui/react';
 
-export const CodeAreaFooter: FunctionComponent<PropsWithChildren<ComponentProps<typeof Box>>> = ({
-    children,
-    ...rest
-}) => {
+export const CodeAreaFooter: FC<PropsWithChildren<BoxProps>> = ({ children, ...rest }) => {
     return (
         <Box
             {...rest}

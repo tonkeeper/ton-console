@@ -1,12 +1,16 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Button, Checkbox, Divider, Flex, Text, useClipboard } from '@chakra-ui/react';
 import { CopyIcon16, ErrorIconCircle24, H4, InfoTooltip, Overlay } from 'src/shared';
 import { AnalyticsGraphQueryError, GraphAddressesList } from 'src/features';
 import { useSearchParams } from 'react-router-dom';
 
-export const GraphError: FunctionComponent<{ query: AnalyticsGraphQueryError }> = ({ query }) => {
+interface GraphErrorProps {
+    query: AnalyticsGraphQueryError;
+}
+
+export const GraphError: FC<GraphErrorProps> = ({ query }) => {
     const [_, setSearchParams] = useSearchParams();
-    const { hasCopied, onCopy } = useClipboard(query.addresses.map(a => a.userFriendly).join('\n'));
+    const { hasCopied, onCopy } = useClipboard(query.addresses.map(a => a.toString()).join('\n'));
     return (
         <Overlay display="flex" flexDirection="column">
             <H4 color="accent.red" mb="2" display="flex" alignItems="center">
@@ -21,7 +25,7 @@ export const GraphError: FunctionComponent<{ query: AnalyticsGraphQueryError }> 
                 New Request
             </Button>
 
-            <Divider w="auto" mb="5" mx="-6" />
+            <Divider w="auto" mx="-6" mb="5" />
             <Flex align="center" gap="1" mb="3">
                 <Checkbox
                     mb="0 !important"

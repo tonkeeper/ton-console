@@ -1,6 +1,6 @@
-import { Box, Button, chakra } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent, PropsWithChildren, ReactNode, useMemo } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { Box, BoxProps, Button, chakra } from '@chakra-ui/react';
+import { FC, PropsWithChildren, ReactNode, useMemo } from 'react';
+import { NavLink, useLocation, NavLinkProps } from 'react-router-dom';
 import { eqPaths } from 'src/shared';
 
 const MenuItemButton = chakra(Button, {
@@ -11,6 +11,7 @@ const MenuItemButton = chakra(Button, {
         alignItems: 'center',
         justifyContent: 'flex-start',
         width: '100%',
+        minHeight: '44px',
         color: 'text.primary',
         borderRadius: 'md',
         backgroundColor: 'transparent',
@@ -31,13 +32,13 @@ const MenuItemButton = chakra(Button, {
     }
 });
 
-export const DropDownMenuItem: FunctionComponent<
-    ComponentProps<typeof Box> &
+export const DropDownMenuItem: FC<
+    BoxProps &
         PropsWithChildren & { layer?: number; leftIcon?: ReactNode; linkTo?: string; path?: string }
 > = props => {
     const location = useLocation();
     const navLinkProps = useMemo<
-        ({ as: typeof NavLink } & ComponentProps<typeof NavLink>) | Record<never, never>
+        ({ as: typeof NavLink } & NavLinkProps) | Record<never, never>
     >(() => {
         const pathname = props.path ? `${props.path}/${props.linkTo}` : props.linkTo;
 
@@ -61,7 +62,7 @@ export const DropDownMenuItem: FunctionComponent<
             : {};
     }, [props.linkTo, props.path, location.pathname, location.search]) as {
         as: typeof NavLink;
-    } & ComponentProps<typeof NavLink>;
+    } & NavLinkProps;
     return (
         <MenuItemButton
             pl={props.layer ? props.layer * 16 : 3}

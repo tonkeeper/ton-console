@@ -1,4 +1,4 @@
-import { FunctionComponent, useId, useState } from 'react';
+import { FC, useId, useState } from 'react';
 import {
     Button,
     Modal,
@@ -9,22 +9,24 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { CreateInvoiceFrom } from './CreateInvoiceFrom';
-import { Invoice } from 'src/features';
+import { Invoice, InvoiceForm } from '../models';
 import { ViewInvoiceModalContent } from './ViewInvoiceModalContent';
-import { invoicesTableStore } from '../models';
 
-const CreateInvoiceModal: FunctionComponent<{
+interface Props {
     isOpen: boolean;
     onClose: () => void;
-}> = ({ isOpen, onClose }) => {
+    onCreateInvoice: (form: InvoiceForm) => Promise<Invoice>;
+    isLoading?: boolean;
+}
+
+const CreateInvoiceModal: FC<Props> = ({ isOpen, onClose, onCreateInvoice, isLoading = false }) => {
     const [createdInvoice, setCreatedInvoice] = useState<Invoice | null>(null);
 
     const id = useId();
 
     const closeHandler = (): void => {
-        if (!invoicesTableStore.createInvoice.isLoading) {
+        if (!isLoading) {
             setCreatedInvoice(null);
             onClose();
         }
@@ -43,7 +45,7 @@ const CreateInvoiceModal: FunctionComponent<{
                         <CreateInvoiceFrom
                             id={id}
                             onSubmit={form =>
-                                invoicesTableStore.createInvoice(form).then(setCreatedInvoice)
+                                onCreateInvoice(form).then(setCreatedInvoice)
                             }
                         />
                     </ModalBody>
@@ -54,7 +56,7 @@ const CreateInvoiceModal: FunctionComponent<{
                         <Button
                             flex={1}
                             form={id}
-                            isLoading={invoicesTableStore.createInvoice.isLoading}
+                            isLoading={isLoading}
                             type="submit"
                             variant="primary"
                         >
@@ -67,4 +69,4 @@ const CreateInvoiceModal: FunctionComponent<{
     );
 };
 
-export default observer(CreateInvoiceModal);
+export default CreateInvoiceModal;

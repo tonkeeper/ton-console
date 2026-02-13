@@ -5,16 +5,17 @@ interface OverlayProps extends BoxProps {
     breadcrumbs?: React.ReactNode;
 }
 
-export const Overlay: FC<OverlayProps> = ({ breadcrumbs, children, ...rest }) => {
+export const Overlay: FC<OverlayProps> = ({ breadcrumbs, children, p, ...rest }) => {
     return (
         <>
             {breadcrumbs}
             <Box
                 maxW="100%"
                 h={breadcrumbs ? 'calc(100% - 28px)' : '100%'}
-                px="6"
-                py="5"
-                borderRadius="lg"
+                px={p ?? { base: 4, md: 6 }}
+                py={p ?? { base: 4, md: 5 }}
+                borderTopRadius={{ base: 'md', md: 'lg' }}
+                borderBottomRadius={{ base: 'none', md: 'lg' }}
                 bgColor="background.content"
                 {...rest}
             >

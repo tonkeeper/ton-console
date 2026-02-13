@@ -1,16 +1,17 @@
 import { FC } from 'react';
-import { observer } from 'mobx-react-lite';
-import { userStore } from 'src/shared/stores';
 import { useBreakpointValue } from '@chakra-ui/react';
 import { ButtonLink, DocsLogo32, EXTERNAL_LINKS } from 'src/shared';
+import { useIsAuthenticated } from 'src/entities/user/queries';
 
-export const DocumentationButton: FC = observer(() => {
+export const DocumentationButton: FC = () => {
+    const isAuth = useIsAuthenticated();
+
     const buttonText = useBreakpointValue({
         base: 'Docs',
-        md: 'Documentation'
+        lg: 'Documentation'
     });
 
-    return userStore.isAuthorized() ? (
+    return isAuth ? (
         <ButtonLink
             href={EXTERNAL_LINKS.DOCUMENTATION}
             isExternal
@@ -20,4 +21,4 @@ export const DocumentationButton: FC = observer(() => {
             {buttonText}
         </ButtonLink>
     ) : null;
-});
+};

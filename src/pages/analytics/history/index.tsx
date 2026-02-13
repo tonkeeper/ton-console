@@ -1,22 +1,32 @@
-import { ComponentProps, FunctionComponent, useEffect } from 'react';
-import { Box, Button, Flex } from '@chakra-ui/react';
+import { FC, useEffect } from 'react';
+import { useLocalObservable } from 'mobx-react-lite';
+import { BoxProps, Button, Flex } from '@chakra-ui/react';
 import { H4, Overlay } from 'src/shared';
 import {
     AnalyticsHistoryTable,
-    analyticsHistoryTableStore,
+    AnalyticsHistoryTableStore,
     FilterQueryByRepetition,
     FilterQueryByType
 } from 'src/features';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
-// import { projectsStore } from 'src/shared/stores';
+import { useProject } from 'src/shared/contexts/ProjectContext';
 
-const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
+const HistoryPage: FC<BoxProps> = () => {
+    const project = useProject();
+    const analyticsHistoryTableStore = useLocalObservable(
+        () => new AnalyticsHistoryTableStore(project)
+    );
+
     useEffect(() => {
         analyticsHistoryTableStore.loadFirstPage();
-    }, []);
+    }, [analyticsHistoryTableStore]);
 
-    // const queryAllowed = projectsStore.selectedProject?.capabilities.stats.query;
+    useEffect(() => {
+        return () => {
+            analyticsHistoryTableStore.destroy();
+        };
+    }, [analyticsHistoryTableStore]);
 
     return (
         <Overlay display="flex" flexDirection="column">
@@ -30,10 +40,13 @@ const HistoryPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
                 </Button>
             </Flex>
             <Flex align="center" gap="4" mb="6">
-                <FilterQueryByType />
-                <FilterQueryByRepetition />
+                <FilterQueryByType analyticsHistoryTableStore={analyticsHistoryTableStore} />
+                <FilterQueryByRepetition analyticsHistoryTableStore={analyticsHistoryTableStore} />
             </Flex>
-            <AnalyticsHistoryTable flex="1" />
+            <AnalyticsHistoryTable
+                flex="1"
+                analyticsHistoryTableStore={analyticsHistoryTableStore}
+            />
         </Overlay>
     );
 };

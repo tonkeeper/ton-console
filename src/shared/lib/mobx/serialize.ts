@@ -1,4 +1,3 @@
-import { Loadable } from './loadable';
 import { BasicCurrencyAmount, TokenCurrencyAmount } from '../currency';
 import { toJS } from 'mobx';
 
@@ -29,12 +28,4 @@ export function serializeState<T>(state: T): string {
 
 export function deserializeState<T>(value: string): T {
     return JSON.parse(value, reviver);
-}
-
-export function serializeLoadableState<T>(state: Loadable<T>): string {
-    return serializeState(state.value);
-}
-
-export function deserializeLoadableState<T>(stateString: string): Loadable<T> {
-    return new Loadable<T>(deserializeState(stateString));
 }

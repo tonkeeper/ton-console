@@ -1,11 +1,30 @@
-import { ComponentProps, FunctionComponent } from 'react';
-import { Box, Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
+import { FC } from 'react';
+import { Box, BoxProps, Button, Flex, Text, useDisclosure } from '@chakra-ui/react';
 import { CopyPad } from 'src/shared';
-import { invoicesAppStore, InvoicesTokenRegenerateConfirmation } from 'src/features';
+import { InvoicesTokenRegenerateConfirmation } from 'src/features';
+import { InvoicesApp } from 'src/features/invoices/models';
 
-const InvoicesStats: FunctionComponent<ComponentProps<typeof Box>> = props => {
+interface InvoicesAuthorizationProps extends BoxProps {
+    app?: InvoicesApp | null;
+    token?: string | null;
+    onRegenerateToken: () => Promise<void>;
+    isRegeneratingToken?: boolean;
+    isTokenLoading?: boolean;
+}
+
+const InvoicesAuthorization: FC<InvoicesAuthorizationProps> = ({
+    app,
+    token,
+    onRegenerateToken,
+    isRegeneratingToken,
+    isTokenLoading,
+    ...props
+}) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
+
+    if (!app) {
+        return null;
+    }
 
     return (
         <Box {...props}>
@@ -17,29 +36,34 @@ const InvoicesStats: FunctionComponent<ComponentProps<typeof Box>> = props => {
             </Text>
             <Flex gap="3" mb="2">
                 <CopyPad
-                    isLoading={!invoicesAppStore.appToken$.isResolved}
+                    isLoading={isTokenLoading}
                     flex="1"
-                    wordBreak="break-all"
-                    text={invoicesAppStore.appToken$.value || ''}
+                    breakAll
+                    text={token || ''}
                 />
                 <Button
                     h="auto"
-                    isDisabled={!invoicesAppStore.appToken$.isResolved}
-                    isLoading={invoicesAppStore.regenerateAppToken.isLoading}
+                    isDisabled={!token}
+                    isLoading={isRegeneratingToken}
                     onClick={onOpen}
                     variant="secondary"
                 >
                     Generate
                 </Button>
-                <InvoicesTokenRegenerateConfirmation isOpen={isOpen} onClose={onClose} />
+                <InvoicesTokenRegenerateConfirmation
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onRegenerateToken={onRegenerateToken}
+                    isLoading={isRegeneratingToken}
+                />
             </Flex>
             <Text textStyle="body2" mb="4" color="text.secondary">
                 Token-based authentication is a protocol which allows for identity verification and
-                offers the second layer of security. The token is secret, don’t reveal it to any
+                offers the second layer of security. The token is secret, don't reveal it to any
                 third party. If your token was compromised, generate a new one.
             </Text>
         </Box>
     );
 };
 
-export default observer(InvoicesStats);
+export default InvoicesAuthorization;

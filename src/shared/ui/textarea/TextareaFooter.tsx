@@ -1,18 +1,15 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren, useContext } from 'react';
-import { Box, Fade } from '@chakra-ui/react';
+import { FC, PropsWithChildren, useContext } from 'react';
+import { Box, BoxProps, Fade } from '@chakra-ui/react';
 import { TextareaGroupContext } from './textarea-group-context';
 
-export const TextareaFooter: FunctionComponent<PropsWithChildren<ComponentProps<typeof Box>>> = ({
-    children,
-    ...rest
-}) => {
+export const TextareaFooter: FC<PropsWithChildren<BoxProps>> = ({ children, ...rest }) => {
     const { showScrollDivider, focused } = useContext(TextareaGroupContext);
     return (
         <Box
             pos="relative"
+            px="4"
             pt="3"
             pb="4"
-            px="4"
             border="1px"
             borderColor={focused ? 'field.activeBorder' : 'field.border'}
             borderTop="none"

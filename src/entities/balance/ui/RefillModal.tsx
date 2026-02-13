@@ -1,9 +1,8 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Modal, ModalOverlay } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import RefillModalContent from 'src/entities/balance/ui/RefillModalContent';
 
-const RefillModal: FunctionComponent<{
+const RefillModal: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = props => {
@@ -15,4 +14,4 @@ const RefillModal: FunctionComponent<{
     );
 };
 
-export default observer(RefillModal);
+export default RefillModal;

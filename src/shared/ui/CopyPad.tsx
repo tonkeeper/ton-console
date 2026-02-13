@@ -15,8 +15,9 @@ export const CopyPad: FC<
         size?: 'sm' | 'md';
         variant?: 'primary' | 'flat';
         hideCopyIcon?: boolean;
+        breakAll?: boolean;
     }
-    // eslint-disable-next-line complexity
+     
 > = ({
     text,
     textView = text,
@@ -27,6 +28,7 @@ export const CopyPad: FC<
     variant,
     textStyles,
     hideCopyIcon = false,
+    breakAll = false,
     ...rest
 }) => {
     const { hasCopied, onCopy } = useClipboard(text);
@@ -76,20 +78,16 @@ export const CopyPad: FC<
                 pr={variant === 'flat' ? '0' : '2.5'}
                 px={variant === 'flat' ? '0' : '4'}
                 py={variant === 'flat' ? '0' : '3'}
-                _hover={
-                    !isLoading && {
-                        svg: {
-                            color: 'icon.primary'
-                        }
-                    }
-                }
+                _hover={isLoading ? undefined : { svg: { color: 'icon.primary' } }}
                 sx={
-                    !isLoading && {
-                        svg: {
-                            transitionProperty: 'color',
-                            transitionDuration: '200ms'
-                        }
-                    }
+                    isLoading
+                        ? undefined
+                        : {
+                              svg: {
+                                  transitionProperty: 'color',
+                                  transitionDuration: '200ms'
+                              }
+                          }
                 }
                 {...(variant === 'flat' && { bgColor: 'transparent' })}
                 {...rest}
@@ -128,7 +126,7 @@ export const CopyPad: FC<
                     pb={iconPosition === 'sticky' ? pb : 0}
                     pl={iconPosition === 'sticky' ? pl : 0}
                     whiteSpace="inherit"
-                    wordBreak="break-word"
+                    wordBreak={breakAll ? 'break-all' : 'break-word'}
                 >
                     {isLoading ? (
                         <Spinner mx="auto" size="sm" />

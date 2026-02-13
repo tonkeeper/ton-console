@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import {
     chakra,
     FormControl,
@@ -13,7 +13,7 @@ import { SubmitHandler, useForm, useFormContext } from 'react-hook-form';
 import { InvoicesProjectForm } from '../models';
 import { isAddressValid } from 'src/shared';
 
-export const EditInvoicesProjectForm: FunctionComponent<
+export const EditInvoicesProjectForm: FC<
     StyleProps & {
         id?: string;
         onSubmit: SubmitHandler<InvoicesProjectForm>;

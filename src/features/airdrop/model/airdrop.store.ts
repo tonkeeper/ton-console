@@ -1,11 +1,12 @@
 /* eslint-disable max-classes-per-file */
 
-import { apiClient, Loadable } from 'src/shared';
+import { Loadable } from 'src/shared';
+import { createJettonAirdrop } from 'src/shared/api';
 import { ADAirdropData, ADDistributorData, airdropApiClient } from 'src/shared/api/airdrop-api';
 import { makeAutoObservable } from 'mobx';
 import { toNano } from '@ton/ton';
 import { AirdropMetadata } from 'src/features/airdrop/model/interfaces/AirdropMetadata';
-import { getAirdropStatus, AirdropStatusT } from 'src/pages/jetton/airdrops/airdrop/deployUtils';
+import { getAirdropStatus, AirdropStatusT } from '../lib/deploy-utils';
 
 export type AirdropFullT = ADAirdropData & {
     name: string;
@@ -55,8 +56,6 @@ export class AirdropStore {
         vesting,
         name
     }: AirdropMetadata & { adminAddress: string }) => {
-        console.log('vesting', vesting);
-
         if (!isValidVesting(vesting)) {
             throw new Error(
                 'Vesting parameters are invalid: all items must have unlockTime and fraction fields'
@@ -70,7 +69,7 @@ export class AirdropStore {
                     admin: adminAddress,
                     jetton: address,
                     royalty_parameters: { min_commission: toNano(fee).toString() },
-                    vesting_parameters: !!vesting?.length
+                    vesting_parameters: vesting?.length
                         ? {
                               unlocks_list: vesting.map(item => ({
                                   unlock_time: Math.floor(
@@ -84,12 +83,12 @@ export class AirdropStore {
             )
             .then(({ data }) => data);
 
-        const consoleRes = await apiClient.api
-            .createJettonAirdrop(
-                { project_id: this.projectId },
-                { api_id: airdropRes.id, name: name }
-            )
-            .then(({ data }) => data);
+        const { data: consoleRes, error } = await createJettonAirdrop({
+            query: { project_id: this.projectId },
+            body: { api_id: airdropRes.id, name: name }
+        });
+
+        if (error) throw error;
 
         this.airdrops.push(consoleRes.airdrop);
 

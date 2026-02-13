@@ -21,17 +21,24 @@ import {
     chakra
 } from '@chakra-ui/react';
 import { AddProjectParticipantFormValues } from 'src/entities';
-import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
 import { useIMask } from 'react-imask';
 import { InfoIcon16, mergeRefs } from 'src/shared';
-import { projectsStore } from 'src/shared/stores';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
+import {
+    useProjectParticipantsQuery,
+    useAddProjectParticipantMutation
+} from 'src/shared/queries/projects';
 
 const AddProjectParticipantModal: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ onClose, ...rest }) => {
     const formId = 'add-project-participant-form';
+    const projectId = useProjectId();
+
+    const { data: participants = [] } = useProjectParticipantsQuery(projectId);
+    const addParticipant = useAddProjectParticipantMutation(projectId);
 
     const { handleSubmit, register, formState, reset } = useForm<AddProjectParticipantFormValues>();
     const ref = useRef(null);
@@ -42,7 +49,9 @@ const AddProjectParticipantModal: FC<{
     };
 
     const submitMiddleware = (form: AddProjectParticipantFormValues): void => {
-        projectsStore.addProjectParticipant(form).then(handleClose);
+        addParticipant.mutate(form, {
+            onSuccess: handleClose
+        });
     };
 
     const { ref: maskRef } = useIMask({
@@ -58,11 +67,7 @@ const AddProjectParticipantModal: FC<{
     const { ref: hookFormRef, ...amountRest } = register('userId', {
         required: 'This is required',
         validate: value => {
-            if (
-                projectsStore.projectParticipants$.value.find(
-                    participant => participant.id === value
-                )
-            ) {
+            if (participants.find(participant => participant.id === value)) {
                 return 'User already exists';
             }
             return true;
@@ -82,7 +87,7 @@ const AddProjectParticipantModal: FC<{
                     </Box>
                 </ModalHeader>
                 <ModalCloseButton />
-                <ModalBody paddingY={1}>
+                <ModalBody py={1}>
                     <chakra.form
                         w="100%"
                         onSubmit={handleSubmit(submitMiddleware)}
@@ -138,7 +143,7 @@ const AddProjectParticipantModal: FC<{
                     <Button
                         flex={1}
                         form={formId}
-                        isLoading={projectsStore.createProject.isLoading}
+                        isLoading={addParticipant.isPending}
                         type="submit"
                         variant="primary"
                     >
@@ -150,4 +155,4 @@ const AddProjectParticipantModal: FC<{
     );
 };
 
-export default observer(AddProjectParticipantModal);
+export default AddProjectParticipantModal;
