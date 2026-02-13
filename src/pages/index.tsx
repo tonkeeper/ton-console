@@ -4,6 +4,8 @@ import { lazy } from '@loadable/component';
 import { useMaybeProject } from 'src/shared/contexts/ProjectContext';
 import { useUserQuery } from 'src/entities/user/queries';
 import { useProjectsQuery } from 'src/shared/queries/projects';
+import { isMaintenanceActive } from 'src/shared/config/maintenance';
+import { MaintenancePage } from 'src/shared/ui/MaintenancePage';
 import AppInitialization from 'src/processes/AppInitialization';
 import { Layout } from './layouts';
 import { LayoutSolid } from 'src/pages/layouts/LayoutSolid';
@@ -70,6 +72,15 @@ const Routing: FC = () => {
                         />
                     </Route>
                 </Routes>
+            </AppInitialization>
+        );
+    }
+
+    // Maintenance mode — show maintenance page for authenticated users
+    if (isMaintenanceActive()) {
+        return (
+            <AppInitialization isLoading={isAppLoading}>
+                <MaintenancePage />
             </AppInitialization>
         );
     }
