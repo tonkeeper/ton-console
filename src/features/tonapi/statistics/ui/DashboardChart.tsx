@@ -36,19 +36,15 @@ const DashboardChart: FC<DashboardChartProps> = ({ period, ...props }) => {
                 onClose={onClose}
                 title="REST API Statistics"
                 period={period}
-                charts={
-                    data && data.length > 0
-                        ? [
-                              {
-                                  title: 'AVG req. per second',
-                                  data,
-                                  color: colors.accent.blue,
-                                  limit: selectedTier?.rps,
-                                  limitLabel: 'Limit'
-                              }
-                          ]
-                        : []
-                }
+                charts={[
+                    {
+                        title: 'AVG req. per second',
+                        data: data || [],
+                        color: colors.accent.blue,
+                        limit: selectedTier?.rps,
+                        limitLabel: 'Limit'
+                    }
+                ]}
             />
         </>
     );

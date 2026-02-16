@@ -1,5 +1,5 @@
 import { FC, useCallback, useMemo } from 'react';
-import { Box, BoxProps, useTheme } from '@chakra-ui/react';
+import { Box, BoxProps, Center, Text, useTheme } from '@chakra-ui/react';
 import {
     LineChart,
     Line,
@@ -82,6 +82,18 @@ const MetricChart: FC<MetricChartProps> = ({
         const values = data.map(item => item.value);
         return Math.max(...values) >= limit * 0.67;
     }, [data, limit]);
+
+    if (!data.length) {
+        return (
+            <Box h={`${height}px`} {...props}>
+                <Center h="100%">
+                    <Text textStyle="body2" color="text.secondary">
+                        No data for this period
+                    </Text>
+                </Center>
+            </Box>
+        );
+    }
 
     return (
         <Box

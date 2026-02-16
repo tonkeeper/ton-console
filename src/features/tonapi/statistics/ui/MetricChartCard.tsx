@@ -96,29 +96,6 @@ const MetricChartCard: FC<MetricChartCardProps> = ({
         );
     }
 
-    if (!data?.length) {
-        return (
-            <Box
-                p="4"
-                borderWidth="1px"
-                borderColor="border.primary"
-                borderRadius="12px"
-                {...props}
-            >
-                <Flex align="center" justify="space-between" mb="4">
-                    <Text textStyle="label1" color="text.primary">
-                        {title}
-                    </Text>
-                </Flex>
-                <Center h={emptyHeight}>
-                    <Text textStyle="body2" color="text.secondary">
-                        Empty data
-                    </Text>
-                </Center>
-            </Box>
-        );
-    }
-
     return (
         <Box
             p="4"
@@ -142,7 +119,7 @@ const MetricChartCard: FC<MetricChartCardProps> = ({
                 )}
             </Flex>
             <MetricChart
-                data={data}
+                data={data || []}
                 title={title}
                 color={color}
                 limit={limit}

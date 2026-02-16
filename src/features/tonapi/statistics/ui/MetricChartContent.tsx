@@ -59,21 +59,6 @@ const MetricChartContent: FC<MetricChartContentProps> = ({
         );
     }
 
-    if (!data || data.length === 0) {
-        return (
-            <Box w="100%" {...props}>
-                <Text textStyle="body2" mb="2" color="text.secondary">
-                    {title}
-                </Text>
-                <Center h={emptyHeight}>
-                    <Text textStyle="body2" color="text.secondary">
-                        Empty data
-                    </Text>
-                </Center>
-            </Box>
-        );
-    }
-
     return (
         <Box w="100%" {...props}>
             <Text textStyle="body2" mb="2" color="text.secondary">
@@ -81,7 +66,7 @@ const MetricChartContent: FC<MetricChartContentProps> = ({
             </Text>
             <Box w="100%" h={dataHeight}>
                 <MetricChart
-                    data={data}
+                    data={data || []}
                     title={title}
                     color={color}
                     limit={limit}
