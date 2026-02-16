@@ -1,8 +1,9 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Box,
     Card,
     CardBody,
+    CardProps,
     Menu,
     MenuButton,
     MenuItem,
@@ -13,21 +14,21 @@ import {
 import { DeleteIcon24, IconButton, Image, VerticalDotsIcon16 } from 'src/shared';
 import { Dapp } from 'src/entities';
 import { ConfirmDappDeleteModal } from './ConfirmDappDeleteModal';
-import { observer } from 'mobx-react-lite';
-import { dappStore } from 'src/shared/stores';
+import { useDeleteDappMutation } from '../model/queries';
 
-const DappCard: FunctionComponent<
-    ComponentProps<typeof Card> & {
+const DappCard: FC<
+    CardProps & {
         dapp: Pick<Dapp, 'name' | 'image' | 'url'> & { id?: Dapp['id'] };
         withMenu?: boolean;
     }
 > = ({ dapp, withMenu, ...rest }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const deleteMutation = useDeleteDappMutation();
 
     const onDelete = (confirm?: boolean): void => {
         onClose();
-        if (confirm && dapp.id !== undefined) {
-            dappStore.deleteValidatedDapp(dapp.id);
+        if (confirm && dapp.id !== undefined && typeof dapp.id === 'number') {
+            deleteMutation.mutate(dapp.id);
         }
     };
 
@@ -82,4 +83,4 @@ const DappCard: FunctionComponent<
     );
 };
 
-export default observer(DappCard);
+export default DappCard;

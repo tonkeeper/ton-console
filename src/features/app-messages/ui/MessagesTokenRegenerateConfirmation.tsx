@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Modal,
@@ -9,14 +9,23 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { appMessagesStore } from '../model';
-import { observer } from 'mobx-react-lite';
+import { useDappsQuery } from 'src/entities/dapp/model/queries';
+import { useRegenerateDappTokenMutation } from '../model/queries';
 
-const MessagesTokenRegenerateConfirmation: FunctionComponent<{
+const MessagesTokenRegenerateConfirmation: FC<{
     isOpen: boolean;
     onClose: () => void;
 }> = ({ isOpen, onClose }) => {
-    const onConfirm = (): Promise<void> => appMessagesStore.regenerateDappToken().then(onClose);
+    const { data: dapps } = useDappsQuery();
+    const dappId = dapps?.[0]?.id;
+    const regenerateMutation = useRegenerateDappTokenMutation();
+
+    const onConfirm = (): void => {
+        if (!dappId) return;
+        regenerateMutation.mutate(dappId, {
+            onSuccess: onClose
+        });
+    };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside" size="md">
@@ -33,7 +42,7 @@ const MessagesTokenRegenerateConfirmation: FunctionComponent<{
                     </Button>
                     <Button
                         flex={1}
-                        isLoading={appMessagesStore.regenerateDappToken.isLoading}
+                        isLoading={regenerateMutation.isPending}
                         onClick={onConfirm}
                         variant="primary"
                     >
@@ -45,4 +54,4 @@ const MessagesTokenRegenerateConfirmation: FunctionComponent<{
     );
 };
 
-export default observer(MessagesTokenRegenerateConfirmation);
+export default MessagesTokenRegenerateConfirmation;

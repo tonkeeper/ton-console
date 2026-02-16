@@ -1,6 +1,5 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
-    Box,
     Button,
     Center,
     Checkbox,
@@ -10,12 +9,22 @@ import {
     MenuList,
     useDisclosure
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { ArrowIcon, MenuButtonDefault, Span, TickIcon } from 'src/shared';
-import { invoicesTableStore, InvoiceStatus } from '../../models';
+import { InvoiceStatus } from '../../models';
 import { invoiceBadges } from './InvoiceStatusBadge';
 
-const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = props => {
+interface Props {
+    selectedStatuses?: InvoiceStatus[];
+    onToggle: (status: InvoiceStatus) => void;
+    onClear: () => void;
+}
+
+const FilterInvoiceByStatus: FC<Props> = ({
+    selectedStatuses = [],
+    onToggle,
+    onClear,
+    ...props
+}) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (
@@ -30,7 +39,7 @@ const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = pro
             <MenuButtonDefault px="4" rightIcon={<ArrowIcon />}>
                 <Flex textStyle="label2" gap="2">
                     Status{' '}
-                    {!!invoicesTableStore.pagination.filter.status?.length && (
+                    {!!selectedStatuses?.length && (
                         <Center
                             textStyle="label3"
                             w="5"
@@ -39,18 +48,18 @@ const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = pro
                             borderRadius="100%"
                             bgColor="text.primary"
                         >
-                            {invoicesTableStore.pagination.filter.status.length}
+                            {selectedStatuses.length}
                         </Center>
                     )}
                 </Flex>
             </MenuButtonDefault>
             <MenuList zIndex={100} w="240px">
-                <Flex justify="space-between" mb="2" pt="2" px="1" color="text.secondary">
+                <Flex justify="space-between" mb="2" px="1" pt="2" color="text.secondary">
                     <Span textStyle="label2">Display only</Span>
-                    {!!invoicesTableStore.pagination.filter.status?.length && (
+                    {!!selectedStatuses?.length && (
                         <Button
                             onClick={() => {
-                                invoicesTableStore.clearFilterByStatus();
+                                onClear();
                                 onClose();
                             }}
                             size="fit"
@@ -62,22 +71,19 @@ const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = pro
                         </Button>
                     )}
                 </Flex>
-                {Object.keys(InvoiceStatus).map(status => (
+                {Object.values(InvoiceStatus).map((statusValue) => (
                     <MenuItem
-                        key={status}
+                        key={statusValue}
                         onClick={e => {
                             e.preventDefault();
-                            invoicesTableStore.toggleFilterByStatus(status as InvoiceStatus);
+                            onToggle(statusValue);
                         }}
                     >
                         <Checkbox
                             icon={<TickIcon w="12px" />}
-                            id="subtractFeeFromAmount"
-                            isChecked={invoicesTableStore.pagination.filter.status?.includes(
-                                status as InvoiceStatus
-                            )}
+                            isChecked={selectedStatuses?.includes(statusValue)}
                         >
-                            {invoiceBadges[status as InvoiceStatus].label}
+                            {invoiceBadges[statusValue].label}
                         </Checkbox>
                     </MenuItem>
                 ))}
@@ -86,4 +92,4 @@ const FilterInvoiceByStatus: FunctionComponent<ComponentProps<typeof Box>> = pro
     );
 };
 
-export default observer(FilterInvoiceByStatus);
+export default FilterInvoiceByStatus;

@@ -1,46 +1,33 @@
-import { apiClient, createImmediateReaction, DTOJettonAirdrop, Loadable } from 'src/shared';
+import { Loadable } from 'src/shared';
+import { getJettonAirdrops, DTOJettonAirdrop } from 'src/shared/api';
 import { ADConfig, airdropApiClient } from 'src/shared/api/airdrop-api';
 import { makeAutoObservable } from 'mobx';
-import { projectsStore } from 'src/shared/stores';
+import { Project } from 'src/entities';
 
 export class AirdropsStore {
     airdrops$ = new Loadable<DTOJettonAirdrop[]>([]);
 
     config$ = new Loadable<ADConfig | null>(null);
 
-    private projectId: number;
-
-    constructor() {
+    constructor(private readonly project: Project) {
         makeAutoObservable(this);
 
-        if (!projectsStore.selectedProject) throw new Error('Project is not selected');
-        this.projectId = projectsStore.selectedProject.id;
-
-        createImmediateReaction(
-            () => projectsStore.selectedProject,
-            project => {
-                this.clearStore();
-
-                if (!project) throw new Error('Project is not selected');
-                this.projectId = project.id;
-
-                this.fetchConfig();
-                this.fetchAirdrops();
-            }
-        );
+        if (!project) throw new Error('Project is not selected');
 
         this.fetchConfig();
         this.fetchAirdrops();
     }
 
-    fetchAirdrops = this.airdrops$.createAsyncAction(() =>
-        apiClient.api
-            .getJettonAirdrops({ project_id: this.projectId })
-            .then(({ data }) => data.airdrops)
-    );
+    fetchAirdrops = this.airdrops$.createAsyncAction(async () => {
+        const { data, error } = await getJettonAirdrops({
+            query: { project_id: this.project.id }
+        });
+        if (error) throw error;
+        return data.airdrops;
+    });
 
     fetchConfig = this.config$.createAsyncAction(() =>
-        airdropApiClient.v2.getConfig({ project_id: `${this.projectId}` }).then(({ data }) => data)
+        airdropApiClient.v2.getConfig({ project_id: `${this.project.id}` }).then(({ data }) => data)
     );
 
     clearStore() {

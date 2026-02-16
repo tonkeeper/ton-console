@@ -2,10 +2,9 @@ import { FC, useEffect, useState } from 'react';
 import { Box, BoxProps, Flex } from '@chakra-ui/react';
 import { CodeArea, CodeAreaFooter, CodeAreaGroup, useDebounce } from 'src/shared';
 import {
-    analyticsGPTGenerationStore,
-    analyticsQueryGPTRequestStore,
-    analyticsQuerySQLRequestStore,
-    analyticsQueryStore
+    AnalyticsQueryStore,
+    AnalyticsQueryRequestStore,
+    AnalyticsGPTGenerationStore
 } from 'src/features';
 import { observer } from 'mobx-react-lite';
 import AnalyticsQueryControlPanel from './AnalyticsQueryControlPanel';
@@ -24,25 +23,33 @@ const defaultGPTRequest = ' ';
 interface AnalyticsQueryCodeProps extends BoxProps {
     type: 'sql' | 'gpt';
     defaultRequest?: string;
+    analyticsQueryStore: AnalyticsQueryStore;
+    analyticsQuerySQLRequestStore: AnalyticsQueryRequestStore;
+    analyticsQueryGPTRequestStore: AnalyticsQueryRequestStore;
+    analyticsGPTGenerationStore: AnalyticsGPTGenerationStore;
 }
 
 const AnalyticsQueryCode: FC<AnalyticsQueryCodeProps> = ({
     type,
     defaultRequest: defaultRequest,
+    analyticsQueryStore,
+    analyticsQuerySQLRequestStore,
+    analyticsQueryGPTRequestStore,
+    analyticsGPTGenerationStore,
     ...props
 }) => {
-    const store = type === 'sql' ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
+    const requestStore = type === 'sql' ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
     const [value, setValue] = useState(
         type === 'gpt'
             ? analyticsGPTGenerationStore.generatedSQL$.value ?? defaultRequest ?? defaultGPTRequest
-            : store.request$.value?.request ?? defaultRequest ?? defaultSQLRequest
+            : requestStore.request$.value?.request ?? defaultRequest ?? defaultSQLRequest
     );
     const debouncedValue = useDebounce(value);
 
     const onValueChange = (val: string): void => {
         setValue(val);
-        if (store.request$.value) {
-            store.clearRequest();
+        if (requestStore.request$.value) {
+            requestStore.clearRequest();
         }
     };
 
@@ -54,7 +61,7 @@ const AnalyticsQueryCode: FC<AnalyticsQueryCodeProps> = ({
 
     useEffect(() => {
         if (debouncedValue) {
-            store.estimateRequest(
+            requestStore.estimateRequest(
                 {
                     request: debouncedValue,
                     name: 'sql'
@@ -62,9 +69,9 @@ const AnalyticsQueryCode: FC<AnalyticsQueryCodeProps> = ({
                 { cancelAllPreviousCalls: true }
             );
         } else {
-            store.clearRequest();
+            requestStore.clearRequest();
         }
-    }, [debouncedValue]);
+    }, [debouncedValue, requestStore]);
 
     const extensions = [
         sql({
@@ -85,7 +92,12 @@ const AnalyticsQueryCode: FC<AnalyticsQueryCodeProps> = ({
                 />
                 <CodeAreaFooter>
                     <Flex align="center" justify="flex-end">
-                        <AnalyticsQueryControlPanel type={type} />
+                        <AnalyticsQueryControlPanel
+                            type={type}
+                            analyticsQueryStore={analyticsQueryStore}
+                            analyticsQuerySQLRequestStore={analyticsQuerySQLRequestStore}
+                            analyticsQueryGPTRequestStore={analyticsQueryGPTRequestStore}
+                        />
                     </Flex>
                 </CodeAreaFooter>
             </CodeAreaGroup>

@@ -1,11 +1,14 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Button, Center, Flex, Text, useBoolean } from '@chakra-ui/react';
 import { CreateIcon96, H4, Overlay } from 'src/shared';
 import { ProjectForm } from 'src/entities';
-import { observer } from 'mobx-react-lite';
-import { projectsStore } from 'src/shared/stores';
-const CreateFirstProjectPage: FunctionComponent = () => {
+import { useCreateProjectMutation } from 'src/shared/queries/projects';
+import { useSetProject } from 'src/shared/contexts/ProjectContext';
+
+const CreateFirstProjectPage: FC = () => {
     const [clicked, setClicked] = useBoolean();
+    const { mutate: createProject, isPending } = useCreateProjectMutation();
+    const selectProject = useSetProject();
     const formId = 'create-first-project-form';
 
     return (
@@ -17,7 +20,11 @@ const CreateFirstProjectPage: FunctionComponent = () => {
                             <ProjectForm
                                 id={formId}
                                 mb="2"
-                                onSubmit={form => projectsStore.createProject(form)}
+                                onSubmit={form =>
+                                    createProject(form, {
+                                        onSuccess: newProject => selectProject(newProject.id)
+                                    })
+                                }
                             />
                             <Text
                                 textStyle="body3"
@@ -27,12 +34,7 @@ const CreateFirstProjectPage: FunctionComponent = () => {
                             >
                                 You can always change icon in the project settings.
                             </Text>
-                            <Button
-                                w="100%"
-                                form={formId}
-                                isLoading={projectsStore.createProject.isLoading}
-                                type="submit"
-                            >
+                            <Button w="100%" form={formId} isLoading={isPending} type="submit">
                                 Create
                             </Button>
                         </>
@@ -52,4 +54,4 @@ const CreateFirstProjectPage: FunctionComponent = () => {
     );
 };
 
-export default observer(CreateFirstProjectPage);
+export default CreateFirstProjectPage;

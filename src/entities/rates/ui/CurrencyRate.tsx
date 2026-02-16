@@ -1,14 +1,12 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren, useState } from 'react';
-import { Box, Skeleton, Text } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
+import { FC, PropsWithChildren, useState, useMemo } from 'react';
+import { Box, Skeleton, Text, TextProps } from '@chakra-ui/react';
 import { Amount, CRYPTO_CURRENCY, getWindow, subtractPixels } from 'src/shared';
-import { ratesStore } from 'src/entities/rates';
-import { computed } from 'mobx';
+import { useRateQuery } from 'src/entities/rates';
 import BigNumber from 'bignumber.js';
 
-const CurrencyRate: FunctionComponent<
+const CurrencyRate: FC<
     PropsWithChildren<
-        ComponentProps<typeof Text> & {
+        TextProps & {
             showSkeletonOnUpdate?: boolean;
             skeletonVariant?: string;
             leftSign?: string;
@@ -42,7 +40,7 @@ const CurrencyRate: FunctionComponent<
     const thousandSeparatorsWithFallback =
         thousandSeparators === undefined ? true : thousandSeparators;
     const [skeletonHeight, setSkeletonHeight] = useState('30px');
-    const rate$ = ratesStore.rates$[currency];
+    const { data: rate, isLoading } = useRateQuery(currency);
 
     const ref = (element: HTMLElement | null): void => {
         const window = getWindow();
@@ -52,12 +50,10 @@ const CurrencyRate: FunctionComponent<
         }
     };
 
-    const value = computed(() => {
-        if (amount === undefined) {
+    const value = useMemo(() => {
+        if (amount === undefined || !rate) {
             return undefined;
         }
-
-        const rate = ratesStore.rates$[currency as CRYPTO_CURRENCY].value;
 
         const result = reverse ? new BigNumber(amount).div(rate) : rate.multipliedBy(amount);
 
@@ -73,7 +69,7 @@ const CurrencyRate: FunctionComponent<
                 .toFormat(format),
             full: result.toString()
         };
-    });
+    }, [amount, rate, reverse, precisionWithFallback, thousandSeparatorsWithFallback]);
 
     return (
         <Text
@@ -81,24 +77,24 @@ const CurrencyRate: FunctionComponent<
             as={Box}
             alignItems="center"
             display="flex"
-            title={value.get()?.full}
+            title={value?.full}
             {...rest}
         >
-            {amountLoading || !rate$.isResolved || (rate$.isLoading && showSkeletonOnUpdate) ? (
+            {amountLoading || isLoading && showSkeletonOnUpdate ? (
                 <Skeleton
                     display="inline-block"
                     w={skeletonWidth || '40px'}
                     h={skeletonHeight}
                     variant={skeletonVariant}
                 />
-            ) : value.get()?.fiendly !== undefined ? (
-                sign + value.get()?.fiendly + (contentUnderSkeleton || '')
+            ) : value?.fiendly !== undefined ? (
+                sign + value.fiendly + (contentUnderSkeleton || '')
             ) : (
                 ''
             )}
-            {value.get() !== undefined && children}
+            {value !== undefined && children}
         </Text>
     );
 };
 
-export default observer(CurrencyRate);
+export default CurrencyRate;

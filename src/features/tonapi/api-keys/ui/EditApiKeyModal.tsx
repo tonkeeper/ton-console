@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useEffect } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import {
     Button,
     Modal,
@@ -9,27 +9,26 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
 import { FormProvider, useForm } from 'react-hook-form';
-import { ApiKey, CreateApiKeyForm } from '../model';
+import { ApiKey, CreateApiKeyForm, useEditApiKeyMutation } from '../model';
 import { ApiKeyForm, ApiKeyFormInternal, toApiKeyFormDefaultValues } from './ApiKeyForm';
-import { tonApiTiersStore } from 'src/shared/stores';
-import { apiKeysStore } from 'src/shared/stores';
+import { useSelectedRestApiTier } from 'src/features/tonapi/pricing/model/queries';
 
-const EditApiKeyModal: FunctionComponent<{
+const EditApiKeyModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     apiKey: ApiKey | undefined;
-}> = ({ apiKey, ...rest }) => {
+}> = ({ apiKey, onClose, ...rest }) => {
     const formId = 'create-api-key-form';
+    const { mutate: editApiKey, isPending } = useEditApiKeyMutation();
 
     const methods = useForm<ApiKeyFormInternal>({
         defaultValues: toApiKeyFormDefaultValues(apiKey)
     });
 
     useEffect(() => {
-        reset(toApiKeyFormDefaultValues(apiKey));
-    }, [apiKey]);
+        methods.reset(toApiKeyFormDefaultValues(apiKey));
+    }, [apiKey, methods]);
 
     const {
         reset,
@@ -39,21 +38,28 @@ const EditApiKeyModal: FunctionComponent<{
     const onSubmit = useCallback(
         (form: CreateApiKeyForm): void => {
             if (apiKey) {
-                apiKeysStore
-                    .editApiKey({
+                editApiKey(
+                    {
                         id: apiKey.id,
                         ...form
-                    })
-                    .then(rest.onClose);
+                    },
+                    {
+                        onSuccess: () => {
+                            reset();
+                            onClose();
+                        }
+                    }
+                );
             }
         },
-        [apiKey, rest.onClose]
+        [apiKey, editApiKey, onClose, reset]
     );
 
-    const maxLimit = tonApiTiersStore.selectedTier$.value?.description.requestsPerSecondLimit || 1;
+    const { data: selectedTier } = useSelectedRestApiTier();
+    const maxLimit = selectedTier?.rps ?? 1;
 
     return (
-        <Modal scrollBehavior="inside" {...rest}>
+        <Modal onClose={onClose} scrollBehavior="inside" {...rest}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Edit API Key</ModalHeader>
@@ -65,14 +71,14 @@ const EditApiKeyModal: FunctionComponent<{
                 </ModalBody>
 
                 <ModalFooter gap="3">
-                    <Button flex={1} onClick={rest.onClose} variant="secondary">
+                    <Button flex={1} onClick={onClose} variant="secondary">
                         Cancel
                     </Button>
                     <Button
                         flex={1}
                         form={formId}
                         isDisabled={!isDirty}
-                        isLoading={apiKeysStore.editApiKey.isLoading}
+                        isLoading={isPending}
                         type="submit"
                         variant="primary"
                     >
@@ -84,4 +90,4 @@ const EditApiKeyModal: FunctionComponent<{
     );
 };
 
-export default observer(EditApiKeyModal);
+export default EditApiKeyModal;

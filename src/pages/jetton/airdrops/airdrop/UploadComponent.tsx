@@ -1,21 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
-import { observer } from 'mobx-react-lite';
 import { Button, Checkbox, Flex, Input, Text } from '@chakra-ui/react';
 import {
     FileInfoComponent,
     FileProcessedComponent
 } from 'src/pages/jetton/airdrops/airdrop/UtilsComponents';
-import { projectsStore } from 'src/shared/stores';
 import { airdropApiClient } from 'src/shared/api/airdrop-api';
 import { AirdropStore } from 'src/features/airdrop/model/airdrop.store';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 
-const UploadComponentInner = (props: { id: string; airdropStore: AirdropStore }) => {
+export const UploadComponent = (props: { id: string; airdropStore: AirdropStore }) => {
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [progress, setProgress] = useState<number | null>(null);
     const [processed, setProcessed] = useState(false);
     const [isExternal, setIsExternal] = useState<boolean>(false);
     const [url, setUrl] = useState<string | null>(null);
+    const projectId = useProjectId();
 
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -58,7 +58,7 @@ const UploadComponentInner = (props: { id: string; airdropStore: AirdropStore })
             .fileUpload(
                 {
                     id: props.id,
-                    project_id: `${projectsStore.selectedProject!.id}`
+                    project_id: `${projectId}`
                 },
                 {
                     file: file
@@ -90,7 +90,7 @@ const UploadComponentInner = (props: { id: string; airdropStore: AirdropStore })
         setError(null);
         try {
             new URL(url!);
-        } catch (e) {
+        } catch (_e) {
             setError('Incorrect file URL');
         }
 
@@ -98,7 +98,7 @@ const UploadComponentInner = (props: { id: string; airdropStore: AirdropStore })
             .fileUpload(
                 {
                     id: props.id,
-                    project_id: `${projectsStore.selectedProject!.id}`
+                    project_id: `${projectId}`
                 },
                 {
                     url: url!
@@ -208,7 +208,7 @@ const UploadComponentInner = (props: { id: string; airdropStore: AirdropStore })
                                     accept=".csv"
                                     style={{ display: 'none' }}
                                     onChange={e => {
-                                        if (!!e.target.files?.length) {
+                                        if (e.target.files?.length) {
                                             handleFileChange(e.target.files[0]);
                                         }
                                     }}
@@ -222,5 +222,3 @@ const UploadComponentInner = (props: { id: string; airdropStore: AirdropStore })
         </Flex>
     );
 };
-
-export const UploadComponent = observer(UploadComponentInner);

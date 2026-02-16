@@ -13,9 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { FC } from 'react';
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { TonApiStats } from '../model/interfaces';
-import { observer } from 'mobx-react-lite';
-import { tonApiStatsStore } from 'src/shared/stores';
+import { useLiteproxyStats } from 'src/features/tonapi/statistics/model/queries';
 
 interface LiteproxyStatsModalProps {
     isOpen: boolean;
@@ -30,37 +28,15 @@ const dateFormatter = (time: number) => {
     })}`;
 };
 
-const getLiteproxyRequestsData = (
-    data: TonApiStats
-): Array<{ time: number; value: number | undefined }> => {
-    return data.chart
-        .filter(item => item.liteproxyRequests !== undefined)
-        .map(item => ({
-            time: item.time,
-            value: item.liteproxyRequests
-        }));
-};
+const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = ({ isOpen, onClose }) => {
+    const { data: value, isLoading } = useLiteproxyStats();
 
-const getLiteproxyConnectionsData = (
-    data: TonApiStats
-): Array<{ time: number; value: number | undefined }> => {
-    return data.chart
-        .filter(item => item.liteproxyConnections !== undefined)
-        .map(item => ({
-            time: item.time,
-            value: item.liteproxyConnections
-        }));
-};
-
-const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = observer(({ isOpen, onClose }) => {
-    const { isResolved, value } = tonApiStatsStore.liteproxyStats$;
-
-    if (!isResolved) {
+    if (isLoading) {
         return (
             <Modal isOpen={isOpen} onClose={onClose} size="4xl">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Liteproxy Statistics</ModalHeader>
+                    <ModalHeader>Liteservers Statistics</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                         <Center h="400px">
@@ -77,7 +53,7 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = observer(({ isOpen, on
             <Modal isOpen={isOpen} onClose={onClose} size="4xl">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Liteproxy Statistics</ModalHeader>
+                    <ModalHeader>Liteservers Statistics</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                         <Center h="400px">
@@ -93,18 +69,18 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = observer(({ isOpen, on
         <Modal isOpen={isOpen} onClose={onClose} size="4xl">
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Liteproxy Statistics</ModalHeader>
+                <ModalHeader>Liteservers Statistics</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody pb={4}>
                     <Flex direction="column" gap={8}>
                         <Text textStyle="text.label1" mb={1} color="text.secondary" fontSize={16}>
-                            Liteproxy Requests
+                            Liteservers Requests
                         </Text>
                         <Box h={250}>
                             <ResponsiveContainer height="100%">
                                 <LineChart
-                                    data={getLiteproxyRequestsData(value)}
-                                    margin={{ left: 0, right: 0 }}
+                                    data={value.requests}
+                                    margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
                                 >
                                     <XAxis
                                         dataKey="time"
@@ -126,13 +102,13 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = observer(({ isOpen, on
                         </Box>
 
                         <Text textStyle="text.label1" mb={1} color="text.secondary" fontSize={16}>
-                            Liteproxy Connections
+                            Liteservers Connections
                         </Text>
                         <Box h={250}>
                             <ResponsiveContainer height="100%">
                                 <LineChart
-                                    data={getLiteproxyConnectionsData(value)}
-                                    margin={{ left: 0, right: 0 }}
+                                    data={value.connections}
+                                    margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
                                 >
                                     <XAxis
                                         dataKey="time"
@@ -157,6 +133,6 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = observer(({ isOpen, on
             </ModalContent>
         </Modal>
     );
-});
+};
 
 export default LiteproxyStatsModal;

@@ -1,14 +1,16 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Button, Checkbox, Divider, Flex, Text, useClipboard } from '@chakra-ui/react';
 import { ButtonLink, CopyIcon16, DoneIconCircle24, H4, InfoTooltip, Overlay } from 'src/shared';
 import { AnalyticsGraphQuerySuccess, GraphAddressesList } from 'src/features';
 import { useSearchParams } from 'react-router-dom';
 
-export const GraphSuccess: FunctionComponent<{ query: AnalyticsGraphQuerySuccess }> = ({
-    query
-}) => {
+interface GraphSuccessProps {
+    query: AnalyticsGraphQuerySuccess;
+}
+
+export const GraphSuccess: FC<GraphSuccessProps> = ({ query }) => {
     const [_, setSearchParams] = useSearchParams();
-    const { hasCopied, onCopy } = useClipboard(query.addresses.map(a => a.userFriendly).join('\n'));
+    const { hasCopied, onCopy } = useClipboard(query.addresses.map(a => a.toString()).join('\n'));
 
     return (
         <Overlay h="100%" maxH="100%" display="flex" flexDirection="column">
@@ -28,7 +30,7 @@ export const GraphSuccess: FunctionComponent<{ query: AnalyticsGraphQuerySuccess
                     New Request
                 </Button>
             </Flex>
-            <Divider w="auto" mb="5" mx="-6" />
+            <Divider w="auto" mx="-6" mb="5" />
             <Flex align="center" gap="1" mb="3">
                 <Checkbox
                     mb="0 !important"

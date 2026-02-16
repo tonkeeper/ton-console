@@ -1,21 +1,48 @@
-import { observer } from 'mobx-react-lite';
 import { dappUrlValidator } from '../model';
 import { DAppUrlInputForm } from './DappUrlInputForm';
-import { FunctionComponent } from 'react';
+import { FC, useState } from 'react';
 import { Divider } from '@chakra-ui/react';
 import { PendingDappInfo } from './PendingDappInfo';
 import { DappVerification } from './DappVerification';
-import { toJS } from 'mobx';
-import { dappStore } from 'src/shared/stores';
+import { useCreateDappMutation, useValidateDappMutation } from '../model/queries';
+import { CreateDappForm, PendingDapp } from '../model/interfaces';
 
-const DappRegistrationForm: FunctionComponent = () => {
-    if (!dappStore.pendingDapp) {
+const DappRegistrationForm: FC = () => {
+    const [pendingDapp, setPendingDapp] = useState<PendingDapp | null>(null);
+
+    const createMutation = useCreateDappMutation();
+    const validateMutation = useValidateDappMutation();
+
+    const handleCreateDapp = async (formData: CreateDappForm) => {
+        try {
+            const result: PendingDapp = await createMutation.mutateAsync(formData);
+            setPendingDapp(result);
+        } catch {
+            // Error toast is handled by mutation onError
+        }
+    };
+
+    const handleValidateDapp = async () => {
+        if (!pendingDapp) return;
+        try {
+            await validateMutation.mutateAsync(pendingDapp.token);
+            setPendingDapp(null);
+        } catch {
+            // Error toast is handled by mutation onError
+        }
+    };
+
+    const handleResetPendingDapp = () => {
+        setPendingDapp(null);
+    };
+
+    if (!pendingDapp) {
         return (
             <DAppUrlInputForm
                 maxW="800px"
                 px="6"
-                onSubmit={dappStore.createDapp}
-                submitButtonLoading={dappStore.createDapp.isLoading}
+                onSubmit={handleCreateDapp}
+                submitButtonLoading={createMutation.isPending}
                 validator={dappUrlValidator}
             />
         );
@@ -27,19 +54,19 @@ const DappRegistrationForm: FunctionComponent = () => {
                 maxW="800px"
                 px="6"
                 mb="5"
-                pendingDapp={toJS(dappStore.pendingDapp)}
-                onReset={dappStore.clearPendingDapp}
+                pendingDapp={pendingDapp}
+                onReset={handleResetPendingDapp}
             />
             <Divider mb="4" />
             <DappVerification
                 maxW="850px"
                 px="6"
-                pendingDapp={toJS(dappStore.pendingDapp)}
-                onSubmit={dappStore.validatePendingDapp}
-                submitLoading={dappStore.validatePendingDapp.isLoading}
+                pendingDapp={pendingDapp}
+                onSubmit={handleValidateDapp}
+                submitLoading={validateMutation.isPending}
             />
         </>
     );
 };
 
-export default observer(DappRegistrationForm);
+export default DappRegistrationForm;

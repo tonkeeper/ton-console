@@ -1,12 +1,13 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { RegisterApp } from './RegisterApp';
-import { observer } from 'mobx-react-lite';
-import { dappStore } from 'src/shared/stores';
 import { Center, Spinner } from '@chakra-ui/react';
 import { AppMessagesDashboard } from './dashboard/AppMessagesDashboard';
+import { useDappsQuery } from 'src/entities/dapp/model/queries';
 
-const AppMessagesPage: FunctionComponent = () => {
-    if (!dappStore.dapps$.isResolved) {
+const AppMessagesPage: FC = () => {
+    const { data: dapps, isLoading } = useDappsQuery();
+
+    if (isLoading) {
         return (
             <Center h="200px">
                 <Spinner />
@@ -14,11 +15,11 @@ const AppMessagesPage: FunctionComponent = () => {
         );
     }
 
-    if (dappStore.dapps$.value.length) {
+    if (dapps && dapps.length > 0) {
         return <AppMessagesDashboard />;
     }
 
     return <RegisterApp />;
 };
 
-export default observer(AppMessagesPage);
+export default AppMessagesPage;

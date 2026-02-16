@@ -1,6 +1,7 @@
-import { ComponentProps, FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Box,
+    BoxProps,
     Code,
     ListItem,
     Tab,
@@ -12,10 +13,17 @@ import {
     UnorderedList
 } from '@chakra-ui/react';
 import { CopyPad, CardLink } from 'src/shared';
-import { invoicesAppStore, INVOICES_LINKS } from 'src/features';
-import { observer } from 'mobx-react-lite';
+import { InvoicesApp, INVOICES_LINKS } from 'src/features';
 
-const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
+interface InvoicesApiProps extends BoxProps {
+    app?: InvoicesApp | null;
+}
+
+const InvoicesApi: FC<InvoicesApiProps> = ({ app, ...props }) => {
+    if (!app) {
+        return null;
+    }
+
     return (
         <Box {...props}>
             <Tabs mb="4" isLazy={true}>
@@ -31,12 +39,11 @@ const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
                             &quot;Example description&quot; with API using curl:
                         </Text>
                         <CopyPad
-                            isLoading={!invoicesAppStore.appToken$.isResolved}
                             whiteSpace="pre-wrap"
                             text={`curl -X POST https://tonconsole.com/api/v1/services/invoices/invoice \\
     -H 'Content-Type: application/json' \\
-    -H 'Authorization: Bearer ${invoicesAppStore.appToken$.value}' \\
-    -d '{"amount": "1000000", "life_time": 1800, "description": "Example description", "currency": "USDT"}'`}
+    -H 'Authorization: Bearer <YOUR_TOKEN>' \\
+    -d '{"amount": "1000000", "life_time": 1800, "description": "Example description", "currency": "TON"}'`}
                             iconAlign="start"
                             mb="3"
                         />
@@ -63,11 +70,10 @@ const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
                             Get invoice information by its id with API using curl:
                         </Text>
                         <CopyPad
-                            isLoading={!invoicesAppStore.appToken$.isResolved}
                             whiteSpace="pre-wrap"
                             text={`curl -X GET https://tonconsole.com/api/v1/services/invoices/<INVOICE_ID> \\
     -H 'Content-Type: application/json' \\
-    -H 'Authorization: Bearer ${invoicesAppStore.appToken$.value}'`}
+    -H 'Authorization: Bearer <YOUR_TOKEN>'`}
                             iconAlign="start"
                             mb="3"
                         />
@@ -79,4 +85,4 @@ const InvoicesApi: FunctionComponent<ComponentProps<typeof Box>> = props => {
     );
 };
 
-export default observer(InvoicesApi);
+export default InvoicesApi;

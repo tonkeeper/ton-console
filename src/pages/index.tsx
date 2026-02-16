@@ -1,19 +1,21 @@
-import { FunctionComponent, Suspense, useEffect } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import TonapiRouting from 'src/pages/tonapi';
+import { FC, Suspense, useEffect } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { lazy } from '@loadable/component';
+import { useMaybeProject } from 'src/shared/contexts/ProjectContext';
+import { useUserQuery } from 'src/entities/user/queries';
+import { useProjectsQuery } from 'src/shared/queries/projects';
+import { isMaintenanceActive } from 'src/shared/config/maintenance';
+import { MaintenancePage } from 'src/shared/ui/MaintenancePage';
+import AppInitialization from 'src/processes/AppInitialization';
 import { Layout } from './layouts';
-import { projectsStore, userStore } from 'src/shared/stores';
-import { observer } from 'mobx-react-lite';
-import SettingsRouting from 'src/pages/settings';
-import InvoicesRouting from './invoices';
 import { LayoutSolid } from 'src/pages/layouts/LayoutSolid';
 import { LayoutWithAside } from 'src/pages/layouts/LayoutWithAside';
+import TonapiRouting from 'src/pages/tonapi';
+import SettingsRouting from 'src/pages/settings';
+import InvoicesRouting from './invoices';
 import AnalyticsRouting from 'src/pages/analytics';
 import NftRouting from 'src/pages/nft';
 import JettonRouting from 'src/pages/jetton';
-import { isDevelopmentMode } from 'src/shared';
-import { useLocation } from 'react-router-dom';
 
 const LandingPage = lazy(() => import('./landing'));
 const LoginPage = lazy(() => import('./login'));
@@ -24,11 +26,18 @@ const AppMessagesPage = lazy(() => import('./app-messages'));
 const FaucetPage = lazy(() => import('./faucet'));
 const UserProfilePage = lazy(() => import('./user-profile'));
 
-const Routing: FunctionComponent = () => {
+const Routing: FC = () => {
     const location = useLocation();
-    const params = new URLSearchParams(location.search);
-    const queryBackUrl = params.get('backUrl');
+    const queryBackUrl = new URLSearchParams(location.search).get('backUrl');
+    const project = useMaybeProject();
+    const { data: user, isLoading: isUserLoading } = useUserQuery();
+    const { isLoading: isProjectsLoading } = useProjectsQuery({ userId: user?.id });
 
+    // Determine if app should show loading screen
+    // Show loader if user is loading OR if user exists and projects are loading
+    const isAppLoading = isUserLoading || (!!user && isProjectsLoading);
+
+    // Track page views with Yandex Metrika
     useEffect(() => {
         /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
         // @ts-ignore
@@ -39,140 +48,144 @@ const Routing: FunctionComponent = () => {
         }
     }, [location]);
 
-    // Scale layout for mobile devices until adaptive layout is not ready
-    useEffect(() => {
-        const metatag = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
-        if (!metatag) {
-            return;
-        }
-
-        if (isDevelopmentMode()) {
-            return;
-        }
-
-        if (!userStore.user$.value) {
-            metatag.content = 'width=device-width, initial-scale=1.0';
-        } else {
-            metatag.content = 'width=1350px';
-        }
-    }, [userStore.user$.value]);
-
-    if (!userStore.user$.isResolved) {
-        return null;
-    }
-
-    if (!userStore.user$.value) {
+    // Unauthenticated user - show landing or login
+    if (!user) {
         return (
-            <Routes>
-                <Route path="/" element={<LayoutSolid />}>
-                    <Route
-                        index
-                        element={
-                            <Suspense fallback={<div>Loading...</div>}>
-                                <LandingPage />
-                            </Suspense>
-                        }
-                    ></Route>
-                    <Route
-                        path="*"
-                        element={
-                            <Suspense fallback={<div>Loading...</div>}>
-                                <LoginPage />
-                            </Suspense>
-                        }
-                    ></Route>
-                </Route>
-            </Routes>
+            <AppInitialization isLoading={isAppLoading}>
+                <Routes>
+                    <Route path="/" element={<LayoutSolid />}>
+                        <Route
+                            index
+                            element={
+                                <Suspense>
+                                    <LandingPage />
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="*"
+                            element={
+                                <Suspense>
+                                    <LoginPage />
+                                </Suspense>
+                            }
+                        />
+                    </Route>
+                </Routes>
+            </AppInitialization>
         );
     }
 
-    if (!projectsStore.selectedProject) {
+    // Maintenance mode — show maintenance page for authenticated users
+    if (isMaintenanceActive()) {
+        return (
+            <AppInitialization isLoading={isAppLoading}>
+                <MaintenancePage />
+            </AppInitialization>
+        );
+    }
+
+    // Authenticated user but no project selected - show create project page
+    if (!project) {
         const currentPath = location.pathname + location.search;
         const backUrl = encodeURIComponent(currentPath);
         const navigateTo = `/?backUrl=${backUrl}`;
 
         return (
-            <Routes>
-                <Route path="/" element={<Layout />}>
-                    <Route
-                        index
-                        element={
-                            <Suspense>
-                                <CreateFirstProjectPage />
-                            </Suspense>
-                        }
-                    ></Route>
-                    <Route path="*" element={<Navigate to={navigateTo} replace />} />
-                </Route>
-            </Routes>
+            <AppInitialization isLoading={isAppLoading}>
+                <Routes>
+                    <Route path="/" element={<Layout />}>
+                        <Route
+                            index
+                            element={
+                                <Suspense>
+                                    <CreateFirstProjectPage />
+                                </Suspense>
+                            }
+                        />
+                        <Route path="*" element={<Navigate to={navigateTo} replace />} />
+                    </Route>
+                </Routes>
+            </AppInitialization>
         );
     }
 
-    if (projectsStore.selectedProject && queryBackUrl) {
+    // Handle redirect from create project flow
+    if (queryBackUrl) {
         return <Navigate to={queryBackUrl} replace />;
     }
 
+    // Main application routes with project selected
     return (
-        <Routes>
-            <Route path="/" element={<LayoutWithAside />}>
-                <Route
-                    path="dashboard"
-                    element={
-                        <Suspense>
-                            <DashboardPage />
-                        </Suspense>
-                    }
-                />
-                <Route path="invoices">{InvoicesRouting}</Route>
-                <Route path="tonapi">{TonapiRouting}</Route>
-                <Route
-                    path="tonkeeper-messages"
-                    element={
-                        <Suspense>
-                            <AppMessagesPage />
-                        </Suspense>
-                    }
-                />
-                <Route
-                    path="balance"
-                    element={
-                        <Suspense>
-                            <BalancePage />
-                        </Suspense>
-                    }
-                />
-                <Route
-                    path="faucet"
-                    element={
-                        <Suspense>
-                            <FaucetPage />
-                        </Suspense>
-                    }
-                />
-                <Route
-                    path="profile"
-                    element={
-                        <Suspense>
-                            <UserProfilePage />
-                        </Suspense>
-                    }
-                />
-                <Route path="analytics">{AnalyticsRouting}</Route>
-                <Route path="nft">{NftRouting}</Route>
-                <Route
-                    path="jetton/*"
-                    element={
-                        <Suspense>
-                            <JettonRouting />
-                        </Suspense>
-                    }
-                />
-                <Route path="settings">{SettingsRouting}</Route>
-                <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path="*" element={<Navigate to="dashboard" replace />} />
-            </Route>
-        </Routes>
+        <AppInitialization isLoading={isAppLoading}>
+            <Routes>
+                <Route path="/" element={<LayoutWithAside />}>
+                    <Route
+                        path="dashboard"
+                        element={
+                            <Suspense>
+                                <DashboardPage />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="invoices/*"
+                        element={
+                            <Suspense>
+                                <InvoicesRouting />
+                            </Suspense>
+                        }
+                    />
+                    <Route path="tonapi">{TonapiRouting}</Route>
+                    <Route
+                        path="tonkeeper-messages"
+                        element={
+                            <Suspense>
+                                <AppMessagesPage />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="balance"
+                        element={
+                            <Suspense>
+                                <BalancePage />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="faucet"
+                        element={
+                            <Suspense>
+                                <FaucetPage />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="profile"
+                        element={
+                            <Suspense>
+                                <UserProfilePage />
+                            </Suspense>
+                        }
+                    />
+                    <Route path="analytics">{AnalyticsRouting}</Route>
+                    <Route path="nft">{NftRouting}</Route>
+                    <Route
+                        path="jetton/*"
+                        element={
+                            <Suspense>
+                                <JettonRouting />
+                            </Suspense>
+                        }
+                    />
+                    <Route path="settings">{SettingsRouting}</Route>
+                    <Route index element={<Navigate to="dashboard" replace />} />
+                    <Route path="*" element={<Navigate to="dashboard" replace />} />
+                </Route>
+            </Routes>
+        </AppInitialization>
     );
 };
 
-export default observer(Routing);
+export default Routing;

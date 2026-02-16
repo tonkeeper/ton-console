@@ -1,71 +1,135 @@
 import { FC, useEffect } from 'react';
-import { Box, Divider, Flex, Text, Image } from '@chakra-ui/react';
-import { CopyPad, H4, Overlay } from 'src/shared';
-import { observer } from 'mobx-react-lite';
-import { userStore } from 'src/shared/stores';
-import { StatsCard } from 'src/entities/stats/Card';
+import {
+    Box,
+    Flex,
+    Text,
+    Image,
+    IconButton,
+    Tooltip,
+    Center,
+    Divider,
+    VStack
+} from '@chakra-ui/react';
+import { CopyPad, DisconnectIcon, H4, Overlay } from 'src/shared';
+import { useUserQuery, useUpdateUserMutation, useLogoutMutation } from 'src/entities/user/queries';
 
 const UserProfilePage: FC = () => {
-    useEffect(() => {
-        userStore.updateMe();
-    }, []);
+    const { data: user } = useUserQuery();
+    const updateUser = useUpdateUserMutation();
+    const logout = useLogoutMutation();
 
-    const user = userStore.user$.value;
+    useEffect(() => {
+        updateUser.mutate();
+    }, []);
 
     if (!user) {
         throw new Error('Missing user for show profile');
     }
 
-    const getRefferalURLURI = () => {
+    const getReferralURL = () => {
         const { protocol, hostname, port } = window.location;
         return `${protocol}//${hostname}${port ? `:${port}` : ''}/?referral=${user.referralId}`;
     };
 
     return (
-        <Overlay>
-            <H4 mb="5">Profile</H4>
-            <Divider w="auto" mb="4" mx="-6" />
+        <VStack align="stretch" spacing="4">
+            {/* Account section */}
+            <Overlay h="fit-content">
+                <Flex align="center" justify="space-between" mb="4">
+                    <H4>Account</H4>
+                    <Tooltip hasArrow label="Disconnect" placement="left">
+                        <IconButton
+                            color="text.secondary"
+                            _hover={{ color: 'accent.red' }}
+                            aria-label="Disconnect"
+                            icon={<DisconnectIcon />}
+                            isLoading={logout.isPending}
+                            onClick={() => logout.mutate()}
+                            size="sm"
+                            variant="ghost"
+                        />
+                    </Tooltip>
+                </Flex>
+                <Divider w="auto" mx="-6" mb="4" />
 
-            <Flex direction="column" w="100%" maxW="512px">
-                <Flex gap={3}>
-                    <Image
-                        w="3.5em"
-                        h="3.5em"
-                        borderRadius={6}
-                        alt={user.id.toString()}
-                        src={user.imageUrl}
-                    />
+                <Flex align="center" gap="4">
+                    {user.imageUrl ? (
+                        <Image
+                            w="56px"
+                            h="56px"
+                            borderRadius="lg"
+                            alt={user.name}
+                            src={user.imageUrl}
+                        />
+                    ) : (
+                        <Center
+                            w="56px"
+                            h="56px"
+                            color="text.primary"
+                            fontSize="xl"
+                            fontWeight="medium"
+                            bg="background.contentTint"
+                            borderRadius="lg"
+                        >
+                            {user.name?.[0] || '?'}
+                        </Center>
+                    )}
                     <Box>
-                        <Text textStyle="label2" mt={1}>
+                        <Text textStyle="label1" mb="1">
                             {user.name}
                         </Text>
-                        <Flex textStyle="body2" gap={1} marginY={2}>
-                            <Text textStyle="label2">User ID:</Text> {/* User ID:{' '} */}
+                        <Flex align="center" gap="1">
+                            <Text textStyle="body2" color="text.secondary">
+                                ID:
+                            </Text>
                             <CopyPad
                                 variant="flat"
                                 size="sm"
                                 text={user.id.toString()}
-                                paddingRight={'1'}
                             />
                         </Flex>
                     </Box>
                 </Flex>
-                {/* <Text textStyle="label2" fontSize={16} mt={5} mb={2}>
-                    Affiliate Program
-                </Text>
-                <Text textStyle="body2" textColor="text.secondary">
-                    As an affiliate, you can earn _____ on all payments coming from users you
-                    brought to TonConsole. In return, your referrals will get a 10% discount.
-                </Text> */}
+            </Overlay>
 
-                <Text textStyle="label2" mt={5} mb={2} fontSize={16}>
-                    Your Referral Link
+            {/* Referral section */}
+            <Overlay h="fit-content">
+                <Text textStyle="label1" mb="4">
+                    Referral Program
                 </Text>
-                <CopyPad mb={4} text={getRefferalURLURI()} paddingRight={'1'} />
-                <StatsCard header="Invited Users" value={user.referralCount} width={'170px'} />
-            </Flex>
-        </Overlay>
+                <Divider w="auto" mx="-6" mb="4" />
+
+                <Flex
+                    align={{ base: 'stretch', md: 'center' }}
+                    justify="space-between"
+                    direction={{ base: 'column', md: 'row' }}
+                    gap="4"
+                >
+                    <Box
+                        minW="120px"
+                        px="4"
+                        py="3"
+                        bg="background.contentTint"
+                        borderRadius="md"
+                    >
+                        <Text textStyle="body2" mb="1" color="text.secondary">
+                            Invited Users
+                        </Text>
+                        <Text textStyle="label1" fontSize="xl">
+                            {user.referralCount}
+                        </Text>
+                    </Box>
+
+                    <Box flex="1">
+                        <Text textStyle="body2" mb="2" color="text.secondary">
+                            Your Referral Link
+                        </Text>
+                        <CopyPad text={getReferralURL()} />
+                    </Box>
+                </Flex>
+            </Overlay>
+        </VStack>
     );
 };
 
-export default observer(UserProfilePage);
+export default UserProfilePage;

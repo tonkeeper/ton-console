@@ -6,7 +6,9 @@ import {
     HStack,
     Box,
     Center,
-    useDisclosure
+    useDisclosure,
+    Tooltip,
+    BoxProps
 } from '@chakra-ui/react';
 import {
     ArrowIcon,
@@ -18,31 +20,51 @@ import {
     Span,
     useIsTextTruncated
 } from 'src/shared';
-import { ComponentProps, FunctionComponent } from 'react';
-import { observer } from 'mobx-react-lite';
+import { FC } from 'react';
 import { Project } from 'src/entities/project';
-import { projectsStore } from 'src/shared/stores';
+import { useMaybeProject, useSetProject } from 'src/shared/contexts/ProjectContext';
+import { useProjectsQuery } from 'src/shared/queries/projects';
 import { CreateProjectModal } from './CreateProjectModal';
+import { useUserQuery } from 'src/entities/user/queries';
 
-const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const SelectProject: FC<BoxProps> = ({ w, maxW, ...props }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const selectedProject = useMaybeProject();
+    const { data: user } = useUserQuery();
+    const { data: projects = [] } = useProjectsQuery({ userId: user?.id });
 
-    if (!projectsStore.selectedProject) {
+    if (!selectedProject) {
         return null;
     }
+    const isLimitReached = projects.length >= 10;
+
+    const createProjectMenuItem = ({ isDisabled }: { isDisabled: boolean }) => (
+        <MenuItem isDisabled={isDisabled} onClick={() => !isDisabled && onOpen()}>
+            <Center w="7" minW="7" h="7" mr="2" borderRadius="sm" bgColor="background.contentTint">
+                <PlusIcon16 />
+            </Center>
+            <Text textStyle="label2" color="text.primary" noOfLines={1}>
+                Create Project
+            </Text>
+        </MenuItem>
+    );
+
+    // Use passed width or default responsive width
+    const buttonWidth = w ?? { base: '160px', md: '240px' };
+    const buttonMaxWidth = maxW ?? { base: 'auto', md: '182px', lg: '240px' };
 
     return (
         <Box {...props}>
             <Menu placement="bottom">
-                <MenuButtonDefault w="240px" rightIcon={<ArrowIcon />}>
+                <MenuButtonDefault w={buttonWidth} maxW={buttonMaxWidth} rightIcon={<ArrowIcon />}>
                     <HStack spacing="2">
-                        {projectsStore.selectedProject.imgUrl ? (
+                        {selectedProject.imgUrl ? (
                             <Image
                                 w="7"
                                 minW="7"
                                 h="7"
                                 borderRadius="sm"
-                                src={projectsStore.selectedProject.imgUrl}
+                                src={selectedProject.imgUrl}
                             />
                         ) : (
                             <Center
@@ -51,36 +73,33 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
                                 h="7"
                                 mr="2"
                                 color="constant.white"
-                                bg={projectsStore.selectedProject.fallbackBackground}
+                                bg={selectedProject.fallbackBackground}
                                 borderRadius="sm"
                             >
-                                {projectsStore.selectedProject.name[0]}
+                                {selectedProject.name[0]}
                             </Center>
                         )}
                         <Text textStyle="label2" noOfLines={1}>
-                            {projectsStore.selectedProject.name}
+                            {selectedProject.name}
                         </Text>
                     </HStack>
                 </MenuButtonDefault>
                 <MenuList zIndex={100} w="256px">
-                    {projectsStore.projects$.value.map(project => (
-                        <SelectProjectItem project={project} key={project.id} />
+                    {projects.map(project => (
+                        <SelectProjectItem
+                            project={project}
+                            key={project.id}
+                            isSelected={project.id === selectedProject.id}
+                        />
                     ))}
-                    <MenuItem onClick={onOpen}>
-                        <Center
-                            w="7"
-                            minW="7"
-                            h="7"
-                            mr="2"
-                            borderRadius="sm"
-                            bgColor="background.contentTint"
-                        >
-                            <PlusIcon16 />
-                        </Center>
-                        <Text textStyle="label2" color="text.primary" noOfLines={1}>
-                            Create Project
-                        </Text>
-                    </MenuItem>
+
+                    {isLimitReached ? (
+                        <Tooltip hasArrow label="Project limit reached (10 max)">
+                            {createProjectMenuItem({ isDisabled: true })}
+                        </Tooltip>
+                    ) : (
+                        createProjectMenuItem({ isDisabled: false })
+                    )}
                 </MenuList>
             </Menu>
             <CreateProjectModal isOpen={isOpen} onClose={onClose} />
@@ -88,15 +107,20 @@ const SelectProject_: FunctionComponent<ComponentProps<typeof Box>> = props => {
     );
 };
 
-const SelectProjectItem = observer<{ project: Project }>(({ project }) => {
+const SelectProjectItem: FC<{ project: Project; isSelected: boolean }> = ({
+    project,
+    isSelected
+}) => {
     const { ref, isTruncated } = useIsTextTruncated();
+    const setProject = useSetProject();
+
     return (
         <TooltipHoverable
             key={project.id}
             placement="right"
             canBeShown={isTruncated}
             host={
-                <MenuItem onClick={() => projectsStore.selectProject(project.id)}>
+                <MenuItem onClick={() => setProject(project.id)}>
                     {project.imgUrl ? (
                         <Image w="7" minW="7" h="7" mr="2" borderRadius="sm" src={project.imgUrl} />
                     ) : (
@@ -121,13 +145,13 @@ const SelectProjectItem = observer<{ project: Project }>(({ project }) => {
                     >
                         {project.name}
                     </Span>
-                    {project.id === projectsStore.selectedProject!.id && <TickIcon ml="auto" />}
+                    {isSelected && <TickIcon ml="auto" />}
                 </MenuItem>
             }
         >
             {project.name}
         </TooltipHoverable>
     );
-});
+};
 
-export const SelectProject = observer(SelectProject_);
+export { SelectProject };

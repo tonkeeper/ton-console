@@ -1,10 +1,10 @@
-/* eslint-disable react/prop-types*/
+ 
 
-import { ComponentProps, memo, useRef } from 'react';
-import { Box, Flex, Link, Tooltip, useClipboard, useDisclosure } from '@chakra-ui/react';
+import { memo, useRef } from 'react';
+import { Box, BoxProps, Flex, Link, Tooltip, useClipboard, useDisclosure } from '@chakra-ui/react';
 import { Span } from 'src/shared';
 
-export const AnalyticsQueryResultsTableRow = memo<{ content: string } & ComponentProps<typeof Box>>(
+export const AnalyticsQueryResultsTableRow = memo<{ content: string } & BoxProps>(
     ({ content, ...rest }) => {
         const isLink = content.startsWith('https://') || content.startsWith('http://');
         const { isOpen, onClose, onOpen } = useDisclosure();

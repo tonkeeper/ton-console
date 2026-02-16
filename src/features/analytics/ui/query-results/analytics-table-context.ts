@@ -1,7 +1,7 @@
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 import { AnalyticsTableSource } from '../../model';
 
-type AnalyticsTableContextType = {
+export type AnalyticsTableContextType = {
     columnsWidths: number[];
     setColumnsWidths: (widths: number[] | ((widths: number[]) => number[])) => void;
     isResizingProcess: boolean;
@@ -10,6 +10,14 @@ type AnalyticsTableContextType = {
     setIColumnWidth: (i: number, width: number) => void;
 };
 
-export const AnalyticsTableContext = createContext<AnalyticsTableContextType>(
-    {} as unknown as AnalyticsTableContextType
+export const AnalyticsTableContext = createContext<AnalyticsTableContextType | undefined>(
+    undefined
 );
+
+export function useAnalyticsTableContext(): AnalyticsTableContextType {
+    const context = useContext(AnalyticsTableContext);
+    if (!context) {
+        throw new Error('useAnalyticsTableContext must be used within AnalyticsTableProvider');
+    }
+    return context;
+}

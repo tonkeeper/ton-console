@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { Card, Center, Flex, Spinner, Text } from '@chakra-ui/react';
 import { H4 } from 'src/shared';
-import { prettifyAmount } from './deployUtils';
+import { prettifyAmount } from 'src/features/airdrop/lib/deploy-utils';
 import { fromNano } from '@ton/core';
 import { AirdropFullT } from 'src/features/airdrop/model/airdrop.store';
 import { ADDistributorData } from 'src/shared/api/airdrop-api';

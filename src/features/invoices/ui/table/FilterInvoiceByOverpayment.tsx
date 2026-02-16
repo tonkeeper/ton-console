@@ -1,15 +1,17 @@
-import { ComponentProps, FunctionComponent } from 'react';
-import { Checkbox } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
-import { invoicesTableStore } from 'src/features';
+import { FC } from 'react';
+import { Checkbox, CheckboxProps } from '@chakra-ui/react';
 
-const FilterInvoiceByOverpayment: FunctionComponent<ComponentProps<typeof Checkbox>> = props => {
+interface Props extends CheckboxProps {
+    isActive: boolean;
+    onToggle: () => void;
+}
+
+const FilterInvoiceByOverpayment: FC<Props> = ({ isActive, onToggle, ...props }) => {
     return (
         <Checkbox
             h="fit-content"
-            checked={invoicesTableStore.pagination.filter.overpayment}
-            defaultChecked={invoicesTableStore.pagination.filter.overpayment}
-            onChange={() => invoicesTableStore.toggleFilterByOverpayment()}
+            isChecked={isActive}
+            onChange={onToggle}
             {...props}
         >
             Overpayment
@@ -17,4 +19,4 @@ const FilterInvoiceByOverpayment: FunctionComponent<ComponentProps<typeof Checkb
     );
 };
 
-export default observer(FilterInvoiceByOverpayment);
+export default FilterInvoiceByOverpayment;

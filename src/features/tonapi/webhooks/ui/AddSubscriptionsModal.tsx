@@ -9,14 +9,18 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
-import { webhooksStore } from '../model';
+import { useAddSubscriptionsMutation, useWebhooksUI } from '../model';
 import { FormProvider, useForm } from 'react-hook-form';
 import { SubscriptionsForm } from './SubscriptionsForm';
 import { AddSubscriptionsForm } from '../model/interfaces/add-subscriptions-form';
 
 const AddSubscriptionsModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'add-subscription-form';
+    const { selectedWebhookId, network } = useWebhooksUI();
+    const { mutate: addSubscriptions, isPending } = useAddSubscriptionsMutation(
+        selectedWebhookId || 0,
+        network
+    );
 
     const methods = useForm<AddSubscriptionsForm>();
 
@@ -27,9 +31,14 @@ const AddSubscriptionsModal: FC<{ isOpen: boolean; onClose: () => void }> = prop
 
     const onSubmit = useCallback(
         (form: AddSubscriptionsForm): void => {
-            webhooksStore.addSubscriptions(form.accounts).then(props.onClose);
+            if (!selectedWebhookId) return;
+            addSubscriptions(form.accounts, {
+                onSuccess: () => {
+                    props.onClose();
+                }
+            });
         },
-        [props.onClose]
+        [addSubscriptions, props, selectedWebhookId]
     );
 
     useEffect(() => {
@@ -58,7 +67,7 @@ const AddSubscriptionsModal: FC<{ isOpen: boolean; onClose: () => void }> = prop
                         flex={1}
                         form={formId}
                         isDisabled={!isDirty}
-                        isLoading={webhooksStore.addSubscriptions.isLoading}
+                        isLoading={isPending}
                         type="submit"
                         variant="primary"
                     >
@@ -70,4 +79,4 @@ const AddSubscriptionsModal: FC<{ isOpen: boolean; onClose: () => void }> = prop
     );
 };
 
-export default observer(AddSubscriptionsModal);
+export default AddSubscriptionsModal;

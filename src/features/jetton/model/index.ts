@@ -1,1 +1,1 @@
-export * from './jetton.store';
+export * from './queries';

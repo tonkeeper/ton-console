@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import {
     Box,
     chakra,
@@ -36,7 +36,7 @@ type ApiKeyFormWithoutLimit = {
 
 export type ApiKeyFormInternal = ApiKeyFormWithLimit | ApiKeyFormWithoutLimit;
 
-export const ApiKeyForm: FunctionComponent<
+export const ApiKeyForm: FC<
     StyleProps & {
         id?: string;
         maxLimit: number;
@@ -45,13 +45,13 @@ export const ApiKeyForm: FunctionComponent<
     }
 > = ({ id, onSubmit, disableDefaultFocus, maxLimit, ...rest }) => {
     const submitHandler = (form: ApiKeyFormInternal): void => {
-        const limitRps = form.useIPLimit ? Number(form.ipLimitValue) : null;
+        const limitRps = form.useIPLimit ? Number(form.ipLimitValue) : undefined;
         const origins = form.useIPLimit
             ? form.originsValue.split('\n').filter(x => x !== '')
             : undefined;
 
         const capabilities =
-            !form.useIPLimit && form.availableWebhook ? [DTOTokenCapability.DTOWebhooks] : [];
+            !form.useIPLimit && form.availableWebhook ? [DTOTokenCapability.WEBHOOKS] : [];
 
         onSubmit({
             name: form.name,
@@ -266,6 +266,6 @@ export function toApiKeyFormDefaultValues(
               name: createApiKeyForm?.name,
               useIPLimit: false,
               availableWebhook:
-                  createApiKeyForm?.capabilities.includes(DTOTokenCapability.DTOWebhooks) ?? false
+                  createApiKeyForm?.capabilities.includes(DTOTokenCapability.WEBHOOKS) ?? false
           };
 }

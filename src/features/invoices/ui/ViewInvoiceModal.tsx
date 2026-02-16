@@ -1,9 +1,9 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { Modal, ModalOverlay } from '@chakra-ui/react';
 import { Invoice } from 'src/features';
 import { ViewInvoiceModalContent } from 'src/features/invoices/ui/ViewInvoiceModalContent';
 
-export const ViewInvoiceModal: FunctionComponent<{
+export const ViewInvoiceModal: FC<{
     isOpen: boolean;
     onClose: () => void;
     invoice: Invoice;

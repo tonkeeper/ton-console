@@ -52,8 +52,8 @@ export default ({ mode }) => {
             })
         ],
         server: {
-            host: '127.0.0.1',
-            port: 5173,
+            host: '127.0.0.1', // Need fix for bot validate URL
+            port: 5201,
             watch: {
                 usePolling: true
             },
@@ -106,15 +106,6 @@ export default ({ mode }) => {
                 }
             }
         }
-
-        // test: {
-        //     globals: true,
-        //     environment: 'jsdom',
-        //     setupFiles: './tests/setup.ts',
-        //     typecheck: {
-        //         tsconfig: './tsconfig.test.json'
-        //     }
-        // }
     });
 };
 

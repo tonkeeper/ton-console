@@ -1,35 +1,33 @@
-import { ComponentProps, FC } from 'react';
-import { Box, Grid, Text } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
-import { CRYPTO_CURRENCY, formatNumber, useIntervalUpdate } from 'src/shared';
-import { invoicesAppStore, InvoicesStatistics } from 'src/features';
-import BigNumber from 'bignumber.js';
+import { FC } from 'react';
+import { Box, BoxProps, Grid, Text, Spinner, Center } from '@chakra-ui/react';
+import { CRYPTO_CURRENCY, formatNumber } from 'src/shared';
+import { InvoicesAllStatistics, InvoicesStatistics } from 'src/features/invoices/models';
 import { StatsCard as StatsCardEntity } from 'src/entities/stats/Card';
+import BigNumber from 'bignumber.js';
 
 const StatsCard: FC<{
     header: string;
     stats?: InvoicesStatistics;
     getValue: (value: InvoicesStatistics) => string;
-}> = observer(({ header, stats, getValue }) => {
-    const isResolved = invoicesAppStore.statistics$.isResolved;
-    const canShow = isResolved && stats;
-
-    if (isResolved && !stats) {
-        throw new Error('Stats are not resolved');
+    loading: boolean;
+}> = ({ header, stats, getValue, loading }) => {
+    if (loading) {
+        return <StatsCardEntity header={header} value="" loading={true} />;
     }
 
     return (
         <StatsCardEntity
             header={header}
-            value={canShow ? getValue(stats!) : ''}
-            loading={!canShow}
+            value={stats ? getValue(stats) : ''}
+            loading={false}
         />
     );
-});
+};
 
-const StatsCurentcy: FC<{ stats?: InvoicesStatistics; currency: CRYPTO_CURRENCY }> = ({
+const StatsCurrency: FC<{ stats?: InvoicesStatistics; currency: CRYPTO_CURRENCY; loading: boolean }> = ({
     stats,
-    currency
+    currency,
+    loading
 }) => {
     return (
         <>
@@ -40,6 +38,7 @@ const StatsCurentcy: FC<{ stats?: InvoicesStatistics; currency: CRYPTO_CURRENCY 
                 <StatsCard
                     header="Total Number of Invoices"
                     stats={stats}
+                    loading={loading}
                     getValue={st =>
                         formatNumber(st.totalInvoices, {
                             roundingMode: BigNumber.ROUND_DOWN
@@ -49,6 +48,7 @@ const StatsCurentcy: FC<{ stats?: InvoicesStatistics; currency: CRYPTO_CURRENCY 
                 <StatsCard
                     header="Active Invoices"
                     stats={stats}
+                    loading={loading}
                     getValue={st =>
                         formatNumber(st.invoicesInProgress, {
                             roundingMode: BigNumber.ROUND_DOWN
@@ -58,16 +58,19 @@ const StatsCurentcy: FC<{ stats?: InvoicesStatistics; currency: CRYPTO_CURRENCY 
                 <StatsCard
                     header="Earned Total"
                     stats={stats}
+                    loading={loading}
                     getValue={st => st.earnedTotal.stringCurrencyAmount}
                 />
                 <StatsCard
                     header="Earned Last 7 Days"
                     stats={stats}
+                    loading={loading}
                     getValue={st => st.earnedLastWeek.stringCurrencyAmount}
                 />
                 <StatsCard
                     header="Pending Payment"
                     stats={stats}
+                    loading={loading}
                     getValue={st => st.awaitingForPaymentAmount.stringCurrencyAmount}
                 />
             </Grid>
@@ -75,24 +78,39 @@ const StatsCurentcy: FC<{ stats?: InvoicesStatistics; currency: CRYPTO_CURRENCY 
     );
 };
 
-const InvoicesStats: FC<ComponentProps<typeof Box>> = props => {
-    useIntervalUpdate(invoicesAppStore.fetchInvoicesStatistics);
+interface InvoicesStatsProps extends BoxProps {
+    data?: InvoicesAllStatistics;
+    isLoading?: boolean;
+}
+
+const InvoicesStats: FC<InvoicesStatsProps> = ({ data, isLoading = false, ...props }) => {
+    if (isLoading) {
+        return (
+            <Box {...props}>
+                <Center h="200px">
+                    <Spinner />
+                </Center>
+            </Box>
+        );
+    }
 
     return (
         <Box {...props}>
             <Text textStyle="label1" my={5}>
                 Statistics
             </Text>
-            <StatsCurentcy
-                stats={invoicesAppStore.statistics$.value?.TON}
+            <StatsCurrency
+                stats={data?.[CRYPTO_CURRENCY.TON]}
                 currency={CRYPTO_CURRENCY.TON}
+                loading={isLoading}
             />
-            <StatsCurentcy
-                stats={invoicesAppStore.statistics$.value?.USDT}
+            <StatsCurrency
+                stats={data?.[CRYPTO_CURRENCY.USDT]}
                 currency={CRYPTO_CURRENCY.USDT}
+                loading={isLoading}
             />
         </Box>
     );
 };
 
-export default observer(InvoicesStats);
+export default InvoicesStats;

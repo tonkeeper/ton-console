@@ -12,9 +12,10 @@ import {
     MenuList,
     MenuItem,
     Menu,
-    Box
+    Box,
+    TableContainerProps
 } from '@chakra-ui/react';
-import { ComponentProps, FunctionComponent, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import {
     CopyIcon16,
     copyToClipboard,
@@ -27,12 +28,14 @@ import {
     MenuButtonIcon
 } from 'src/shared';
 import { ApiKey } from '../model';
-import { observer } from 'mobx-react-lite';
 import EditApiKeyModal from './EditApiKeyModal';
 import DeleteApiKeyModal from './DeleteApiKeyModal';
-import { apiKeysStore } from 'src/shared/stores';
 
-const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = props => {
+interface ApiKeysTableProps extends TableContainerProps {
+    apiKeys: ApiKey[];
+}
+
+const ApiKeysTable: FC<ApiKeysTableProps> = ({ apiKeys, ...props }) => {
     const [modal, setModal] = useState<{ key: ApiKey; action: 'edit' | 'delete' } | null>();
     const [copiedKey, setCopiedKey] = useState<number | undefined>();
 
@@ -76,7 +79,7 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {apiKeysStore.apiKeys$.value.map(apiKey => (
+                        {apiKeys.map(apiKey => (
                             <Tr key={apiKey.id}>
                                 <Td overflow="hidden" maxW="200px">
                                     <TooltipHoverable
@@ -116,7 +119,7 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
                                 </Td>
                                 <Td>{apiKey.capabilities.join(', ') || '-'}</Td>
                                 <Td>
-                                    {apiKey.limitRps === null
+                                    {apiKey.limitRps === undefined
                                         ? 'Unlimited'
                                         : `IP - ${apiKey.limitRps} RPS`}
                                 </Td>
@@ -167,4 +170,4 @@ const ApiKeysTable: FunctionComponent<ComponentProps<typeof TableContainer>> = p
     );
 };
 
-export default observer(ApiKeysTable);
+export default ApiKeysTable;

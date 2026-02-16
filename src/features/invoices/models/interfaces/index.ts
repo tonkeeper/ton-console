@@ -5,3 +5,4 @@ export * from './invoice';
 export * from './invoice-table-pagination';
 export * from './invoices-statistics';
 export type { InvoicesWebhook } from './invoices-webhook';
+export { isCustomFiltrationPeriod } from './invoice-table-pagination';

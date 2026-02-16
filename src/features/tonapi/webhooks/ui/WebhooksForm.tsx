@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import {
     chakra,
     FormControl,
@@ -17,7 +17,7 @@ export type WebhookFormInternal = {
     // accounts: string;
 };
 
-export const WebhookForm: FunctionComponent<
+export const WebhookForm: FC<
     StyleProps & {
         id?: string;
         onSubmit: SubmitHandler<CreateWebhookForm>;

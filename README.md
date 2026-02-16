@@ -15,7 +15,7 @@ Launch a successful business with TON blockchain: manage dapps, tokens and payme
 2. `npm run generate-api`
 
 ### Lint & test
-- lint (eslint & prettier): `npm run lint`
+- lint (eslint): `npm run lint`
 - test (vitest): `npm run test`
 - check typings (vite DOESN'T do it automatically): `npx tsc --noEmit`
 
@@ -28,10 +28,6 @@ Runs lint for staged files and checks typescript typings
 2. `npm ci`
 3. `npm run build:staging`
 
-## Build for dev2
-1. `nvm use`
-2. `npm ci`
-3. `npm run build:staging2`
 
 ## Build for prod
 1. `nvm use`

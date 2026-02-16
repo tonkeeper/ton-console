@@ -1,11 +1,12 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import { ButtonLink, FolderIcon40, H4, Overlay } from 'src/shared';
 import { Button, Divider, Flex, Text, useDisclosure } from '@chakra-ui/react';
-import { CreateInvoicesProjectModal, INVOICES_LINKS, invoicesAppStore } from 'src/features';
-import { observer } from 'mobx-react-lite';
+import { CreateInvoicesProjectModal, INVOICES_LINKS } from 'src/features';
+import { useInvoicesApp } from 'src/features/invoices/models';
 
-const RegisterProject: FunctionComponent = () => {
+const RegisterProject: FC = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const { isCreatingApp } = useInvoicesApp();
 
     return (
         <Overlay h="fit-content" pb="76px">
@@ -13,7 +14,7 @@ const RegisterProject: FunctionComponent = () => {
             <Text textStyle="body2" mb="5" color="text.secondary">
                 Easy TON transaction tracking
             </Text>
-            <Divider w="auto" mb="76px" mx="-6" />
+            <Divider w="auto" mx="-6" mb="76px" />
             <Flex align="center" direction="column">
                 <FolderIcon40 mb="4" />
                 <Text mb="5" color="text.secondary">
@@ -28,7 +29,7 @@ const RegisterProject: FunctionComponent = () => {
                         Read Guide
                     </ButtonLink>
                     <Button
-                        isLoading={invoicesAppStore.createInvoicesApp.isLoading}
+                        isLoading={isCreatingApp}
                         onClick={onOpen}
                         variant="primary"
                     >
@@ -36,9 +37,12 @@ const RegisterProject: FunctionComponent = () => {
                     </Button>
                 </Flex>
             </Flex>
-            <CreateInvoicesProjectModal isOpen={isOpen} onClose={onClose} />
+            <CreateInvoicesProjectModal
+                isOpen={isOpen}
+                onClose={onClose}
+            />
         </Overlay>
     );
 };
 
-export default observer(RegisterProject);
+export default RegisterProject;

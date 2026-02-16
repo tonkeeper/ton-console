@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
     chakra,
     FormControl,
@@ -17,10 +17,12 @@ import {
 import { ArrowIcon, isNumber, MenuButtonDefault, mergeRefs, toBinaryRadio } from 'src/shared';
 import { Controller, useForm } from 'react-hook-form';
 import { observer } from 'mobx-react-lite';
-import { AnalyticsQuery, analyticsQueryStore } from '../../model';
+import { AnalyticsQuery, AnalyticsQueryStore } from '../../model';
 import { useIMask } from 'react-imask';
 
 type TimeInterval = 'day' | 'hour' | 'minute';
+
+const TIME_INTERVALS: TimeInterval[] = ['day', 'hour', 'minute'];
 
 const intervalLabels: Record<TimeInterval, string> = {
     day: 'Days',
@@ -34,12 +36,21 @@ const intervalSecondsMultiplier: Record<TimeInterval, number> = {
     minute: 60
 };
 
-const RepeatRequestModalContent: FunctionComponent<{
+interface RepeatRequestModalContentProps {
     query: AnalyticsQuery;
     formId: string;
     onIsDirtyChange: (val: boolean) => void;
     onClose: () => void;
-}> = ({ query, formId, onIsDirtyChange, onClose }) => {
+    analyticsQueryStore: AnalyticsQueryStore;
+}
+
+const RepeatRequestModalContent: FC<RepeatRequestModalContentProps> = ({
+    query,
+    formId,
+    onIsDirtyChange,
+    onClose,
+    analyticsQueryStore
+}) => {
     const [selectedInterval, setSelectedInterval] = useState<TimeInterval>(() => {
         if (!query.repeatFrequencyMs) {
             return 'day';
@@ -193,11 +204,11 @@ const RepeatRequestModalContent: FunctionComponent<{
                             </MenuButtonDefault>
                             <Portal>
                                 <MenuList zIndex={10000}>
-                                    {Object.keys(intervalLabels).map(interval => (
+                                    {TIME_INTERVALS.map(interval => (
                                         <MenuItem
                                             key={interval}
                                             onClick={() => {
-                                                setSelectedInterval(interval as TimeInterval);
+                                                setSelectedInterval(interval);
                                                 setTimeout(() => {
                                                     if (menuButtonRef.current) {
                                                         setPr(menuButtonRef.current?.clientWidth);
@@ -205,7 +216,7 @@ const RepeatRequestModalContent: FunctionComponent<{
                                                 });
                                             }}
                                         >
-                                            {intervalLabels[interval as TimeInterval]}
+                                            {intervalLabels[interval]}
                                         </MenuItem>
                                     ))}
                                 </MenuList>

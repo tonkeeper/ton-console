@@ -55,3 +55,4 @@ export { DatabaseIcon40 } from './DatabaseIcon40';
 export { TrashIcon16 } from './TrashIcon16';
 export { NftIcon24 } from './NftIcon24';
 export { DocsLogo32 } from './DocsLogo32';
+export { MenuIcon24 } from './MenuIcon24';

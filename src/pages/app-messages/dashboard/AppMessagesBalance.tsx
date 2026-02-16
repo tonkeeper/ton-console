@@ -1,32 +1,38 @@
-import { ComponentProps, FunctionComponent } from 'react';
-import { formatWithSuffix, H4, Overlay } from 'src/shared';
-import { Box, Button, Skeleton, Text, useDisclosure } from '@chakra-ui/react';
-import { appMessagesStore, MessagesRefillModal } from 'src/features';
-import { observer } from 'mobx-react-lite';
+import { FC } from 'react';
+import { formatWithSuffix } from 'src/shared';
+import { Box, BoxProps, Button, Flex, Skeleton, Text, useDisclosure } from '@chakra-ui/react';
+import { MessagesRefillModal } from 'src/features';
+import { useMessagesBalanceQuery } from 'src/features/app-messages/model/queries';
 
-const AppMessagesBalance: FunctionComponent<ComponentProps<typeof Box>> = props => {
+const AppMessagesBalance: FC<BoxProps> = props => {
     const { isOpen, onOpen, onClose } = useDisclosure();
-
-    const balanceIsZero = appMessagesStore.balance$.isResolved && !appMessagesStore.balance$.value;
+    const { data: amount, isLoading } = useMessagesBalanceQuery();
 
     return (
-        <Overlay h="fit-content" w="320px" {...props}>
-            <H4 mb="1">
-                {appMessagesStore.balance$.isLoading ? (
-                    <Skeleton w="100px" h="6" />
-                ) : (
-                    formatWithSuffix(appMessagesStore.balance$.value || 0)
-                )}
-            </H4>
-            <Text textStyle="body2" mb="5" color="text.secondary">
+        <Box h="fit-content" {...props}>
+            <Text textStyle="label1" mb="5">
                 Available messages
             </Text>
-            <Button w="100%" onClick={onOpen} variant={balanceIsZero ? 'primary' : 'secondary'}>
-                Refill
-            </Button>
+            <Flex direction="column" gap="2">
+                {isLoading ? (
+                    <Skeleton w="80px" h="6" />
+                ) : (
+                    <Text
+                        flex="1"
+                        mb="0"
+                        color={amount === 0 ? 'accent.red' : 'text.primary'}
+                        fontWeight={amount === 0 ? 'bold' : 'normal'}
+                    >
+                        {formatWithSuffix(amount || 0)} messages
+                    </Text>
+                )}
+                <Button w="100%" onClick={onOpen} size="lg" variant="primary">
+                    Refill
+                </Button>
+            </Flex>
             <MessagesRefillModal isOpen={isOpen} onClose={onClose} />
-        </Overlay>
+        </Box>
     );
 };
 
-export default observer(AppMessagesBalance);
+export default AppMessagesBalance;

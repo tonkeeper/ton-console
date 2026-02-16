@@ -1,11 +1,17 @@
-import { ComponentProps, FunctionComponent } from 'react';
-import { Box, Center, Grid, GridItem, Spinner } from '@chakra-ui/react';
+import { FC } from 'react';
+import { BoxProps, Center, Flex, Spinner } from '@chakra-ui/react';
 import { DashboardTierCard } from '../../tonapi';
-import { tonApiTiersStore } from 'src/shared/stores';
-import { observer } from 'mobx-react-lite';
+import { useSelectedRestApiTier } from 'src/features/tonapi/pricing/model/queries';
+import { useSelectedLiteproxyTier } from 'src/features/tonapi/liteproxy/model/queries';
 
-const DashboardCardsList: FunctionComponent<ComponentProps<typeof Box>> = props => {
-    if (!tonApiTiersStore.selectedTier$.isResolved) {
+const DashboardCardsList: FC<BoxProps> = props => {
+    const { data: selectedRestApiTier, isLoading: isRestApiLoading } = useSelectedRestApiTier();
+    const { data: selectedLiteproxyTier, isLoading: isLiteproxyLoading } =
+        useSelectedLiteproxyTier();
+
+    const isLoading = isRestApiLoading || isLiteproxyLoading;
+
+    if (isLoading) {
         return (
             <Center h="78px" {...props}>
                 <Spinner />
@@ -14,20 +20,20 @@ const DashboardCardsList: FunctionComponent<ComponentProps<typeof Box>> = props 
     }
 
     return (
-        <Grid gridTemplate="1fr / repeat(4, 1fr)" {...props}>
-            {tonApiTiersStore.selectedTier$.value && (
-                <GridItem
-                    gridColumn={
-                        tonApiTiersStore.selectedTier$.value?.price.amount.isZero()
-                            ? 'unset'
-                            : 'span 2'
-                    }
-                >
-                    <DashboardTierCard tier={tonApiTiersStore.selectedTier$.value} />
-                </GridItem>
+        <Flex wrap="wrap" gap="4" {...props}>
+            {selectedRestApiTier && <DashboardTierCard tier={selectedRestApiTier} service="REST API" />}
+            {selectedLiteproxyTier && (
+                <DashboardTierCard
+                    tier={{
+                        name: selectedLiteproxyTier.name,
+                        rps: selectedLiteproxyTier.rps,
+                        renewsDate: selectedLiteproxyTier.next_payment
+                    }}
+                    service="Liteservers"
+                />
             )}
-        </Grid>
+        </Flex>
     );
 };
 
-export default observer(DashboardCardsList);
+export default DashboardCardsList;

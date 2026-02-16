@@ -1,32 +1,31 @@
 import { Box, Flex } from '@chakra-ui/react';
 import {
-    FunctionComponent,
+    FC,
     memo,
     PropsWithChildren,
-    useContext,
     useEffect,
     useMemo,
     useRef,
     useState
 } from 'react';
-import { AnalyticsTableContext } from './analytics-table-context';
+import { useAnalyticsTableContext } from './analytics-table-context';
 import { getTextWidth } from './analytics-query-ui-utils';
 
-export const AnalyticsQueryTableStructure: FunctionComponent<PropsWithChildren> = memo(() => {
+export const AnalyticsQueryTableStructure: FC<PropsWithChildren> = memo(() => {
     const {
         columnsWidths,
         isResizingProcess,
         setIsResizingProcess,
         source: { headings },
         setIColumnWidth
-    } = useContext(AnalyticsTableContext);
+    } = useAnalyticsTableContext();
     const [hoverOnColumn, setHoverOnColumn] = useState<number | undefined>(undefined);
 
     const pressedColumn = useRef<
         { index: number; initialPageX: number; initialWidth: number } | undefined
     >(undefined);
 
-    const textWidths = useMemo(() => headings.map(v => getTextWidth(v)), [headings.join(';')]);
+    const textWidths = useMemo(() => headings.map((v: string) => getTextWidth(v)), [headings.join(';')]);
 
     const changeColWidth = (i: number, change: number) => {
         if (!pressedColumn.current) {
@@ -91,7 +90,7 @@ export const AnalyticsQueryTableStructure: FunctionComponent<PropsWithChildren> 
             fontFamily="mono"
             bg="background.content"
         >
-            {headings.map((text, i) => (
+            {headings.map((text: string, i: number) => (
                 <>
                     <Flex
                         key={text}
@@ -104,8 +103,8 @@ export const AnalyticsQueryTableStructure: FunctionComponent<PropsWithChildren> 
                         pr={i === headings.length - 1 ? 4 : 0}
                         pl={i === 0 ? 4 : 2}
                         bg="background.contentTint"
-                        borderTopLeftRadius={i === 0 ? 'sm' : 'unset'}
                         borderTopRightRadius={i === headings.length - 1 ? 'sm' : 'unset'}
+                        borderTopLeftRadius={i === 0 ? 'sm' : 'unset'}
                         _hover={{
                             bg: 'background.page'
                         }}

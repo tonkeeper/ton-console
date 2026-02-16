@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { useCallback, useEffect, useState, forwardRef } from 'react';
 import {
     chakra,
     FormControl,
@@ -17,28 +17,35 @@ import {
     isNumber,
     mergeRefs,
     Span,
-    TonCurrencyAmount
+    UsdCurrencyAmount
 } from 'src/shared';
 import { useIMask } from 'react-imask';
-import { CNFTStore, IndexingCnftCollectionDataT } from '../../model/cnft.store';
-import { observer } from 'mobx-react-lite';
+import {
+    useCNftConfig,
+    useCNftAddressCheck,
+    IndexingCnftCollectionDataT
+} from '../../model/queries';
 
-const CNFTAddForm: FC<
+const CNFTAddForm = forwardRef<
+    HTMLFormElement,
     StyleProps & {
-        cnftStore: CNFTStore;
         id?: string;
         onSubmit: SubmitHandler<IndexingCnftCollectionDataT>;
     }
-> = ({ id, onSubmit, cnftStore, ...rest }) => {
+>(({ id, onSubmit, ...rest }, ref) => {
+    const { data: pricePerNFT, isLoading: isPriceLoading } = useCNftConfig();
+    const {
+        mutate: checkCNft,
+        data: checkedAddress,
+        isPending: isCheckingAddress,
+        error: checkError,
+        reset: resetAddressCheck
+    } = useCNftAddressCheck();
+    const [addressCheckError, setAddressCheckError] = useState<string | null>(null);
+
     const submitHandler = (form: IndexingCnftCollectionDataT): void => {
         onSubmit(form);
     };
-
-    useEffect(() => {
-        return () => {
-            cnftStore.currentAddress$.clear();
-        };
-    }, []);
 
     const {
         handleSubmit,
@@ -47,20 +54,38 @@ const CNFTAddForm: FC<
         formState: { errors }
     } = useForm<IndexingCnftCollectionDataT>({});
 
+    // Update address check error state when check completes
+    useEffect(() => {
+        if (!isCheckingAddress) {
+            if (checkError) {
+                setAddressCheckError('Network error checking address');
+            } else if (checkedAddress === null) {
+                setAddressCheckError('cNFT not exists for this address');
+            } else if (checkedAddress !== undefined) {
+                // Only clear error if we have a valid result (not undefined, not null)
+                setAddressCheckError(null);
+            }
+            // If checkedAddress is undefined, we haven't checked yet, so keep current error state
+        }
+    }, [isCheckingAddress, checkedAddress, checkError]);
+
+    // Reset address check state when component unmounts or form resets
+    useEffect(() => {
+        return () => {
+            resetAddressCheck();
+        };
+    }, [resetAddressCheck]);
+
     const inputCount = watch('count');
-    const pricePerNFT = cnftStore.pricePerNFT$.value;
     const canCalculatePrice =
-        cnftStore.pricePerNFT$.isResolved &&
-        inputCount > 0 &&
-        isNumber(inputCount) &&
-        inputCount >= 0.01;
+        !isPriceLoading && inputCount > 0 && isNumber(inputCount) && inputCount >= 0.01;
 
     const priceString =
         canCalculatePrice && pricePerNFT
-            ? TonCurrencyAmount.fromRelativeAmount(
+            ? new UsdCurrencyAmount(
                   pricePerNFT.amount.multipliedBy(inputCount)
               ).toStringCurrencyAmount({ decimalPlaces: 4 })
-            : undefined;
+            : '0';
 
     const { ref: maskRef } = useIMask({
         mask: Number,
@@ -73,12 +98,10 @@ const CNFTAddForm: FC<
         max: 1000000000
     });
 
-    const { nft_count, paid_indexing_count } = cnftStore.currentAddress$.value ?? {};
+    const { nft_count, paid_indexing_count } = checkedAddress ?? {};
     const currentAddressDataExists = nft_count !== undefined && paid_indexing_count !== undefined;
     const invalidHelpText =
-        cnftStore.currentAddress$.error && !errors.account
-            ? 'cNFT not exists for this address'
-            : 'Please enter cNFT address';
+        addressCheckError && !errors.account ? addressCheckError : 'Please enter cNFT address';
     const availableNFTCount = currentAddressDataExists ? nft_count - paid_indexing_count : 0;
     const addressHelpText = currentAddressDataExists
         ? `Collection NFT count: ${nft_count}, Paid: ${paid_indexing_count}, Available: ${availableNFTCount}`
@@ -98,8 +121,22 @@ const CNFTAddForm: FC<
         valueAsNumber: true
     });
 
+    const handleAddressChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            checkCNft(e.target.value);
+        },
+        [checkCNft]
+    );
+
     return (
-        <chakra.form id={id} w="100%" onSubmit={handleSubmit(submitHandler)} noValidate {...rest}>
+        <chakra.form
+            ref={ref}
+            id={id}
+            w="100%"
+            onSubmit={handleSubmit(submitHandler)}
+            noValidate
+            {...rest}
+        >
             <FormControl isInvalid={!!errors.account} isRequired>
                 <FormLabel htmlFor="address">Address</FormLabel>
                 <AsyncInput
@@ -112,11 +149,9 @@ const CNFTAddForm: FC<
                             if (!isAddressValid(value, { acceptRaw: true })) {
                                 return 'Wrong address';
                             }
-                            if (cnftStore.currentAddress$.error) {
-                                return 'cNFT not exists for this address';
-                            }
+                            // Async validation happens in useEffect above
                         },
-                        onChange: e => cnftStore.checkCNFT(e.target.value)
+                        onChange: handleAddressChange
                     })}
                 />
 
@@ -146,6 +181,8 @@ const CNFTAddForm: FC<
             </FormControl>
         </chakra.form>
     );
-};
+});
 
-export default observer(CNFTAddForm);
+CNFTAddForm.displayName = 'CNFTAddForm';
+
+export default CNFTAddForm;

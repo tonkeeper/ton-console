@@ -19,5 +19,6 @@ export { IconButton } from './IconButton';
 export * from './code-area';
 export { NumberedTextArea } from './NumberedTextArea';
 export * from './textarea';
-export * from './TgChannelCardLink';
 export { default as Pagination } from './Pagination';
+export { UnavailableFeature } from './UnavailableFeature';
+export { UnavailableFeatureGate } from './UnavailableFeatureGate';

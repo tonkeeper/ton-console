@@ -1,19 +1,24 @@
-import { ComponentProps, FunctionComponent, useCallback, useEffect, useState } from 'react';
-import { Box, Center, Spinner } from '@chakra-ui/react';
+import { FC, useCallback, useEffect, useState } from 'react';
+import { useLocalObservable } from 'mobx-react-lite';
+import { BoxProps, Center, Spinner } from '@chakra-ui/react';
 import { Overlay, useIntervalUpdate, usePrevious } from 'src/shared';
-import { analyticsGraphQueryStore } from 'src/features';
+import { AnalyticsGraphQueryStore } from 'src/features';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GraphSuccess } from './GraphSuccess';
 import { GraphError } from './GraphError';
 import { GraphHome } from './GraphHome';
-import { observer } from 'mobx-react-lite';
-import { projectsStore } from 'src/shared/stores';
+import { useProject } from 'src/shared/contexts/ProjectContext';
 
-const GraphPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
+const GraphPage: FC<BoxProps> = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const queryId = searchParams.get('id');
+    const project = useProject();
     const [queryResolved, setQueryResolved] = useState(false);
+
+    const analyticsGraphQueryStore = useLocalObservable(
+        () => new AnalyticsGraphQueryStore(project)
+    );
 
     useEffect(() => {
         if (queryId) {
@@ -32,7 +37,7 @@ const GraphPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
         }
     }, [queryId]);
 
-    const projectId = projectsStore.selectedProject?.id;
+    const projectId = project?.id;
     const prevProjectId = usePrevious(projectId);
 
     useEffect(() => {
@@ -46,8 +51,14 @@ const GraphPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
         if (query?.status === 'executing') {
             analyticsGraphQueryStore.refetchQuery();
         }
-    }, [query?.status]);
+    }, [query?.status, analyticsGraphQueryStore]);
     useIntervalUpdate(callback, 1000);
+
+    useEffect(() => {
+        return () => {
+            analyticsGraphQueryStore.destroy();
+        };
+    }, [analyticsGraphQueryStore]);
 
     if (!queryResolved) {
         return (
@@ -67,7 +78,7 @@ const GraphPage: FunctionComponent<ComponentProps<typeof Box>> = () => {
         return <GraphError query={query} />;
     }
 
-    return <GraphHome />;
+    return <GraphHome analyticsGraphQueryStore={analyticsGraphQueryStore} />;
 };
 
-export default observer(GraphPage);
+export default GraphPage;

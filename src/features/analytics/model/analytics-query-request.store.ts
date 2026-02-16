@@ -1,37 +1,38 @@
 import { makeAutoObservable } from 'mobx';
-import {
-    apiClient,
-    createReaction,
-    DTOChain,
-    DTOStatsEstimateQuery,
-    Loadable,
-    Network,
-    TonCurrencyAmount
-} from 'src/shared';
+import { createReaction, Loadable, Network, UsdCurrencyAmount } from 'src/shared';
+import { estimateStatsQuery, DTOChain, DTOStatsEstimateQuery } from 'src/shared/api';
 import { AnalyticsQueryTemplate } from './interfaces';
-import { projectsStore } from 'src/shared/stores';
 import { DTOChainNetworkMap } from 'src/shared/lib/blockchain/network';
+import { Project } from 'src/entities';
 
 export class AnalyticsQueryRequestStore {
     request$ = new Loadable<AnalyticsQueryTemplate | null>(null);
 
     private _network = Network.MAINNET;
 
+    private disposers: Array<() => void> = [];
+
     get network(): Network {
         return this._network;
     }
 
-    constructor() {
+    constructor(private readonly project: Project) {
         makeAutoObservable(this);
 
-        createReaction(
-            () => projectsStore.selectedProject?.id,
+        const dispose = createReaction(
+            () => this.project,
             (_, prevId) => {
                 if (prevId) {
                     this.clear();
                 }
             }
         );
+        this.disposers.push(dispose);
+    }
+
+    destroy(): void {
+        this.disposers.forEach(dispose => dispose?.());
+        this.disposers = [];
     }
 
     public estimateRequest = this.request$.createAsyncAction(
@@ -47,23 +48,21 @@ export class AnalyticsQueryRequestStore {
             try {
                 const chain =
                     (network || this.network) === Network.TESTNET
-                        ? DTOChain.DTOTestnet
-                        : DTOChain.DTOMainnet;
+                        ? DTOChain.TESTNET
+                        : DTOChain.MAINNET;
 
-                const result = await apiClient.api.estimateStatsQuery(
-                    {
-                        project_id: projectsStore.selectedProject!.id,
+                const { data, error } = await estimateStatsQuery({
+                    body: {
+                        project_id: this.project.id,
                         query: request,
                         name
                     },
-                    { chain }
-                );
+                    query: { chain }
+                });
 
-                const analyticsQuery = mapDTOStatsEstimateSQLToAnalyticsQuery(
-                    request,
-                    chain,
-                    result.data
-                );
+                if (error) throw error;
+
+                const analyticsQuery = mapDTOStatsEstimateSQLToAnalyticsQuery(request, chain, data);
 
                 this.request$.value = analyticsQuery;
                 return analyticsQuery;
@@ -115,10 +114,8 @@ function mapDTOStatsEstimateSQLToAnalyticsQuery(
         request,
         network: DTOChainNetworkMap[network],
         estimatedTimeMS: value.approximate_time,
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        estimatedCost: new TonCurrencyAmount(value.approximate_cost),
+
+        estimatedCost: new UsdCurrencyAmount(value.approximate_usd_cost),
         explanation: value.explain!
     };
 }

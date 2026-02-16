@@ -2,7 +2,7 @@ import { CURRENCY } from './CURRENCY';
 import BigNumber from 'bignumber.js';
 
 export interface CurrencyAmount {
-    readonly currency: CURRENCY;
+    readonly currency: keyof typeof CURRENCY;
 
     readonly amount: BigNumber;
 

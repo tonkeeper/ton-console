@@ -1,44 +1,45 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren } from 'react';
-import { Box, Button } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
-import { invoicesTableStore, InvoiceTableColumn } from '../../models';
-import { SortAscIcon16, SortDescIcon16 } from 'src/shared';
+import { FC, PropsWithChildren } from 'react';
+import { Box, Button, ButtonProps } from '@chakra-ui/react';
+import { DTOInvoiceFieldOrder, SortAscIcon16, SortDescIcon16 } from 'src/shared';
 
-const InvoicesTableColumnLabel: FunctionComponent<
-    PropsWithChildren<ComponentProps<typeof Button> & { column: InvoiceTableColumn }>
-> = ({ children, column, ...rest }) => {
-    const disabled =
-        !invoicesTableStore.invoices$.value.length && !invoicesTableStore.invoices$.isLoading;
+interface Props extends PropsWithChildren<ButtonProps> {
+    currentColumn?: DTOInvoiceFieldOrder;
+    direction?: 'asc' | 'desc';
+    column: DTOInvoiceFieldOrder;
+    onSetColumn: (column: DTOInvoiceFieldOrder) => void;
+    onToggleDirection: () => void;
+    isDisabled?: boolean;
+}
 
-    const defaultShown =
-        invoicesTableStore.sortDirectionTouched &&
-        invoicesTableStore.pagination.sort.column === column;
-
-    const Icon =
-        defaultShown && invoicesTableStore.pagination.sort.direction === 'asc'
-            ? SortAscIcon16
-            : SortDescIcon16;
+const InvoicesTableSortButton: FC<Props> = ({
+    currentColumn,
+    direction = 'desc',
+    column,
+    onSetColumn,
+    onToggleDirection,
+    isDisabled = false,
+    children,
+    ...rest
+}) => {
+    const isCurrentColumn = currentColumn === column;
+    const Icon = direction === 'asc' ? SortAscIcon16 : SortDescIcon16;
 
     return (
         <Button
             pos="relative"
-            left={disabled ? '0' : '-24px'}
+            left={isDisabled ? '0' : '-24px'}
             _hover={{ svg: { opacity: 1 } }}
             _disabled={{
                 opacity: 1,
                 cursor: 'default'
             }}
-            isDisabled={disabled}
-            onClick={
-                defaultShown
-                    ? invoicesTableStore.toggleSortDirection
-                    : () => invoicesTableStore.setSortColumn(column)
-            }
+            isDisabled={isDisabled}
+            onClick={isCurrentColumn ? onToggleDirection : () => onSetColumn(column)}
             size="fit"
             variant="flat"
-            {...(!disabled && {
+            {...(!isDisabled && {
                 leftIcon: (
-                    <Icon transition="opacity 0.15s ease-in-out" opacity={defaultShown ? 1 : 0} />
+                    <Icon transition="opacity 0.15s ease-in-out" opacity={isCurrentColumn ? 1 : 0} />
                 )
             })}
             {...rest}
@@ -50,4 +51,4 @@ const InvoicesTableColumnLabel: FunctionComponent<
     );
 };
 
-export default observer(InvoicesTableColumnLabel);
+export default InvoicesTableSortButton;

@@ -14,21 +14,16 @@ import {
 } from '@chakra-ui/react';
 import { H4 } from 'src/shared';
 import { FeedbackFrom } from './FeedbackForm';
-import { observer } from 'mobx-react-lite';
-import { feetbackModalStore } from './model/feedback';
+import { useFeedbackModal } from './contexts/FeedbackModalContext';
+import { useSendFeedbackMutation } from './model/queries';
 
 const FeedbackModal: FC = () => {
     const formId = 'feedback-form';
-
-    const onClose = () => feetbackModalStore.close();
+    const { isOpen, close } = useFeedbackModal();
+    const { isPending } = useSendFeedbackMutation();
 
     return (
-        <Modal
-            isOpen={feetbackModalStore.isOpen}
-            onClose={onClose}
-            scrollBehavior="inside"
-            size="2xl"
-        >
+        <Modal isOpen={isOpen} onClose={close} scrollBehavior="inside" size="2xl">
             <ModalOverlay></ModalOverlay>
             <ModalContent>
                 <ModalCloseButton />
@@ -38,7 +33,6 @@ const FeedbackModal: FC = () => {
                 <ModalBody>
                     <Flex direction="column">
                         <Box mb="4">
-                            {/* <Text textStyle="label2">Ton Console</Text> */}
                             <Text textStyle="body2">
                                 Your message has been successfully submitted. We will review it
                                 shortly and get back to you using the contact information you
@@ -49,13 +43,13 @@ const FeedbackModal: FC = () => {
                     </Flex>
                 </ModalBody>
                 <ModalFooter>
-                    <Button flex={1} onClick={onClose} variant="secondary">
+                    <Button flex={1} onClick={close} variant="secondary">
                         Cancel
                     </Button>
                     <Button
                         flex={1}
                         form={formId}
-                        isLoading={feetbackModalStore.sendForm.isLoading}
+                        isLoading={isPending}
                         type="submit"
                         variant="primary"
                     >
@@ -67,4 +61,4 @@ const FeedbackModal: FC = () => {
     );
 };
 
-export default observer(FeedbackModal);
+export default FeedbackModal;

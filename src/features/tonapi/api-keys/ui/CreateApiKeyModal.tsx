@@ -9,14 +9,19 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
-import { CreateApiKeyForm } from '../model';
+import { CreateApiKeyForm, useCreateApiKeyMutation } from '../model';
 import { ApiKeyForm } from './ApiKeyForm';
 import { FormProvider, useForm } from 'react-hook-form';
-import { apiKeysStore, tonApiTiersStore } from 'src/shared/stores';
+import { useSelectedRestApiTier } from 'src/features/tonapi/pricing/model/queries';
 
-const CreateApiKeyModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
+interface CreateApiKeyModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+const CreateApiKeyModal: FC<CreateApiKeyModalProps> = ({ isOpen, onClose }) => {
     const formId = 'create-api-key-form';
+    const { mutate: createApiKey, isPending } = useCreateApiKeyMutation();
 
     const methods = useForm<CreateApiKeyForm>();
 
@@ -27,21 +32,27 @@ const CreateApiKeyModal: FC<{ isOpen: boolean; onClose: () => void }> = props =>
 
     const onSubmit = useCallback(
         (form: CreateApiKeyForm): void => {
-            apiKeysStore.createApiKey(form).then(props.onClose);
+            createApiKey(form, {
+                onSuccess: () => {
+                    reset();
+                    onClose();
+                }
+            });
         },
-        [props.onClose]
+        [createApiKey, onClose, reset]
     );
 
     useEffect(() => {
-        if (!props.isOpen) {
+        if (!isOpen) {
             setTimeout(reset, 200);
         }
-    }, [reset, props.isOpen]);
+    }, [reset, isOpen]);
 
-    const maxLimit = tonApiTiersStore.selectedTier$.value?.description.requestsPerSecondLimit || 1;
+    const { data: selectedTier } = useSelectedRestApiTier();
+    const maxLimit = selectedTier?.rps ?? 1;
 
     return (
-        <Modal scrollBehavior="inside" {...props}>
+        <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>New API key</ModalHeader>
@@ -53,14 +64,14 @@ const CreateApiKeyModal: FC<{ isOpen: boolean; onClose: () => void }> = props =>
                 </ModalBody>
 
                 <ModalFooter gap="3">
-                    <Button flex={1} onClick={props.onClose} variant="secondary">
+                    <Button flex={1} onClick={onClose} variant="secondary">
                         Cancel
                     </Button>
                     <Button
                         flex={1}
                         form={formId}
                         isDisabled={!isDirty}
-                        isLoading={apiKeysStore.createApiKey.isLoading}
+                        isLoading={isPending}
                         type="submit"
                         variant="primary"
                     >
@@ -72,4 +83,4 @@ const CreateApiKeyModal: FC<{ isOpen: boolean; onClose: () => void }> = props =>
     );
 };
 
-export default observer(CreateApiKeyModal);
+export default CreateApiKeyModal;

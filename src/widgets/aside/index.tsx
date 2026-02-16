@@ -14,13 +14,25 @@ import {
 } from 'src/shared';
 import { FC } from 'react';
 import { Flex, Text } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
-import { invoicesAppStore } from 'src/features';
 import { NftIcon24 } from 'src/shared';
 import { JettonIcon24 } from 'src/shared/ui/icons/JettonIcon24';
-import { balancesStore } from 'src/shared/stores';
+import { useBalanceQuery } from 'src/features/balance';
+import { useProject } from 'src/shared/contexts/ProjectContext';
 
 const Aside: FC = () => {
+    const { data: balance, isLoading } = useBalanceQuery();
+    const project = useProject();
+
+    const totalAmount = balance?.total;
+    const formattedTotalAmount =
+        totalAmount !== undefined
+            ? new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2
+              }).format(totalAmount)
+            : null;
     return (
         <DropDownMenu>
             <DropDownMenuItem linkTo="dashboard" leftIcon={<DashboardIcon />}>
@@ -35,14 +47,14 @@ const Aside: FC = () => {
             <DropDownMenuItem linkTo="tonkeeper-messages" leftIcon={<MessageIcon24 />}>
                 Tonkeeper Messages
             </DropDownMenuItem>
-            {invoicesAppStore.invoicesApp$.value ? (
+            {project?.capabilities.invoices ? (
                 <DropDownMenuItemExpandable
                     leftIcon={<InvoicesIcon24 />}
                     content="Payment Tracker"
                     linkTo="invoices"
                 >
-                    <DropDownMenuItem linkTo="manage">Manage</DropDownMenuItem>
                     <DropDownMenuItem linkTo="dashboard">Overview</DropDownMenuItem>
+                    <DropDownMenuItem linkTo="manage">Manage</DropDownMenuItem>
                 </DropDownMenuItemExpandable>
             ) : (
                 <DropDownMenuItem linkTo="invoices" leftIcon={<InvoicesIcon24 />}>
@@ -54,9 +66,6 @@ const Aside: FC = () => {
                 content="TON Analytics"
                 linkTo="analytics"
             >
-                {/*{projectsStore.selectedProject?.capabilities.stats.query && (
-                    <DropDownMenuItem linkTo="dashboard">Dashboard</DropDownMenuItem>
-                )}*/}
                 <DropDownMenuItem linkTo="history">History</DropDownMenuItem>
                 <DropDownMenuItem linkTo="query">Query</DropDownMenuItem>
                 <DropDownMenuItem linkTo="graph">Graph</DropDownMenuItem>
@@ -81,12 +90,12 @@ const Aside: FC = () => {
                         Balance
                     </Text>
                     <TextWithSkeleton
-                        isLoading={!balancesStore.portfolio$.isResolved}
+                        isLoading={isLoading}
                         textStyle="body3"
                         color="text.secondary"
                         skeletonWidth="45px"
                     >
-                        {balancesStore.balances[0]?.stringCurrencyAmount}
+                        {formattedTotalAmount}
                     </TextWithSkeleton>
                 </Flex>
             </DropDownMenuItem>
@@ -103,4 +112,4 @@ const Aside: FC = () => {
     );
 };
 
-export default observer(Aside);
+export default Aside;

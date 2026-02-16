@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Modal,
@@ -11,14 +11,21 @@ import {
 } from '@chakra-ui/react';
 import { ProjectForm } from './ProjectForm';
 import { ProjectFormValues } from 'src/entities';
-import { observer } from 'mobx-react-lite';
-import { projectsStore } from 'src/shared/stores';
+import { useCreateProjectMutation } from 'src/shared/queries/projects';
+import { useSetProject } from 'src/shared/contexts/ProjectContext';
 
-const CreateProjectModal_: FunctionComponent<{ isOpen: boolean; onClose: () => void }> = props => {
+export const CreateProjectModal: FC<{ isOpen: boolean; onClose: () => void }> = props => {
     const formId = 'create-project-form';
+    const createProject = useCreateProjectMutation();
+    const setProject = useSetProject();
 
     const onSubmit = (form: ProjectFormValues): void => {
-        projectsStore.createProject(form).then(props.onClose);
+        createProject.mutate(form, {
+            onSuccess: (newProject) => {
+                setProject(newProject.id);
+                props.onClose();
+            }
+        });
     };
 
     return (
@@ -38,7 +45,7 @@ const CreateProjectModal_: FunctionComponent<{ isOpen: boolean; onClose: () => v
                     <Button
                         flex={1}
                         form={formId}
-                        isLoading={projectsStore.createProject.isLoading}
+                        isLoading={createProject.isPending}
                         type="submit"
                         variant="primary"
                     >
@@ -49,5 +56,3 @@ const CreateProjectModal_: FunctionComponent<{ isOpen: boolean; onClose: () => v
         </Modal>
     );
 };
-
-export const CreateProjectModal = observer(CreateProjectModal_);

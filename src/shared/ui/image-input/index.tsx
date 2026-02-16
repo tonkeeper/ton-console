@@ -1,6 +1,5 @@
 import {
     ChangeEvent,
-    ComponentProps,
     forwardRef,
     ReactNode,
     useCallback,
@@ -8,12 +7,12 @@ import {
     useRef,
     useState
 } from 'react';
-import { Box, Center, Flex, Text, Button, Image, Input } from '@chakra-ui/react';
+import { Box, Center, Flex, Text, Button, Image, Input, BoxProps } from '@chakra-ui/react';
 import { UseFormRegisterReturn } from 'react-hook-form/dist/types/form';
 
 const ImageInput = forwardRef<
     HTMLInputElement,
-    ComponentProps<typeof Box> &
+    BoxProps &
         UseFormRegisterReturn & {
             accept?: string;
             heading?: ReactNode;
@@ -61,8 +60,7 @@ const ImageInput = forwardRef<
                         if (key === 'value') {
                             if (fileList && fileList[0]) {
                                 // to make  isDirty = true
-                                (fileList[0] as unknown as { identity: number }).identity =
-                                    fileList[0].size;
+                                Object.assign(fileList[0], { identity: fileList[0].size });
                             }
                             return fileList;
                         }
@@ -105,7 +103,7 @@ const ImageInput = forwardRef<
     );
 
     const handleChange = useCallback(
-        (e: ChangeEvent<HTMLInputElement>): void => {
+        (e: ChangeEvent<HTMLInputElement> | { target: HTMLInputElement }): void => {
             if (e.target.files?.[0]) {
                 setFileList(e.target.files);
                 onChange({
@@ -160,7 +158,7 @@ const ImageInput = forwardRef<
         dropContainerRef.current.ondrop = evt => {
             if (!file) {
                 inputRef.current!.files = evt.dataTransfer?.files || null;
-                handleChange({ target: inputRef.current } as ChangeEvent<HTMLInputElement>);
+                handleChange({ target: inputRef.current! });
             }
             evt.preventDefault();
         };

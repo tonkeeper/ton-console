@@ -8,40 +8,52 @@ import {
     ModalHeader,
     ModalOverlay
 } from '@chakra-ui/react';
-import { observer } from 'mobx-react-lite';
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useRef } from 'react';
 import CNFTAddForm from './CNFTAddForm';
-import { CNFTStore, IndexingCnftCollectionDataT } from '../../model/cnft.store';
+import { useAddCNftMutation, IndexingCnftCollectionDataT } from '../../model/queries';
 
-const CNFTAddModal: FC<{ isOpen: boolean; onClose: () => void; cnftStore: CNFTStore }> = props => {
+const CNFTAddModal: FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
     const formId = 'cnft-add-form';
-    const { cnftStore, onClose } = props;
+    const { mutate: addCNft, isPending } = useAddCNftMutation();
+    const formRef = useRef<HTMLFormElement>(null);
 
     const onSubmit = useCallback(
         (form: IndexingCnftCollectionDataT): void => {
-            cnftStore.addCNFT(form).then(() => onClose());
+            addCNft(form, {
+                onSuccess: () => {
+                    // Reset form before closing
+                    formRef.current?.reset();
+                    onClose();
+                }
+            });
         },
-        [onClose]
+        [onClose, addCNft]
     );
 
+    const handleClose = useCallback(() => {
+        // Reset form when closing modal
+        formRef.current?.reset();
+        onClose();
+    }, [onClose]);
+
     return (
-        <Modal scrollBehavior="inside" {...props}>
+        <Modal isOpen={isOpen} onClose={handleClose} scrollBehavior="inside">
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Add cNFT</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody py="0">
-                    <CNFTAddForm cnftStore={cnftStore} id={formId} onSubmit={onSubmit} />
+                    <CNFTAddForm ref={formRef} id={formId} onSubmit={onSubmit} />
                 </ModalBody>
 
                 <ModalFooter gap="3">
-                    <Button flex={1} onClick={onClose} variant="secondary">
+                    <Button flex={1} onClick={handleClose} variant="secondary">
                         Cancel
                     </Button>
                     <Button
                         flex={1}
                         form={formId}
-                        isLoading={cnftStore.addCNFT.isLoading}
+                        isLoading={isPending}
                         type="submit"
                         variant="primary"
                     >
@@ -53,4 +65,4 @@ const CNFTAddModal: FC<{ isOpen: boolean; onClose: () => void; cnftStore: CNFTSt
     );
 };
 
-export default observer(CNFTAddModal);
+export default CNFTAddModal;

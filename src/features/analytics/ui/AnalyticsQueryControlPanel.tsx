@@ -2,17 +2,37 @@ import { FC, useEffect } from 'react';
 import { BoxProps, Button, Center, Flex, Skeleton, Spacer, useDisclosure } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import { InfoIcon16, Span, TooltipHoverable, toTimeLeft } from 'src/shared';
-import {
-    analyticsQueryGPTRequestStore,
-    analyticsQuerySQLRequestStore,
-    analyticsQueryStore
-} from 'src/features';
+import { AnalyticsQueryStore, AnalyticsQueryRequestStore } from 'src/features';
 import { useSearchParams } from 'react-router-dom';
 import { computed } from 'mobx';
 import ExplainSQLModal from './ExplainSQLModal';
+import RefillModal from 'src/entities/balance/ui/RefillModal';
+import { InsufficientBalanceModal } from 'src/entities/balance/ui/InsufficientBalanceModal';
+import { useInsufficientBalanceModal } from './hooks';
 
-const AnalyticsQueryControlPanel: FC<BoxProps & { type: 'sql' | 'gpt' }> = ({ type, ...props }) => {
+interface AnalyticsQueryControlPanelProps extends BoxProps {
+    type: 'sql' | 'gpt';
+    analyticsQueryStore: AnalyticsQueryStore;
+    analyticsQuerySQLRequestStore: AnalyticsQueryRequestStore;
+    analyticsQueryGPTRequestStore: AnalyticsQueryRequestStore;
+}
+
+const AnalyticsQueryControlPanel: FC<AnalyticsQueryControlPanelProps> = ({
+    type,
+    analyticsQueryStore,
+    analyticsQuerySQLRequestStore,
+    analyticsQueryGPTRequestStore,
+    ...props
+}) => {
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const { isOpen: isRefillOpen, onClose: onRefillClose, onOpen: onRefillOpen } = useDisclosure();
+    const {
+        isOpen: isInsufficientBalanceOpen,
+        onClose: onInsufficientBalanceClose,
+        error: insufficientBalanceError,
+        handlePaymentRequiredError
+    } = useInsufficientBalanceModal();
+
     const store = type === 'sql' ? analyticsQuerySQLRequestStore : analyticsQueryGPTRequestStore;
     const request = store.request$.value;
     const [_, setSearchParams] = useSearchParams();
@@ -31,12 +51,16 @@ const AnalyticsQueryControlPanel: FC<BoxProps & { type: 'sql' | 'gpt' }> = ({ ty
             !analyticsQueryStore.createQuery.isLoading
     );
 
-    const onCreate = async (): Promise<void> => {
-        const query = await analyticsQueryStore.createQuery(
-            store.request$.value!.request,
-            store.request$.value!.network
-        );
-        setSearchParams({ id: query.id });
+    const onCreate = (): void => {
+        analyticsQueryStore
+            .createQuery(store.request$.value!.request, store.request$.value!.network)
+            .then(({ data, error }) => {
+                if (error) {
+                    handlePaymentRequiredError(error);
+                    return;
+                }
+                setSearchParams({ id: data!.id });
+            });
     };
 
     useEffect(() => {
@@ -140,11 +164,13 @@ const AnalyticsQueryControlPanel: FC<BoxProps & { type: 'sql' | 'gpt' }> = ({ ty
                                     minutes of execution.
                                 </Span>
                             </TooltipHoverable>
-                            <Span opacity="0.6" fontFamily="mono">
+                            <Span
+                                opacity="0.6"
+                                fontFamily="mono"
+                                title={request.estimatedCost.amount.toString()}
+                            >
                                 &nbsp;·&nbsp;
-                                {request.estimatedCost.toStringCurrencyAmount({
-                                    decimalPlaces: null
-                                })}
+                                {request.estimatedCost.toStringCurrencyAmount()}
                             </Span>
                         </Span>
                     )
@@ -167,6 +193,13 @@ const AnalyticsQueryControlPanel: FC<BoxProps & { type: 'sql' | 'gpt' }> = ({ ty
                 explanation={explanation}
                 request={store.request$.value?.request}
             />
+            <InsufficientBalanceModal
+                isOpen={isInsufficientBalanceOpen}
+                onClose={onInsufficientBalanceClose}
+                onOpenRefill={onRefillOpen}
+                error={insufficientBalanceError}
+            />
+            <RefillModal isOpen={isRefillOpen} onClose={onRefillClose} />
         </Flex>
     );
 };

@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Modal,
@@ -11,7 +11,7 @@ import {
     Text
 } from '@chakra-ui/react';
 
-export const ConfirmAppResetModal: FunctionComponent<{
+export const ConfirmAppResetModal: FC<{
     appUrl: string;
     isOpen: boolean;
     onClose: (confirm?: boolean) => void;

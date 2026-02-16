@@ -1,8 +1,5 @@
 import type { InvoiceStatus, InvoiceCurrency } from '../interfaces';
-import { MonthName } from 'src/shared';
-
-export type InvoiceTableColumn = 'id' | 'status' | 'creation-date' | 'description' | 'amount';
-export type InvoiceTableSortColumn = InvoiceTableColumn;
+import { DTOInvoiceFieldOrder, GetInvoicesData, MonthName } from 'src/shared';
 
 export type InvoiceTableFiltration = {
     id?: string;
@@ -27,9 +24,12 @@ export function isCustomFiltrationPeriod(period: InvoiceTableFiltration['period'
     return !!period && 'from' in period;
 }
 
-export type InvoiceTableSortDirection = 'asc' | 'desc';
+export type InvoiceTableSortDirection = GetInvoicesData['query']['type_order'];
 
-export type InvoiceTableSort = { column: InvoiceTableColumn; direction: InvoiceTableSortDirection };
+export type InvoiceTableSort = {
+    column: DTOInvoiceFieldOrder;
+    direction: InvoiceTableSortDirection;
+};
 
 export type InvoicesTablePagination = {
     filter: InvoiceTableFiltration;

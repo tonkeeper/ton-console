@@ -1,41 +1,50 @@
 import { makeAutoObservable } from 'mobx';
-import {
-    apiClient,
-    createReaction,
-    DTOStatsQueryResult,
-    DTOStatsQueryStatus,
-    Loadable,
-    TonAddress,
-    TonCurrencyAmount
-} from 'src/shared';
+import { createReaction, Loadable, UsdCurrencyAmount } from 'src/shared';
+import { getGraphFromStats, getSqlResultFromStats, DTOStatsQueryResult } from 'src/shared/api';
 import { AnalyticsGraphQuery, AnalyticsGraphQueryBasic } from './interfaces';
-import { projectsStore } from 'src/shared/stores';
+import { Project } from 'src/entities/project';
+import { Address } from '@ton/core';
 
 export class AnalyticsGraphQueryStore {
     query$ = new Loadable<AnalyticsGraphQuery | null>(null);
 
-    constructor() {
+    private disposers: Array<() => void> = [];
+
+    constructor(private readonly project: Project) {
         makeAutoObservable(this);
 
-        createReaction(
-            () => projectsStore.selectedProject?.id,
+        const dispose = createReaction(
+            () => project,
             (_, prevId) => {
                 if (prevId) {
                     this.clear();
                 }
             }
         );
+        this.disposers.push(dispose);
+    }
+
+    destroy(): void {
+        this.disposers.forEach(dispose => dispose?.());
+        this.disposers = [];
     }
 
     createQuery = this.query$.createAsyncAction(
         async (form: { addresses: string[]; isBetweenSelectedOnly: boolean }) => {
-            const result = await apiClient.api.getGraphFromStats({
-                project_id: projectsStore.selectedProject!.id,
-                addresses: form.addresses.join(','),
-                only_between: form.isBetweenSelectedOnly
+            const { data, error } = await getGraphFromStats({
+                query: {
+                    project_id: this.project.id,
+                    addresses: form.addresses.join(','),
+                    only_between: form.isBetweenSelectedOnly
+                }
             });
 
-            return mapDTOStatsGraphResultToAnalyticsGraphQuery(result.data);
+            const result = {
+                data: error ? undefined : mapDTOStatsGraphResultToAnalyticsGraphQuery(data),
+                error: error ? error : undefined
+            };
+
+            return result;
         },
         {
             onError: () => {
@@ -49,16 +58,22 @@ export class AnalyticsGraphQueryStore {
     );
 
     refetchQuery = this.query$.createAsyncAction(async () => {
-        const result = await apiClient.api.getSqlResultFromStats(this.query$.value!.id);
+        const { data, error } = await getSqlResultFromStats({
+            path: { id: this.query$.value!.id }
+        });
 
-        return mapDTOStatsGraphResultToAnalyticsGraphQuery(result.data);
+        if (error) throw error;
+        return mapDTOStatsGraphResultToAnalyticsGraphQuery(data);
     });
 
     loadQuery = this.query$.createAsyncAction(async id => {
-        const result = await apiClient.api.getSqlResultFromStats(id);
+        const { data, error } = await getSqlResultFromStats({
+            path: { id }
+        });
 
+        if (error) throw error;
         this.refetchQuery.cancelAllPendingCalls();
-        return mapDTOStatsGraphResultToAnalyticsGraphQuery(result.data);
+        return mapDTOStatsGraphResultToAnalyticsGraphQuery(data);
     });
 
     clear(): void {
@@ -72,12 +87,12 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
     const basicQuery: AnalyticsGraphQueryBasic = {
         id: value.id,
         type: 'graph',
-        addresses: value.query!.addresses!.map(a => TonAddress.parse(a)),
+        addresses: value.query?.addresses?.map(a => Address.parse(a)) ?? [],
         creationDate: new Date(value.date_create),
         isBetweenSelectedOnly: value.query!.only_between!
     };
 
-    if (value.status === DTOStatsQueryStatus.DTOSuccess) {
+    if (value.status === 'success') {
         return {
             ...basicQuery,
             status: 'success',
@@ -85,14 +100,11 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
                 value.url!
             )}&meta=${encodeURIComponent(value.meta_url!)}`,
             spentTimeMS: value.spent_time!,
-            // TODO: PRICES remove this after backend will be updated
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            cost: new TonCurrencyAmount(value.cost!)
+            cost: value.usd_cost ? new UsdCurrencyAmount(value.usd_cost) : new UsdCurrencyAmount(0)
         };
     }
 
-    if (value.status === DTOStatsQueryStatus.DTOExecuting) {
+    if (value.status === 'executing') {
         return {
             ...basicQuery,
             status: 'executing'
@@ -104,9 +116,6 @@ export function mapDTOStatsGraphResultToAnalyticsGraphQuery(
         status: 'error',
         errorReason: value.error!,
         spentTimeMS: value.spent_time!,
-        // TODO: PRICES remove this after backend will be updated
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        cost: new TonCurrencyAmount(value.cost!)
+        cost: value.usd_cost ? new UsdCurrencyAmount(value.usd_cost) : undefined
     };
 }

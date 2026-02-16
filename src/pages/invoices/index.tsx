@@ -1,17 +1,22 @@
 import RegisterProject from './RegisterProject';
-import { FunctionComponent, PropsWithChildren, Suspense, useEffect } from 'react';
-import { observer } from 'mobx-react-lite';
-import { invoicesAppStore } from 'src/features';
+import { FC, PropsWithChildren, Suspense, useEffect } from 'react';
 import { Center, Spinner } from '@chakra-ui/react';
-import { Route, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { lazy } from '@loadable/component';
-import JoinInvoices from './JoinInvoices';
+import { UnavailableInvoices } from 'src/features/invoices/ui';
+import { useProject } from 'src/shared/contexts/ProjectContext';
+import { useInvoicesAppQuery } from 'src/features/invoices/models';
+import type { InvoicesApp } from 'src/features/invoices/models';
 
 const InvoiceDashboardPage = lazy(() => import('./dashboard'));
 const ManageInvoicesPage = lazy(() => import('./manage'));
 
-const WaitForAppResolving: FunctionComponent<PropsWithChildren> = observer(({ children }) => {
-    if (!invoicesAppStore.invoicesApp$.isResolved) {
+interface LoadingProps extends PropsWithChildren {
+    isLoading: boolean;
+}
+
+const WaitForLoading: FC<LoadingProps> = ({ isLoading, children }) => {
+    if (isLoading) {
         return (
             <Center h="200px">
                 <Spinner />
@@ -20,42 +25,50 @@ const WaitForAppResolving: FunctionComponent<PropsWithChildren> = observer(({ ch
     }
 
     return <>{children}</>;
-});
+};
 
-const InvoicesPage = observer(() => {
-    if (invoicesAppStore.invoicesServiceAvailable) {
-        return <RegisterProject />;
+interface InvoicesPageProps {
+    app: InvoicesApp | null | undefined;
+}
+
+const InvoicesPage: FC<InvoicesPageProps> = ({ app }) => {
+    const project = useProject();
+    const navigate = useNavigate();
+    const hasInvoicesCapability = project?.capabilities.invoices;
+
+    // Navigate to dashboard if app exists
+    useEffect(() => {
+        if (app?.id) {
+            navigate('dashboard', { replace: true });
+        }
+    }, [app?.id, navigate]);
+
+    if (!hasInvoicesCapability) {
+        return <UnavailableInvoices />;
     }
 
-    return <JoinInvoices />;
-});
+    // Don't show RegisterProject if app exists (navigation is in progress)
+    if (app?.id) {
+        return null;
+    }
 
-const Index = observer(() => {
+    return <RegisterProject />;
+};
+
+interface ApiDescriptionProps {
+    app: InvoicesApp | null | undefined;
+}
+
+const ApiDescription: FC<ApiDescriptionProps> = ({ app }) => {
     const navigate = useNavigate();
-    const location = useLocation();
-
-    const id = invoicesAppStore.invoicesApp$.value?.id;
 
     useEffect(() => {
-        if (id !== undefined) {
-            navigate(location.pathname.endsWith('dashboard') ? 'dashboard' : 'manage');
-        }
-    }, [id]);
-
-    return <InvoicesPage />;
-});
-
-const ApiDescription = observer(() => {
-    const navigate = useNavigate();
-    const id = invoicesAppStore.invoicesApp$.value?.id;
-
-    useEffect(() => {
-        if (id === undefined) {
+        if (!app?.id) {
             navigate('../');
         }
-    }, [id]);
+    }, [app?.id, navigate]);
 
-    if (id === undefined) {
+    if (!app?.id) {
         return null;
     }
 
@@ -64,19 +77,22 @@ const ApiDescription = observer(() => {
             <InvoiceDashboardPage />
         </Suspense>
     );
-});
+};
 
-const Manage = observer(() => {
+interface ManageProps {
+    app: InvoicesApp | null | undefined;
+}
+
+const Manage: FC<ManageProps> = ({ app }) => {
     const navigate = useNavigate();
-    const id = invoicesAppStore.invoicesApp$.value?.id;
 
     useEffect(() => {
-        if (id === undefined) {
+        if (!app?.id) {
             navigate('../');
         }
-    }, [id]);
+    }, [app?.id, navigate]);
 
-    if (id === undefined) {
+    if (!app?.id) {
         return null;
     }
 
@@ -85,43 +101,33 @@ const Manage = observer(() => {
             <ManageInvoicesPage />
         </Suspense>
     );
-});
+};
 
-const InvoicesRouting = (
-    <>
-        <Route
-            path="dashboard"
-            element={
-                <WaitForAppResolving>
-                    <ApiDescription />
-                </WaitForAppResolving>
-            }
-        />
-        <Route
-            path="manage"
-            element={
-                <WaitForAppResolving>
-                    <Manage />
-                </WaitForAppResolving>
-            }
-        />
-        <Route
-            index
-            element={
-                <WaitForAppResolving>
-                    <Index />
-                </WaitForAppResolving>
-            }
-        />
-        <Route
-            path="*"
-            element={
-                <WaitForAppResolving>
-                    <Index />
-                </WaitForAppResolving>
-            }
-        />
-    </>
-);
+const InvoicesRouting = () => {
+    const { data: app, isLoading } = useInvoicesAppQuery();
+
+    return (
+        <WaitForLoading isLoading={isLoading}>
+            <Routes>
+                <Route
+                    path="dashboard"
+                    element={<ApiDescription app={app} />}
+                />
+                <Route
+                    path="manage"
+                    element={<Manage app={app} />}
+                />
+                <Route
+                    index
+                    element={<InvoicesPage app={app} />}
+                />
+                <Route
+                    path="*"
+                    element={<InvoicesPage app={app} />}
+                />
+            </Routes>
+        </WaitForLoading>
+    );
+};
 
 export default InvoicesRouting;

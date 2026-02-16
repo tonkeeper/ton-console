@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FC } from 'react';
 import {
     Button,
     Modal,
@@ -10,17 +10,20 @@ import {
     ModalOverlay,
     Text
 } from '@chakra-ui/react';
-import { Invoice, invoicesTableStore } from 'src/features';
-import { observer } from 'mobx-react-lite';
+import { Invoice } from '../models';
 import { H4, Span } from 'src/shared';
 
-const CancelInvoiceConfirmation: FunctionComponent<{
+interface Props {
     invoice: Invoice;
     isOpen: boolean;
     onClose: () => void;
-}> = ({ invoice, isOpen, onClose }) => {
+    onCancelInvoice: (invoiceId: string) => Promise<void>;
+    isLoading?: boolean;
+}
+
+const CancelInvoiceConfirmation: FC<Props> = ({ invoice, isOpen, onClose, onCancelInvoice, isLoading = false }) => {
     const onConfirm = async (): Promise<void> => {
-        await invoicesTableStore.cancelInvoice(invoice.id);
+        await onCancelInvoice(invoice.id);
         onClose();
     };
     return (
@@ -47,7 +50,7 @@ const CancelInvoiceConfirmation: FunctionComponent<{
                     </Button>
                     <Button
                         flex={1}
-                        isLoading={invoicesTableStore.cancelInvoice.isLoading}
+                        isLoading={isLoading}
                         onClick={onConfirm}
                         type="submit"
                         variant="primary"
@@ -60,4 +63,4 @@ const CancelInvoiceConfirmation: FunctionComponent<{
     );
 };
 
-export default observer(CancelInvoiceConfirmation);
+export default CancelInvoiceConfirmation;

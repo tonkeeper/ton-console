@@ -1,11 +1,8 @@
-import { ComponentProps, FunctionComponent, PropsWithChildren, useContext } from 'react';
-import { Box } from '@chakra-ui/react';
+import { FC, PropsWithChildren, useContext } from 'react';
+import { Box, BoxProps } from '@chakra-ui/react';
 import { TextareaGroupContext } from './textarea-group-context';
 
-export const TextareaRight: FunctionComponent<PropsWithChildren<ComponentProps<typeof Box>>> = ({
-    children,
-    ...rest
-}) => {
+export const TextareaRight: FC<PropsWithChildren<BoxProps>> = ({ children, ...rest }) => {
     const { focused } = useContext(TextareaGroupContext);
     return (
         <Box
@@ -14,10 +11,10 @@ export const TextareaRight: FunctionComponent<PropsWithChildren<ComponentProps<t
             border="1px"
             borderColor={focused ? 'field.activeBorder' : 'field.border'}
             borderLeft="none"
-            borderTopLeftRadius="0"
             borderTopRightRadius="md"
-            borderBottomRightRadius="md"
+            borderTopLeftRadius="0"
             borderBottomLeftRadius="0"
+            borderBottomRightRadius="md"
             bgColor="field.background"
             transitionDuration="200ms"
             transitionProperty="border"
