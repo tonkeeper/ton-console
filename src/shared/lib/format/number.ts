@@ -55,3 +55,15 @@ export function formatNumber(
 
     return res.toFormat(format);
 }
+
+const usdFloorFormatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+});
+
+export function formatUsdAmount(value: number): string {
+    const floored = Math.floor(value * 100) / 100;
+    return usdFloorFormatter.format(floored);
+}

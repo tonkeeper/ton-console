@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { H2, Overlay, Span, toDecimals, InfoTooltip } from 'src/shared';
+import { H2, Overlay, Span, toDecimals, InfoTooltip, formatUsdAmount } from 'src/shared';
 import { Box, Button, Flex, Skeleton, useDisclosure, Text, Divider } from '@chakra-ui/react';
 import { RefillModal } from 'src/entities';
 import { useBalanceQuery, useTonRateQuery } from 'src/features/balance';
@@ -21,14 +21,7 @@ const BalanceBlock: FC = () => {
     const totalTonAmount = tonAmount + tonPromoAmount;
 
     const formattedTotalAmount =
-        balance?.total !== undefined
-            ? new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2
-              }).format(balance?.total)
-            : null;
+        balance?.total !== undefined ? formatUsdAmount(balance.total) : null;
 
     return (
         <>

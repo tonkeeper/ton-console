@@ -5,6 +5,7 @@ import {
     DropDownMenu,
     DropDownMenuItem,
     DropDownMenuItemExpandable,
+    formatUsdAmount,
     InvoicesIcon24,
     MessageIcon24,
     SettingsIcon,
@@ -23,16 +24,8 @@ const Aside: FC = () => {
     const { data: balance, isLoading } = useBalanceQuery();
     const project = useProject();
 
-    const totalAmount = balance?.total;
     const formattedTotalAmount =
-        totalAmount !== undefined
-            ? new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2
-              }).format(totalAmount)
-            : null;
+        balance?.total !== undefined ? formatUsdAmount(balance.total) : null;
     return (
         <DropDownMenu>
             <DropDownMenuItem linkTo="dashboard" leftIcon={<DashboardIcon />}>
