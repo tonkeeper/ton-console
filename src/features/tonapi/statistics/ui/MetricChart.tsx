@@ -1,5 +1,5 @@
 import { FC, useCallback, useMemo } from 'react';
-import { Box, BoxProps } from '@chakra-ui/react';
+import { Box, BoxProps, useTheme } from '@chakra-ui/react';
 import {
     LineChart,
     Line,
@@ -32,6 +32,7 @@ const MetricChart: FC<MetricChartProps> = ({
     height = 250,
     ...props
 }) => {
+    const { colors } = useTheme();
     const ticks = useMemo(() => {
         if (!data?.length) {
             return [];
@@ -88,13 +89,13 @@ const MetricChart: FC<MetricChartProps> = ({
                             <ReferenceLine
                                 ifOverflow="extendDomain"
                                 y={limit}
-                                stroke="#F53C36"
+                                stroke={colors.accent.red}
                             />
                             <Line
                                 dot={false}
                                 dataKey="ReferenceLineStub"
                                 name={limitLabel}
-                                stroke="#F53C36"
+                                stroke={colors.accent.red}
                             />
                         </>
                     )}
