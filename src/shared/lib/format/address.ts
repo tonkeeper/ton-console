@@ -15,7 +15,7 @@ export function sliceAddress(
     options?: { headLength?: number; tailLength?: number; bounceable?: boolean }
 ): string {
     const headLength = options?.headLength || 6;
-    const tailLength = options?.headLength || 4;
+    const tailLength = options?.tailLength || 4;
 
     if (address instanceof Address) {
         address = address.toString({ bounceable: options?.bounceable });
