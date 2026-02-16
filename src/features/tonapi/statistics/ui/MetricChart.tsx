@@ -11,8 +11,9 @@ import {
     Legend,
     ReferenceLine
 } from 'recharts';
-import { toDate, toDateTime } from 'src/shared';
+import { toDate, toDateTime, toTime } from 'src/shared';
 import { ChartPoint } from '../model/queries';
+import { TimePeriod, getTimestampRange } from '../model/time-periods';
 
 interface MetricChartProps extends BoxProps {
     data: ChartPoint[];
@@ -21,6 +22,7 @@ interface MetricChartProps extends BoxProps {
     limit?: number;
     limitLabel?: string;
     height?: number;
+    period?: TimePeriod;
 }
 
 const MetricChart: FC<MetricChartProps> = ({
@@ -30,24 +32,47 @@ const MetricChart: FC<MetricChartProps> = ({
     limit,
     limitLabel = 'Limit',
     height = 250,
+    period,
     ...props
 }) => {
     const { colors } = useTheme();
-    const ticks = useMemo(() => {
-        if (!data?.length) {
-            return [];
+
+    const { domain, ticks } = useMemo(() => {
+        if (!period) {
+            const tickList: number[] = [];
+            if (data?.length) {
+                const items = data.filter((_, index) => index % 48 === 0).map(i => i.time);
+                if (!items.includes(data[data.length - 1].time)) {
+                    items.push(data[data.length - 1].time);
+                }
+                tickList.push(...items);
+            }
+            return { domain: ['dataMin', 'dataMax'] as const, ticks: tickList };
         }
 
-        const items = data.filter((_, index) => index % 48 === 0).map(i => i.time);
-        if (!items.includes(data[data.length - 1].time)) {
-            items.push(data[data.length - 1].time);
+        const range = getTimestampRange(period);
+        const startMs = range.start * 1000;
+        const endMs = range.end * 1000;
+        const tickCount = 7;
+        const tickInterval = (endMs - startMs) / tickCount;
+        const tickList: number[] = [];
+        for (let i = 0; i <= tickCount; i++) {
+            tickList.push(startMs + tickInterval * i);
         }
-
-        return items;
-    }, [data]);
+        return { domain: [startMs, endMs], ticks: tickList };
+    }, [period, data]);
 
     const formatTooltip = useCallback((timestamp: number) => toDateTime(new Date(timestamp)), []);
-    const formatXLabel = useCallback((timestamp: number) => toDate(new Date(timestamp)), []);
+    const formatXLabel = useCallback(
+        (timestamp: number) => {
+            const date = new Date(timestamp);
+            if (period === 'last_6h' || period === 'last_24h') {
+                return toTime(date);
+            }
+            return toDate(date);
+        },
+        [period]
+    );
 
     const shouldDrawLimit = useMemo(() => {
         if (!data?.length || !limit) {
@@ -101,11 +126,13 @@ const MetricChart: FC<MetricChartProps> = ({
                     )}
                     <XAxis
                         dataKey="time"
-                        domain={['dataMin', 'dataMax']}
+                        domain={domain}
                         tickFormatter={formatXLabel}
                         name="time"
                         type="number"
                         ticks={ticks.length > 0 ? ticks : undefined}
+                        allowDataOverflow={!!period}
+                        minTickGap={period ? 50 : undefined}
                     />
                     <YAxis padding={{ top: 10, bottom: 0 }} />
                     <Tooltip labelFormatter={formatTooltip} />

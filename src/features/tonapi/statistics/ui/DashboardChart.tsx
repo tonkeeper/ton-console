@@ -20,7 +20,7 @@ const DashboardChart: FC<DashboardChartProps> = ({ period, ...props }) => {
     return (
         <>
             <MetricChartCard
-                title="REST API requests on behalf"
+                title="REST API requests"
                 data={data || null}
                 isLoading={isLoading_}
                 error={error}
@@ -28,12 +28,14 @@ const DashboardChart: FC<DashboardChartProps> = ({ period, ...props }) => {
                 limit={selectedTier?.rps}
                 limitLabel="Limit"
                 onExpand={onOpen}
+                period={period}
                 {...props}
             />
             <MetricChartModal
                 isOpen={isOpen}
                 onClose={onClose}
                 title="REST API Statistics"
+                period={period}
                 charts={
                     data && data.length > 0
                         ? [

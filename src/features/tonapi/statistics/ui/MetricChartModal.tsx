@@ -12,6 +12,7 @@ import {
 } from '@chakra-ui/react';
 import MetricChart from './MetricChart';
 import { ChartPoint } from '../model/queries';
+import { TimePeriod } from '../model/time-periods';
 
 export interface ChartConfig {
     title: string;
@@ -27,9 +28,10 @@ interface MetricChartModalProps {
     title: string;
     charts: ChartConfig[];
     headerExtra?: ReactNode;
+    period?: TimePeriod;
 }
 
-const MetricChartModal: FC<MetricChartModalProps> = ({ isOpen, onClose, title, charts, headerExtra }) => {
+const MetricChartModal: FC<MetricChartModalProps> = ({ isOpen, onClose, title, charts, headerExtra, period }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="4xl">
             <ModalOverlay />
@@ -56,6 +58,7 @@ const MetricChartModal: FC<MetricChartModalProps> = ({ isOpen, onClose, title, c
                                         limit={chart.limit}
                                         limitLabel={chart.limitLabel}
                                         height={300}
+                                        period={period}
                                     />
                                 </Box>
                             </Box>

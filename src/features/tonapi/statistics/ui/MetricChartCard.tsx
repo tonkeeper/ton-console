@@ -3,6 +3,7 @@ import { Box, BoxProps, Center, Spinner, Text, Flex, IconButton } from '@chakra-
 import { ChevronUpIcon } from '@chakra-ui/icons';
 import MetricChart from './MetricChart';
 import { ChartPoint } from '../model/queries';
+import { TimePeriod } from '../model/time-periods';
 
 interface MetricChartCardProps extends BoxProps {
     title: string;
@@ -14,6 +15,7 @@ interface MetricChartCardProps extends BoxProps {
     limitLabel?: string;
     onExpand?: () => void;
     compact?: boolean;
+    period?: TimePeriod;
 }
 
 const MetricChartCard: FC<MetricChartCardProps> = ({
@@ -26,6 +28,7 @@ const MetricChartCard: FC<MetricChartCardProps> = ({
     limitLabel,
     onExpand,
     compact = false,
+    period,
     ...props
 }) => {
     const emptyHeight = compact ? '120px' : '200px';
@@ -145,6 +148,7 @@ const MetricChartCard: FC<MetricChartCardProps> = ({
                 limit={limit}
                 limitLabel={limitLabel}
                 height={parseInt(dataHeight)}
+                period={period}
             />
         </Box>
     );

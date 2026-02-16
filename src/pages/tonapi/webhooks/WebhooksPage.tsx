@@ -163,6 +163,7 @@ const WebhooksPage: FC = () => {
                 onClose={onChartClose}
                 title="Webhook Statistics"
                 headerExtra={<PeriodSelector value={chartPeriod} onChange={setChartPeriod} />}
+                period={chartPeriod}
                 charts={[
                     {
                         title: 'Delivered webhook requests',

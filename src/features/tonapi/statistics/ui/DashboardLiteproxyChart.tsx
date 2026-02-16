@@ -65,6 +65,7 @@ const DashboardLiteproxyChart: FC<DashboardLiteproxyChartProps> = ({ period, chi
                     compact={!hasData}
                     limit={selectedLiteproxyTier?.rps}
                     limitLabel="Limit"
+                    period={period}
                 />
                 <MetricChartContent
                     title="Connections"
@@ -73,12 +74,14 @@ const DashboardLiteproxyChart: FC<DashboardLiteproxyChartProps> = ({ period, chi
                     error={error}
                     color={colors.accent.green}
                     compact={!hasData}
+                    period={period}
                 />
             </MetricGroupCard>
             <MetricChartModal
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Liteservers Statistics"
+                period={period}
                 charts={[
                     {
                         title: 'Liteservers Requests',

@@ -72,6 +72,7 @@ const DashboardWebhooksChart: FC<DashboardWebhooksChartProps> = ({
                     error={error}
                     color={colors.accent.blue}
                     compact={!hasData}
+                    period={period}
                 />
                 <MetricChartContent
                     title="Failed"
@@ -80,12 +81,14 @@ const DashboardWebhooksChart: FC<DashboardWebhooksChartProps> = ({
                     error={error}
                     color={colors.accent.red}
                     compact={!hasData}
+                    period={period}
                 />
             </MetricGroupCard>
             <MetricChartModal
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Webhook"
+                period={period}
                 charts={[
                     {
                         title: 'Delivered webhook requests',

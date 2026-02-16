@@ -25,6 +25,7 @@ const LiteproxyStatsModal: FC<LiteproxyStatsModalProps> = ({ isOpen, onClose }) 
             onClose={onClose}
             title="Liteservers Statistics"
             headerExtra={<PeriodSelector value={period} onChange={setPeriod} />}
+            period={period}
             charts={[
                 {
                     title: 'Liteservers Requests',

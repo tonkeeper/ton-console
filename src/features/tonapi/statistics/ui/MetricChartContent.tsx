@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { Box, BoxProps, Center, Spinner, Text } from '@chakra-ui/react';
 import MetricChart from './MetricChart';
 import { ChartPoint } from '../model/queries';
+import { TimePeriod } from '../model/time-periods';
 
 interface MetricChartContentProps extends BoxProps {
     title: string;
@@ -12,6 +13,7 @@ interface MetricChartContentProps extends BoxProps {
     limit?: number;
     limitLabel?: string;
     compact?: boolean;
+    period?: TimePeriod;
 }
 
 const MetricChartContent: FC<MetricChartContentProps> = ({
@@ -23,6 +25,7 @@ const MetricChartContent: FC<MetricChartContentProps> = ({
     limit,
     limitLabel,
     compact = false,
+    period,
     ...props
 }) => {
     const emptyHeight = compact ? '120px' : '200px';
@@ -84,6 +87,7 @@ const MetricChartContent: FC<MetricChartContentProps> = ({
                     limit={limit}
                     limitLabel={limitLabel}
                     height={compact ? 150 : 200}
+                    period={period}
                 />
             </Box>
         </Box>
