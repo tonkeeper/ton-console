@@ -1,5 +1,6 @@
-import { FC } from 'react';
-import { CreateWebhookModal, WebhooksTable, useWebhooksUI, useWebhooksQuery, useWebhooksStatsQuery } from 'src/features/tonapi/webhooks';
+import { FC, useState } from 'react';
+import { CreateWebhookModal, WebhooksTable, useWebhooksUI, useWebhooksQuery } from 'src/features/tonapi/webhooks';
+import { useWebhooksStatsQuery, mapWebhooksStatsToChartPoints } from 'src/features/tonapi/webhooks/model/queries';
 import { EmptyWebhooks } from './EmptyWebhooks';
 import { UnavailableWebhooks } from './UnavailableWebhooks';
 import {
@@ -23,16 +24,24 @@ import {
     Menu,
     MenuItem,
     MenuList,
-    Box
+    Box,
+    useTheme
 } from '@chakra-ui/react';
-import WebhookChartModal from './ChatrWebhooks';
+import MetricChartModal from 'src/features/tonapi/statistics/ui/MetricChartModal';
+import PeriodSelector from 'src/features/tonapi/statistics/ui/PeriodSelector';
+import { TimePeriod } from 'src/features/tonapi/statistics/model/queries';
 
 const WebhooksPage: FC = () => {
+    const { colors } = useTheme();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isChartOpen, onOpen: onChartOpen, onClose: onChartClose } = useDisclosure();
     const { network, setNetwork } = useWebhooksUI();
     const { data: webhooks = [], isLoading, error } = useWebhooksQuery(network);
-    const { data: WebhooksStats = null } = useWebhooksStatsQuery();
+    const [chartPeriod, setChartPeriod] = useState<TimePeriod>('last_6h');
+    const { data: webhooksStats } = useWebhooksStatsQuery(chartPeriod);
+
+    const failedData = webhooksStats ? mapWebhooksStatsToChartPoints(webhooksStats, 'failed') : [];
+    const deliveredData = webhooksStats ? mapWebhooksStatsToChartPoints(webhooksStats, 'delivered') : [];
 
     if (isLoading) {
         return (
@@ -149,7 +158,24 @@ const WebhooksPage: FC = () => {
                 )}
             </Overlay>
             <CreateWebhookModal isOpen={isOpen} onClose={onClose} />
-            <WebhookChartModal data={WebhooksStats as any} isOpen={isChartOpen} onClose={onChartClose} />  {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+            <MetricChartModal
+                isOpen={isChartOpen}
+                onClose={onChartClose}
+                title="Webhook Statistics"
+                headerExtra={<PeriodSelector value={chartPeriod} onChange={setChartPeriod} />}
+                charts={[
+                    {
+                        title: 'Delivered webhook requests',
+                        data: deliveredData,
+                        color: colors.accent.blue
+                    },
+                    {
+                        title: 'Failed webhook requests',
+                        data: failedData,
+                        color: colors.accent.red
+                    }
+                ]}
+            />
         </>
     );
 };

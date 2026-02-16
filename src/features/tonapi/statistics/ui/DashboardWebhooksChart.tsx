@@ -88,14 +88,14 @@ const DashboardWebhooksChart: FC<DashboardWebhooksChartProps> = ({
                 title="Webhook"
                 charts={[
                     {
-                        title: 'Failed webhook requests',
-                        data: failedData && failedData.length > 0 ? failedData : [],
-                        color: colors.accent.red
-                    },
-                    {
                         title: 'Delivered webhook requests',
                         data: deliveredData && deliveredData.length > 0 ? deliveredData : [],
                         color: colors.accent.blue
+                    },
+                    {
+                        title: 'Failed webhook requests',
+                        data: failedData && failedData.length > 0 ? failedData : [],
+                        color: colors.accent.red
                     }
                 ]}
             />

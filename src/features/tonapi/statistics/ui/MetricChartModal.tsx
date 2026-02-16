@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import {
     Modal,
     ModalOverlay,
@@ -26,14 +26,20 @@ interface MetricChartModalProps {
     onClose: () => void;
     title: string;
     charts: ChartConfig[];
+    headerExtra?: ReactNode;
 }
 
-const MetricChartModal: FC<MetricChartModalProps> = ({ isOpen, onClose, title, charts }) => {
+const MetricChartModal: FC<MetricChartModalProps> = ({ isOpen, onClose, title, charts, headerExtra }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="4xl">
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>{title}</ModalHeader>
+                <ModalHeader>
+                    <Flex align="center" justify="space-between" pr="8">
+                        {title}
+                        {headerExtra}
+                    </Flex>
+                </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody pb={4}>
                     <Flex direction="column" gap={8}>
