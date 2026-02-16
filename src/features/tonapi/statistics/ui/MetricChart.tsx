@@ -79,8 +79,10 @@ const MetricChart: FC<MetricChartProps> = ({
             return false;
         }
 
-        const values = data.map(item => item.value);
-        return Math.max(...values) >= limit * 0.67;
+        const values = data.map(item => item.value).filter(
+            (v): v is number => v !== undefined
+        );
+        return values.length > 0 && Math.max(...values) >= limit * 0.67;
     }, [data, limit]);
 
     if (!data.length) {

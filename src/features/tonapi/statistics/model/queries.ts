@@ -7,7 +7,7 @@ export type { TimePeriod };
 
 export interface ChartPoint {
     time: number;
-    value: number;
+    value: number | undefined;
 }
 
 // Mappers
@@ -16,9 +16,9 @@ function mapRestStatsDTOToChartPoints(stats: DTOStats): ChartPoint[] | null {
         return null;
     }
 
-    const mapToChartPoint = (item: [number, number]): ChartPoint => ({
+    const mapToChartPoint = (item: [number, number | null]): ChartPoint => ({
         time: Number(item[0]) * 1000,
-        value: Math.round(Number(item[1]) * 100) / 100
+        value: item[1] == null ? undefined : Math.round(Number(item[1]) * 100) / 100
     });
 
     return stats.result[0].values.map((item: unknown) => mapToChartPoint(item as [number, number]));
@@ -37,9 +37,9 @@ function mapLiteproxyStatsDTOToChartPoints(
 
     const requestsChartPoints = requestsResult[0]?.values
         .map((item: unknown) => {
-            const [timestamp, value] = item as [number, number];
+            const [timestamp, value] = item as [number, number | null];
             const time = Number(timestamp) * 1000;
-            const normalizedValue = Math.round(Number(value) * 100) / 100;
+            const normalizedValue = value == null ? undefined : Math.round(Number(value) * 100) / 100;
 
             return { time, value: normalizedValue };
         })
@@ -47,9 +47,9 @@ function mapLiteproxyStatsDTOToChartPoints(
 
     const connectionsChartPoints = connectionsResult[0]?.values
         .map((item: unknown) => {
-            const [timestamp, value] = item as [number, number];
+            const [timestamp, value] = item as [number, number | null];
             const time = Number(timestamp) * 1000;
-            const normalizedValue = Math.round(Number(value) * 100) / 100;
+            const normalizedValue = value == null ? undefined : Math.round(Number(value) * 100) / 100;
 
             return { time, value: normalizedValue };
         })

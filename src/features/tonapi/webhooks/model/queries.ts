@@ -39,10 +39,10 @@ export function mapWebhooksStatsToChartPoints(
       return metricType === type;
     })
     .flatMap(item => {
-      const values = item.values as [number, string][];
+      const values = item.values as [number, string | null][];
       return values.map(([timestamp, value]) => ({
         time: timestamp * 1000,
-        value: parseFloat(value)
+        value: value == null ? undefined : parseFloat(value)
       }));
     });
 

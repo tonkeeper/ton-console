@@ -9,7 +9,7 @@ interface MaintenanceConfig {
 const BYPASS_KEY = 'bypass_maintenance';
 
 export const maintenanceConfig: MaintenanceConfig = {
-    enabled: false,
+    enabled: false
     // estimatedEndTime: "2026-02-16T08:30:00Z",
     // message: "We are performing scheduled maintenance to improve our services."
 };
