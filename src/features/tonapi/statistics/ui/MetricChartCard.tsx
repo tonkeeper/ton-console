@@ -14,7 +14,6 @@ interface MetricChartCardProps extends BoxProps {
     limit?: number;
     limitLabel?: string;
     onExpand?: () => void;
-    compact?: boolean;
     period?: TimePeriod;
 }
 
@@ -27,13 +26,9 @@ const MetricChartCard: FC<MetricChartCardProps> = ({
     limit,
     limitLabel,
     onExpand,
-    compact = false,
     period,
     ...props
 }) => {
-    const emptyHeight = compact ? '120px' : '200px';
-    const dataHeight = compact ? '150px' : '200px';
-
     if (isLoading) {
         return (
             <Box
@@ -57,7 +52,7 @@ const MetricChartCard: FC<MetricChartCardProps> = ({
                         />
                     )}
                 </Flex>
-                <Center h={emptyHeight}>
+                <Center h="200px">
                     <Spinner />
                 </Center>
             </Box>
@@ -87,7 +82,7 @@ const MetricChartCard: FC<MetricChartCardProps> = ({
                         />
                     )}
                 </Flex>
-                <Center h={emptyHeight}>
+                <Center h="200px">
                     <Text textStyle="body2" color="text.secondary">
                         Error loading data
                     </Text>
@@ -124,7 +119,7 @@ const MetricChartCard: FC<MetricChartCardProps> = ({
                 color={color}
                 limit={limit}
                 limitLabel={limitLabel}
-                height={parseInt(dataHeight)}
+                height={200}
                 period={period}
             />
         </Box>

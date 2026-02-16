@@ -12,7 +12,6 @@ interface MetricChartContentProps extends BoxProps {
     color: string;
     limit?: number;
     limitLabel?: string;
-    compact?: boolean;
     period?: TimePeriod;
 }
 
@@ -24,20 +23,16 @@ const MetricChartContent: FC<MetricChartContentProps> = ({
     color,
     limit,
     limitLabel,
-    compact = false,
     period,
     ...props
 }) => {
-    const emptyHeight = compact ? '120px' : '200px';
-    const dataHeight = compact ? '150px' : '200px';
-
     if (isLoading) {
         return (
             <Box w="100%" {...props}>
                 <Text textStyle="body2" mb="2" color="text.secondary">
                     {title}
                 </Text>
-                <Center h={emptyHeight}>
+                <Center h="200px">
                     <Spinner />
                 </Center>
             </Box>
@@ -50,7 +45,7 @@ const MetricChartContent: FC<MetricChartContentProps> = ({
                 <Text textStyle="body2" mb="2" color="text.secondary">
                     {title}
                 </Text>
-                <Center h={emptyHeight}>
+                <Center h="200px">
                     <Text textStyle="body2" color="text.error">
                         Error loading data
                     </Text>
@@ -64,14 +59,14 @@ const MetricChartContent: FC<MetricChartContentProps> = ({
             <Text textStyle="body2" mb="2" color="text.secondary">
                 {title}
             </Text>
-            <Box w="100%" h={dataHeight}>
+            <Box w="100%" h="200px">
                 <MetricChart
                     data={data || []}
                     title={title}
                     color={color}
                     limit={limit}
                     limitLabel={limitLabel}
-                    height={compact ? 150 : 200}
+                    height={200}
                     period={period}
                 />
             </Box>

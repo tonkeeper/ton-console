@@ -12,7 +12,7 @@ interface MetricGroupCardProps extends BoxProps {
 
 const MetricGroupCard: FC<MetricGroupCardProps> = ({ title, onExpand, children, hasData, childrenDirection = 'column', ...rest }) => {
     return (
-        <Box p="4" borderWidth="1px" borderColor="border.primary" borderRadius="12px" {...rest}>
+        <Box h="100%" p="4" borderWidth="1px" borderColor="border.primary" borderRadius="12px" {...rest}>
             <Flex align="center" justify="space-between" mb="4">
                 <Text textStyle="label1" color="text.primary" fontSize={16}>
                     {title}

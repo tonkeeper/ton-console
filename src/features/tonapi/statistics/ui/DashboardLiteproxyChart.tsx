@@ -62,7 +62,6 @@ const DashboardLiteproxyChart: FC<DashboardLiteproxyChartProps> = ({ period, chi
                     isLoading={isLoading}
                     error={error}
                     color={colors.accent.blue}
-                    compact={!hasData}
                     limit={selectedLiteproxyTier?.rps}
                     limitLabel="Limit"
                     period={period}
@@ -73,7 +72,6 @@ const DashboardLiteproxyChart: FC<DashboardLiteproxyChartProps> = ({ period, chi
                     isLoading={isLoading}
                     error={error}
                     color={colors.accent.green}
-                    compact={!hasData}
                     period={period}
                 />
             </MetricGroupCard>

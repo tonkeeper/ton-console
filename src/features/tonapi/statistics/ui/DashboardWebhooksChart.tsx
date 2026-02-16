@@ -71,7 +71,6 @@ const DashboardWebhooksChart: FC<DashboardWebhooksChartProps> = ({
                     isLoading={isLoading}
                     error={error}
                     color={colors.accent.blue}
-                    compact={!hasData}
                     period={period}
                 />
                 <MetricChartContent
@@ -80,7 +79,6 @@ const DashboardWebhooksChart: FC<DashboardWebhooksChartProps> = ({
                     isLoading={isLoading}
                     error={error}
                     color={colors.accent.red}
-                    compact={!hasData}
                     period={period}
                 />
             </MetricGroupCard>
