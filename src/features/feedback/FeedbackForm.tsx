@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { chakra, FormControl, FormLabel, Input, Textarea } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { FeedbackFromI } from './interfaces/form';
-import { useProject } from 'src/shared/contexts/ProjectContext';
+import { useMaybeProject } from 'src/shared/contexts/ProjectContext';
 import { useFeedbackModal } from './contexts/FeedbackModalContext';
 import { useSendFeedbackMutation } from './model/queries';
 import { useUserQuery } from 'src/entities/user/queries';
@@ -10,7 +10,7 @@ import { useUserQuery } from 'src/entities/user/queries';
 export const FeedbackFrom: FC<{
     formId: string;
 }> = ({ formId }) => {
-    const { name: projectName } = useProject();
+    const projectName = useMaybeProject()?.name;
     const { source, close } = useFeedbackModal();
     const { mutate: sendFeedback } = useSendFeedbackMutation();
     const { data: user } = useUserQuery();
