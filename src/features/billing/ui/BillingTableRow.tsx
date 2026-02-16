@@ -1,6 +1,13 @@
 import { FC, useContext } from 'react';
 import { Link, Skeleton, Td, Tr } from '@chakra-ui/react';
-import { toDateTime, DTOBillingTransaction, explorer, TonCurrencyAmount } from 'src/shared';
+import {
+    toDateTime,
+    DTOBillingTransaction,
+    explorer,
+    TonCurrencyAmount,
+    toUserFriendlyAddress,
+    sliceAddress
+} from 'src/shared';
 import { DTOBillingTxInfo } from 'src/shared/api';
 import { BillingHistoryTableContext } from './BillingHistoryTableContext';
 import {
@@ -49,6 +56,20 @@ type DescriptionFormattersMap = {
         fallbackDescription: string
     ) => React.ReactNode;
 };
+
+function formatCollectionAddress(collection: string | undefined): React.ReactNode {
+    if (!collection) return null;
+    try {
+        const friendlyAddress = toUserFriendlyAddress(collection);
+        return (
+            <Link href={explorer.accountLink(friendlyAddress)} isExternal>
+                {sliceAddress(friendlyAddress)}
+            </Link>
+        );
+    } catch {
+        return <strong>{collection}</strong>;
+    }
+}
 
 const descriptionFormatters: DescriptionFormattersMap = {
     tonapi_monthly_payment: info => {
@@ -141,16 +162,17 @@ const descriptionFormatters: DescriptionFormattersMap = {
     },
     cnft_indexing_payment: info => {
         const meta = info as DTOCnftIndexingPaymentMeta;
+        const collectionLabel = formatCollectionAddress(meta.collection);
         return (
             <>
                 NFT indexing
-                {meta.collection && (
+                {collectionLabel && (
                     <>
                         {' '}
-                        — <strong>{meta.collection}</strong>
+                        — {collectionLabel}
                     </>
                 )}
-                {meta.count && (
+                {meta.count != null && (
                     <>
                         {' '}
                         <strong>({meta.count} items)</strong>
@@ -193,9 +215,19 @@ const descriptionFormatters: DescriptionFormattersMap = {
         if (!meta.period) {
             return <>Webhooks API payment</>;
         }
-        const minutes = Math.round(meta.period / 60);
-        const hours = Math.round(minutes / 60);
-        const timeStr = minutes >= 60 ? `${hours}h` : `${minutes}m`;
+        const totalMinutes = Math.round(meta.period / 60);
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+
+        let timeStr: string;
+        if (hours > 0 && minutes > 0) {
+            timeStr = `${hours} hr ${minutes} min`;
+        } else if (hours > 0) {
+            timeStr = `${hours} hr`;
+        } else {
+            timeStr = `${minutes} min`;
+        }
+
         return (
             <>
                 Webhooks API payment — <strong>{timeStr}</strong>
@@ -305,7 +337,18 @@ const ItemRow: FC<{ historyItem: BillingHistoryItem; style: React.CSSProperties 
             >
                 {toDateTime(historyItem.date)}
             </Td>
-            <Td w="100%" minW="320px" h={rowHeight} maxH={rowHeight} boxSizing="content-box">
+            <Td
+                overflow="hidden"
+                w="100%"
+                minW="320px"
+                maxW="0"
+                h={rowHeight}
+                maxH={rowHeight}
+                whiteSpace="nowrap"
+                textOverflow="ellipsis"
+                boxSizing="content-box"
+                title={historyItem.description}
+            >
                 {formatBillingDescription(historyItem)}
             </Td>
             <Td

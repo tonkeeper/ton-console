@@ -24,11 +24,14 @@ interface SubscriptionListItemProps {
     subscription?: Subscription;
 }
 
-const intervalToText = (interval: string) => {
+const intervalToText = (interval: string): string => {
     switch (interval) {
         case 'month':
+        case 'monthly':
+        case 'Monthly':
             return 'Monthly';
         case 'pay_as_you_go':
+        case 'pay-as-you-go':
             return 'Pay as you go';
         default:
             return interval;
