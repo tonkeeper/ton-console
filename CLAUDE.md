@@ -2,7 +2,7 @@
 
 title: TON Console — AI Project Guide
 version: 1.0.0
-last_verified: 2025-10-31
+last_verified: 2026-02-16
 owners:
 
 * <fill in: owner GitHub handle/email>
@@ -43,8 +43,8 @@ This file is a source of truth for AI assistants and developers:
 | Build        | Vite **5.4.6**                                  | Code-splitting by routes/features |
 | Server state | **@tanstack/react-query 5.90.5**                | Mandatory for CRUD/fetching       |
 | UI           | Chakra UI **2.10.9**                            | Single theme/tokens               |
-| Charts       | Recharts **2.5.0**                              | Time series, see §7               |
-| Routing      | React Router DOM **6.9.0**                      | Pages are thin, composition only  |
+| Charts       | Recharts **3.0.0**                              | Time series, see §7               |
+| Routing      | React Router DOM **6.28.0**                     | Pages are thin, composition only  |
 | Quality      | ESLint **9.38.0**, Prettier **3.6.2**, Vitest   | Zero errors/warnings in CI        |
 
 ---
@@ -76,6 +76,7 @@ src/
 │  │  └─ console/        # ⚙️ auto-generated from swagger.yaml
 │  ├─ lib/               # utilities (Loadable — legacy)
 │  ├─ ui/                # reusable UI components
+│  ├─ config/            # app-level config (maintenance mode, etc.)
 │  ├─ hooks/             # shared hooks (legacy helpers)
 │  ├─ contexts/          # ProjectContext.tsx — selected project context
 │  └─ queries/           # projects.ts — React Query for projects
@@ -246,6 +247,23 @@ const toLiteproxySeries = (data: TonApiStats) =>
 * Code-splitting by pages.
 * 404/NotFound is mandatory.
 
+## 8.1 Maintenance mode
+
+Controlled via `src/shared/config/maintenance.ts`:
+
+```ts
+export const maintenanceConfig: MaintenanceConfig = {
+    enabled: true,                              // toggle on/off
+    estimatedEndTime: "2026-02-16T08:30:00Z",   // optional ISO 8601
+    message: "Custom message here."             // optional
+};
+```
+
+* Landing page stays accessible for unauthenticated users.
+* Authenticated users see a full-screen maintenance page (`src/shared/ui/MaintenancePage.tsx`).
+* Bypass on a specific browser: `localStorage.setItem('bypass_maintenance', '1')` + reload.
+* Guard logic lives in `src/pages/index.tsx` — `isMaintenanceActive()` check after auth.
+
 ---
 
 # 9) Testing, quality, Definition of Done
@@ -288,8 +306,8 @@ npm run generate-airdrop2
 **Historical context:** The project previously used MobX stores for server state management. In 2025, we completed a full migration to React Query (`@tanstack/react-query`) for all CRUD and data fetching operations.
 
 **Current state:**
-- ✅ All major features use React Query (API Keys, Webhooks, Statistics, Liteservers, Pricing, Balance, Rates, NFT, Faucet, App Messages, Jetton, Projects)
-- ⚠️ A few isolated modules (Invoices, Analytics, Airdrop) retain localized MobX stores within their components for internal state management only
+- ✅ All major features use React Query (API Keys, Webhooks, Statistics, Liteservers, Pricing, Balance, Rates, NFT, Faucet, App Messages, Jetton, Projects, Invoices)
+- ⚠️ A few isolated modules (Analytics, Airdrop) retain localized MobX stores within their components for internal state management only
 - ✅ No global stores — `ProjectContext` manages project selection with React Query
 
 **For new features:** Always use React Query. See patterns in §5.1 and examples in §19.
