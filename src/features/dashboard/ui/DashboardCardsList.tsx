@@ -27,7 +27,10 @@ const DashboardCardsList: FC<BoxProps> = props => {
                     tier={{
                         name: selectedLiteproxyTier.name,
                         rps: selectedLiteproxyTier.rps,
-                        renewsDate: selectedLiteproxyTier.next_payment
+                        renewsDate:
+                            selectedLiteproxyTier.usd_price && selectedLiteproxyTier.next_payment
+                                ? selectedLiteproxyTier.next_payment
+                                : undefined
                     }}
                     service="Liteservers"
                 />
