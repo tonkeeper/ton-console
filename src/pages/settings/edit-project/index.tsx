@@ -1,5 +1,6 @@
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+    Box,
     Button,
     Center,
     Divider,
@@ -11,21 +12,14 @@ import {
     IconButton,
     Image,
     Input,
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    ModalOverlay,
     Text,
     useClipboard,
-    useDisclosure,
     VStack
 } from '@chakra-ui/react';
 import { DeleteProjectConfirmation, EditProjectParticipant } from 'src/entities';
 import { useForm } from 'react-hook-form';
-import { CopyIcon16, EditIcon24, H4, ImageInput, imageUrlToFilesList, Overlay } from 'src/shared';
+import { CloseIcon24, CopyIcon16, EditIcon24, H4, Overlay } from 'src/shared';
+import { UpdateProjectFormValues } from 'src/entities/project/model/interfaces/update-project-form-values';
 import { useProject, useSetProject } from 'src/shared/contexts/ProjectContext';
 import {
     useUpdateProjectMutation,
@@ -37,7 +31,6 @@ const availableDeleteProject = import.meta.env.VITE_AVAILABLE_DELETE_PROJECT ===
 
 interface EditProjectFormValues {
     name: string;
-    icon: FileList | null;
 }
 
 const EditProjectPage: FC = () => {
@@ -49,25 +42,24 @@ const EditProjectPage: FC = () => {
 
     const [deleteConfirmationIsOpen, setDeleteConfirmationIsOpen] = useState(false);
     const [isParticipantModalOpen, setIsParticipantModalOpen] = useState(false);
-    const iconModal = useDisclosure();
 
-    const { register, handleSubmit, formState, reset, watch } =
+    const [iconFile, setIconFile] = useState<File | null>(null);
+    const [iconRemoved, setIconRemoved] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const { register, handleSubmit, formState, reset } =
         useForm<EditProjectFormValues>({
             defaultValues: {
-                name: '',
-                icon: null
+                name: ''
             }
         });
 
-    const iconValue = watch('icon');
     const iconPreviewUrl = useMemo(() => {
-        if (iconValue && iconValue.length > 0) {
-            return URL.createObjectURL(iconValue[0]);
-        }
-        return selectedProject?.imgUrl || null;
-    }, [iconValue, selectedProject?.imgUrl]);
+        if (iconRemoved) return null;
+        if (iconFile) return URL.createObjectURL(iconFile);
+        return selectedProject.imgUrl ?? null;
+    }, [iconRemoved, iconFile, selectedProject.imgUrl]);
 
-    // Cleanup blob URL to prevent memory leak
     useEffect(() => {
         return () => {
             if (iconPreviewUrl && iconPreviewUrl.startsWith('blob:')) {
@@ -77,55 +69,66 @@ const EditProjectPage: FC = () => {
     }, [iconPreviewUrl]);
 
     useEffect(() => {
-        const loadDefaults = async () => {
-            let iconFileList: FileList | null = null;
-            if (selectedProject?.imgUrl) {
-                iconFileList = await imageUrlToFilesList(selectedProject.imgUrl);
-            }
-
-            reset({
-                name: selectedProject?.name || '',
-                icon: iconFileList
-            });
-        };
-
-        loadDefaults();
+        reset({ name: selectedProject.name || '' });
+        setIconFile(null);
+        setIconRemoved(false);
     }, [selectedProject, reset]);
+
+    const hasIconChange = iconFile !== null || iconRemoved;
+    const isFormDirty = formState.isDirty || hasIconChange;
+
+    const handleFileSelect = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setIconFile(file);
+            setIconRemoved(false);
+        }
+        e.target.value = '';
+    }, []);
+
+    const handleRemoveIcon = useCallback(() => {
+        setIconFile(null);
+        setIconRemoved(true);
+    }, []);
 
     const onSubmit = useCallback(
         (values: EditProjectFormValues) => {
-            if (!selectedProject) {
-                return;
-            }
-
-            const modifiedFields: { name?: string; icon?: File } = {};
+            let hasChanges = false;
+            const updateData: UpdateProjectFormValues = {
+                projectId: selectedProject.id
+            };
 
             if (formState.dirtyFields.name) {
-                modifiedFields.name = values.name;
+                updateData.name = values.name;
+                hasChanges = true;
             }
 
-            if (formState.dirtyFields.icon && values.icon && values.icon.length > 0) {
-                modifiedFields.icon = values.icon[0];
+            if (iconFile) {
+                updateData.icon = iconFile;
+                hasChanges = true;
+            } else if (iconRemoved) {
+                // Explicit undefined so that 'icon' in updateData === true,
+                // which triggers remove_image in the mutation
+                updateData.icon = undefined;
+                hasChanges = true;
             }
 
-            if (Object.keys(modifiedFields).length === 0) {
-                return;
-            }
+            if (!hasChanges) return;
 
-            updateProject.mutate({
-                projectId: selectedProject.id,
-                ...modifiedFields
+            updateProject.mutate(updateData, {
+                onSuccess: () => {
+                    setIconFile(null);
+                    setIconRemoved(false);
+                }
             });
         },
-        [formState.dirtyFields, selectedProject, updateProject]
+        [formState.dirtyFields, selectedProject, updateProject, iconFile, iconRemoved]
     );
 
-    const handleIconModalSave = () => {
-        iconModal.onClose();
-    };
-
-    const projectIdString = selectedProject?.id.toString() || '';
+    const projectIdString = selectedProject.id.toString();
     const { onCopy, hasCopied } = useClipboard(projectIdString);
+
+    const showRemoveIcon = !iconRemoved && (iconFile !== null || !!selectedProject.imgUrl);
 
     return (
         <VStack align="stretch" spacing="4">
@@ -164,57 +167,99 @@ const EditProjectPage: FC = () => {
                 <form onSubmit={handleSubmit(onSubmit)}>
                     {/* Icon + Name row */}
                     <Flex
-                        // align="center"
                         direction={{ base: 'column', md: 'row' }}
                         gap="5"
                     >
-                        {/* Icon (clickable) */}
-                        <Center
-                            as="button"
-                            pos="relative"
-                            overflow="hidden"
-                            w="72px"
-                            minW="72px"
-                            h="72px"
-                            bg="background.contentTint"
-                            borderRadius="lg"
-                            _hover={{
-                                '& > .edit-overlay': {
-                                    opacity: 1
-                                }
-                            }}
-                            cursor="pointer"
-                            onClick={iconModal.onOpen}
-                            type="button"
-                        >
-                            {iconPreviewUrl ? (
-                                <Image
-                                    w="100%"
-                                    h="100%"
-                                    objectFit="cover"
-                                    alt={selectedProject?.name || 'Project icon'}
-                                    src={iconPreviewUrl}
-                                />
-                            ) : (
-                                <Text
-                                    color="text.primary"
-                                    fontSize="xl"
-                                    fontWeight="medium"
-                                >
-                                    {selectedProject?.name?.[0] || 'P'}
-                                </Text>
-                            )}
+                        {/* Icon (clickable) + corner remove badge */}
+                        <Box pos="relative" w="fit-content">
                             <Center
-                                className="edit-overlay"
-                                pos="absolute"
-                                bg="blackAlpha.600"
-                                opacity="0"
-                                transition="opacity 0.2s"
-                                inset="0"
+                                as="button"
+                                pos="relative"
+                                overflow="hidden"
+                                w="72px"
+                                minW="72px"
+                                h="72px"
+                                bg="background.contentTint"
+                                borderRadius="lg"
+                                _hover={{
+                                    '& > .edit-overlay': {
+                                        opacity: 1
+                                    }
+                                }}
+                                cursor="pointer"
+                                onClick={() => fileInputRef.current?.click()}
+                                type="button"
                             >
-                                <EditIcon24 color="white" />
+                                {iconPreviewUrl ? (
+                                    <Image
+                                        w="100%"
+                                        h="100%"
+                                        objectFit="cover"
+                                        alt={selectedProject.name || 'Project icon'}
+                                        src={iconPreviewUrl}
+                                    />
+                                ) : (
+                                    <Text
+                                        color="text.primary"
+                                        fontSize="xl"
+                                        fontWeight="medium"
+                                    >
+                                        {selectedProject.name[0] || 'P'}
+                                    </Text>
+                                )}
+                                <Center
+                                    className="edit-overlay"
+                                    pos="absolute"
+                                    bg="blackAlpha.600"
+                                    opacity="0"
+                                    transition="opacity 0.2s"
+                                    inset="0"
+                                >
+                                    <EditIcon24 color="white" />
+                                </Center>
                             </Center>
-                        </Center>
+
+                            {showRemoveIcon && (
+                                <IconButton
+                                    pos="absolute"
+                                    zIndex={1}
+                                    top="-6px"
+                                    right="-6px"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    display="flex"
+                                    w="20px"
+                                    minW="20px"
+                                    h="20px"
+                                    bg="gray.600"
+                                    borderRadius="full"
+                                    _hover={{
+                                        bg: 'red.500',
+                                        transform: 'scale(1.1)'
+                                    }}
+                                    transition="all 0.15s"
+                                    aria-label="Remove icon"
+                                    icon={
+                                        <CloseIcon24
+                                            w="10px"
+                                            h="10px"
+                                            color="white"
+                                        />
+                                    }
+                                    onClick={handleRemoveIcon}
+                                    size="xs"
+                                    variant="unstyled"
+                                />
+                            )}
+
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                                onChange={handleFileSelect}
+                            />
+                        </Box>
 
                         {/* Name input */}
                         <FormControl flex="1" isInvalid={!!formState.errors.name} isRequired>
@@ -238,7 +283,7 @@ const EditProjectPage: FC = () => {
                     <Button
                         w="100%"
                         mt="5"
-                        isDisabled={!formState.isDirty || deleteProject.isPending}
+                        isDisabled={!isFormDirty || deleteProject.isPending}
                         isLoading={updateProject.isPending}
                         type="submit"
                     >
@@ -279,7 +324,7 @@ const EditProjectPage: FC = () => {
                     <DeleteProjectConfirmation
                         isOpen={deleteConfirmationIsOpen}
                         onClose={() => setDeleteConfirmationIsOpen(false)}
-                        projectName={selectedProject?.name || ''}
+                        projectName={selectedProject.name}
                         onConfirm={() => {
                             if (!selectedProject) return;
                             deleteProject.mutate(selectedProject.id, {
@@ -292,23 +337,6 @@ const EditProjectPage: FC = () => {
                     />
                 </Overlay>
             )}
-
-            {/* Icon Upload Modal */}
-            <Modal isOpen={iconModal.isOpen} onClose={iconModal.onClose}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Project Icon</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <ImageInput {...register('icon')} />
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button w="100%" onClick={handleIconModalSave}>
-                            Done
-                        </Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
 
             {/* Add Participant Modal */}
             <AddProjectParticipantModal
