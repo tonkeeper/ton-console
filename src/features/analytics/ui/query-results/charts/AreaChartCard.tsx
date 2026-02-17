@@ -58,8 +58,8 @@ export const AreaChartCard: FC<
                     }}
                 >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey={xKey} />
-                    <YAxis />
+                    <XAxis axisLine={false} tickLine={false} dataKey={xKey} />
+                    <YAxis axisLine={false} tickLine={false} />
                     <Tooltip />
                     {areas.map((area, index) => (
                         <Area

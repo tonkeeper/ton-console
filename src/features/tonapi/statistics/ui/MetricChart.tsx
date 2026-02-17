@@ -101,11 +101,6 @@ const MetricChart: FC<MetricChartProps> = ({
         <Box
             h={`${height}px`}
             {...props}
-            sx={{
-                '.recharts-wrapper .recharts-cartesian-grid-horizontal line:last-child': {
-                    strokeOpacity: 0
-                }
-            }}
         >
             <ResponsiveContainer width="99%" height="100%">
                 <LineChart
@@ -139,6 +134,8 @@ const MetricChart: FC<MetricChartProps> = ({
                         </>
                     )}
                     <XAxis
+                        axisLine={false}
+                        tickLine={false}
                         dataKey="time"
                         domain={domain}
                         tickFormatter={formatXLabel}
@@ -148,7 +145,7 @@ const MetricChart: FC<MetricChartProps> = ({
                         allowDataOverflow={!!period}
                         minTickGap={period ? 50 : undefined}
                     />
-                    <YAxis padding={{ top: 10, bottom: 0 }} />
+                    <YAxis axisLine={false} tickLine={false} padding={{ top: 10, bottom: 0 }} />
                     <Tooltip labelFormatter={formatTooltip} />
                     <Legend />
                 </LineChart>
