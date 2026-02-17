@@ -92,15 +92,9 @@ const Aside: FC = () => {
                     </TextWithSkeleton>
                 </Flex>
             </DropDownMenuItem>
-            <DropDownMenuItemExpandable
-                leftIcon={<SettingsIcon />}
-                content="Settings"
-                linkTo="settings"
-            >
-                <DropDownMenuItem linkTo="edit-project" pb="0">
-                    Edit project
-                </DropDownMenuItem>
-            </DropDownMenuItemExpandable>
+            <DropDownMenuItem linkTo="settings" leftIcon={<SettingsIcon />}>
+                Settings
+            </DropDownMenuItem>
         </DropDownMenu>
     );
 };
