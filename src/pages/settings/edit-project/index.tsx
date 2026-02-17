@@ -166,10 +166,7 @@ const EditProjectPage: FC = () => {
 
                 <form onSubmit={handleSubmit(onSubmit)}>
                     {/* Icon + Name row */}
-                    <Flex
-                        direction={{ base: 'column', md: 'row' }}
-                        gap="5"
-                    >
+                    <Flex direction="row" gap="5">
                         {/* Icon (clickable) + corner remove badge */}
                         <Box pos="relative" w="fit-content">
                             <Center
