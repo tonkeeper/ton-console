@@ -143,7 +143,7 @@ const WebhooksViewPage: FC = () => {
                                         variant={getWebhookStatusVariant(selectedWebhook.status)}
                                         label={getWebhookStatusLabel(selectedWebhook.status)}
                                     />
-                                    {isOffline && (
+                                    {(isOffline || isSuspended) && (
                                         <Button
                                             isLoading={isBackToOnlinePending}
                                             onClick={() => backToOnline(selectedWebhook.id)}
