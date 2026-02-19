@@ -17,7 +17,7 @@ const WEBHOOKS_KEYS = {
   all: ['webhooks'],
   list: (projectId: number | undefined, network: Network) => ['webhooks', projectId, network],
   stats: (projectId: number | undefined) => ['webhooks', 'stats', projectId],
-  subscriptions: (projectId: number | undefined, webhookId: number, page: number) => ['webhooks', 'subscriptions', projectId, webhookId, page]
+  subscriptions: (projectId: number | undefined, webhookId: number, network: Network, page: number) => ['webhooks', 'subscriptions', projectId, webhookId, network, page]
 };
 
 // Mappers
@@ -117,13 +117,14 @@ export function useWebhooksStatsQuery(period: TimePeriod = 'last_6h') {
  */
 export function useWebhookSubscriptionsQuery(
   webhookId: number | null,
+  network: Network,
   page: number,
   limit = 20
 ) {
   const projectId = useProjectId();
 
   return useQuery({
-    queryKey: WEBHOOKS_KEYS.subscriptions(projectId || undefined, webhookId || 0, page),
+    queryKey: WEBHOOKS_KEYS.subscriptions(projectId || undefined, webhookId || 0, network, page),
     queryFn: async () => {
       if (!webhookId || !projectId) return [];
 
@@ -131,7 +132,7 @@ export function useWebhookSubscriptionsQuery(
 
       const response = await rtTonApiClient.webhooks.webhookAccountTxSubscriptions(webhookId, {
         project_id: projectId.toString(),
-        network: 'mainnet',
+        network,
         limit,
         offset
       });
@@ -229,9 +230,9 @@ export function useAddSubscriptionsMutation(webhookId: number, network: Network)
       return { webhookId, projectId: currentProjectId };
     },
     onSuccess: (data) => {
-      // Refetch subscriptions with correct projectId from mutation result
+      // Invalidate all pages for this webhook+network
       queryClient.invalidateQueries({
-        queryKey: WEBHOOKS_KEYS.subscriptions(data.projectId, data.webhookId, 1)
+        queryKey: ['webhooks', 'subscriptions', data.projectId, data.webhookId, network]
       });
     }
   });
@@ -264,9 +265,9 @@ export function useUnsubscribeWebhookMutation(webhookId: number, network: Networ
       return { webhookId, projectId: currentProjectId };
     },
     onSuccess: (data) => {
-      // Invalidate subscriptions with correct projectId from mutation result
+      // Invalidate all pages for this webhook+network
       queryClient.invalidateQueries({
-        queryKey: WEBHOOKS_KEYS.subscriptions(data.projectId, data.webhookId, 1)
+        queryKey: ['webhooks', 'subscriptions', data.projectId, data.webhookId, network]
       });
     }
   });

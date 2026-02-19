@@ -36,11 +36,11 @@ const CreateWebhookModal: FC<{ isOpen: boolean; onClose: () => void }> = props =
                         throw new Error('Webhook was not created');
                     }
                     setSelectedWebhookId(webhookId);
-                    navigate(`./view?webhookId=${webhookId}`);
+                    navigate(`./view?webhookId=${webhookId}&network=${network}`);
                 }
             });
         },
-        [createWebhook, navigate, setSelectedWebhookId]
+        [createWebhook, navigate, setSelectedWebhookId, network]
     );
 
     useEffect(() => {

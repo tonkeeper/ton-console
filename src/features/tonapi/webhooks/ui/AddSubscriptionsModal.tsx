@@ -55,7 +55,7 @@ const AddSubscriptionsModal: FC<{ isOpen: boolean; onClose: () => void }> = prop
                 <ModalCloseButton />
                 <ModalBody>
                     <FormProvider {...methods}>
-                        <SubscriptionsForm id={formId} onSubmit={onSubmit} />
+                        <SubscriptionsForm id={formId} network={network} onSubmit={onSubmit} />
                     </FormProvider>
                 </ModalBody>
 

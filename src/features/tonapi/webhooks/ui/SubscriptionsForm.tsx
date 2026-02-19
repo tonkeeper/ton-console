@@ -14,20 +14,34 @@ import { Controller, SubmitHandler, useFormContext } from 'react-hook-form';
 import { Address } from '@ton/core';
 import { AddSubscriptionsForm } from '../model/interfaces/add-subscriptions-form';
 import { isValidAddress } from 'src/features/jetton/lib/utils';
-import { toBinaryRadio } from 'src/shared';
+import { Network, toBinaryRadio } from 'src/shared';
 
 export type SubscriptionsFormInternal = {
     initiations: 'transaction' | 'finalizeTrace';
     accounts: string;
 };
 
+function validateAddressNetwork(address: string, network: Network): string | true {
+    if (!Address.isFriendly(address)) return true;
+
+    const { isTestOnly } = Address.parseFriendly(address);
+    if (isTestOnly && network === Network.MAINNET) {
+        return 'This is a testnet address, but you are on mainnet';
+    }
+    if (!isTestOnly && network === Network.TESTNET) {
+        return 'This is a mainnet address, but you are on testnet';
+    }
+    return true;
+}
+
 export const SubscriptionsForm: FC<
     StyleProps & {
         id?: string;
+        network: Network;
         onSubmit: SubmitHandler<AddSubscriptionsForm>;
         disableDefaultFocus?: boolean;
     }
-> = ({ id, onSubmit, disableDefaultFocus, ...rest }) => {
+> = ({ id, network, onSubmit, disableDefaultFocus, ...rest }) => {
     const submitHandler = (form: SubscriptionsFormInternal): void => {
         onSubmit({
             accounts: form.accounts
@@ -87,9 +101,16 @@ export const SubscriptionsForm: FC<
                     {...register('accounts', {
                         required: 'This is required',
                         validate(value) {
-                            const accounts = value.split(',');
-                            if (accounts.some(a => !isValidAddress(a.trim()))) {
+                            const accounts = value.split(',').map(a => a.trim());
+                            if (accounts.some(a => !isValidAddress(a))) {
                                 return 'Invalid account address';
+                            }
+
+                            for (const addr of accounts) {
+                                const networkCheck = validateAddressNetwork(addr, network);
+                                if (networkCheck !== true) {
+                                    return networkCheck;
+                                }
                             }
 
                             return true;

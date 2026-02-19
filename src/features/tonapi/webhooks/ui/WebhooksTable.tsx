@@ -50,8 +50,8 @@ const WebhooksTable: FC<TableContainerProps> = props => {
 
     const goToWebhookPage = useCallback((key: Webhook) => {
         setSelectedWebhookId(key.id);
-        navigate(`./view?webhookId=${key.id}`);
-    }, [navigate, setSelectedWebhookId]);
+        navigate(`./view?webhookId=${key.id}&network=${network}`);
+    }, [navigate, setSelectedWebhookId, network]);
 
     const openDeleteModal = useCallback((key: Webhook) => {
         setModal({ key, action: 'delete' });
@@ -92,7 +92,7 @@ const WebhooksTable: FC<TableContainerProps> = props => {
                                 key={webhook.id}
                                 as={ReactRouterLink}
                                 display="contents"
-                                to={`./view?webhookId=${webhook.id}`}
+                                to={`./view?webhookId=${webhook.id}&network=${network}`}
                             >
                                 <Tr>
                                     <Td overflow="hidden" maxW="200px">

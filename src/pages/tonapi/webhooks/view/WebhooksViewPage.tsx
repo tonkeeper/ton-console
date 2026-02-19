@@ -3,7 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { SubscriptionsTable, useWebhooksUI, useWebhooksQuery, useWebhookSubscriptionsQuery, useBackWebhookToOnlineMutation, WebhookSuspendedModal, getWebhookStatusLabel, getWebhookStatusVariant } from 'src/features/tonapi/webhooks';
 import { RefillModal } from 'src/entities';
 import { EmptySubscriptions } from './EmptySubscriptions';
-import { EXTERNAL_LINKS, H4, Overlay, useSearchParams } from 'src/shared';
+import { EXTERNAL_LINKS, H4, Network, Overlay, useSearchParams } from 'src/shared';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -46,14 +46,18 @@ const WebhooksViewPage: FC = () => {
     const currentProjectId = useProjectId();
     const initialProjectIdRef = useRef(currentProjectId);
 
+    const webhooksListPath = network === Network.TESTNET
+        ? '/tonapi/webhooks?network=testnet'
+        : '/tonapi/webhooks';
+
     useEffect(() => {
         if (currentProjectId !== initialProjectIdRef.current) {
-            navigate('/tonapi/webhooks', { replace: true });
+            navigate(webhooksListPath, { replace: true });
         }
-    }, [currentProjectId, navigate]);
+    }, [currentProjectId, navigate, webhooksListPath]);
 
     const { data: webhooks = [], isLoading: webhooksLoading } = useWebhooksQuery(network);
-    const { data: subscriptions = [], isLoading: subscriptionsLoading } = useWebhookSubscriptionsQuery(webhookIdNum, 1);
+    const { data: subscriptions = [], isLoading: subscriptionsLoading } = useWebhookSubscriptionsQuery(webhookIdNum, network, 1);
     const { mutate: backToOnline, isPending: isBackToOnlinePending } = useBackWebhookToOnlineMutation(network);
 
     const selectedWebhook = webhookIdNum ? webhooks.find(w => w.id === webhookIdNum) : null;
@@ -74,7 +78,7 @@ const WebhooksViewPage: FC = () => {
 
     // If URL has invalid webhookId, redirect to main webhooks page
     if (webhookId && !webhookIdNum) {
-        return <Navigate to="/tonapi/webhooks" replace />;
+        return <Navigate to={webhooksListPath} replace />;
     }
 
     if (webhooksLoading || subscriptionsLoading) {
@@ -90,12 +94,12 @@ const WebhooksViewPage: FC = () => {
             <Overlay h="fit-content">
                 <Center py="16">
                     <Box
-                        maxW="460px"
                         w="100%"
+                        maxW="460px"
                         p="6"
+                        bg="background.contentTint"
                         border="1px solid"
                         borderColor="background.contentTint"
-                        bg="background.contentTint"
                         borderRadius="sm"
                     >
                         <H4 mb="4">Webhook #{webhookIdNum} Not Found</H4>
@@ -112,7 +116,7 @@ const WebhooksViewPage: FC = () => {
                             <li>The link is outdated or incorrect</li>
                         </Flex>
                         <Center mt="6">
-                            <Button as={RouterLink} to="/tonapi/webhooks">
+                            <Button as={RouterLink} to={webhooksListPath}>
                                 Back to Webhooks
                             </Button>
                         </Center>
@@ -132,7 +136,7 @@ const WebhooksViewPage: FC = () => {
             spacing="8px"
         >
             <BreadcrumbItem>
-                <BreadcrumbLink as={RouterLink} to={'/tonapi/webhooks'}>
+                <BreadcrumbLink as={RouterLink} to={webhooksListPath}>
                     Webhooks
                 </BreadcrumbLink>
             </BreadcrumbItem>

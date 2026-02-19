@@ -27,9 +27,10 @@ import DeleteSubscriptionsModal from './DeleteSubscriptionModal';
 import { Address } from '@ton/core';
 
 const SubscriptionsTable: FC<TableContainerProps> = props => {
-    const { selectedWebhookId, subscriptionsPage, setSubscriptionsPage } = useWebhooksUI();
+    const { selectedWebhookId, subscriptionsPage, setSubscriptionsPage, network } = useWebhooksUI();
     const { data: subscriptions = [], isLoading } = useWebhookSubscriptionsQuery(
         selectedWebhookId,
+        network,
         subscriptionsPage
     );
     const [modal, setModal] = useState<{ key: Subscription; action: 'edit' | 'delete' } | null>();
@@ -72,9 +73,7 @@ const SubscriptionsTable: FC<TableContainerProps> = props => {
                         {subscriptions.map((subscription: Subscription) => (
                             <Tr key={subscription.account_id}>
                                 <Td overflow="hidden" minW={250}>
-                                    {Address.parse(subscription.account_id).toString({
-                                        bounceable: false
-                                    })}
+                                    {Address.parse(subscription.account_id).toRawString()}
                                 </Td>
                                 <Td overflow="hidden" maxW="200px">
                                     {subscription.last_delivered_lt ?? '-'}
