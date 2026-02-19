@@ -91,15 +91,6 @@ export type DTOAppTier = {
     instant_payment: boolean;
 };
 
-export type DTOProServiceAppTier = {
-    id: number;
-    name: string;
-    description?: string;
-    amount: string;
-    next_payment?: number;
-    date_create: number;
-};
-
 export type DTOBillingTransaction = {
     id: string;
     type: 'deposit' | 'charge';
@@ -348,7 +339,6 @@ export enum DTOServiceName {
     STATS = 'stats',
     TONAPI = 'tonapi',
     TESTNET = 'testnet',
-    PRO = 'pro',
     CNFT = 'cnft',
     LITEPROXY = 'liteproxy',
     STREAMING = 'streaming'

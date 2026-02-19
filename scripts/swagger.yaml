@@ -2985,35 +2985,6 @@ components:
         instant_payment:
           type: boolean
           example: false
-    ProServiceAppTier:
-      type: object
-      required:
-        - id
-        - name
-        - amount
-        - date_create
-      properties:
-        id:
-          type: integer
-          format: uint32
-          example: 1
-        name:
-          type: string
-          example: "Test tier"
-        description:
-          type: string
-          example: "Test description"
-        amount:
-          type: string
-          example: "1000000000"
-        next_payment:
-          type: integer
-          format: int64
-          example: 1690889913000
-        date_create:
-          type: integer
-          format: int64
-          example: 1690889913000
     BillingTransaction:
       type: object
       required:
@@ -3567,7 +3538,6 @@ components:
         - stats
         - tonapi
         - testnet
-        - pro
         - cnft
         - liteproxy
         - streaming
@@ -4269,24 +4239,6 @@ components:
             properties:
               tier:
                 $ref: '#/components/schemas/AppTier'
-    ProjectProServiceTier:
-      description: "Project tier"
-      headers:
-        Access-Control-Allow-Credentials:
-          $ref: "#/components/headers/accessControlAllowCredentials"
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/accessControlAllowOrigin"
-        Access-Control-Allow-Headers:
-          $ref: "#/components/headers/accessControlAllowHeaders"
-      content:
-        application/json:
-          schema:
-            required:
-              - tier
-            type: object
-            properties:
-              tier:
-                $ref: '#/components/schemas/ProServiceAppTier'
     ValidChangeTier:
       description: "Valid change tier for project"
       content:
@@ -4840,3 +4792,4 @@ components:
                 type: integer
                 format: int64
                 example: 1000000000
+

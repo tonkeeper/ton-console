@@ -158,8 +158,8 @@ export function useCreateWebhookMutation(network: Network) {
       if (!currentProjectId) throw new Error('Project not selected');
 
       const response = await rtTonApiClient.webhooks.createWebhook(
-        { project_id: currentProjectId.toString(), network },
-        { endpoint }
+        { endpoint },
+        { project_id: currentProjectId.toString(), network }
       );
 
       return { ...response.data, _projectId: currentProjectId };
@@ -218,11 +218,11 @@ export function useAddSubscriptionsMutation(webhookId: number, network: Network)
       await rtTonApiClient.webhooks.webhookAccountTxSubscribe(
         webhookId,
         {
-          project_id: currentProjectId.toString(),
-          network
+          accounts: accounts.map(account => ({ account_id: account.toRawString() }))
         },
         {
-          accounts: accounts.map(account => ({ account_id: account.toRawString() }))
+          project_id: currentProjectId.toString(),
+          network
         }
       );
 
@@ -253,11 +253,11 @@ export function useUnsubscribeWebhookMutation(webhookId: number, network: Networ
       await rtTonApiClient.webhooks.webhookAccountTxUnsubscribe(
         webhookId,
         {
-          project_id: currentProjectId.toString(),
-          network
+          accounts: accounts.map(account => account.toRawString())
         },
         {
-          accounts: accounts.map(account => account.toRawString())
+          project_id: currentProjectId.toString(),
+          network
         }
       );
 
