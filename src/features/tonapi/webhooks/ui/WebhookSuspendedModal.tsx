@@ -45,8 +45,8 @@ const WebhookSuspendedModal: FC<WebhookSuspendedModalProps> = ({
                             borderRadius="8px"
                         >
                             <Text color="status.error.foreground" fontSize="sm">
-                                Once your balance is sufficient, the webhook will automatically
-                                resume processing events.
+                                After topping up your balance, please click the &quot;Try
+                                Online&quot; button on the webhook page to restore the connection.
                             </Text>
                         </Box>
                     </VStack>
