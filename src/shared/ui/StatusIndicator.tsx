@@ -1,6 +1,36 @@
+import { FC } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
 
-const StatusIndicator = ({ isOnline, label = false }: { isOnline: boolean; label: boolean }) => {
+export type StatusIndicatorVariant = 'success' | 'error';
+
+interface VariantConfig {
+    dotColor: string;
+    textColor: string;
+    shadow: string;
+    animation: string;
+}
+
+const VARIANT_CONFIG: Record<StatusIndicatorVariant, VariantConfig> = {
+    success: {
+        dotColor: 'green.500',
+        textColor: 'green.700',
+        shadow: '0 0 8px green',
+        animation: 'pulse 1.5s infinite'
+    },
+    error: {
+        dotColor: 'red.500',
+        textColor: 'gray.700',
+        shadow: 'none',
+        animation: 'none'
+    }
+};
+
+const StatusIndicator: FC<{ variant: StatusIndicatorVariant; label?: string }> = ({
+    variant,
+    label
+}) => {
+    const config = VARIANT_CONFIG[variant];
+
     return (
         <Flex align="center" gap="8px">
             <Box
@@ -13,14 +43,14 @@ const StatusIndicator = ({ isOnline, label = false }: { isOnline: boolean; label
                 }}
                 w="10px"
                 h="10px"
-                bg={isOnline ? 'green.500' : 'red.500'}
+                bg={config.dotColor}
                 borderRadius="50%"
-                shadow={isOnline ? '0 0 8px green' : 'none'}
-                animation={isOnline ? 'pulse 1.5s infinite' : 'none'}
+                shadow={config.shadow}
+                animation={config.animation}
             />
             {label && (
-                <Text color={isOnline ? 'green.700' : 'gray.700'} fontSize="sm">
-                    {isOnline ? 'Online' : 'Offline'}
+                <Text color={config.textColor} fontSize="sm">
+                    {label}
                 </Text>
             )}
         </Flex>

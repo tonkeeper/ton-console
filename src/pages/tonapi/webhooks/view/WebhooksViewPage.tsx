@@ -1,6 +1,7 @@
 import { FC, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { SubscriptionsTable, useWebhooksUI, useWebhooksQuery, useWebhookSubscriptionsQuery, useBackWebhookToOnlineMutation } from 'src/features/tonapi/webhooks';
+import { SubscriptionsTable, useWebhooksUI, useWebhooksQuery, useWebhookSubscriptionsQuery, useBackWebhookToOnlineMutation, WebhookSuspendedModal, getWebhookStatusLabel, getWebhookStatusVariant } from 'src/features/tonapi/webhooks';
+import { RefillModal } from 'src/entities';
 import { EmptySubscriptions } from './EmptySubscriptions';
 import { EXTERNAL_LINKS, H4, Overlay, useSearchParams } from 'src/shared';
 import {
@@ -57,6 +58,8 @@ const WebhooksViewPage: FC = () => {
     }, [webhookIdNum, setSelectedWebhookId]);
 
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isSuspendedOpen, onOpen: onSuspendedOpen, onClose: onSuspendedClose } = useDisclosure();
+    const { isOpen: isRefillOpen, onOpen: onRefillOpen, onClose: onRefillClose } = useDisclosure();
 
     // If URL has invalid webhookId, redirect to main webhooks page
     if (webhookId && !webhookIdNum) {
@@ -93,7 +96,8 @@ const WebhooksViewPage: FC = () => {
 
     const isEmpty = subscriptions.length === 0;
 
-    const isOnline = selectedWebhook.status === RTWebhookListStatusEnum.RTOnline;
+    const isOffline = selectedWebhook.status === RTWebhookListStatusEnum.RTOffline;
+    const isSuspended = selectedWebhook.status === RTWebhookListStatusEnum.RTSuspended;
 
     return (
         <>
@@ -135,17 +139,22 @@ const WebhooksViewPage: FC = () => {
                             <Flex align="center" justify="space-between" gap={4}>
                                 <H4>Status</H4>
                                 <Flex gap="3">
-                                    <StatusIndicator isOnline={isOnline} label />
-                                    {!isOnline && (
+                                    <StatusIndicator
+                                        variant={getWebhookStatusVariant(selectedWebhook.status)}
+                                        label={getWebhookStatusLabel(selectedWebhook.status)}
+                                    />
+                                    {isOffline && (
                                         <Button
                                             isLoading={isBackToOnlinePending}
-                                            onClick={() =>
-                                                selectedWebhook &&
-                                                backToOnline(selectedWebhook.id)
-                                            }
-                                            size={'sm'}
+                                            onClick={() => backToOnline(selectedWebhook.id)}
+                                            size="sm"
                                         >
                                             Try Online
+                                        </Button>
+                                    )}
+                                    {isSuspended && (
+                                        <Button onClick={onSuspendedOpen} size="sm">
+                                            Top Up Balance
                                         </Button>
                                     )}
                                 </Flex>
@@ -248,6 +257,12 @@ const WebhooksViewPage: FC = () => {
                 )}
             </Overlay>
             <AddSubscriptionsModal isOpen={isOpen} onClose={onClose} />
+            <WebhookSuspendedModal
+                isOpen={isSuspendedOpen}
+                onClose={onSuspendedClose}
+                onOpenRefill={onRefillOpen}
+            />
+            <RefillModal isOpen={isRefillOpen} onClose={onRefillClose} />
         </>
     );
 };

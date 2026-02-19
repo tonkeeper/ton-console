@@ -10,5 +10,6 @@ export {
   useBackWebhookToOnlineMutation,
   type Subscription
 } from './queries';
- 
+export { getWebhookStatusLabel, getWebhookStatusVariant } from './utils';
+
 export { WebhooksProvider, useWebhooksUI } from './webhooks.context.tsx';

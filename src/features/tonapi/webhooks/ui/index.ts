@@ -1,5 +1,6 @@
 export { default as CreateWebhookModal } from './CreateWebhookModal';
 export { default as DeleteWebhookModal } from './DeleteWebhookModal';
+export { default as WebhookSuspendedModal } from './WebhookSuspendedModal';
 export { default as WebhooksTable } from './WebhooksTable';
 
 export { default as CreateSubscriptionsModal } from './AddSubscriptionsModal';

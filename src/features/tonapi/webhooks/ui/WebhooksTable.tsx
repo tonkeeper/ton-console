@@ -29,11 +29,10 @@ import {
     copyToClipboard,
     IconButton
 } from 'src/shared';
-import { useWebhooksQuery, useWebhooksUI } from '../model';
+import { useWebhooksQuery, useWebhooksUI, getWebhookStatusLabel } from '../model';
 import { Webhook } from '../model/interfaces/webhooks';
 import DeleteWebhookModal from './DeleteWebhookModal';
 import { useNavigate, Link as ReactRouterLink } from 'react-router-dom';
-import { RTWebhookListStatusEnum } from 'src/shared/api/streaming-api';
 
 const WebhooksTable: FC<TableContainerProps> = props => {
     const navigate = useNavigate();
@@ -139,9 +138,7 @@ const WebhooksTable: FC<TableContainerProps> = props => {
                                         {webhook.subscribed_to_new_contracts ? 'Yes' : 'No'}
                                     </Td>
                                     <Td maxW="100px" onClick={e => e.preventDefault()}>
-                                        {webhook.status === RTWebhookListStatusEnum.RTOnline
-                                            ? 'Online'
-                                            : 'Offline'}
+                                        {getWebhookStatusLabel(webhook.status)}
                                     </Td>
                                     <Td w="100px">
                                         <Flex
