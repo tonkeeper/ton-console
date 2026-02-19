@@ -1,5 +1,5 @@
-import { FC, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { FC, useEffect, useRef } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { SubscriptionsTable, useWebhooksUI, useWebhooksQuery, useWebhookSubscriptionsQuery, useBackWebhookToOnlineMutation, WebhookSuspendedModal, getWebhookStatusLabel, getWebhookStatusVariant } from 'src/features/tonapi/webhooks';
 import { RefillModal } from 'src/entities';
 import { EmptySubscriptions } from './EmptySubscriptions';
@@ -24,6 +24,7 @@ import { ChevronRightIcon16 } from 'src/shared/ui/icons/ChevronRightIcon16';
 import { StatsCard } from 'src/entities/stats/Card';
 import StatusIndicator from 'src/shared/ui/StatusIndicator';
 import { RTWebhookListStatusEnum } from 'src/shared/api/streaming-api';
+import { useProjectId } from 'src/shared/contexts/ProjectContext';
 
 /**
  * Safe parse webhookId from URL params
@@ -41,7 +42,17 @@ const WebhooksViewPage: FC = () => {
     const webhookIdNum = parseWebhookId(webhookId);
 
     const { setSelectedWebhookId, network } = useWebhooksUI();
-    const { data: webhooks = [] } = useWebhooksQuery(network);
+    const navigate = useNavigate();
+    const currentProjectId = useProjectId();
+    const initialProjectIdRef = useRef(currentProjectId);
+
+    useEffect(() => {
+        if (currentProjectId !== initialProjectIdRef.current) {
+            navigate('/tonapi/webhooks', { replace: true });
+        }
+    }, [currentProjectId, navigate]);
+
+    const { data: webhooks = [], isLoading: webhooksLoading } = useWebhooksQuery(network);
     const { data: subscriptions = [], isLoading: subscriptionsLoading } = useWebhookSubscriptionsQuery(webhookIdNum, 1);
     const { mutate: backToOnline, isPending: isBackToOnlinePending } = useBackWebhookToOnlineMutation(network);
 
@@ -66,11 +77,48 @@ const WebhooksViewPage: FC = () => {
         return <Navigate to="/tonapi/webhooks" replace />;
     }
 
-    if (!selectedWebhook || subscriptionsLoading) {
+    if (webhooksLoading || subscriptionsLoading) {
         return (
             <Center h="300px">
                 <Spinner />
             </Center>
+        );
+    }
+
+    if (!selectedWebhook) {
+        return (
+            <Overlay h="fit-content">
+                <Center py="16">
+                    <Box
+                        maxW="460px"
+                        w="100%"
+                        p="6"
+                        border="1px solid"
+                        borderColor="background.contentTint"
+                        bg="background.contentTint"
+                        borderRadius="sm"
+                    >
+                        <H4 mb="4">Webhook #{webhookIdNum} Not Found</H4>
+                        <Text mb="2" color="text.secondary" fontSize="14px">
+                            Possible reasons:
+                        </Text>
+                        <Flex as="ul" direction="column" gap="1" pl="5" color="text.secondary" fontSize="14px">
+                            <li>The webhook belongs to a different project</li>
+                            <li>
+                                It&apos;s on a different network (
+                                {network === 'mainnet' ? 'try testnet' : 'try mainnet'})
+                            </li>
+                            <li>The webhook has been deleted</li>
+                            <li>The link is outdated or incorrect</li>
+                        </Flex>
+                        <Center mt="6">
+                            <Button as={RouterLink} to="/tonapi/webhooks">
+                                Back to Webhooks
+                            </Button>
+                        </Center>
+                    </Box>
+                </Center>
+            </Overlay>
         );
     }
 
