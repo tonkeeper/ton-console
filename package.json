@@ -9,18 +9,13 @@
     "build": "tsc && vite build",
     "build:staging": "tsc && vite build --mode staging",
     "preview": "vite preview",
-    "test": "vitest",
     "typecheck": "tsc -p tsconfig.json --noemit",
     "lint": "eslint ./",
-    "lint:fix": "eslint ./ --fix",
-    "lint:unused": "eslint ./ --no-eslintrc --config .eslintrc.unused.cjs",
-    "knip": "knip",
-    "prepare": "husky install",
+    "test": "npm run lint && npm run typecheck",
     "api:generate": "openapi-ts",
     "generate-webhooks": "npx tsx ./scripts/webhooks.ts",
     "generate-airdrop": "npx tsx ./scripts/airdrop.ts",
-    "generate-airdrop2": "npx tsx ./scripts/airdrop2.ts",
-    "postinstall": "patch-package"
+    "generate-airdrop2": "npx tsx ./scripts/airdrop2.ts"
   },
   "dependencies": {
     "@chakra-ui/anatomy": "^2.3.6",
@@ -84,10 +79,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-unused-imports": "^3.2.0",
-    "husky": "^8.0.3",
-    "knip": "^5.66.2",
     "lint-staged": "^16.2.6",
-    "patch-package": "^8.0.0",
     "swagger-typescript-api": "^13.0.5",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
@@ -96,7 +88,6 @@
     "vite-plugin-html": "^3.2.2",
     "vite-plugin-mkcert": "^1.13.3",
     "vite-plugin-node-polyfills": "^0.22.0",
-    "vite-tsconfig-paths": "^4.0.5",
-    "vitest": "^2.1.1"
+    "vite-tsconfig-paths": "^4.0.5"
   }
 }

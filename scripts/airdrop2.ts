@@ -2,7 +2,7 @@ import { GenerateApiParams, generateApi } from 'swagger-typescript-api';
 import path from 'path';
 
 const generateApiParams: GenerateApiParams = {
-    name: 'airdrop2.generated.ts',
+    fileName: 'airdrop2.generated.ts',
     output: path.resolve(process.cwd(), './src/shared/api'),
     input: path.resolve(process.cwd(), './scripts/airdrop2.yaml'),
     apiClassName: 'Api',

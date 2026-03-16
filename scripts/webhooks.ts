@@ -6,7 +6,7 @@ const OUTPUT_DIR = path.resolve(process.cwd(), './src/shared/api');
 const TARGET_FILE = path.join(OUTPUT_DIR, 'rt.tonapi.generated.ts');
 
 const generateApiParams: GenerateApiParams = {
-    name: 'rt.tonapi.generated.ts',
+    fileName: 'rt.tonapi.generated.ts',
     output: OUTPUT_DIR,
     url: 'https://raw.githubusercontent.com/tonkeeper/opentonapi/refs/heads/master/api/rt.yml',
     typePrefix: 'RT',
