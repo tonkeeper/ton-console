@@ -14,8 +14,7 @@
     "test": "npm run lint && npm run typecheck",
     "api:generate": "openapi-ts",
     "generate-webhooks": "npx tsx ./scripts/webhooks.ts",
-    "generate-airdrop": "npx tsx ./scripts/airdrop.ts",
-    "generate-airdrop2": "npx tsx ./scripts/airdrop2.ts"
+    "generate-airdrop": "npx tsx ./scripts/airdrop.ts"
   },
   "dependencies": {
     "@chakra-ui/anatomy": "^2.3.6",
