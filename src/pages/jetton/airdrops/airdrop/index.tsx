@@ -11,6 +11,7 @@ import {
     Spinner,
     Text
 } from '@chakra-ui/react';
+import { observer } from 'mobx-react-lite';
 import { TonConnectButton } from '@tonconnect/ui-react';
 import { InfoComponent } from './InfoComponent';
 import { UploadComponent } from './UploadComponent';
@@ -193,4 +194,4 @@ const AirdropPage: FC<AirdropPageProps> = ({ airdropsStore, ...props }) => {
     );
 };
 
-export default AirdropPage;
+export default observer(AirdropPage);

@@ -146,7 +146,7 @@ const MetricChart: FC<MetricChartProps> = ({
                         minTickGap={period ? 50 : undefined}
                     />
                     <YAxis axisLine={false} tickLine={false} padding={{ top: 10, bottom: 0 }} />
-                    <Tooltip labelFormatter={formatTooltip} />
+                    <Tooltip labelFormatter={(v) => formatTooltip(v)} />
                     <Legend />
                 </LineChart>
             </ResponsiveContainer>

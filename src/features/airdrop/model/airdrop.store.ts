@@ -69,7 +69,7 @@ export class AirdropStore {
                     admin: adminAddress,
                     jetton: address,
                     royalty_parameters: { min_commission: toNano(fee).toString() },
-                    vesting_parameters: vesting?.length
+                    vesting_parameters: !!vesting?.length
                         ? {
                               unlocks_list: vesting.map(item => ({
                                   unlock_time: Math.floor(
@@ -110,6 +110,7 @@ export class AirdropStore {
         this.distributors$.value = distributors;
 
         const current = this.airdrops.find(i => i.api_id === id);
+
         if (!current) {
             throw new Error('Airdrop not found in local store');
         }
@@ -139,71 +140,6 @@ export class AirdropStore {
     switchClaim = async (id: string, type: 'enable' | 'disable') => {
         const methodClaim =
             type === 'enable' ? airdropApiClient.v2.openClaim : airdropApiClient.v2.closeClaim;
-
-        await methodClaim({
-            id,
-            project_id: `${this.projectId}`
-        }).finally(() => this.loadAirdrop(id));
-    };
-
-    clearAirdrop() {
-        this.airdrop$.clear();
-        this.distributors$.clear();
-    }
-}
-
-// Depricated class for old airdrop API
-export class AirdropOldStore {
-    airdrop$ = new Loadable<AirdropFullT | null>(null);
-
-    distributors$ = new Loadable<ADDistributorData[]>([]);
-
-    private readonly projectId: number;
-
-    constructor({ projectId }: { projectId: number }) {
-        makeAutoObservable(this);
-        this.projectId = projectId;
-    }
-
-    loadAirdrop = this.airdrop$.createAsyncAction(async (id: string) => {
-        const airdrop = await airdropApiClient.v1
-            .getAirdropData({ id, project_id: `${this.projectId}` })
-            .then(v => v.data);
-
-        const distributors = await airdropApiClient.v1
-            .getDistributorsData({
-                id,
-                project_id: `${this.projectId}`
-            })
-            .then(v => v.data.distributors);
-
-        this.distributors$.value = distributors;
-
-        const status = getAirdropStatus(airdrop, distributors);
-
-        const data: AirdropFullT = {
-            ...airdrop,
-            name: 'Legacy airdrop',
-            status: status
-        };
-
-        return data;
-    });
-
-    loadDistributors = this.distributors$.createAsyncAction(async (id: string) => {
-        const distributors = await airdropApiClient.v1
-            .getDistributorsData({
-                id,
-                project_id: `${this.projectId}`
-            })
-            .then(({ data }) => data.distributors);
-
-        return distributors;
-    });
-
-    switchClaim = async (id: string, type: 'enable' | 'disable') => {
-        const methodClaim =
-            type === 'enable' ? airdropApiClient.v1.openClaim : airdropApiClient.v1.closeClaim;
 
         await methodClaim({
             id,

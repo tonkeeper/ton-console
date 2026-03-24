@@ -131,7 +131,7 @@ const JettonNewPage: FC<BoxProps> = () => {
                     Mint
                 </Button>
             ) : (
-                <Button flex={1} maxW={600} mt={4} onClick={openConnect} variant="primary">
+                <Button flex={1} maxW={600} mt={4} onClick={() => openConnect()} variant="primary">
                     Connect Wallet
                 </Button>
             )}

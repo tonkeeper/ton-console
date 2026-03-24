@@ -198,7 +198,7 @@ const CreateAirdropPage: FC<CreatePageProps> = ({ airdropsStore, ...props }) => 
                             Continue
                         </Button>
                     ) : (
-                        <Button flex={1} maxW={600} mt={4} onClick={openConnect} variant="primary">
+                        <Button flex={1} maxW={600} mt={4} onClick={() => openConnect()} variant="primary">
                             Connect W5 Wallet
                         </Button>
                     )}
