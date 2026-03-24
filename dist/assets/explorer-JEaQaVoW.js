@@ -1,0 +1,1 @@
+class e{constructor(t){this.baseUrl=t}accountLink(t){return`${this.baseUrl}/${t}`}transactionLink(t){return`${this.baseUrl}/transaction/${t}`}}const s=new e("https://testnet.tonviewer.com"),n=new e("https://tonviewer.com");export{n as e,s as t};
