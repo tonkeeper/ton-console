@@ -50,7 +50,7 @@ export default ({ mode }) => {
         ],
         server: {
             host: '127.0.0.1', // Need fix for bot validate URL
-            port: 3000,
+            port: 3001,
             watch: {
                 usePolling: true
             },

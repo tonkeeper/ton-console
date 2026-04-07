@@ -6,7 +6,7 @@ export function createTransferLink(
         jetton: string;
     }
 ): string {
-    const baseUrl = 'https://app.tonkeeper.com/transfer';
+    const baseUrl = 'ton://transfer';
     const link = new URL(address ? `${baseUrl}/${address}` : baseUrl);
 
     link.searchParams.append('jetton', options.jetton);
