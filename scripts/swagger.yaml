@@ -1657,7 +1657,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
-    
+
   /api/v1/services/cnft/config:
     get:
       summary: "Get cNFT config"
@@ -2885,6 +2885,7 @@ components:
       type: string
       enum:
         - "webhooks"
+        - "cocoon"
     TonConnectProof:
       type: object
       required:
@@ -3033,26 +3034,28 @@ components:
         - $ref: '#/components/schemas/ChatGptRequestPaymentMeta'
         - $ref: '#/components/schemas/PromoCodeActivationMeta'
         - $ref: '#/components/schemas/StreamingApiPaymentMeta'
+        - $ref: '#/components/schemas/CocoonApiPaymentMeta'
         - $ref: '#/components/schemas/ReplenishmentOfDepositMeta'
         - $ref: '#/components/schemas/AnalyticsRequestPaymentMeta'
         - $ref: '#/components/schemas/OtherMeta'
       discriminator:
-          propertyName: reason
-          mapping:
-            tonapi_monthly_payment: TonapiMonthlyPaymentMeta
-            tonapi_instant_payment: TonapiInstantPaymentMeta
-            tonapi_change_tier: TonapiChangeTierMeta
-            liteproxy_monthly_payment: LiteproxyMonthlyPaymentMeta
-            liteproxy_change_tier: LiteproxyChangeTierMeta
-            testnet_tons_purchase: TestnetTonsPurchaseMeta
-            cnft_indexing_payment: CnftIndexingPaymentMeta
-            message_package_purchase: MessagePackagePurchaseMeta
-            chatgpt_request_payment: ChatGptRequestPaymentMeta
-            promo_code_activation: PromoCodeActivationMeta
-            streaming_api_payment: StreamingApiPaymentMeta
-            replenishment_of_deposit: ReplenishmentOfDepositMeta
-            analytics_request_payment: AnalyticsRequestPaymentMeta
-            other: OtherMeta
+        propertyName: reason
+        mapping:
+          tonapi_monthly_payment: TonapiMonthlyPaymentMeta
+          tonapi_instant_payment: TonapiInstantPaymentMeta
+          tonapi_change_tier: TonapiChangeTierMeta
+          liteproxy_monthly_payment: LiteproxyMonthlyPaymentMeta
+          liteproxy_change_tier: LiteproxyChangeTierMeta
+          testnet_tons_purchase: TestnetTonsPurchaseMeta
+          cnft_indexing_payment: CnftIndexingPaymentMeta
+          message_package_purchase: MessagePackagePurchaseMeta
+          chatgpt_request_payment: ChatGptRequestPaymentMeta
+          promo_code_activation: PromoCodeActivationMeta
+          streaming_api_payment: StreamingApiPaymentMeta
+          cocoon_api_payment: CocoonApiPaymentMeta
+          replenishment_of_deposit: ReplenishmentOfDepositMeta
+          analytics_request_payment: AnalyticsRequestPaymentMeta
+          other: OtherMeta
     TonapiMonthlyPaymentMeta:
       type: object
       properties:
@@ -3109,6 +3112,8 @@ components:
         period:
           type: integer
           format: int32
+    CocoonApiPaymentMeta:
+      type: object
     ReplenishmentOfDepositMeta:
       type: object
       properties:
@@ -4197,9 +4202,9 @@ components:
               - usdt_balance
             properties:
               usdt_balance:
-                  $ref: '#/components/schemas/Balance'
+                $ref: '#/components/schemas/Balance'
               ton_balance:
-                  $ref: '#/components/schemas/Balance'
+                $ref: '#/components/schemas/Balance'
               history:
                 type: array
                 items:
@@ -4792,4 +4797,3 @@ components:
                 type: integer
                 format: int64
                 example: 1000000000
-

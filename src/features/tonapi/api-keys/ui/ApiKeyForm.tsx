@@ -32,6 +32,7 @@ type ApiKeyFormWithoutLimit = {
     name: string;
     useIPLimit: false;
     availableWebhook: boolean;
+    availableCocoon: boolean;
 };
 
 export type ApiKeyFormInternal = ApiKeyFormWithLimit | ApiKeyFormWithoutLimit;
@@ -51,7 +52,12 @@ export const ApiKeyForm: FC<
             : undefined;
 
         const capabilities =
-            !form.useIPLimit && form.availableWebhook ? [DTOTokenCapability.WEBHOOKS] : [];
+            !form.useIPLimit
+                ? [
+                      ...(form.availableWebhook ? [DTOTokenCapability.WEBHOOKS] : []),
+                      ...(form.availableCocoon ? [DTOTokenCapability.COCOON] : [])
+                  ]
+                : [];
 
         onSubmit({
             name: form.name,
@@ -243,9 +249,14 @@ export const ApiKeyForm: FC<
 
             {!useIPLimit && (
                 <FormControl mt="4" mb="0" isInvalid={!!ipLimitValueErrors} isRequired>
-                    <Checkbox size="sm" {...register('availableWebhook')}>
-                        <Text textStyle="label2">Allow webhook management</Text>
-                    </Checkbox>
+                    <Flex direction="column" align="flex-start" gap="3">
+                        <Checkbox size="sm" {...register('availableWebhook')}>
+                            <Text textStyle="label2">Allow webhook management</Text>
+                        </Checkbox>
+                        <Checkbox size="sm" {...register('availableCocoon')}>
+                            <Text textStyle="label2">Allow Cocoon</Text>
+                        </Checkbox>
+                    </Flex>
                 </FormControl>
             )}
         </chakra.form>
@@ -266,6 +277,8 @@ export function toApiKeyFormDefaultValues(
               name: createApiKeyForm?.name,
               useIPLimit: false,
               availableWebhook:
-                  createApiKeyForm?.capabilities.includes(DTOTokenCapability.WEBHOOKS) ?? false
+                  createApiKeyForm?.capabilities.includes(DTOTokenCapability.WEBHOOKS) ?? false,
+              availableCocoon:
+                  createApiKeyForm?.capabilities.includes(DTOTokenCapability.COCOON) ?? false
           };
 }

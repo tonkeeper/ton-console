@@ -38,6 +38,7 @@ const reasonMapping = {
     ChatGptRequestPaymentMeta: 'chatgpt_request_payment',
     PromoCodeActivationMeta: 'promo_code_activation',
     StreamingApiPaymentMeta: 'streaming_api_payment',
+    CocoonApiPaymentMeta: 'cocoon_api_payment',
     ReplenishmentOfDepositMeta: 'replenishment_of_deposit',
     AnalyticsRequestPaymentMeta: 'analytics_request_payment',
     OtherMeta: 'Default'
@@ -234,6 +235,7 @@ const descriptionFormatters: DescriptionFormattersMap = {
             </>
         );
     },
+    cocoon_api_payment: () => <>Cocoon API payment</>,
     replenishment_of_deposit: info => {
         const { tx_hash } = info as DTOReplenishmentOfDepositMeta;
 

@@ -55,7 +55,8 @@ export type DTOTgAuth = {
 };
 
 export enum DTOTokenCapability {
-    WEBHOOKS = 'webhooks'
+    WEBHOOKS = 'webhooks',
+    COCOON = 'cocoon'
 }
 
 export type DTOTonConnectProof = {
@@ -127,6 +128,8 @@ export type DTOBillingTxInfo = ({
 } & DTOPromoCodeActivationMeta) | ({
     reason: 'StreamingApiPaymentMeta';
 } & DTOStreamingApiPaymentMeta) | ({
+    reason: 'CocoonApiPaymentMeta';
+} & DTOCocoonApiPaymentMeta) | ({
     reason: 'ReplenishmentOfDepositMeta';
 } & DTOReplenishmentOfDepositMeta) | ({
     reason: 'AnalyticsRequestPaymentMeta';
@@ -173,6 +176,10 @@ export type DTOPromoCodeActivationMeta = {
 
 export type DTOStreamingApiPaymentMeta = {
     period?: number;
+};
+
+export type DTOCocoonApiPaymentMeta = {
+    [key: string]: unknown;
 };
 
 export type DTOReplenishmentOfDepositMeta = {

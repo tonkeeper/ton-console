@@ -13,7 +13,8 @@ import {
     MenuItem,
     Menu,
     Box,
-    TableContainerProps
+    TableContainerProps,
+    Portal
 } from '@chakra-ui/react';
 import { FC, useCallback, useEffect, useState } from 'react';
 import {
@@ -128,22 +129,29 @@ const ApiKeysTable: FC<ApiKeysTableProps> = ({ apiKeys, ...props }) => {
                                         <chakra.span color="text.secondary">
                                             {apiKey.creationDate.toDateString()}
                                         </chakra.span>
-                                        <Menu placement="bottom-end">
-                                            <MenuButtonIcon icon={<VerticalDotsIcon16 />} />
-                                            <MenuList w="132px">
-                                                <MenuItem onClick={() => openEditModal(apiKey)}>
-                                                    <EditIcon24 mr="2" />
-                                                    <Text textStyle="label2" fontFamily="body">
-                                                        Edit
-                                                    </Text>
-                                                </MenuItem>
-                                                <MenuItem onClick={() => openDeleteModal(apiKey)}>
-                                                    <DeleteIcon24 mr="2" />
-                                                    <Text textStyle="label2" fontFamily="body">
-                                                        Delete
-                                                    </Text>
-                                                </MenuItem>
-                                            </MenuList>
+                                        <Menu isLazy placement="bottom-end">
+                                            <MenuButtonIcon
+                                                aria-label="Open API key actions"
+                                                icon={<VerticalDotsIcon16 />}
+                                            />
+                                            <Portal>
+                                                <MenuList w="132px">
+                                                    <MenuItem onClick={() => openEditModal(apiKey)}>
+                                                        <EditIcon24 mr="2" />
+                                                        <Text textStyle="label2" fontFamily="body">
+                                                            Edit
+                                                        </Text>
+                                                    </MenuItem>
+                                                    <MenuItem
+                                                        onClick={() => openDeleteModal(apiKey)}
+                                                    >
+                                                        <DeleteIcon24 mr="2" />
+                                                        <Text textStyle="label2" fontFamily="body">
+                                                            Delete
+                                                        </Text>
+                                                    </MenuItem>
+                                                </MenuList>
+                                            </Portal>
                                         </Menu>
                                     </Flex>
                                 </Td>
