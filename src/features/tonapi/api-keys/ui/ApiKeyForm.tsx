@@ -57,7 +57,7 @@ export const ApiKeyForm: FC<
                 ? [
                       ...(form.availableWebhook ? [DTOTokenCapability.WEBHOOKS] : []),
                       ...(form.availableCocoon ? [DTOTokenCapability.COCOON] : []),
-                      ...(form.availableCocoon ? [DTOTokenCapability.MEMPOOL] : [])
+                      ...(form.availableMempool ? [DTOTokenCapability.MEMPOOL] : [])
                   ]
                 : [];
 
