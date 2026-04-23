@@ -1,1 +1,0 @@
-import{ek as e}from"./index-BvYXAkJf.js";function t(n){switch(n){case e.RTOnline:return"Online";case e.RTOffline:return"Offline";case e.RTSuspended:return"Suspended"}}function r(n){switch(n){case e.RTOnline:return"success";case e.RTOffline:case e.RTSuspended:return"error"}}export{r as a,t as g};
