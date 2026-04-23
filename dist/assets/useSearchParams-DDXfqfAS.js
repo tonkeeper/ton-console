@@ -1,1 +1,0 @@
-import{cV as n,r as o}from"./index-mNEfgtlJ.js";const h=()=>{const[a,r]=n(),c=o.useCallback(m=>{const e=new URLSearchParams(a);Object.entries(m).forEach(([s,t])=>{if(t===null){e.delete(s);return}e.set(s,t)}),r(e)},[a,r]);return{searchParams:a,setSearchParams:r,updateSearchParams:c}};export{h as u};
