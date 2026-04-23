@@ -33,7 +33,6 @@ type ApiKeyFormWithoutLimit = {
     useIPLimit: false;
     availableWebhook: boolean;
     availableCocoon: boolean;
-    availableMempool: boolean;
 };
 
 export type ApiKeyFormInternal = ApiKeyFormWithLimit | ApiKeyFormWithoutLimit;
@@ -57,7 +56,6 @@ export const ApiKeyForm: FC<
                 ? [
                       ...(form.availableWebhook ? [DTOTokenCapability.WEBHOOKS] : []),
                       ...(form.availableCocoon ? [DTOTokenCapability.COCOON] : []),
-                      ...(form.availableMempool ? [DTOTokenCapability.MEMPOOL] : [])
                   ]
                 : [];
 
@@ -258,9 +256,6 @@ export const ApiKeyForm: FC<
                         <Checkbox size="sm" {...register('availableCocoon')}>
                             <Text textStyle="label2">Allow Cocoon</Text>
                         </Checkbox>
-                        <Checkbox size="sm" {...register('availableMempool')}>
-                            <Text textStyle="label2">Allow Mempool</Text>
-                        </Checkbox>
                     </Flex>
                 </FormControl>
             )}
@@ -285,7 +280,5 @@ export function toApiKeyFormDefaultValues(
                   createApiKeyForm?.capabilities.includes(DTOTokenCapability.WEBHOOKS) ?? false,
               availableCocoon:
                   createApiKeyForm?.capabilities.includes(DTOTokenCapability.COCOON) ?? false,
-              availableMempool:
-                  createApiKeyForm?.capabilities.includes(DTOTokenCapability.MEMPOOL) ?? false
           };
 }

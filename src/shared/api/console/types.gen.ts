@@ -56,8 +56,7 @@ export type DTOTgAuth = {
 
 export enum DTOTokenCapability {
     WEBHOOKS = 'webhooks',
-    COCOON = 'cocoon',
-    MEMPOOL = 'mempool'
+    COCOON = 'cocoon'
 }
 
 export type DTOTonConnectProof = {
