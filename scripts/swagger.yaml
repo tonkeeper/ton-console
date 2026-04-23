@@ -2886,6 +2886,7 @@ components:
       enum:
         - "webhooks"
         - "cocoon"
+        - "mempool"
     TonConnectProof:
       type: object
       required:
