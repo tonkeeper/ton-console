@@ -11,7 +11,7 @@ export const EmptyAirdrops: FC = () => {
                     <H3>Airdrops</H3>
                     <Text textStyle="Body2" color="text.secondary">
                         Service enables a mass jetton distribution model where the recipient pays a
-                        fixed fee in TONs and receives jettons. The distribution is carried out to a
+                        fixed fee in GRAM and receives jettons. The distribution is carried out to a
                         fixed list of Recipients. In the following, we will refer to the jetton
                         distribution process as an Airdrop.
                     </Text>

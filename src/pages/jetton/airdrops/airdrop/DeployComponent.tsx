@@ -201,18 +201,18 @@ const DeployComponentInner = ({
                     isLoading={status === 'withdraw_ton' && loading}
                     onClick={sendTransaction}
                 >
-                    Withdraw TON
+                    Withdraw GRAM
                 </Button>
             </Flex>
         );
     }
 
     let buttonText = 'Deploy';
-    let text = `You need ${prettifyAmount(fromNano(amount.ton))} TON on your wallet`;
+    let text = `You need ${prettifyAmount(fromNano(amount.ton))} GRAM on your wallet`;
 
     if (status === 'topup') {
         buttonText = 'Top Up';
-        text = `You need ${prettifyAmount(fromNano(amount.ton))} TON and ${prettifyAmount(
+        text = `You need ${prettifyAmount(fromNano(amount.ton))} GRAM and ${prettifyAmount(
             amount.jetton! / 10 ** parseFloat(airdrop.jetton.decimals)
         )} ${airdrop.jetton.symbol} on your wallet`;
     }

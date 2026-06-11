@@ -25,7 +25,7 @@ export const TonDeprecatedTab: FC<TonDeprecatedTabProps> = ({ tonDepositWallet }
                     </Box>
                     <VStack align="flex-start" spacing="1">
                         <Text textStyle="label1" color="orange.900">
-                            TON Balance is Deprecated
+                            GRAM Balance is Deprecated
                         </Text>
                         <Text textStyle="body2" color="orange.800">
                             This method is no longer recommended. Please use USDT refills instead.
@@ -37,7 +37,7 @@ export const TonDeprecatedTab: FC<TonDeprecatedTabProps> = ({ tonDepositWallet }
             {tonDepositWallet && (
                 <Box w="full">
                     <Text textStyle="body2" color="text.secondary">
-                        Deposit address for TON (legacy):
+                        Deposit address for Gram (prev. Toncoin):
                     </Text>
                     <CopyPad text={tonDepositWallet} />
                 </Box>

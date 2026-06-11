@@ -60,19 +60,6 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                 </Button>
             </FeatureCard>
 
-            {/* <FeatureCard
-                background="linear-gradient(104deg, #5C92FF 0%, #3D7EFF 100%)"
-                src="/assets/images/tonkeeper-NFT.webp"
-                heading="NFT Themes"
-                description="Customize Tonkeeper with your NFTs."
-                imgBorder
-                {...(isContrast && { backgroundColor: 'background.content' })}
-            >
-                <Button onClick={openFeedbackModal('nft-themes')} variant={buttonVariant}>
-                    Become Partner
-                </Button>
-            </FeatureCard> */}
-
             <FeatureCard
                 background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
                 src="/assets/images/tonkeeper-swap.webp"
@@ -85,19 +72,6 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                     Become Partner
                 </Button>
             </FeatureCard>
-
-            {/* <FeatureCard
-                background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
-                src="/assets/images/tonkeeper-price-graph.webp"
-                heading="Token Stats & Prices"
-                description="Add a chart for your token on Tonkeeper: unlock exclusive customization for your holders' UX."
-                imgBorder
-                {...(isContrast && { backgroundColor: 'background.content' })}
-            >
-                <Button onClick={openFeedbackModal('token-stats')} variant={buttonVariant}>
-                    Become Partner
-                </Button>
-            </FeatureCard> */}
 
             <FeatureCard
                 background="linear-gradient(104deg, #2EA5FF 0%, #0F97FF 100%)"
@@ -164,45 +138,6 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                     </Button>
                 )}
             </FeatureCard>
-
-            {/* <FeatureCard
-                background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
-                imgSources={[
-                    {
-                        media: '(max-width: 490px)',
-                        srcSet: '/assets/images/tonviewer-pages-m.webp'
-                    }
-                ]}
-                src="/assets/images/tonviewer-pages.webp"
-                heading="Custom Pages"
-                description="Promote your own project through most convenient blockchain&nbsp;explorer in the TON ecosystem."
-                {...(isContrast && { backgroundColor: 'background.content' })}
-            >
-                <Button
-                    onClick={openFeedbackModal('tonviewer-custom-pages')}
-                    variant={buttonVariant}
-                >
-                    Become Partner
-                </Button>
-            </FeatureCard> */}
-
-            {/* <FeatureCard
-                background="linear-gradient(104deg, #2EA5FF 0%, #0F97FF 100%);"
-                imgSources={[
-                    {
-                        media: '(max-width: 490px)',
-                        srcSet: '/assets/images/tonviewer-widget-m.webp'
-                    }
-                ]}
-                src="/assets/images/tonviewer-widget.webp"
-                heading="App Widget on Tonviewer"
-                description="Add a custom widget with stats and actions to your decentralized app."
-                {...(isContrast && { backgroundColor: 'background.content' })}
-            >
-                <Button onClick={openFeedbackModal('tonviewer-app-widget')} variant={buttonVariant}>
-                    Become Partner
-                </Button>
-            </FeatureCard> */}
 
             <FeatureCard
                 background="linear-gradient(104deg, #2EA5FF 0%, #0F97FF 100%);"

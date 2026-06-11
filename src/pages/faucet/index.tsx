@@ -114,18 +114,18 @@ const FaucetPage: FC = () => {
                 <Flex align="center" justify="space-between" gap="4" w="100%">
                     <Flex align="center" wrap="wrap" gap="4">
                         <Button form={formId} isLoading={isBuyingAssets} type="submit">
-                            {price ? `Buy for ${price.stringCurrencyAmount}` : 'Buy Testnet TON'}
+                            {price ? `Buy for ${price.stringCurrencyAmount}` : 'Buy Testnet GRAM'}
                         </Button>
                     </Flex>
                     {testnetTonRate > 0 && (
                         <Box textStyle="label2" color="text.secondary" textAlign="right">
-                            1 testnet TON =&nbsp;${formatNumber(testnetTonRate, { decimalPlaces: 2 })}
+                            1 testnet GRAM =&nbsp;${formatNumber(testnetTonRate, { decimalPlaces: 2 })}
                         </Box>
                     )}
 
                     {latestPurchase && (
                         <Box textStyle="label2" ml="auto" color="text.secondary" textAlign="right">
-                            Bought {latestPurchase.amount.stringAmount} testnet TON{' '}
+                            Bought {latestPurchase.amount.stringAmount} testnet GRAM{' '}
                             <Link
                                 textStyle="label2"
                                 color="text.accent"

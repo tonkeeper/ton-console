@@ -10,9 +10,9 @@ const RegisterProject: FC = () => {
 
     return (
         <Overlay h="fit-content" pb="76px">
-            <H4 mb="1">Track TON Payments</H4>
+            <H4 mb="1">Track GRAM Payments</H4>
             <Text textStyle="body2" mb="5" color="text.secondary">
-                Easy TON transaction tracking
+                Easy GRAM transaction tracking
             </Text>
             <Divider w="auto" mx="-6" mb="76px" />
             <Flex align="center" direction="column">

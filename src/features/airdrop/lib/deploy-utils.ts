@@ -25,7 +25,7 @@ export const checkAccount = async (v: AccountCheckT) => {
         const account = await tonapiClient.accounts.getAccount(Address.parse(v.admin));
 
         if (account.balance < BigInt(v.needTon)) {
-            v.errCb({ title: 'Not enough TON', text: 'Top up balance and try again' });
+            v.errCb({ title: 'Not enough GRAM', text: 'Top up balance and try again' });
             return false;
         }
     }

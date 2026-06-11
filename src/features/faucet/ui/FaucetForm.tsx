@@ -108,7 +108,7 @@ export const FaucetForm: FC<
                         />
                         <InputRightElement w="130px">
                             <Span textStyle="body2" color="text.secondary">
-                                TON (testnet)
+                                GRAM (testnet)
                             </Span>
                         </InputRightElement>
                     </InputGroup>

@@ -246,7 +246,7 @@ const RefillModalContent: FC<{
                                     {...getRadioProps({ value: 'TON' })}
                                     key="TON"
                                 >
-                                    TON
+                                    GRAM
                                 </RadioCard>
                             )}
                             <RadioCard

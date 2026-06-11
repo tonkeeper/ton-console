@@ -42,7 +42,7 @@ const Control = <T extends { [controlId]: string }>({
             />
 
             <FormHelperText color="text.secondary">
-                The decimal precision of your token (9 is TON default).
+                The decimal precision of your token (9 is GRAM default).
             </FormHelperText>
             <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
         </FormControl>

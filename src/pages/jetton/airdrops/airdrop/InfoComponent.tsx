@@ -100,7 +100,7 @@ export const InfoComponent = ({
                     />
                     <TextItem
                         title="Claim Fee"
-                        text={`${prettifyAmount(fromNano(royalty_parameters.min_commission))} TON`}
+                        text={`${prettifyAmount(fromNano(royalty_parameters.min_commission))} GRAM`}
                     />
                 </Flex>
                 {!!file_name && !!file_hash && (

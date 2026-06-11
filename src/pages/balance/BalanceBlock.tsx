@@ -83,7 +83,7 @@ const BalanceBlock: FC = () => {
                             </Flex>
                         </Box>
 
-                        {/* Right Column - TON Balance and TON Promo (if exists) */}
+                        {/* Right Column - GRAM Balance and GRAM Promo (if exists) */}
                         {totalTonAmount > 0 && (
                             <Box flex="1">
                                 <Flex>
@@ -93,7 +93,7 @@ const BalanceBlock: FC = () => {
                                         mb="1"
                                         color="text.secondary"
                                     >
-                                        TON Balance
+                                        GRAM Balance
                                     </Text>
                                     {isLoading ? (
                                         <Skeleton w="150px" h="5" />
@@ -103,7 +103,7 @@ const BalanceBlock: FC = () => {
                                             whiteSpace="nowrap"
                                             title={tonAmount.toString()}
                                         >
-                                            {tonAmount.toFixed(2)} TON{' '}
+                                            {tonAmount.toFixed(2)} GRAM{' '}
                                             <Span color="text.secondary">
                                                 ≈ ${tonAmountUsd.toFixed(2)}
                                             </Span>
@@ -113,7 +113,7 @@ const BalanceBlock: FC = () => {
                                 <Flex>
                                     <Flex align="center" gap="1" minW="110px" mb="1">
                                         <Text textStyle="body2" color="text.secondary">
-                                            TON Promo
+                                            GRAM Promo
                                         </Text>
                                         <InfoTooltip>
                                             Apply promo codes to get bonus balance
@@ -127,7 +127,7 @@ const BalanceBlock: FC = () => {
                                             whiteSpace="nowrap"
                                             title={tonPromoAmount.toString()}
                                         >
-                                            {tonPromoAmount.toFixed(2)} TON{' '}
+                                            {tonPromoAmount.toFixed(2)} GRAM{' '}
                                             <Span color="text.secondary">
                                                 ≈ ${tonPromoAmountUsd.toFixed(2)}
                                             </Span>

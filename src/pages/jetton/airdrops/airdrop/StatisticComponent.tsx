@@ -63,7 +63,7 @@ const StatisticComponentInner = ({
                     remainingJettons / 10 ** parseFloat(airdrop.jetton.decimals)
                 )} ${airdrop.jetton.symbol}`}
             />
-            <InfoCard title="Profit" text={`${prettifyAmount(fromNano(profit))} TON`} />
+            <InfoCard title="Profit" text={`${prettifyAmount(fromNano(profit))} GRAM`} />
         </Flex>
     );
 };

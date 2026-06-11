@@ -30,10 +30,10 @@ const Control = <T extends { [controlId]: string }>({
         required: 'This is required',
         validate: value => {
             if (parseFloat(value) < 0.15) {
-                return 'Minimum 0.15 TON';
+                return 'Minimum 0.15 GRAM';
             }
             if (parseFloat(value) > 5) {
-                return 'Maximum 5 TON';
+                return 'Maximum 5 GRAM';
             }
         }
     });
@@ -46,12 +46,12 @@ const Control = <T extends { [controlId]: string }>({
                 autoComplete="off"
                 defaultValue="0.15"
                 id={fieldName}
-                placeholder="0.15 TON"
+                placeholder="0.15 GRAM"
                 {...registerFeeRest}
             />
             <FormErrorMessage pos="static">{fieldErrors && fieldErrors.message}</FormErrorMessage>
             <FormHelperText textStyle="body2" color="text.secondary">
-                Amount of TON required to receive Jettons. Min: 0.15 TON and Max: 5 TON.
+                Amount of GRAM required to receive Jettons. Min: 0.15 GRAM and Max: 5 GRAM.
             </FormHelperText>
         </FormControl>
     );

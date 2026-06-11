@@ -35,7 +35,7 @@ const InvoicesApi: FC<InvoicesApiProps> = ({ app, ...props }) => {
                 <TabPanels>
                     <TabPanel>
                         <Text textStyle="body2" mb="5" color="text.secondary">
-                            Creating an 1 TON invoice with life time of 30 minutes and description
+                            Creating a 1 GRAM invoice with life time of 30 minutes and description
                             &quot;Example description&quot; with API using curl:
                         </Text>
                         <CopyPad
@@ -43,7 +43,7 @@ const InvoicesApi: FC<InvoicesApiProps> = ({ app, ...props }) => {
                             text={`curl -X POST https://tonconsole.com/api/v1/services/invoices/invoice \\
     -H 'Content-Type: application/json' \\
     -H 'Authorization: Bearer <YOUR_TOKEN>' \\
-    -d '{"amount": "1000000", "life_time": 1800, "description": "Example description", "currency": "TON"}'`}
+    -d '{"amount": "1000000", "life_time": 1800, "description": "Example description", "currency": "GRAM"}'`}
                             iconAlign="start"
                             mb="3"
                         />
@@ -51,7 +51,7 @@ const InvoicesApi: FC<InvoicesApiProps> = ({ app, ...props }) => {
                             <Box mb="1">Where body have properties:</Box>
                             <UnorderedList listStyleType={'"-"'} spacing="1">
                                 <ListItem pl="1">
-                                    <Code>amount</Code> is an amount in nanoTONs (10^-9) for TON and
+                                    <Code>amount</Code> is an amount in nanoGRAMs (10^-9) for GRAM and
                                     microUSDTs (10^-6) for USDT to pay to the invoice
                                 </ListItem>
                                 <ListItem pl="1">

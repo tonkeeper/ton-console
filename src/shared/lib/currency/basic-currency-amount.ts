@@ -16,6 +16,10 @@ export class BasicCurrencyAmount implements CurrencyAmount {
     protected readonly thousandSeparators = true;
 
     get stringCurrency(): string {
+        if (this.currency === CURRENCY.TON) {
+            return 'GRAM';
+        }
+
         return this.currency;
     }
 
