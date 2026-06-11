@@ -36,7 +36,7 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
         >
             <FeatureCard
                 background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
-                src="/assets/images/tonkeeper-on-ramp.webp"
+                src="/assets/images/tonkeeper-on-ramp.webp?v=1"
                 heading="On-Ramp"
                 description="Place your exchange, payment solution, or DEX under Tonkeeper's Buy button and reach 1M+ buyers"
                 imgBorder
@@ -49,7 +49,7 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
 
             <FeatureCard
                 background="linear-gradient(104deg, #2EA5FF 0%, #0F97FF 100%)"
-                src="/assets/images/tonkeeper-browser.webp"
+                src="/assets/images/tonkeeper-browser.webp?v=1"
                 heading="Tonkeeper Browser"
                 description="Get 500K+ monthly clicks from Tonkeeper's app catalog and turn subscribers into repeat revenue."
                 imgBorder
@@ -62,7 +62,7 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
 
             <FeatureCard
                 background="linear-gradient(104deg, #2E3847 0%, #28303D 100%)"
-                src="/assets/images/tonkeeper-swap.webp"
+                src="/assets/images/tonkeeper-swap.webp?v=1"
                 heading="Swap"
                 description="Feature your DEX inside Tonkeeper Swap and convert wallet traffic directly into trades"
                 imgBorder
@@ -75,7 +75,7 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
 
             <FeatureCard
                 background="linear-gradient(104deg, #2EA5FF 0%, #0F97FF 100%)"
-                src="/assets/images/tonkeeper-activity.webp"
+                src="/assets/images/tonkeeper-activity.webp?v=1"
                 heading="Tonkeeper Messages"
                 description="Send trusted in-wallet messages to Tonkeeper's high-intent users to boost retention and conversion"
                 imgBorder
@@ -95,10 +95,10 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                 imgSources={[
                     {
                         media: '(max-width: 490px)',
-                        srcSet: '/assets/images/invoices-m.webp'
+                        srcSet: '/assets/images/invoices-m.webp?v=1'
                     }
                 ]}
-                src="/assets/images/invoices.webp"
+                src="/assets/images/invoices.webp?v=1"
                 heading="TON Payments"
                 description="Track and manage TON transactions with a simple, powerful payments service built for reliability"
                 {...(isContrast && { backgroundColor: 'background.content' })}
@@ -117,10 +117,10 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                 imgSources={[
                     {
                         media: '(max-width: 1024px)',
-                        srcSet: '/assets/images/tonapi-m.webp'
+                        srcSet: '/assets/images/tonapi-m.webp?v=1'
                     }
                 ]}
-                src="/assets/images/tonapi.webp"
+                src="/assets/images/tonapi.webp?v=1"
                 heading="TON API"
                 description="Build on TON with a clean, scalable API that’s fast, reliable, and developer-friendly"
                 {...(isContrast && { backgroundColor: 'background.content' })}
@@ -144,10 +144,10 @@ const FeaturesList: FC<BoxProps & { onTonapiClick?: () => void; isContrast?: boo
                 imgSources={[
                     {
                         media: '(max-width: 490px)',
-                        srcSet: '/assets/images/partnerships-m.webp'
+                        srcSet: '/assets/images/partnerships-m.webp?v=1'
                     }
                 ]}
-                src="/assets/images/partnerships.webp"
+                src="/assets/images/partnerships.webp?v=1"
                 heading="Premium Partnership"
                 description="Access exclusive terms and co-marketing—Ton Apps supports a limited set of high-potential partners"
                 {...(isContrast && { backgroundColor: 'background.content' })}
