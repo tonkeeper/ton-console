@@ -27,7 +27,7 @@ jobs:
 
       - name: Build
         env:
-          VITE_PUBLIC_BASE_PATH: /ton-console/
+          VITE_PUBLIC_BASE_PATH: /
         run: npm run build:staging
 
       - name: Prepare GitHub Pages fallback
