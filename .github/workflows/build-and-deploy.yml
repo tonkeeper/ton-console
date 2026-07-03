@@ -1,9 +1,10 @@
 name: Build and Deploy to gh-pages
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - dev
+      - shadcn-migration
 
 jobs:
   build-and-deploy:
@@ -14,8 +15,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: dev
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -24,10 +23,17 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build
+        env:
+          VITE_PUBLIC_BASE_PATH: /ton-console/
         run: npm run build:staging
+
+      - name: Prepare GitHub Pages fallback
+        run: |
+          cp dist/index.html dist/404.html
+          touch dist/.nojekyll
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3

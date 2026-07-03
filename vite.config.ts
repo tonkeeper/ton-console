@@ -8,6 +8,7 @@ import { defineConfig, loadEnv } from "vite"
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "")
   const apiProxyTarget = env.VITE_BASE_PROXY_URL ?? "https://tonconsole.com"
+  const publicBasePath = env.VITE_PUBLIC_BASE_PATH ?? "/"
   const telegramBotName = env.VITE_TG_OAUTH_BOT_NAME
   const devAuthCookie = env.VITE_DEV_AUTH_COOKIE
   const apiProxyHeaders = devAuthCookie
@@ -17,6 +18,7 @@ export default defineConfig(({ mode }) => {
     : undefined
 
   return {
+    base: publicBasePath,
     plugins: [
       react(),
       tailwindcss(),

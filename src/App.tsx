@@ -14,6 +14,8 @@ import { revalidateSessionOnUnauthorized } from "@/lib/auth"
 import { queryClient } from "@/lib/query-client"
 import { AppRouter } from "@/routes/router"
 
+const routerBasename = import.meta.env.BASE_URL.replace(/\/$/, "") || "/"
+
 function getTonConnectTheme(theme: string) {
   if (theme === "dark") {
     return THEME.DARK
@@ -111,7 +113,7 @@ export function App() {
         <QueryClientProvider client={queryClient}>
           <QueryUnauthorizedBridge />
           <TonConnectProvider>
-            <BrowserRouter>
+            <BrowserRouter basename={routerBasename}>
               <AppRouter />
             </BrowserRouter>
           </TonConnectProvider>
