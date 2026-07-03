@@ -5,6 +5,7 @@ import {
   ChevronRight,
   ChevronsUpDown,
   Coins,
+  Copy,
   CreditCard,
   FolderPlus,
   Droplets,
@@ -32,6 +33,7 @@ import {
   Webhook,
   type LucideIcon,
 } from "lucide-react"
+import copyToClipboard from "copy-to-clipboard"
 import { Link, useLocation, useNavigate } from "react-router"
 
 import TonConsoleLogo from "@/assets/ton-console-logo.svg"
@@ -553,10 +555,6 @@ function ConsoleProjectSwitcher() {
 
   function openCreateProjectDialog() {
     setCreateProjectOpen(true)
-
-    if (isMobile) {
-      setOpenMobile(false)
-    }
   }
 
   function handleCreateProject(values: { name: string; image?: File }) {
@@ -564,6 +562,9 @@ function ConsoleProjectSwitcher() {
       onSuccess: (project) => {
         setSelectedProjectId(project.id)
         setCreateProjectOpen(false)
+        if (isMobile) {
+          setOpenMobile(false)
+        }
         navigate("/dashboard")
       },
     })
@@ -801,6 +802,14 @@ function ConsoleUserMenu() {
                 Profile
               </Link>
             </DropdownMenuItem>
+            {user ? (
+              <DropdownMenuItem
+                onSelect={() => copyToClipboard(String(user.id))}
+              >
+                <Copy className="size-4" />
+                Copy ID
+              </DropdownMenuItem>
+            ) : null}
             <DropdownMenuItem
               variant="destructive"
               disabled={logout.isPending}

@@ -9,7 +9,6 @@ import { QueryClientProvider } from "@tanstack/react-query"
 
 import { ThemeProvider, useTheme } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { TONCONNECT_MANIFEST_URL } from "@/lib/env"
 import { revalidateSessionOnUnauthorized } from "@/lib/auth"
 import { queryClient } from "@/lib/query-client"
 import { AppRouter } from "@/routes/router"
@@ -47,7 +46,7 @@ function TonConnectProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <TonConnectUIProvider
-      manifestUrl={TONCONNECT_MANIFEST_URL}
+      manifestUrl="https://tonconsole.com/tonconnect-manifest.json"
       walletsRequiredFeatures={{
         sendTransaction: {
           minMessages: 16,

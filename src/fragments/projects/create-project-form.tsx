@@ -1,5 +1,5 @@
-import { useId, useState, type FormEvent } from "react"
-import { FolderPlus, ImagePlus, Loader2 } from "lucide-react"
+import { useEffect, useId, useRef, useState, type FormEvent } from "react"
+import { FolderPlus, ImagePlus, Loader2, X } from "lucide-react"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -38,14 +38,27 @@ export function CreateProjectForm({
   onSubmit,
 }: CreateProjectFormProps) {
   const nameId = useId()
-  const imageId = useId()
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [name, setName] = useState("")
   const [image, setImage] = useState<File | undefined>()
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const trimmedName = name.trim()
   const nameError =
     name.length > 0 && trimmedName.length < 2
       ? "Use at least 2 characters."
       : undefined
+
+  useEffect(() => {
+    if (!image) {
+      setPreviewUrl(null)
+      return
+    }
+
+    const nextPreviewUrl = URL.createObjectURL(image)
+    setPreviewUrl(nextPreviewUrl)
+
+    return () => URL.revokeObjectURL(nextPreviewUrl)
+  }, [image])
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -60,9 +73,6 @@ export function CreateProjectForm({
   return (
     <Card className="w-full max-w-xl">
       <CardHeader>
-        <div className="mb-1 flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <FolderPlus className="size-4" />
-        </div>
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
@@ -75,34 +85,76 @@ export function CreateProjectForm({
             </Alert>
           ) : null}
 
-          <FieldGroup>
-            <Field data-invalid={Boolean(nameError)}>
-              <FieldLabel htmlFor={nameId}>Project name</FieldLabel>
-              <Input
-                id={nameId}
-                autoComplete="off"
-                placeholder="Mainnet app"
-                value={name}
-                aria-invalid={Boolean(nameError)}
-                onChange={(event) => setName(event.target.value)}
-              />
-              <FieldError>{nameError}</FieldError>
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor={imageId}>Project icon</FieldLabel>
-              <Input
-                id={imageId}
+          <div className="flex flex-col gap-4 sm:flex-row">
+            <div className="relative size-20 shrink-0">
+              <Button
+                type="button"
+                variant="ghost"
+                className="group relative size-20 overflow-hidden rounded-lg border bg-muted p-0 text-lg font-medium hover:bg-muted"
+                onClick={() => fileInputRef.current?.click()}
+                aria-label="Upload project icon"
+              >
+                {previewUrl ? (
+                  <img
+                    src={previewUrl}
+                    alt=""
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <FolderPlus className="size-7 text-muted-foreground" />
+                )}
+                <span className="absolute inset-0 flex items-center justify-center bg-black/55 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                  <ImagePlus className="size-5" />
+                </span>
+              </Button>
+              {previewUrl ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  className="absolute -right-1.5 -top-1.5 z-10 size-6 rounded-full border bg-background p-0 shadow-sm hover:bg-destructive hover:text-destructive-foreground"
+                  aria-label="Remove project icon"
+                  onClick={() => {
+                    setImage(undefined)
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = ""
+                    }
+                  }}
+                >
+                  <X className="size-3.5" />
+                </Button>
+              ) : null}
+              <input
+                ref={fileInputRef}
                 type="file"
                 accept="image/png,image/jpeg,image/webp,image/gif"
-                onChange={(event) => setImage(event.target.files?.[0])}
+                className="hidden"
+                onChange={(event) => {
+                  setImage(event.target.files?.[0])
+                  event.target.value = ""
+                }}
               />
+            </div>
+
+            <FieldGroup className="flex-1">
+              <Field data-invalid={Boolean(nameError)}>
+                <FieldLabel htmlFor={nameId}>Project name</FieldLabel>
+                <Input
+                  id={nameId}
+                  autoComplete="off"
+                  placeholder="Mainnet app"
+                  value={name}
+                  aria-invalid={Boolean(nameError)}
+                  onChange={(event) => setName(event.target.value)}
+                />
+                <FieldError>{nameError}</FieldError>
+              </Field>
               <FieldDescription className="flex items-center gap-1.5">
                 <ImagePlus className="size-3.5" />
                 You can add or change the icon later in project settings.
               </FieldDescription>
-            </Field>
-          </FieldGroup>
+            </FieldGroup>
+          </div>
 
           <Button
             type="submit"

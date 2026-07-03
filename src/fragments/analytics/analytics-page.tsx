@@ -11,7 +11,6 @@ import {
   Database,
   Download,
   ExternalLink,
-  FileSearch,
   FileText,
   LineChart,
   Loader2,
@@ -120,6 +119,7 @@ import { useSelectedProject } from "@/hooks/use-project"
 import { cn } from "@/lib/utils"
 import { Link, useNavigate, useSearchParams } from "react-router"
 
+import { AnalyticsSqlEditor } from "@/fragments/analytics/analytics-sql-editor"
 import {
   type AnalyticsChain,
   useCreateStatsGraphMutation,
@@ -134,6 +134,8 @@ import {
 } from "@/utils/analytics/analytics-queries"
 
 const starterSql = "select id from accounts limit 10"
+const analyticsGptEnabled =
+  import.meta.env.VITE_ANALYTICS_GPT_ENABLED === "true"
 const allHistoryTypes = [
   DTOStatsQueryType.DTOBaseQuery,
   DTOStatsQueryType.DTOChatGptQuery,
@@ -299,13 +301,14 @@ export function AnalyticsQueryPage() {
   } | null>(null)
   const [latestEstimate, setLatestEstimate] =
     useState<DTOStatsEstimateQuery | null>(null)
+  const [schemaOpen, setSchemaOpen] = useState(false)
   const selectedProject = useSelectedProject()
   const projectId = selectedProject.selectedProject?.id ?? null
   const previousProjectId = useRef<number | null>(projectId)
   const activeQueryId = searchParams.get("id")
 
   const ddlQuery = useStatsDdlQuery(chain)
-  const gptPriceQuery = useStatsGptPriceQuery(projectId)
+  const gptPriceQuery = useStatsGptPriceQuery(projectId, analyticsGptEnabled)
   const resultQuery = useStatsResultQuery(activeQueryId)
   const estimateMutation = useEstimateStatsQueryMutation(projectId)
   const sendMutation = useSendStatsQueryMutation(projectId)
@@ -405,13 +408,28 @@ export function AnalyticsQueryPage() {
   return (
     <AnalyticsPageFrame
       title="New request"
-      description={`Write SQL, generate it with GPT, inspect schema, and run it against ${selectedProject.selectedProject?.name ?? "the selected project"}.`}
+      description={`Write SQL, inspect schema, and run it against ${selectedProject.selectedProject?.name ?? "the selected project"}.`}
       chain={chain}
       onChainChange={handleChainChange}
       selectedProject={selectedProject}
       projectId={projectId}
+      actions={
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setSchemaOpen(true)}
+        >
+          <FileText />
+          Stats schema
+        </Button>
+      }
     >
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div
+        className={cn(
+          "grid gap-4",
+          analyticsGptEnabled && "xl:grid-cols-[minmax(0,1fr)_360px]"
+        )}
+      >
         <div className="grid gap-4">
           <Card>
             <CardHeader>
@@ -449,11 +467,10 @@ export function AnalyticsQueryPage() {
               </CardAction>
             </CardHeader>
             <CardContent className="grid gap-3">
-              <Textarea
+              <AnalyticsSqlEditor
                 value={sql}
-                onChange={(event) => setSql(event.target.value)}
-                spellCheck={false}
-                className="min-h-52 resize-y font-mono text-sm"
+                onChange={setSql}
+                ddl={ddlQuery.data}
               />
 
               {estimate ? <EstimateSummary estimate={estimate} /> : null}
@@ -516,55 +533,56 @@ export function AnalyticsQueryPage() {
           </Card>
         </div>
 
-        <div className="grid content-start gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="size-4 text-muted-foreground" />
-                GPT SQL builder
-              </CardTitle>
-              <CardDescription>
-                Generate SQL from a natural language request, then estimate and
-                run it in the SQL panel.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <GptSqlBuilder
-                prompt={gptPrompt}
-                context={gptContext}
-                generatedSql={generatedSql}
-                price={gptPriceQuery.data}
-                loadingPrice={gptPriceQuery.isLoading}
-                priceError={gptPriceQuery.error}
-                generating={generateGptMutation.isPending}
-                error={generateGptMutation.error}
-                onPromptChange={setGptPrompt}
-                onContextChange={setGptContext}
-                onGenerate={handleGenerateSql}
-              />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="size-4 text-muted-foreground" />
-                Stats schema
-              </CardTitle>
-              <CardDescription>
-                DDL returned by the stats service for the selected chain.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DdlPanel
-                ddl={ddlQuery.data}
-                loading={ddlQuery.isLoading}
-                error={ddlQuery.error}
-              />
-            </CardContent>
-          </Card>
-        </div>
+        {analyticsGptEnabled ? (
+          <div className="grid content-start gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="size-4 text-muted-foreground" />
+                  GPT SQL builder
+                </CardTitle>
+                <CardDescription>
+                  Generate SQL from a natural language request, then estimate
+                  and run it in the SQL panel.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <GptSqlBuilder
+                  prompt={gptPrompt}
+                  context={gptContext}
+                  generatedSql={generatedSql}
+                  price={gptPriceQuery.data}
+                  loadingPrice={gptPriceQuery.isLoading}
+                  priceError={gptPriceQuery.error}
+                  generating={generateGptMutation.isPending}
+                  error={generateGptMutation.error}
+                  onPromptChange={setGptPrompt}
+                  onContextChange={setGptContext}
+                  onGenerate={handleGenerateSql}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        ) : null}
       </div>
+      <Dialog open={schemaOpen} onOpenChange={setSchemaOpen}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="size-4 text-muted-foreground" />
+              Stats schema
+            </DialogTitle>
+            <DialogDescription>
+              DDL returned by the stats service for the selected chain.
+            </DialogDescription>
+          </DialogHeader>
+          <DdlPanel
+            ddl={ddlQuery.data}
+            loading={ddlQuery.isLoading}
+            error={ddlQuery.error}
+          />
+        </DialogContent>
+      </Dialog>
     </AnalyticsPageFrame>
   )
 }
@@ -696,6 +714,7 @@ function AnalyticsPageFrame({
   onChainChange,
   selectedProject,
   projectId,
+  actions,
   children,
 }: {
   title: string
@@ -704,6 +723,7 @@ function AnalyticsPageFrame({
   onChainChange?: (value: AnalyticsChain) => void
   selectedProject: ReturnType<typeof useSelectedProject>
   projectId: number | null
+  actions?: ReactNode
   children: ReactNode
 }) {
   if (selectedProject.isLoading) {
@@ -742,19 +762,26 @@ function AnalyticsPageFrame({
         description={description}
         actions={
           chain && onChainChange ? (
-            <Select
-              value={chain}
-              onValueChange={(value) => onChainChange(value as AnalyticsChain)}
-            >
-              <SelectTrigger className="w-36">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="mainnet">Mainnet</SelectItem>
-                <SelectItem value="testnet">Testnet</SelectItem>
-              </SelectContent>
-            </Select>
-          ) : null
+            <div className="flex flex-wrap items-center gap-2 md:w-full md:justify-end">
+              <Select
+                value={chain}
+                onValueChange={(value) =>
+                  onChainChange(value as AnalyticsChain)
+                }
+              >
+                <SelectTrigger className="w-36">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mainnet">Mainnet</SelectItem>
+                  <SelectItem value="testnet">Testnet</SelectItem>
+                </SelectContent>
+              </Select>
+              {actions}
+            </div>
+          ) : (
+            actions
+          )
         }
       />
 
@@ -1113,44 +1140,17 @@ function getGraphResultUrl(result: DTOStatsQueryResult | null) {
 }
 
 function EstimateSummary({ estimate }: { estimate: DTOStatsEstimateQuery }) {
-  const [explainOpen, setExplainOpen] = useState(false)
-
   return (
-    <>
-      <div className="grid gap-2 rounded-lg border bg-muted/30 p-3 text-sm md:grid-cols-3">
-        <Metric
-          label="Approximate time"
-          value={formatDuration(estimate.approximate_time)}
-        />
-        <Metric
-          label="Approximate cost"
-          value={formatUsd(estimate.approximate_usd_cost)}
-        />
-        <div className="grid gap-1">
-          <span className="text-xs font-medium text-muted-foreground uppercase">
-            Explain
-          </span>
-          {estimate.explain ? (
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-fit"
-              onClick={() => setExplainOpen(true)}
-            >
-              <FileSearch />
-              View plan
-            </Button>
-          ) : (
-            <span className="font-medium break-words">No explain returned</span>
-          )}
-        </div>
-      </div>
-      <ExplainSqlDialog
-        open={explainOpen}
-        onOpenChange={setExplainOpen}
-        explanation={estimate.explain}
+    <div className="grid gap-2 rounded-lg border bg-muted/30 p-3 text-sm md:grid-cols-2">
+      <Metric
+        label="Approximate time"
+        value={formatDuration(estimate.approximate_time)}
       />
-    </>
+      <Metric
+        label="Approximate cost"
+        value={formatUsd(estimate.approximate_usd_cost)}
+      />
+    </div>
   )
 }
 
@@ -1179,7 +1179,6 @@ function QueryResultPanel({
   onRepeatUpdate: (id: string, repeatInterval: number) => Promise<void>
 }) {
   const [repeatOpen, setRepeatOpen] = useState(false)
-  const [explainOpen, setExplainOpen] = useState(false)
 
   if (loading) {
     return (
@@ -1240,21 +1239,8 @@ function QueryResultPanel({
         </Alert>
       ) : null}
 
-      {result.url ||
-      result.meta_url ||
-      result.estimate?.explain ||
-      canManageRepeat ? (
+      {result.url || result.meta_url || canManageRepeat ? (
         <div className="flex flex-wrap gap-2">
-          {result.estimate?.explain ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setExplainOpen(true)}
-            >
-              <FileSearch />
-              Explain
-            </Button>
-          ) : null}
           {result.url ? (
             <Button asChild variant="outline" size="sm">
               <a href={result.url} target="_blank" rel="noreferrer">
@@ -1299,12 +1285,6 @@ function QueryResultPanel({
 
       <ChartsPanel result={result} />
       <PreviewTable result={result} />
-      <ExplainSqlDialog
-        open={explainOpen}
-        onOpenChange={setExplainOpen}
-        request={result.query?.sql}
-        explanation={result.estimate?.explain}
-      />
       <RepeatRequestDialog
         open={repeatOpen}
         onOpenChange={setRepeatOpen}
@@ -1341,52 +1321,6 @@ function CopyPreviewButton({ result }: { result: DTOStatsQueryResult }) {
       <Copy />
       Copy preview
     </Button>
-  )
-}
-
-function ExplainSqlDialog({
-  open,
-  onOpenChange,
-  request,
-  explanation,
-}: {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  request?: string
-  explanation?: string
-}) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl">
-        <DialogHeader>
-          <DialogTitle>Explain SQL</DialogTitle>
-          <DialogDescription>
-            Execution plan returned by the stats estimate response.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid max-h-[70vh] gap-3 overflow-auto">
-          {request ? (
-            <pre className="overflow-auto rounded-lg border bg-muted/30 p-3 font-mono text-xs whitespace-pre-wrap">
-              {request.trim()}
-            </pre>
-          ) : null}
-          {explanation ? (
-            <pre className="overflow-auto rounded-lg border bg-background p-3 font-mono text-xs whitespace-pre-wrap">
-              {explanation.trim()}
-            </pre>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              No explain text was returned for this query.
-            </p>
-          )}
-        </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Done</Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   )
 }
 
@@ -1553,10 +1487,10 @@ function ChartsPanel({ result }: { result: DTOStatsQueryResult }) {
 
   useEffect(() => {
     setCharts([])
-    setDataSource(null)
+    setDataSource(parsePreviewToChartData(result.preview))
     setError(null)
     setLoading(false)
-  }, [result.id])
+  }, [result.id, result.preview])
 
   useEffect(() => {
     if (!charts.length || dataSource || loading || !result.url) {
@@ -1576,12 +1510,17 @@ function ChartsPanel({ result }: { result: DTOStatsQueryResult }) {
       })
       .then((csv) => {
         if (!cancelled) {
-          setDataSource(parseCsvToChartData(csv))
+          const nextDataSource = parseCsvToChartData(csv)
+          setDataSource((current) =>
+            nextDataSource.length ? nextDataSource : current
+          )
         }
       })
       .catch((csvError: unknown) => {
         if (!cancelled) {
-          setError(getApiErrorMessage(csvError))
+          setError((current) =>
+            dataSource ? current : getApiErrorMessage(csvError)
+          )
         }
       })
       .finally(() => {
@@ -1650,7 +1589,7 @@ function ChartsPanel({ result }: { result: DTOStatsQueryResult }) {
         <ErrorAlert title="Charts could not be loaded" error={error} />
       ) : null}
       {dataSource && charts.length ? (
-        <div className="grid gap-3 xl:grid-cols-2">
+        <div className="grid min-w-0 gap-3 xl:grid-cols-2">
           {charts.map((chart) => (
             <ChartCard
               key={chart}
@@ -1685,7 +1624,7 @@ function ChartCard({
   )
 
   return (
-    <div className="grid gap-3 rounded-lg border bg-muted/20 p-3">
+    <div className="grid min-w-0 gap-3 overflow-hidden rounded-lg border bg-muted/20 p-3">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-medium">
           <option.icon className="size-4 text-muted-foreground" />
@@ -1743,16 +1682,25 @@ function CartesianChartView({
   const common = (
     <>
       <CartesianGrid vertical={false} />
-      <XAxis dataKey={xKey} tickLine={false} axisLine={false} tickMargin={8} />
+      <XAxis
+        dataKey={xKey}
+        tickLine={false}
+        axisLine={false}
+        tickMargin={8}
+        minTickGap={36}
+      />
       <YAxis tickLine={false} axisLine={false} width={48} />
       <ChartTooltip content={<ChartTooltipContent />} />
     </>
   )
 
   return (
-    <ChartContainer config={config} className="h-72 w-full">
+    <ChartContainer
+      config={config}
+      className="h-72 min-w-0 overflow-hidden aspect-auto"
+    >
       {type === "bar" ? (
-        <BarChart data={dataSource}>
+        <BarChart data={dataSource} margin={{ top: 8, right: 12, bottom: 8 }}>
           {common}
           {numericKeys.map((key, index) => (
             <Bar
@@ -1764,7 +1712,10 @@ function CartesianChartView({
           ))}
         </BarChart>
       ) : type === "area" ? (
-        <RechartsAreaChart data={dataSource}>
+        <RechartsAreaChart
+          data={dataSource}
+          margin={{ top: 8, right: 12, bottom: 8 }}
+        >
           {common}
           {numericKeys.map((key, index) => (
             <Area
@@ -1779,7 +1730,10 @@ function CartesianChartView({
           ))}
         </RechartsAreaChart>
       ) : (
-        <RechartsLineChart data={dataSource}>
+        <RechartsLineChart
+          data={dataSource}
+          margin={{ top: 8, right: 12, bottom: 8 }}
+        >
           {common}
           {numericKeys.map((key, index) => (
             <Line
@@ -2143,9 +2097,13 @@ function DdlPanel({
   }
 
   return (
-    <pre className="max-h-72 overflow-auto rounded-lg border bg-muted/30 p-3 text-xs">
-      {ddl}
-    </pre>
+    <AnalyticsSqlEditor
+      value={ddl}
+      onChange={() => undefined}
+      readOnly
+      heightClassName="h-72 max-h-72"
+      editorHeight="18rem"
+    />
   )
 }
 
@@ -2277,6 +2235,18 @@ function getNumericKeys(dataSource: ChartDatum[]) {
 
 function parseCsvToChartData(csv: string): ChartDatum[] {
   const rows = parseCsvRows(csv)
+  return parseRowsToChartData(rows)
+}
+
+function parsePreviewToChartData(preview?: string[][]): ChartDatum[] | null {
+  if (!preview?.length) {
+    return null
+  }
+
+  return parseRowsToChartData(preview)
+}
+
+function parseRowsToChartData(rows: string[][]): ChartDatum[] {
   const [headers, ...body] = rows
 
   if (!headers?.length) {

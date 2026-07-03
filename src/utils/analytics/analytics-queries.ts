@@ -104,7 +104,10 @@ export function useStatsHistoryQuery(
   })
 }
 
-export function useStatsGptPriceQuery(projectId: number | null) {
+export function useStatsGptPriceQuery(
+  projectId: number | null,
+  enabled = true
+) {
   return useQuery({
     queryKey: analyticsQueryKeys.gptPrice(projectId),
     queryFn: async () => {
@@ -119,7 +122,7 @@ export function useStatsGptPriceQuery(projectId: number | null) {
 
       return response.data
     },
-    enabled: Boolean(projectId),
+    enabled: Boolean(projectId && enabled),
     staleTime: 30 * 1000,
   })
 }
