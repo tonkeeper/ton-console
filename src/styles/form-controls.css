@@ -1,0 +1,56 @@
+@media (max-width: 767px) {
+  [data-slot="input"],
+  [data-slot="textarea"],
+  [data-slot="input-group-control"],
+  [data-slot="input-group"] input,
+  [data-slot="input-group"] textarea {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}
+
+[data-slot="textarea"],
+[data-slot="input-group"] textarea {
+  resize: none;
+}
+
+:where(
+  button,
+  a[href],
+  [role="button"],
+  [data-slot="button"],
+  [data-slot="select-trigger"],
+  [data-slot="select-item"],
+  [data-slot="dropdown-menu-item"],
+  [data-slot="dropdown-menu-checkbox-item"],
+  [data-slot="dropdown-menu-radio-item"],
+  [data-slot="context-menu-item"],
+  [data-slot="context-menu-checkbox-item"],
+  [data-slot="context-menu-radio-item"],
+  [data-slot="menubar-trigger"],
+  [data-slot="menubar-item"],
+  [data-slot="menubar-checkbox-item"],
+  [data-slot="menubar-radio-item"],
+  [data-slot="tabs-trigger"],
+  [data-slot="checkbox"],
+  [data-slot="switch"],
+  [data-slot="radio-group-item"],
+  [data-slot="toggle"],
+  [data-slot="toggle-group-item"],
+  [data-slot="pagination-link"],
+  [data-slot="accordion-trigger"],
+  [data-slot="collapsible-trigger"],
+  [data-slot="dialog-trigger"],
+  [data-slot="alert-dialog-trigger"],
+  [data-slot="popover-trigger"],
+  [data-slot="navigation-menu-trigger"],
+  [data-slot="combobox-trigger"],
+  [data-slot="combobox-clear"],
+  [data-slot="combobox-item"],
+  [data-slot="combobox-chip-remove"],
+  [data-slot="command-item"]
+):not(:disabled):not([aria-disabled="true"]):not([data-disabled]):not(
+    [disabled]
+  ) {
+  cursor: pointer;
+}

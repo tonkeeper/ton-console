@@ -1,4 +1,0 @@
-import { CRYPTO_CURRENCY } from './CRYPTO_CURRENCY';
-import { FIAT_CURRENCY } from './FIAT_CURRENCY';
-
-export const CURRENCY = { ...CRYPTO_CURRENCY, ...FIAT_CURRENCY };

@@ -1,16 +1,12 @@
-import React from 'react';
-import App from 'src/app';
-import { client } from 'src/shared/api';
-import { createRoot } from 'react-dom/client';
+import { StrictMode } from "react"
+import { createRoot } from "react-dom/client"
 
-// Initialize API client with base URL from env
-const apiClientBaseURL = import.meta.env.VITE_BASE_URL;
-client.setConfig({ baseUrl: apiClientBaseURL, credentials: 'include' });
+import "./index.css"
+import "./styles/form-controls.css"
+import { App } from "./App.tsx"
 
-const container = document.getElementById('root')!;
-const root = createRoot(container);
-root.render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>
-);
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+)

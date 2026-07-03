@@ -1,1 +1,0 @@
-export { TgUserButton } from './TgUserButton';

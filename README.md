@@ -1,36 +1,21 @@
-# Ton Console
-Launch a successful business with TON blockchain: manage dapps, tokens and payments in one place with powerful API and deep commercial integrations
+# React + TypeScript + Vite + shadcn/ui
 
-[Try it](https://tonconsole.com/)
+This is a template for a new Vite project with React, TypeScript, and shadcn/ui.
 
-![alt text](https://github.com/tonkeeper/ton-console/blob/master/public/og-image.png "")
+## Adding components
 
-## Run locally
-1. `nvm use`
-2`npm i`
-3`npm run dev`
+To add components to your app, run the following command:
 
-### Generate api
-1. Put new swagger.yaml to the `./scripts`
-2. `npm run generate-api`
+```bash
+npx shadcn@latest add button
+```
 
-### Lint & test
-- lint (eslint): `npm run lint`
-- test (vitest): `npm run test`
-- check typings (vite DOESN'T do it automatically): `npx tsc --noEmit`
+This will place the ui components in the `src/components` directory.
 
-### Husky pre-commit hook
-Runs lint for staged files and checks typescript typings
-(You don't have to install or configure husky, it is done automatically) 
+## Using components
 
-## Build for dev
-1. `nvm use`
-2. `npm ci`
-3. `npm run build:staging`
+To use the components in your app, import them as follows:
 
-
-## Build for prod
-1. `nvm use`
-2. `npm ci`
-3. `npm run build`
-
+```tsx
+import { Button } from "@/components/ui/button"
+```
