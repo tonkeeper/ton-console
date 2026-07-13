@@ -118,7 +118,7 @@ function formatDate(value?: number) {
     return "Unknown"
   }
 
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",

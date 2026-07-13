@@ -3,7 +3,7 @@ import type { DTOProject } from "@/api/api.generated"
 export function formatProjectDate(value: number) {
   const timestamp = value < 1_000_000_000_000 ? value * 1000 : value
 
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
